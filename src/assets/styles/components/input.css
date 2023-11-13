@@ -1,0 +1,14 @@
+.p-inputtext {
+    height: 50px;
+}
+
+.p-checkbox .p-checkbox-box.p-highlight,
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
+    background: var(--admss-app-success);
+    border-color: var(--admss-app-success);
+}
+
+.p-error {
+    font-size: .77rem;
+    margin-left: 12px;
+}
