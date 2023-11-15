@@ -9,8 +9,6 @@ export const Tasks = () => {
         const authUser: AuthUser = getKeyValue("admss-client-app-user");
         if (authUser) {
             getTasksByUserId(authUser.useruid).then((response) => setTasks(response.splice(0, 5)));
-            // eslint-disable-next-line no-console
-            console.log(tasks);
         }
     }, []);
     return (
