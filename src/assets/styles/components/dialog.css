@@ -1,12 +1,14 @@
 .p-dialog {
-    width: 50vw;
+    width: 80vw;
 }
 
 .p-dialog > .p-dialog-header {
     font-weight: var(--admss-app-font-weight);
-    padding: 2rem 3rem;
+    padding: 3rem;
     color: var(--admss-app-main-blue);
     border-bottom: none;
+    padding-top: 2rem;
+    padding-bottom: 0;
 }
 
 .p-inputgroup-addon {
@@ -15,4 +17,10 @@
 
 .p-dialog .p-dialog-footer {
     border-top: none;
+}
+
+@media screen and (min-width: 992px) {
+    .p-dialog {
+        width: 50vw;
+    }
 }

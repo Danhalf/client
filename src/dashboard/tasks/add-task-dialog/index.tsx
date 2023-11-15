@@ -5,8 +5,9 @@ import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
+import { Dropdown } from "primereact/dropdown";
 
-export const AddTaskDialog = ({ visible, onHide, header }: DialogProps) => {
+export const AddTaskDialog = ({ visible, onHide }: DialogProps) => {
     const [assignTo, setAssignTo] = useState<string>("");
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [dueDate, setDueDate] = useState<Date | null>(null);
@@ -16,23 +17,41 @@ export const AddTaskDialog = ({ visible, onHide, header }: DialogProps) => {
     const [phoneNumber, setPhoneNumber] = useState<string>("");
     const [description, setDescription] = useState<string>("");
 
-    const handleSave = () => {
+    const handleSaveTaskData = () => {
+        const taskData = {
+            assignTo,
+            startDate,
+            dueDate,
+            account,
+            deal,
+            contact,
+            phoneNumber,
+            description,
+        };
+
+        // eslint-disable-next-line no-console
+        console.log(taskData);
         onHide();
     };
 
+    const demoDropdownData = [
+        "Deep Watermelon",
+        "Round Hair Brush",
+        "Straight Dog Bone",
+        "Thin Cheeseburger",
+        "Fat Stick",
+        "Double Head",
+        "Iron Guard",
+    ];
+
     return (
-        <Dialog
-            header='Add Task'
-            headerClassName='dialog-header'
-            className='dialog'
-            visible={visible}
-            onHide={onHide}
-        >
-            <div className='flex flex-column row-gap-4 p-4'>
-                <InputText
+        <Dialog header='Add Task' className='dialog' visible={visible} onHide={onHide}>
+            <div className='flex flex-column row-gap-3 p-4'>
+                <Dropdown
                     placeholder='Assign to'
                     value={assignTo}
-                    onChange={(e) => setAssignTo(e.target.value)}
+                    options={demoDropdownData}
+                    onChange={(e) => setAssignTo(e.value)}
                 />
                 <div className='flex flex-column md:flex-row column-gap-3'>
                     <div className='p-inputgroup flex-1'>
@@ -41,7 +60,7 @@ export const AddTaskDialog = ({ visible, onHide, header }: DialogProps) => {
                             value={startDate}
                             onChange={(e) => setStartDate(e.value as Date)}
                         />
-                        <span className='p-inputgroup-addon dialog-icon'>
+                        <span className='p-inputgroup-addon'>
                             <i className='pi pi-calendar'></i>
                         </span>
                     </div>
@@ -51,7 +70,7 @@ export const AddTaskDialog = ({ visible, onHide, header }: DialogProps) => {
                             value={dueDate}
                             onChange={(e) => setDueDate(e.value as Date)}
                         />
-                        <span className='p-inputgroup-addon dialog-icon'>
+                        <span className='p-inputgroup-addon'>
                             <i className='pi pi-calendar'></i>
                         </span>
                     </div>
@@ -62,7 +81,7 @@ export const AddTaskDialog = ({ visible, onHide, header }: DialogProps) => {
                         value={account}
                         onChange={(e) => setAccount(e.target.value)}
                     />
-                    <span className='p-inputgroup-addon dialog-icon'>
+                    <span className='p-inputgroup-addon'>
                         <i className='pi pi-search'></i>
                     </span>
                 </div>
@@ -72,7 +91,7 @@ export const AddTaskDialog = ({ visible, onHide, header }: DialogProps) => {
                         value={deal}
                         onChange={(e) => setDeal(e.target.value)}
                     />
-                    <span className='p-inputgroup-addon dialog-icon'>
+                    <span className='p-inputgroup-addon'>
                         <i className='pi pi-search'></i>
                     </span>
                 </div>
@@ -82,7 +101,7 @@ export const AddTaskDialog = ({ visible, onHide, header }: DialogProps) => {
                         value={contact}
                         onChange={(e) => setContact(e.target.value)}
                     />
-                    <span className='p-inputgroup-addon dialog-icon'>
+                    <span className='p-inputgroup-addon'>
                         <i className='pi pi-search'></i>
                     </span>
                 </div>
@@ -95,12 +114,12 @@ export const AddTaskDialog = ({ visible, onHide, header }: DialogProps) => {
                     placeholder='Description'
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    rows={3}
+                    className='h-8rem'
                 />
             </div>
 
             <div className='p-dialog-footer flex justify-content-center'>
-                <Button label='Save' className='w-4' onClick={handleSave} />
+                <Button label='Save' className='w-4' onClick={handleSaveTaskData} />
             </div>
         </Dialog>
     );
