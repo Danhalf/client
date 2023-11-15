@@ -43,7 +43,11 @@ export const Tasks = () => {
                 Add new task
             </span>
             <div className='hidden'>
-                <AddTaskDialog visible={showAddTaskDialog} onHide={handleAddTaskDialogHide} />
+                <AddTaskDialog
+                    visible={showAddTaskDialog}
+                    onHide={handleAddTaskDialogHide}
+                    header='Add Task'
+                />
             </div>
         </>
     );

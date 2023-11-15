@@ -1,0 +1,18 @@
+.p-dialog {
+    width: 50vw;
+}
+
+.p-dialog > .p-dialog-header {
+    font-weight: var(--admss-app-font-weight);
+    padding: 2rem 3rem;
+    color: var(--admss-app-main-blue);
+    border-bottom: none;
+}
+
+.p-inputgroup-addon {
+    background: var(--admss-app-lightest-grey);
+}
+
+.p-dialog .p-dialog-footer {
+    border-top: none;
+}
