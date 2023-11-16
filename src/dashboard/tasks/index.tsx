@@ -12,7 +12,6 @@ export const Tasks = () => {
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
     const [checkedId, setCheckedId] = useState<number | null>(null);
     const [checkboxDisabled, setChechboxDisabled] = useState<boolean>(false);
-    // const [currentTaskIndex, setCurrentTaskIndex] = useState<number>()
 
     const toast = useRef<Toast>(null);
 
@@ -34,8 +33,6 @@ export const Tasks = () => {
 
     const handleDeleteTask = (taskIndex: number) => {
         setCheckedId(taskIndex);
-        // eslint-disable-next-line no-console
-        // console.log(currentTaskIndex)
         setChechboxDisabled(true);
         confirm(taskIndex);
     };
