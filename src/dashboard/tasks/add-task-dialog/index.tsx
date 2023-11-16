@@ -6,6 +6,7 @@ import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
+import { Task, createTask } from "http/services/tasks.service";
 
 export const AddTaskDialog = ({ visible, onHide }: DialogProps) => {
     const [assignTo, setAssignTo] = useState<string>("");
@@ -18,7 +19,7 @@ export const AddTaskDialog = ({ visible, onHide }: DialogProps) => {
     const [description, setDescription] = useState<string>("");
 
     const handleSaveTaskData = () => {
-        const taskData = {
+        const taskData: any = {
             assignTo,
             startDate,
             dueDate,
@@ -29,8 +30,10 @@ export const AddTaskDialog = ({ visible, onHide }: DialogProps) => {
             description,
         };
 
-        // eslint-disable-next-line no-console
-        console.log(taskData);
+        createTask(taskData).then((response) => {
+            // eslint-disable-next-line no-console
+            console.log(response);
+        });
         onHide();
     };
 

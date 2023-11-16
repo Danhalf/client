@@ -26,7 +26,7 @@ export const Tasks = () => {
             <h2 className='card-content__title uppercase'>Tasks</h2>
             <ul className='list-none ml-0 pl-0'>
                 {tasks.map((task) => (
-                    <li key={task.itemuid} className='mb-2'>
+                    <li key={`${task.itemuid}-${task.index}`} className='mb-2'>
                         <label className='ml-2'>
                             {task.taskname && `${task.taskname} - `}
                             {task.description && `${task.description} - `}

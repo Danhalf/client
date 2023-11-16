@@ -27,3 +27,18 @@ export const getTasksByUserId = async (uid: string): Promise<Task[]> => {
         .catch((err) => err.response.data);
     return response;
 };
+
+export const createTask = async (
+    taskData: Record<string, string | number>,
+    taskuid?: string | undefined
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<any>(
+            `tasks/${taskuid || 0}/`,
+            taskData
+        );
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
