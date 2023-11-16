@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
-import { Task, getTasksByUserId } from "http/services/tasks.service";
+import { Task, deleteTask, getTasksByUserId } from "http/services/tasks.service";
 import { AddTaskDialog } from "./add-task-dialog";
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
-
-import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 export const Tasks = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -16,8 +15,9 @@ export const Tasks = () => {
 
     const toast = useRef<Toast>(null);
 
+    const authUser: AuthUser = getKeyValue("admss-client-app-user");
+
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue("admss-client-app-user");
         if (authUser) {
             getTasksByUserId(authUser.useruid).then((response) => setTasks(response.splice(0, 5)));
         }
@@ -38,15 +38,24 @@ export const Tasks = () => {
     };
 
     const accept = () => {
-        if (toast.current != null) {
-            toast.current.show({
-                severity: "info",
-                summary: "Confirmed",
-                detail: "Task completed and deleted.",
-                life: 3000,
+        deleteTask(String(checkedId))
+            .then((res) => {
+                if (res.status === "OK" && toast.current != null) {
+                    toast.current.show({
+                        severity: "info",
+                        summary: "Confirmed",
+                        detail: "Task completed and deleted.",
+                        life: 3000,
+                    });
+                    getTasksByUserId(authUser.useruid).then((response) =>
+                        setTasks(response.splice(0, 5))
+                    );
+                }
+            })
+            .finally(() => {
+                setChechboxDisabled(false);
+                setCheckedId(null);
             });
-            setChechboxDisabled(false);
-        }
     };
 
     const reject = () => {
@@ -58,11 +67,12 @@ export const Tasks = () => {
                 life: 3000,
             });
             setChechboxDisabled(false);
+            setCheckedId(null);
         }
     };
 
     const confirm = () => {
-        confirmPopup({
+        confirmDialog({
             message: "Are you sure you want to mark the task as completed and delete it?",
             icon: "pi pi-exclamation-triangle",
             accept,
@@ -72,8 +82,6 @@ export const Tasks = () => {
 
     return (
         <>
-            <Toast ref={toast} />
-            <ConfirmPopup />
             <h2 className='card-content__title uppercase'>Tasks</h2>
             <ul className='list-none ml-0 pl-0'>
                 {tasks.map((task) => (
@@ -100,6 +108,8 @@ export const Tasks = () => {
                 Add new task
             </span>
             <div className='hidden'>
+                <Toast ref={toast} />
+                <ConfirmDialog />
                 <AddTaskDialog
                     visible={showAddTaskDialog}
                     onHide={handleAddTaskDialogHide}
