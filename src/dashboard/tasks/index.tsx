@@ -12,6 +12,7 @@ export const Tasks = () => {
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
     const [checkedId, setCheckedId] = useState<number | null>(null);
     const [checkboxDisabled, setChechboxDisabled] = useState<boolean>(false);
+    // const [currentTaskIndex, setCurrentTaskIndex] = useState<number>()
 
     const toast = useRef<Toast>(null);
 
@@ -33,12 +34,14 @@ export const Tasks = () => {
 
     const handleDeleteTask = (taskIndex: number) => {
         setCheckedId(taskIndex);
+        // eslint-disable-next-line no-console
+        // console.log(currentTaskIndex)
         setChechboxDisabled(true);
-        confirm();
+        confirm(taskIndex);
     };
 
-    const accept = () => {
-        deleteTask(String(checkedId))
+    const accept = (taskIndex: number) => {
+        deleteTask(taskIndex)
             .then((res) => {
                 if (res.status === "OK" && toast.current != null) {
                     toast.current.show({
@@ -71,11 +74,11 @@ export const Tasks = () => {
         }
     };
 
-    const confirm = () => {
+    const confirm = (taskIndex: number) => {
         confirmDialog({
             message: "Are you sure you want to mark the task as completed and delete it?",
             icon: "pi pi-exclamation-triangle",
-            accept,
+            accept: () => accept(taskIndex),
             reject,
         });
     };

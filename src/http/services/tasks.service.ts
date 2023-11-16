@@ -43,9 +43,9 @@ export const createTask = async (
     }
 };
 
-export const deleteTask = async (taskuid: string) => {
+export const deleteTask = async (taskIndex: number) => {
     try {
-        const request = await authorizedUserApiInstance.post<any>(`tasks/${taskuid}/delete`);
+        const request = await authorizedUserApiInstance.post<any>(`tasks/${taskIndex}/delete`);
         return request.data;
     } catch (error) {
         // TODO: add error handler
