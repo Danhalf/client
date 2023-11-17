@@ -48,7 +48,12 @@ export const AddTaskDialog = ({ visible, onHide }: DialogProps) => {
     ];
 
     return (
-        <Dialog header='Add Task' className='dialog' visible={visible} onHide={onHide}>
+        <Dialog
+            header='Add Task'
+            className='dialog dialog__add-task'
+            visible={visible}
+            onHide={onHide}
+        >
             <div className='flex flex-column row-gap-3 p-4'>
                 <Dropdown
                     placeholder='Assign to'

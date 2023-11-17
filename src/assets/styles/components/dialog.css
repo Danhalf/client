@@ -1,5 +1,6 @@
 .p-dialog {
     width: 80vw;
+    border-radius: 15px;
 }
 
 .p-dialog > .p-dialog-header {
