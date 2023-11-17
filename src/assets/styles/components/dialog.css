@@ -1,6 +1,9 @@
 .p-dialog {
     width: 80vw;
-    border-radius: 15px;
+    border-radius: var(--admss-app-dialog-border-radius);
+}
+
+.p-header {
 }
 
 .p-dialog > .p-dialog-header {
@@ -10,6 +13,8 @@
     border-bottom: none;
     padding-top: 2rem;
     padding-bottom: 0;
+    border-top-right-radius: var(--admss-app-dialog-border-radius);
+    border-top-left-radius: var(--admss-app-dialog-border-radius);
 }
 
 .p-inputgroup-addon {
@@ -18,6 +23,11 @@
 
 .p-dialog .p-dialog-footer {
     border-top: none;
+}
+
+.p-dialog .p-dialog-content:last-of-type {
+    border-bottom-right-radius: var(--admss-app-dialog-border-radius);
+    border-bottom-left-radius: var(--admss-app-dialog-border-radius);
 }
 
 @media screen and (min-width: 992px) {
