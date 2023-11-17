@@ -93,9 +93,8 @@ export const Tasks = () => {
                             onChange={() => handleDeleteTask(task.index)}
                         />
                         <label className='ml-2'>
-                            {task.taskname && `${task.taskname} - `}
-                            {task.description && `${task.description} - `}
-                            {task.username}
+                            {task.taskname ||
+                                `${task.description} ${task.username ?? `- ${task.username}`}`}
                         </label>
                     </li>
                 ))}
