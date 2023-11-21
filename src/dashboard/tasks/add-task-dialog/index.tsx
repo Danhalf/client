@@ -8,15 +8,19 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
 import { Task, createTask } from "http/services/tasks.service";
 
-export const AddTaskDialog = ({ visible, onHide }: DialogProps) => {
-    const [assignTo, setAssignTo] = useState<string>("");
-    const [startDate, setStartDate] = useState<Date | null>(null);
-    const [dueDate, setDueDate] = useState<Date | null>(null);
-    const [account, setAccount] = useState<string>("");
-    const [deal, setDeal] = useState<string>("");
-    const [contact, setContact] = useState<string>("");
-    const [phoneNumber, setPhoneNumber] = useState<string>("");
-    const [description, setDescription] = useState<string>("");
+interface AddTaskDialogProps extends DialogProps {
+    currentTask?: Task;
+}
+
+export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskDialogProps) => {
+    const [assignTo, setAssignTo] = useState<string>(currentTask?.accountuid || "");
+    const [startDate, setStartDate] = useState<Date | null>((currentTask?.created as any) || null);
+    const [dueDate, setDueDate] = useState<Date | null>((currentTask?.deadline as any) || null);
+    const [account, setAccount] = useState<string>(currentTask?.username || "");
+    const [deal, setDeal] = useState<string>(currentTask?.dealuid || "");
+    const [contact, setContact] = useState<string>(currentTask?.contactname || "");
+    const [phoneNumber, setPhoneNumber] = useState<string>(currentTask?.phone || "");
+    const [description, setDescription] = useState<string>(currentTask?.description || "");
 
     const handleSaveTaskData = () => {
         const taskData: any = {
@@ -49,7 +53,7 @@ export const AddTaskDialog = ({ visible, onHide }: DialogProps) => {
 
     return (
         <Dialog
-            header='Add Task'
+            header={header}
             className='dialog dialog__add-task'
             visible={visible}
             onHide={onHide}
@@ -110,7 +114,7 @@ export const AddTaskDialog = ({ visible, onHide }: DialogProps) => {
                         onChange={(e) => setContact(e.target.value)}
                     />
                     <span className='p-inputgroup-addon'>
-                        <i className='pi pi-search'></i>
+                        <i className='admss-icon-search'></i>
                     </span>
                 </div>
                 <InputText

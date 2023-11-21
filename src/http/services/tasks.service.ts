@@ -51,3 +51,14 @@ export const deleteTask = async (taskIndex: number) => {
         // TODO: add error handler
     }
 };
+
+export const setTaskStatus = async (taskuid: string, taskStatus: "completed") => {
+    try {
+        const request = await authorizedUserApiInstance.post<any>(`tasks/${taskuid || 0}/status`, {
+            task_status: taskStatus,
+        });
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
