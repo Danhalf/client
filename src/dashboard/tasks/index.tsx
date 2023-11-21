@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
-import { Task, getTasksByUserId, setTaskStatus } from "http/services/tasks.service";
+import {
+    Task,
+    getTasksByUserId,
+    getTasksUserList,
+    setTaskStatus,
+} from "http/services/tasks.service";
 import { AddTaskDialog } from "./add-task-dialog";
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
@@ -11,7 +16,7 @@ export const Tasks = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
     const [showEditTaskDialog, setShowEditTaskDialog] = useState<boolean>(false);
-    const [checkedId, setCheckedId] = useState<string | null>(null);
+    const [checkedId, setCheckedId] = useState<number | null>(null);
     const [checkboxDisabled, setChechboxDisabled] = useState<boolean>(false);
     const [currentTask, setCurrentTask] = useState<Task | null>(null);
 
@@ -19,13 +24,20 @@ export const Tasks = () => {
 
     const authUser: AuthUser = getKeyValue("admss-client-app-user");
 
+    const getTasks = () =>
+        getTasksByUserId(authUser.useruid).then((response) => setTasks(response.splice(0, 5)));
+
     useEffect(() => {
         if (authUser) {
-            getTasksByUserId(authUser.useruid).then((response) => setTasks(response.splice(0, 5)));
+            getTasks();
         }
     }, []);
 
     const handleAddTaskClick = () => {
+        getTasksUserList("33e88d0e-fa44-4e1d-a279-e8a72f9bbbbb").then((res) => {
+            // eslint-disable-next-line no-console
+            console.log(res);
+        });
         setShowAddTaskDialog(true);
     };
 
@@ -36,8 +48,8 @@ export const Tasks = () => {
         setShowEditTaskDialog(false);
     };
 
-    const handleDeleteTask = (taskuid: string) => {
-        setCheckedId(taskuid);
+    const handleDeleteTask = (taskuid: string, taskIndex: number) => {
+        setCheckedId(taskIndex);
         setChechboxDisabled(true);
         confirm(taskuid);
     };
@@ -54,9 +66,10 @@ export const Tasks = () => {
                     toast.current.show({
                         severity: "info",
                         summary: "Confirmed",
-                        detail: "Task completed and deleted.",
+                        detail: "The task marked as completed.",
                         life: 3000,
                     });
+                    getTasks();
                     getTasksByUserId(authUser.useruid).then((response) =>
                         setTasks(response.splice(0, 5))
                     );
@@ -83,7 +96,7 @@ export const Tasks = () => {
 
     const confirm = (taskuid: string) => {
         confirmDialog({
-            message: "Are you sure you want to mark the task as completed and delete it?",
+            message: "Are you sure you want to mark the task as completed?",
             icon: "pi pi-exclamation-triangle",
             accept: () => accept(taskuid),
             reject,
@@ -99,10 +112,13 @@ export const Tasks = () => {
                         <Checkbox
                             name='task'
                             disabled={checkboxDisabled}
-                            checked={checkedId === task.itemuid}
-                            onChange={() => handleDeleteTask(task.itemuid)}
+                            checked={Number(checkedId) === task.index}
+                            onChange={() => handleDeleteTask(task.itemuid, task.index)}
                         />
-                        <label className='ml-2' onClick={() => handleEditTask(task)}>
+                        <label
+                            className='ml-2 cursor-pointer hover:text-primary'
+                            onClick={() => handleEditTask(task)}
+                        >
                             {task.taskname ||
                                 `${task.description} ${task.username ?? `- ${task.username}`}`}
                         </label>

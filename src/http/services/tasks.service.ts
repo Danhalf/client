@@ -43,6 +43,15 @@ export const createTask = async (
     }
 };
 
+export const getTasksUserList = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any>(`user/${useruid}/users`);
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
 export const deleteTask = async (taskIndex: number) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(`tasks/${taskIndex}/delete`);

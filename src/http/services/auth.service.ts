@@ -39,7 +39,10 @@ export const auth = async (signData: LoginForm): Promise<AuthUser | AppError> =>
             application: APPLICATION,
             // magic: MAGIC,
         })
-        .then((response) => response.data)
+        .then((response) => {
+            localStorage.setItem("useruid", JSON.stringify(response.data));
+            return response.data;
+        })
         .catch((err) => err.response.data);
     return response;
 };
