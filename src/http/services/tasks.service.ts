@@ -1,12 +1,14 @@
 import { authorizedUserApiInstance } from "http/index";
 
 export interface Task {
+    accountname: string;
     accountnumber: string;
     accountuid: string;
     contactname: string;
     contactuid: string;
     created: string;
     deadline: string;
+    dealname: string;
     dealuid: string;
     description: string;
     index: number;
@@ -15,6 +17,14 @@ export interface Task {
     phone: string;
     task_status: string;
     taskname: string;
+    updated: string;
+    username: string;
+    useruid: string;
+}
+
+export interface TaskUser {
+    created: string;
+    createdbyuid: string;
     updated: string;
     username: string;
     useruid: string;
@@ -45,7 +55,7 @@ export const createTask = async (
 
 export const getTasksUserList = async (useruid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any>(`user/${useruid}/users`);
+        const request = await authorizedUserApiInstance.get<TaskUser[]>(`user/${useruid}/users`);
         return request.data;
     } catch (error) {
         // TODO: add error handler
@@ -64,7 +74,7 @@ export const deleteTask = async (taskIndex: number) => {
 export const setTaskStatus = async (taskuid: string, taskStatus: "completed") => {
     try {
         const request = await authorizedUserApiInstance.post<any>(`tasks/${taskuid || 0}/status`, {
-            task_status: taskStatus,
+            status: taskStatus,
         });
         return request.data;
     } catch (error) {

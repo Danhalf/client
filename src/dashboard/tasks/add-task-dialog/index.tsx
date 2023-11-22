@@ -3,24 +3,39 @@ import "./index.css";
 import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
-import { Task, createTask } from "http/services/tasks.service";
+import { Task, TaskUser, createTask, getTasksUserList } from "http/services/tasks.service";
+import { AuthUser } from "http/services/auth.service";
+import { getDealsList } from "http/services/deals.service";
+import { getKeyValue } from "services/local-storage.service";
 
 interface AddTaskDialogProps extends DialogProps {
     currentTask?: Task;
 }
 
 export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskDialogProps) => {
+    const [authUser, setUser] = useState<AuthUser | null>(null);
     const [assignTo, setAssignTo] = useState<string>(currentTask?.accountuid || "");
     const [startDate, setStartDate] = useState<Date | null>((currentTask?.created as any) || null);
     const [dueDate, setDueDate] = useState<Date | null>((currentTask?.deadline as any) || null);
-    const [account, setAccount] = useState<string>(currentTask?.username || "");
-    const [deal, setDeal] = useState<string>(currentTask?.dealuid || "");
+    const [account, setAccount] = useState<string>(currentTask?.accountname || "");
+    const [deal, setDeal] = useState<string>(currentTask?.dealname || "");
     const [contact, setContact] = useState<string>(currentTask?.contactname || "");
     const [phoneNumber, setPhoneNumber] = useState<string>(currentTask?.phone || "");
     const [description, setDescription] = useState<string>(currentTask?.description || "");
+    const [assignToData, setAssignToData] = useState<TaskUser[] | null>(null);
+
+    useEffect(() => {
+        const authUser: AuthUser = getKeyValue("admss-client-app-user");
+        if (authUser) {
+            setUser(authUser);
+            getTasksUserList(authUser.useruid).then((response) => {
+                if (response) setAssignToData(response);
+            });
+        }
+    }, []);
 
     const handleSaveTaskData = () => {
         const taskData: any = {
@@ -41,16 +56,6 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
         onHide();
     };
 
-    const demoDropdownData = [
-        "Deep Watermelon",
-        "Round Hair Brush",
-        "Straight Dog Bone",
-        "Thin Cheeseburger",
-        "Fat Stick",
-        "Double Head",
-        "Iron Guard",
-    ];
-
     return (
         <Dialog
             header={header}
@@ -59,12 +64,16 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
             onHide={onHide}
         >
             <div className='flex flex-column row-gap-3 p-4'>
-                <Dropdown
-                    placeholder='Assign to'
-                    value={assignTo}
-                    options={demoDropdownData}
-                    onChange={(e) => setAssignTo(e.value)}
-                />
+                {assignToData && (
+                    <Dropdown
+                        placeholder='Assign to'
+                        value={assignTo}
+                        options={assignToData}
+                        optionLabel={"username"}
+                        className='flex align-items-center'
+                        onChange={(e) => setAssignTo(e.value)}
+                    />
+                )}
                 <div className='flex flex-column md:flex-row column-gap-3'>
                     <div className='p-inputgroup flex-1'>
                         <Calendar

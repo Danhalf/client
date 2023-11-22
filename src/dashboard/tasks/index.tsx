@@ -1,12 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
-import {
-    Task,
-    getTasksByUserId,
-    getTasksUserList,
-    setTaskStatus,
-} from "http/services/tasks.service";
+import { Task, getTasksByUserId, setTaskStatus } from "http/services/tasks.service";
 import { AddTaskDialog } from "./add-task-dialog";
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
@@ -16,7 +11,6 @@ export const Tasks = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
     const [showEditTaskDialog, setShowEditTaskDialog] = useState<boolean>(false);
-    const [checkedId, setCheckedId] = useState<number | null>(null);
     const [checkboxDisabled, setChechboxDisabled] = useState<boolean>(false);
     const [currentTask, setCurrentTask] = useState<Task | null>(null);
 
@@ -25,6 +19,7 @@ export const Tasks = () => {
     const authUser: AuthUser = getKeyValue("admss-client-app-user");
 
     const getTasks = () =>
+        authUser &&
         getTasksByUserId(authUser.useruid).then((response) => setTasks(response.splice(0, 5)));
 
     useEffect(() => {
@@ -34,10 +29,6 @@ export const Tasks = () => {
     }, []);
 
     const handleAddTaskClick = () => {
-        getTasksUserList("33e88d0e-fa44-4e1d-a279-e8a72f9bbbbb").then((res) => {
-            // eslint-disable-next-line no-console
-            console.log(res);
-        });
         setShowAddTaskDialog(true);
     };
 
@@ -48,8 +39,7 @@ export const Tasks = () => {
         setShowEditTaskDialog(false);
     };
 
-    const handleDeleteTask = (taskuid: string, taskIndex: number) => {
-        setCheckedId(taskIndex);
+    const handleDeleteTask = (taskuid: string) => {
         setChechboxDisabled(true);
         confirm(taskuid);
     };
@@ -77,7 +67,6 @@ export const Tasks = () => {
             })
             .finally(() => {
                 setChechboxDisabled(false);
-                setCheckedId(null);
             });
     };
 
@@ -90,7 +79,6 @@ export const Tasks = () => {
                 life: 3000,
             });
             setChechboxDisabled(false);
-            setCheckedId(null);
         }
     };
 
@@ -112,8 +100,8 @@ export const Tasks = () => {
                         <Checkbox
                             name='task'
                             disabled={checkboxDisabled}
-                            checked={Number(checkedId) === task.index}
-                            onChange={() => handleDeleteTask(task.itemuid, task.index)}
+                            checked={task.task_status === "Completed"}
+                            onChange={() => handleDeleteTask(task.itemuid)}
                         />
                         <label
                             className='ml-2 cursor-pointer hover:text-primary'
