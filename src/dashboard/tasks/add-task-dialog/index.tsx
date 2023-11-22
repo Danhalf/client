@@ -9,6 +9,17 @@ import { Dropdown } from "primereact/dropdown";
 import { Task, TaskUser, createTask, getTasksUserList } from "http/services/tasks.service";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
+import browserSearchIcon from "assets/images/icons/common-tasks/browser-search.svg";
+import calendarIcon from "assets/images/icons/common-tasks/calendar.svg";
+
+const DialogIcon = ({ icon }: { icon: "search" | "calendar" }) => {
+    const currentIcon = icon === "search" ? browserSearchIcon : calendarIcon;
+    return (
+        <div className='p-inputgroup-addon'>
+            <img src={currentIcon} alt='Search Icon' className='tasks-dialog__icon browse-search' />
+        </div>
+    );
+};
 
 interface AddTaskDialogProps extends DialogProps {
     currentTask?: Task;
@@ -78,9 +89,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                             value={startDate}
                             onChange={(e) => setStartDate(e.value as Date)}
                         />
-                        <span className='p-inputgroup-addon'>
-                            <i className='pi pi-calendar'></i>
-                        </span>
+                        <DialogIcon icon='calendar' />
                     </div>
                     <div className='p-inputgroup flex-1'>
                         <Calendar
@@ -88,9 +97,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                             value={dueDate}
                             onChange={(e) => setDueDate(e.value as Date)}
                         />
-                        <span className='p-inputgroup-addon'>
-                            <i className='pi pi-calendar'></i>
-                        </span>
+                        <DialogIcon icon='calendar' />
                     </div>
                 </div>
                 <div className='p-inputgroup flex-1'>
@@ -99,9 +106,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                         value={account}
                         onChange={(e) => setAccount(e.target.value)}
                     />
-                    <span className='p-inputgroup-addon'>
-                        <i className='pi pi-search'></i>
-                    </span>
+                    <DialogIcon icon='search' />
                 </div>
                 <div className='p-inputgroup flex-1'>
                     <InputText
@@ -109,9 +114,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                         value={deal}
                         onChange={(e) => setDeal(e.target.value)}
                     />
-                    <span className='p-inputgroup-addon'>
-                        <i className='pi pi-search'></i>
-                    </span>
+                    <DialogIcon icon='search' />
                 </div>
                 <div className='p-inputgroup flex-1'>
                     <InputText
@@ -119,9 +122,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                         value={contact}
                         onChange={(e) => setContact(e.target.value)}
                     />
-                    <span className='p-inputgroup-addon'>
-                        <i className='admss-icon-search'></i>
-                    </span>
+                    <DialogIcon icon='search' />
                 </div>
                 <InputText
                     placeholder='Phone Number'
