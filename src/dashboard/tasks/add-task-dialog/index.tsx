@@ -8,7 +8,6 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Dropdown } from "primereact/dropdown";
 import { Task, TaskUser, createTask, getTasksUserList } from "http/services/tasks.service";
 import { AuthUser } from "http/services/auth.service";
-import { getDealsList } from "http/services/deals.service";
 import { getKeyValue } from "services/local-storage.service";
 
 interface AddTaskDialogProps extends DialogProps {
@@ -16,7 +15,6 @@ interface AddTaskDialogProps extends DialogProps {
 }
 
 export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskDialogProps) => {
-    const [authUser, setUser] = useState<AuthUser | null>(null);
     const [assignTo, setAssignTo] = useState<string>(currentTask?.accountuid || "");
     const [startDate, setStartDate] = useState<Date | null>((currentTask?.created as any) || null);
     const [dueDate, setDueDate] = useState<Date | null>((currentTask?.deadline as any) || null);
@@ -30,7 +28,6 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
     useEffect(() => {
         const authUser: AuthUser = getKeyValue("admss-client-app-user");
         if (authUser) {
-            setUser(authUser);
             getTasksUserList(authUser.useruid).then((response) => {
                 if (response) setAssignToData(response);
             });

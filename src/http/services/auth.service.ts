@@ -2,7 +2,7 @@ import { LoginForm } from "sign/sign-in";
 import {
     APPLICATION,
     authorizedUserApiInstance,
-    MAGIC,
+    // MAGIC,
     nonAuthorizedUserApiInstance,
 } from "../index";
 import { BaseResponse } from "common/models/base-response";
