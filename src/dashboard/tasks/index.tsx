@@ -40,9 +40,9 @@ export const Tasks = () => {
         setShowEditTaskDialog(false);
     };
 
-    const handleTaskStatusChange = (taskuid: string) => {
+    const handleTaskStatusChange = (taskuid: string, taskStatus: TaskStatus) => {
         setCheckboxDisabled(true);
-        confirm(taskuid);
+        confirm(taskuid, taskStatus);
     };
 
     const handleEditTask = (task: Task) => {
@@ -50,14 +50,19 @@ export const Tasks = () => {
         setShowEditTaskDialog(true);
     };
 
-    const accept = (taskuid: string) => {
-        setTaskStatus(taskuid, TaskStatus.COMPLETED)
+    const accept = (taskuid: string, taskStatus: TaskStatus) => {
+        const newStatus =
+            taskStatus === TaskStatus.COMPLETED ? TaskStatus.DEFAULT : TaskStatus.COMPLETED;
+        const detail = `The task marked as ${
+            taskStatus === TaskStatus.COMPLETED ? "uncompleted" : "completed"
+        }.`;
+        setTaskStatus(taskuid, newStatus)
             .then((res) => {
                 if (res.status === "OK" && toast.current != null) {
                     toast.current.show({
                         severity: "info",
                         summary: "Confirmed",
-                        detail: "The task marked as completed.",
+                        detail,
                         life: 3000,
                     });
                     getTasks();
@@ -76,18 +81,21 @@ export const Tasks = () => {
             toast.current.show({
                 severity: "warn",
                 summary: "Rejected",
-                detail: "Task not completed!",
+                detail: "Action canceled!",
                 life: 3000,
             });
             setCheckboxDisabled(false);
         }
     };
 
-    const confirm = (taskuid: string) => {
+    const confirm = (taskuid: string, taskStatus: TaskStatus) => {
+        const message = `Are you sure you want to mark the task as ${
+            taskStatus === TaskStatus.COMPLETED ? "uncompleted" : "completed"
+        }?`;
         confirmDialog({
-            message: "Are you sure you want to mark the task as completed?",
+            message,
             icon: "pi pi-exclamation-triangle",
-            accept: () => accept(taskuid),
+            accept: () => accept(taskuid, taskStatus),
             reject,
         });
     };
@@ -102,7 +110,7 @@ export const Tasks = () => {
                             name='task'
                             disabled={checkboxDisabled}
                             checked={task.task_status === TaskStatus.COMPLETED}
-                            onChange={() => handleTaskStatusChange(task.itemuid)}
+                            onChange={() => handleTaskStatusChange(task.itemuid, task.task_status)}
                         />
                         <label
                             className='ml-2 cursor-pointer hover:text-primary'
@@ -122,7 +130,6 @@ export const Tasks = () => {
                 Add new task
             </span>
             <div className='hidden'>
-                <Toast ref={toast} />
                 <ConfirmDialog />
                 <AddTaskDialog
                     visible={showAddTaskDialog}
@@ -138,6 +145,8 @@ export const Tasks = () => {
                     />
                 )}
             </div>
+
+            <Toast ref={toast} />
         </>
     );
 };

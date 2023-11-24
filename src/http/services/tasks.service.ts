@@ -22,7 +22,7 @@ export interface Task {
     itemuid: string;
     parentuid: string;
     phone: string;
-    task_status: string;
+    task_status: TaskStatus;
     taskname: string;
     updated: string;
     username: string;
