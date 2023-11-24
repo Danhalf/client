@@ -1,4 +1,11 @@
+/* eslint-disable no-unused-vars */
 import { authorizedUserApiInstance } from "http/index";
+
+export enum TaskStatus {
+    COMPLETED = "Completed",
+    STARTED = "Started",
+    DEFAULT = "Default",
+}
 
 export interface Task {
     accountname: string;
@@ -71,7 +78,7 @@ export const deleteTask = async (taskIndex: number) => {
     }
 };
 
-export const setTaskStatus = async (taskuid: string, taskStatus: "completed") => {
+export const setTaskStatus = async (taskuid: string, taskStatus: TaskStatus) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(`tasks/${taskuid || 0}/status`, {
             status: taskStatus,
