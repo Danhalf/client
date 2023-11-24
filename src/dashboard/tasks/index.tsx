@@ -66,9 +66,6 @@ export const Tasks = () => {
                         life: 3000,
                     });
                     getTasks();
-                    getTasksByUserId(authUser.useruid).then((response) =>
-                        setTasks(response.splice(0, 5))
-                    );
                 }
             })
             .finally(() => {

@@ -9,15 +9,12 @@ import { Dropdown } from "primereact/dropdown";
 import { Task, TaskUser, createTask, getTasksUserList } from "http/services/tasks.service";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
-import browserSearchIcon from "assets/images/icons/common-tasks/browser-search.svg";
-import calendarIcon from "assets/images/icons/common-tasks/calendar.svg";
 
 const DialogIcon = ({ icon }: { icon: "search" | "calendar" }) => {
-    const currentIcon = icon === "search" ? browserSearchIcon : calendarIcon;
     return (
-        <div className='p-inputgroup-addon'>
-            <img src={currentIcon} alt='Search Icon' className='tasks-dialog__icon browse-search' />
-        </div>
+        <span className='p-inputgroup-addon'>
+            <i className={`pi pi-${icon}`} />
+        </span>
     );
 };
 
