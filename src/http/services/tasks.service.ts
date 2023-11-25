@@ -39,7 +39,7 @@ export interface TaskUser {
 
 export const getTasksByUserId = async (uid: string): Promise<Task[]> => {
     const response = await authorizedUserApiInstance
-        .get(`tasks/${uid}/list`)
+        .get(`tasks/${uid}/listcurrent`)
         .then((response) => response.data)
         .catch((err) => err.response.data);
     return response;
