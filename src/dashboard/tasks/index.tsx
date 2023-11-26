@@ -13,6 +13,7 @@ export const Tasks = () => {
     const [showEditTaskDialog, setShowEditTaskDialog] = useState<boolean>(false);
     const [checkboxDisabled, setCheckboxDisabled] = useState<boolean>(false);
     const [currentTask, setCurrentTask] = useState<Task | null>(null);
+    const [checkboxStates, setCheckboxStates] = useState<{ [key: string]: boolean }>({});
 
     const toast = useRef<Toast>(null);
 
@@ -20,7 +21,7 @@ export const Tasks = () => {
 
     const getTasks = () =>
         authUser &&
-        getTasksByUserId(authUser.useruid).then((response) => setTasks(response.splice(0, 5)));
+        getTasksByUserId(authUser.useruid, { top: 5 }).then((response) => setTasks(response));
 
     useEffect(() => {
         if (authUser) {
@@ -40,61 +41,39 @@ export const Tasks = () => {
         setShowEditTaskDialog(false);
     };
 
-    const handleTaskStatusChange = (taskuid: string, taskStatus: TaskStatus) => {
-        setCheckboxDisabled(true);
-        confirm(taskuid, taskStatus);
-    };
-
     const handleEditTask = (task: Task) => {
         setCurrentTask(task);
         setShowEditTaskDialog(true);
     };
 
-    const accept = (taskuid: string, taskStatus: TaskStatus) => {
-        const newStatus =
-            taskStatus === TaskStatus.COMPLETED ? TaskStatus.DEFAULT : TaskStatus.COMPLETED;
-        const detail = `The task marked as ${
-            taskStatus === TaskStatus.COMPLETED ? "uncompleted" : "completed"
-        }.`;
-        setTaskStatus(taskuid, newStatus)
-            .then((res) => {
-                if (res.status === "OK" && toast.current != null) {
-                    toast.current.show({
-                        severity: "info",
-                        summary: "Confirmed",
-                        detail,
-                        life: 3000,
-                    });
-                    getTasks();
-                }
-            })
-            .finally(() => {
-                setCheckboxDisabled(false);
-            });
-    };
+    const handleTaskStatusChange = (taskuid: string) => {
+        setCheckboxStates((prevStates) => ({
+            ...prevStates,
+            [taskuid]: true,
+        }));
+        setCheckboxDisabled(true);
 
-    const reject = () => {
-        if (toast.current != null) {
-            toast.current.show({
-                severity: "warn",
-                summary: "Rejected",
-                detail: "Action canceled!",
-                life: 3000,
-            });
-            setCheckboxDisabled(false);
-        }
-    };
-
-    const confirm = (taskuid: string, taskStatus: TaskStatus) => {
-        const message = `Are you sure you want to mark the task as ${
-            taskStatus === TaskStatus.COMPLETED ? "uncompleted" : "completed"
-        }?`;
-        confirmDialog({
-            message,
-            icon: "pi pi-exclamation-triangle",
-            accept: () => accept(taskuid, taskStatus),
-            reject,
-        });
+        setTimeout(() => {
+            setTaskStatus(taskuid, TaskStatus.COMPLETED)
+                .then((res) => {
+                    if (res.status === "OK" && toast.current != null) {
+                        toast.current.show({
+                            severity: "info",
+                            summary: "Confirmed",
+                            detail: "The task marked as completed",
+                            life: 3000,
+                        });
+                        getTasks();
+                    }
+                })
+                .finally(() => {
+                    setCheckboxStates((prevStates) => ({
+                        ...prevStates,
+                        [taskuid]: false,
+                    }));
+                    setCheckboxDisabled(false);
+                });
+        }, 1000);
     };
 
     return (
@@ -106,8 +85,8 @@ export const Tasks = () => {
                         <Checkbox
                             name='task'
                             disabled={checkboxDisabled}
-                            checked={task.task_status === TaskStatus.COMPLETED}
-                            onChange={() => handleTaskStatusChange(task.itemuid, task.task_status)}
+                            checked={checkboxStates[task.itemuid] || false}
+                            onChange={() => handleTaskStatusChange(task.itemuid)}
                         />
                         <label
                             className='ml-2 cursor-pointer hover:text-primary'
@@ -127,7 +106,6 @@ export const Tasks = () => {
                 Add new task
             </span>
             <div className='hidden'>
-                <ConfirmDialog />
                 <AddTaskDialog
                     visible={showAddTaskDialog}
                     onHide={handleAddTaskDialogHide}

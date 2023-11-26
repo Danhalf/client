@@ -1,3 +1,4 @@
+import { QueryParams } from "common/models/query-params";
 /* eslint-disable no-unused-vars */
 import { authorizedUserApiInstance } from "http/index";
 
@@ -37,9 +38,11 @@ export interface TaskUser {
     useruid: string;
 }
 
-export const getTasksByUserId = async (uid: string): Promise<Task[]> => {
+export const getTasksByUserId = async (uid: string, params?: QueryParams): Promise<Task[]> => {
     const response = await authorizedUserApiInstance
-        .get(`tasks/${uid}/listcurrent`)
+        .get(`tasks/${uid}/listcurrent`, {
+            params,
+        })
         .then((response) => response.data)
         .catch((err) => err.response.data);
     return response;
