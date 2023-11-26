@@ -54,7 +54,7 @@ export const createTask = async (
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(
-            `tasks/${taskuid || 0}/`,
+            `tasks/${taskuid || 0}`,
             taskData
         );
         return request.data;
