@@ -10,10 +10,10 @@ import { Task, TaskUser, createTask, getTasksUserList } from "http/services/task
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 
-const DialogIcon = ({ icon }: { icon: "search" | "calendar" }) => {
+const DialogIcon = ({ icon }: { icon: "search" | string }) => {
     return (
         <span className='p-inputgroup-addon'>
-            <i className={`pi pi-${icon}`} />
+            <i className={`admss-icon-${icon}`} />
         </span>
     );
 };
@@ -86,7 +86,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                             value={startDate}
                             onChange={(e) => setStartDate(e.value as Date)}
                         />
-                        <DialogIcon icon='calendar' />
+                        <DialogIcon icon='support-history' />
                     </div>
                     <div className='p-inputgroup flex-1'>
                         <Calendar
@@ -94,7 +94,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                             value={dueDate}
                             onChange={(e) => setDueDate(e.value as Date)}
                         />
-                        <DialogIcon icon='calendar' />
+                        <DialogIcon icon='support-history' />
                     </div>
                 </div>
                 <div className='p-inputgroup flex-1'>
