@@ -44,11 +44,9 @@ export default function Header(props: HeaderProps) {
             label: "Logout",
             command(event: MenuItemCommandEvent) {
                 if (props.user) {
-                    logout(props.user.useruid).then((res) => {
-                        if (res?.status === "OK") {
-                            clear();
-                            navigate("/");
-                        }
+                    logout(props.user.useruid).finally(() => {
+                        clear();
+                        navigate("/");
                     });
                 }
             },
