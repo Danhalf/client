@@ -3,18 +3,22 @@
     border-radius: var(--admss-app-dialog-border-radius);
 }
 
-.p-header {
+.p-dialog > .p-dialog-content {
+    padding: 50px;
+    padding-top: 0;
 }
 
 .p-dialog > .p-dialog-header {
     font-weight: var(--admss-app-font-weight);
-    padding: 3rem;
     color: var(--admss-app-main-blue);
     border-bottom: none;
-    padding-top: 2rem;
-    padding-bottom: 0;
     border-top-right-radius: var(--admss-app-dialog-border-radius);
     border-top-left-radius: var(--admss-app-dialog-border-radius);
+}
+
+.p-dialog > .p-dialog-header > .p-dialog-title {
+    font-size: 22px;
+    font-weight: bold;
 }
 
 .p-inputgroup-addon {
@@ -28,6 +32,12 @@
 .p-dialog .p-dialog-content:last-of-type {
     border-bottom-right-radius: var(--admss-app-dialog-border-radius);
     border-bottom-left-radius: var(--admss-app-dialog-border-radius);
+}
+
+.p-dialog-header-icon.p-dialog-header-close > svg {
+    width: 20px;
+    height: 20px;
+    color: var(--admss-app-blue-text);
 }
 
 @media screen and (min-width: 992px) {

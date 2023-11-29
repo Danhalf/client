@@ -54,10 +54,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
             description,
         };
 
-        createTask(taskData).then((response) => {
-            // eslint-disable-next-line no-console
-            console.log(response);
-        });
+        createTask(taskData).then((response) => {});
         onHide();
     };
 
@@ -68,7 +65,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
             visible={visible}
             onHide={onHide}
         >
-            <div className='flex flex-column row-gap-3 p-4'>
+            <div className='flex flex-column row-gap-3'>
                 {assignToData && (
                     <Dropdown
                         placeholder='Assign to'
