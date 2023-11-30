@@ -52,27 +52,25 @@ export const Tasks = () => {
         }));
         setCheckboxDisabled(true);
 
-        setTimeout(() => {
-            setTaskStatus(taskuid, TaskStatus.COMPLETED)
-                .then((res) => {
-                    if (res.status === "OK" && toast.current != null) {
-                        toast.current.show({
-                            severity: "info",
-                            summary: "Confirmed",
-                            detail: "The task marked as completed",
-                            life: 3000,
-                        });
-                        getTasks();
-                    }
-                })
-                .finally(() => {
-                    setCheckboxStates((prevStates) => ({
-                        ...prevStates,
-                        [taskuid]: false,
-                    }));
-                    setCheckboxDisabled(false);
-                });
-        }, 1000);
+        setTaskStatus(taskuid, TaskStatus.COMPLETED)
+            .then((res) => {
+                if (res.status === "OK" && toast.current != null) {
+                    toast.current.show({
+                        severity: "info",
+                        summary: "Confirmed",
+                        detail: "The task marked as completed",
+                        life: 3000,
+                    });
+                    getTasks();
+                }
+            })
+            .finally(() => {
+                setCheckboxStates((prevStates) => ({
+                    ...prevStates,
+                    [taskuid]: false,
+                }));
+                setCheckboxDisabled(false);
+            });
     };
 
     return (
