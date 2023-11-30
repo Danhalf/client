@@ -17,13 +17,12 @@ export const Tasks = () => {
 
     const toast = useRef<Toast>(null);
 
+    const authUser: AuthUser = getKeyValue(LS_APP_USER);
 
     const getTasks = () =>
-        authUser &&
         getTasksByUserId(authUser.useruid, { top: 5 }).then((response) => setTasks(response));
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             getTasks();
         }

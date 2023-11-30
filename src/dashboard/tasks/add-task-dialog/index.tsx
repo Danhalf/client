@@ -1,6 +1,5 @@
-import { Dialog, DialogProps } from "primereact/dialog";
+import { DialogProps } from "primereact/dialog";
 import "./index.css";
-import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
 import { useEffect, useState } from "react";
