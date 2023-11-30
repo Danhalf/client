@@ -65,7 +65,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
             visible={visible}
             onHide={onHide}
         >
-            <div className='flex flex-column row-gap-3'>
+            <div className='p-dialog-content-body'>
                 {assignToData && (
                     <Dropdown
                         placeholder='Assign to'
@@ -127,12 +127,12 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                     placeholder='Description'
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className='h-8rem'
+                    className='p-dialog-description'
                 />
             </div>
 
             <div className='p-dialog-footer flex justify-content-center'>
-                <Button label='Save' className='w-4' onClick={handleSaveTaskData} />
+                <Button label='Save' onClick={handleSaveTaskData} />
             </div>
         </Dialog>
     );

@@ -4,21 +4,38 @@
 }
 
 .p-dialog > .p-dialog-content {
-    padding: 50px;
-    padding-top: 0;
+    padding: 0 50px;
 }
 
 .p-dialog > .p-dialog-header {
     font-weight: var(--admss-app-font-weight);
     color: var(--admss-app-main-blue);
+    padding: 50px 50px 30px;
     border-bottom: none;
     border-top-right-radius: var(--admss-app-dialog-border-radius);
     border-top-left-radius: var(--admss-app-dialog-border-radius);
+    position: relative;
 }
 
 .p-dialog > .p-dialog-header > .p-dialog-title {
     font-size: 22px;
     font-weight: bold;
+}
+
+.p-dialog > .p-dialog-header > .p-dialog-header-icons {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.p-dialog .p-dialog-content-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.p-dialog .p-dialog-description {
+    height: 130px;
 }
 
 .p-inputgroup-addon {
@@ -27,6 +44,19 @@
 
 .p-dialog .p-dialog-footer {
     border-top: none;
+}
+
+.p-dialog .p-dialog-footer {
+    border-top: none;
+    margin: 20px 0 40px;
+}
+
+.p-dialog-footer > .p-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    padding: 13px 100px;
 }
 
 .p-dialog .p-dialog-content:last-of-type {
