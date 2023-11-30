@@ -9,6 +9,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Task, TaskUser, createTask, getTasksUserList } from "http/services/tasks.service";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
+import { DashboardDialog } from "dashboard/dialog";
 
 const DialogIcon = ({ icon }: { icon: "search" | string }) => {
     return (
@@ -59,13 +60,15 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
     };
 
     return (
-        <Dialog
-            header={header}
-            className='dialog dialog__add-task'
-            visible={visible}
+        <DashboardDialog
             onHide={onHide}
+            visible={visible}
+            header={header}
+            className={"dialog__add-task "}
+            footer='Save'
+            action={handleSaveTaskData}
         >
-            <div className='p-dialog-content-body'>
+            <>
                 {assignToData && (
                     <Dropdown
                         placeholder='Assign to'
@@ -129,11 +132,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
                     onChange={(e) => setDescription(e.target.value)}
                     className='p-dialog-description'
                 />
-            </div>
-
-            <div className='p-dialog-footer flex justify-content-center'>
-                <Button label='Save' onClick={handleSaveTaskData} />
-            </div>
-        </Dialog>
+            </>
+        </DashboardDialog>
     );
 };

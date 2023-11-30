@@ -29,17 +29,6 @@ export const Tasks = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleAddTaskClick = () => {
-        setShowAddTaskDialog(true);
-    };
-
-    const handleAddTaskDialogHide = () => {
-        setShowAddTaskDialog(false);
-    };
-    const handleEditTaskDialogHide = () => {
-        setShowEditTaskDialog(false);
-    };
-
     const handleEditTask = (task: Task) => {
         setCurrentTask(task);
         setShowEditTaskDialog(true);
@@ -85,10 +74,7 @@ export const Tasks = () => {
                             checked={checkboxStates[task.itemuid] || false}
                             onChange={() => handleTaskStatusChange(task.itemuid)}
                         />
-                        <label
-                            className='ml-2 cursor-pointer hover:text-primary'
-                            onClick={() => handleEditTask(task)}
-                        >
+                        <label className='ml-2 cursor-pointer' onClick={() => handleEditTask(task)}>
                             {task.taskname ||
                                 `${task.description} ${task.username ?? `- ${task.username}`}`}
                         </label>
@@ -97,7 +83,7 @@ export const Tasks = () => {
             </ul>
             <span
                 className='add-task-control font-semibold cursor-pointer'
-                onClick={handleAddTaskClick}
+                onClick={() => setShowAddTaskDialog(true)}
             >
                 <i className='pi pi-plus add-task-control__icon'></i>
                 Add new task
@@ -105,13 +91,13 @@ export const Tasks = () => {
             <div className='hidden'>
                 <AddTaskDialog
                     visible={showAddTaskDialog}
-                    onHide={handleAddTaskDialogHide}
+                    onHide={() => setShowAddTaskDialog(false)}
                     header='Add Task'
                 />
                 {currentTask && (
                     <AddTaskDialog
                         visible={showEditTaskDialog}
-                        onHide={handleEditTaskDialogHide}
+                        onHide={() => setShowEditTaskDialog(false)}
                         currentTask={currentTask}
                         header='Edit Task'
                     />
