@@ -9,10 +9,27 @@ import { useNavigate } from "react-router-dom";
 import { getExtendedData } from "http/services/auth-user.service";
 import { localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { DashboardDialog } from "dashboard/dialog";
+import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
 
 export interface HeaderProps {
     user: AuthUser;
 }
+
+const SupportContactDialog = ({ useruid }: AuthUser): JSX.Element => {
+    return (
+        <DashboardDialog footer='Send' header='Contact support' visible={true} onHide={() => {}}>
+            <InputText placeholder='E-mail' onChange={(e) => e.target.value} />
+            <InputText placeholder='Choose your topic' onChange={(e) => e.target.value} />
+            <InputTextarea
+                placeholder='Describe your problem...'
+                onChange={(e) => e.target.value}
+                className='p-dialog-description'
+            />
+        </DashboardDialog>
+    );
+};
 
 export default function Header(props: HeaderProps) {
     const menuRight = useRef<Menu>(null);
@@ -78,6 +95,7 @@ export default function Header(props: HeaderProps) {
                         </div>
                     </div>
                 </div>
+                <SupportContactDialog {...props.user} />
             </header>
         );
     }
