@@ -9,33 +9,18 @@ import { useNavigate } from "react-router-dom";
 import { getExtendedData } from "http/services/auth-user.service";
 import { localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { DashboardDialog } from "dashboard/dialog";
-import { InputText } from "primereact/inputtext";
-import { InputTextarea } from "primereact/inputtextarea";
+import { SupportContactDialog } from "dashboard/profile";
 
 export interface HeaderProps {
     user: AuthUser;
 }
-
-const SupportContactDialog = ({ useruid }: AuthUser): JSX.Element => {
-    return (
-        <DashboardDialog footer='Send' header='Contact support' visible={true} onHide={() => {}}>
-            <InputText placeholder='E-mail' onChange={(e) => e.target.value} />
-            <InputText placeholder='Choose your topic' onChange={(e) => e.target.value} />
-            <InputTextarea
-                placeholder='Describe your problem...'
-                onChange={(e) => e.target.value}
-                className='p-dialog-description'
-            />
-        </DashboardDialog>
-    );
-};
 
 export default function Header(props: HeaderProps) {
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const [dealerName, setDealerName] = useState<string>("");
     const [location, setLocation] = useState<string>("");
+    const [supportContact, setSupportContact] = useState<boolean>(false);
 
     useEffect(() => {
         getExtendedData(props.user.useruid).then((response) => {
@@ -61,7 +46,12 @@ export default function Header(props: HeaderProps) {
         { label: "Change location" },
         { label: "Users" },
         { separator: true },
-        { label: "Contact support" },
+        {
+            label: "Contact support",
+            command() {
+                setSupportContact(true);
+            },
+        },
         { label: "Support history" },
         { label: "Help" },
         { separator: true },
@@ -95,7 +85,10 @@ export default function Header(props: HeaderProps) {
                         </div>
                     </div>
                 </div>
-                <SupportContactDialog {...props.user} />
+                <SupportContactDialog
+                    onHide={() => setSupportContact(false)}
+                    visible={supportContact}
+                />
             </header>
         );
     }
