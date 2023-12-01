@@ -9,6 +9,7 @@ import { Task, TaskUser, createTask, getTasksUserList } from "http/services/task
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { DashboardDialog } from "dashboard/dialog";
+import { LS_APP_USER } from "common/constants/localStorage";
 
 const DialogIcon = ({ icon }: { icon: "search" | string }) => {
     return (
@@ -34,7 +35,7 @@ export const AddTaskDialog = ({ visible, onHide, header, currentTask }: AddTaskD
     const [assignToData, setAssignToData] = useState<TaskUser[] | null>(null);
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue("admss-client-app-user");
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             getTasksUserList(authUser.useruid).then((response) => {
                 if (response) setAssignToData(response);
