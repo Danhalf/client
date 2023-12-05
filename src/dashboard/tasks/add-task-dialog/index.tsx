@@ -8,7 +8,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Task, TaskUser, createTask, getTasksUserList } from "http/services/tasks.service";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
-import { DashboardDialog } from "dashboard/dialog";
+import { DashboardDialog } from "dashboard/common/dialog";
 import { LS_APP_USER } from "common/constants/localStorage";
 
 const DialogIcon = ({ icon }: { icon: "search" | string }) => {
