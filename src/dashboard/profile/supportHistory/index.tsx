@@ -2,7 +2,7 @@ import { DashboardDialog } from "dashboard/common/dialog";
 import { DialogProps } from "primereact/dialog";
 import "./index.css";
 import { useState } from "react";
-import { DataTable, DataTableExpandedRows, DataTableRowToggleEvent } from "primereact/datatable";
+import { DataTable, DataTableExpandedRows, DataTableRowClickEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
 
 const formatDate = (date: Date) => {
@@ -46,6 +46,20 @@ export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): JSX.Elem
         return <div>{data.body}</div>;
     };
 
+    const columnBody = ({ element, field }: { element: SupportHistory; field: string }) => {
+        const handleRowClick = () => {
+            // setExpandedRows([element] as any);
+        };
+
+        return <div onClick={handleRowClick}>{field}</div>;
+    };
+
+    const handleRowClick = (e: DataTableRowClickEvent) => {
+        // eslint-disable-next-line no-console
+        // console.log(e.data);
+        setExpandedRows([e.data]);
+    };
+
     return (
         <DashboardDialog
             className='dialog__contact-support history-support'
@@ -58,11 +72,21 @@ export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): JSX.Elem
                 rowExpansionTemplate={rowExpansionTemplate}
                 expandedRows={expandedRows}
                 onRowToggle={(e: any) => setExpandedRows(e.data)}
+                onRowClick={handleRowClick}
+                // rowHover
             >
-                <Column expander style={{ width: "3em" }} />
-                <Column field='from' header='From' />
-                <Column field='theme' header='Theme' />
-                <Column field='date' header='Date' />
+                <Column
+                    header='From'
+                    body={(element) => columnBody({ element: element, field: element.from })}
+                />
+                <Column
+                    header='Theme'
+                    body={(element) => columnBody({ element: element, field: element.theme })}
+                />
+                <Column
+                    header='Date'
+                    body={(element) => columnBody({ element: element, field: element.date })}
+                />
             </DataTable>
         </DashboardDialog>
     );
