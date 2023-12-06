@@ -36,6 +36,12 @@ const supportHistoryDummy = [
         date: formatDate(new Date()),
         body: "AGAIN!!! The last time i saved the file it was allright so i probably did something wrong but i dont know where to search",
     },
+    {
+        from: "Someone",
+        theme: "Tables placeholder",
+        date: formatDate(new Date()),
+        body: "very dark table, i don't know where to search for this file",
+    },
 ];
 
 export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): JSX.Element => {
@@ -43,20 +49,10 @@ export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): JSX.Elem
     const [expandedRows, setExpandedRows] = useState<DataTableExpandedRows[]>([]);
 
     const rowExpansionTemplate = (data: SupportHistory) => {
-        return <div>{data.body}</div>;
-    };
-
-    const columnBody = ({ element, field }: { element: SupportHistory; field: string }) => {
-        const handleRowClick = () => {
-            // setExpandedRows([element] as any);
-        };
-
-        return <div onClick={handleRowClick}>{field}</div>;
+        return <div className='datatable-hidden'>{data.body}</div>;
     };
 
     const handleRowClick = (e: DataTableRowClickEvent) => {
-        // eslint-disable-next-line no-console
-        // console.log(e.data);
         setExpandedRows([e.data]);
     };
 
@@ -71,22 +67,13 @@ export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): JSX.Elem
                 value={supportHistoryData}
                 rowExpansionTemplate={rowExpansionTemplate}
                 expandedRows={expandedRows}
-                onRowToggle={(e: any) => setExpandedRows(e.data)}
+                onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                 onRowClick={handleRowClick}
-                // rowHover
+                rowHover
             >
-                <Column
-                    header='From'
-                    body={(element) => columnBody({ element: element, field: element.from })}
-                />
-                <Column
-                    header='Theme'
-                    body={(element) => columnBody({ element: element, field: element.theme })}
-                />
-                <Column
-                    header='Date'
-                    body={(element) => columnBody({ element: element, field: element.date })}
-                />
+                <Column header='From' field='from' />
+                <Column header='Theme' field='theme' />
+                <Column header='Date' field='date' />
             </DataTable>
         </DashboardDialog>
     );
