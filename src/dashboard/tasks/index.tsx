@@ -6,6 +6,7 @@ import { AddTaskDialog } from "./add-task-dialog";
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { TaskSummaryDialog } from "./task-summary";
 
 export const Tasks = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -66,20 +67,28 @@ export const Tasks = () => {
         <>
             <h2 className='card-content__title uppercase'>Tasks</h2>
             <ul className='list-none ml-0 pl-0'>
-                {tasks.map((task) => (
-                    <li key={`${task.itemuid}-${task.index}`} className='mb-2'>
-                        <Checkbox
-                            name='task'
-                            disabled={checkboxDisabled}
-                            checked={checkboxStates[task.itemuid] || false}
-                            onChange={() => handleTaskStatusChange(task.itemuid)}
-                        />
-                        <label className='ml-2 cursor-pointer' onClick={() => handleEditTask(task)}>
-                            {task.taskname ||
-                                `${task.description} ${task.username ?? `- ${task.username}`}`}
-                        </label>
-                    </li>
-                ))}
+                {tasks &&
+                    tasks.map((task) => {
+                        return (
+                            <li key={`${task.itemuid}-${task.index}`} className='mb-2'>
+                                <Checkbox
+                                    name='task'
+                                    disabled={checkboxDisabled}
+                                    checked={checkboxStates[task.itemuid] || false}
+                                    onChange={() => handleTaskStatusChange(task.itemuid)}
+                                />
+                                <label
+                                    className='ml-2 cursor-pointer'
+                                    onClick={() => handleEditTask(task)}
+                                >
+                                    {task.taskname ||
+                                        `${task.description} ${
+                                            task.username ?? `- ${task.username}`
+                                        }`}
+                                </label>
+                            </li>
+                        );
+                    })}
             </ul>
             <span
                 className='add-task-control font-semibold cursor-pointer'
@@ -94,12 +103,21 @@ export const Tasks = () => {
                     onHide={() => setShowAddTaskDialog(false)}
                     header='Add Task'
                 />
-                {currentTask && (
+                {currentTask &&
+                currentTask.accountuid === authUser.useruid &&
+                currentTask?.useruid === authUser.useruid ? (
                     <AddTaskDialog
                         visible={showEditTaskDialog}
                         onHide={() => setShowEditTaskDialog(false)}
                         currentTask={currentTask}
                         header='Edit Task'
+                    />
+                ) : (
+                    <TaskSummaryDialog
+                        visible={showEditTaskDialog}
+                        onHide={() => setShowEditTaskDialog(false)}
+                        currentTask={currentTask as Task}
+                        header='Task summary'
                     />
                 )}
             </div>
