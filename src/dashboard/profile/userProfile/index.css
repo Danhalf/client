@@ -25,3 +25,12 @@
 .profile-row__value>div {
     width: 100%;
 }
+
+.profile__change-password {
+    color: var(--admss-app-main-blue);
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: auto;
+    margin-top: -20px;
+    border-bottom: 1px var(--admss-app-main-blue) dashed;
+}

@@ -16,12 +16,17 @@ export const UserProfileDialog = ({
     authUser,
 }: UserProfileDialogProps): JSX.Element => {
     const [user, setUser] = useState<AuthUser>(authUser);
+    const [newPassword, setNewPassword] = useState<boolean>(false);
 
     useEffect(() => {}, []);
 
     const handleSendSupportContact = (): void => {
-        onHide();
         return;
+    };
+
+    const handleCloseDialog = () => {
+        setNewPassword(false);
+        onHide();
     };
 
     return (
@@ -30,7 +35,7 @@ export const UserProfileDialog = ({
             footer='Save changes'
             header='My profile'
             visible={visible}
-            onHide={onHide}
+            onHide={handleCloseDialog}
             action={handleSendSupportContact}
         >
             <div className='user-profile__row profile-row'>
@@ -82,6 +87,39 @@ export const UserProfileDialog = ({
                     />
                 </div>
             </div>
+            {newPassword || (
+                <div className='user-profile__row profile-row'>
+                    <div className='profile__change-password' onClick={() => setNewPassword(true)}>
+                        Change password
+                    </div>
+                </div>
+            )}
+            {newPassword && (
+                <>
+                    <div className='user-profile__row profile-row'>
+                        <div className='profile-row__title'>New password</div>
+                        <div className='profile-row__value'>
+                            <Password
+                                className='w-100'
+                                value={""}
+                                onChange={(e) => {}}
+                                toggleMask
+                            />
+                        </div>
+                    </div>
+                    <div className='user-profile__row profile-row'>
+                        <div className='profile-row__title'>Confirm password</div>
+                        <div className='profile-row__value'>
+                            <Password
+                                className='w-100'
+                                value={""}
+                                onChange={(e) => {}}
+                                toggleMask
+                            />
+                        </div>
+                    </div>
+                </>
+            )}
             <div className='user-profile__row profile-row'>
                 <div className='profile-row__title'>Next payment</div>
                 <div className='profile-row__value'>16 of May, 2023</div>
