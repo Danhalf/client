@@ -1,11 +1,10 @@
 import { DashboardDialog } from "dashboard/common/dialog";
 import { InputText } from "primereact/inputtext";
-import { InputTextarea } from "primereact/inputtextarea";
 import { useEffect, useState } from "react";
 import { DialogProps } from "primereact/dialog";
-import { Dropdown } from "primereact/dropdown";
 import "./index.css";
 import { AuthUser } from "http/services/auth.service";
+import { Password } from "primereact/password";
 
 interface UserProfileDialogProps extends DialogProps {
     authUser: AuthUser;
@@ -17,8 +16,6 @@ export const UserProfileDialog = ({
     authUser,
 }: UserProfileDialogProps): JSX.Element => {
     const [user, setUser] = useState<AuthUser>(authUser);
-
-    const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
     useEffect(() => {}, []);
 
@@ -35,7 +32,6 @@ export const UserProfileDialog = ({
             visible={visible}
             onHide={onHide}
             action={handleSendSupportContact}
-            buttonDisabled={isButtonDisabled}
         >
             <div className='user-profile__row profile-row'>
                 <div className='profile-row__title'>User name</div>
@@ -78,11 +74,11 @@ export const UserProfileDialog = ({
             <div className='user-profile__row profile-row'>
                 <div className='profile-row__title'>Current password</div>
                 <div className='profile-row__value'>
-                    <InputText
-                        type='password'
-                        placeholder='Current password'
-                        value='password'
-                        onChange={(event) => {}}
+                    <Password
+                        className='w-100'
+                        value={"password"}
+                        onChange={(e) => {}}
+                        toggleMask
                     />
                 </div>
             </div>
