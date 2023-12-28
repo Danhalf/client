@@ -98,6 +98,7 @@ export default function Header(props: HeaderProps) {
                 />
                 <SupportHistoryDialog
                     onHide={() => setSupportHistory(false)}
+                    useruid={props.user.useruid}
                     visible={supportHistory}
                 />
             </header>

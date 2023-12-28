@@ -1,9 +1,13 @@
 import { DashboardDialog } from "dashboard/common/dialog";
 import { DialogProps } from "primereact/dialog";
 import "./index.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DataTable, DataTableExpandedRows, DataTableRowClickEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { getSupportMessages } from "http/services/support.service";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { AuthUser } from "http/services/auth.service";
+import { getKeyValue } from "services/local-storage.service";
 
 const formatDate = (date: Date) => {
     const day = date.getDate().toString().padStart(2, "0");
@@ -23,30 +27,28 @@ interface SupportHistory {
     body: string;
 }
 
-const supportHistoryDummy = [
-    {
-        from: "Support team",
-        theme: "Empty tables",
-        date: formatDate(new Date()),
-        body: "The last time i saved the file it was allright so i probably did something wrong but i dont know where to search",
-    },
-    {
-        from: "Support team",
-        theme: "Empty tables2",
-        date: formatDate(new Date()),
-        body: "AGAIN!!! The last time i saved the file it was allright so i probably did something wrong but i dont know where to search",
-    },
-    {
-        from: "Someone",
-        theme: "Tables placeholder",
-        date: formatDate(new Date()),
-        body: "very dark table, i don't know where to search for this file",
-    },
-];
+interface SupportContactDialogProps extends DialogProps {
+    useruid: string;
+}
 
-export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): JSX.Element => {
-    const [supportHistoryData] = useState<SupportHistory[]>(supportHistoryDummy);
+export const SupportHistoryDialog = ({
+    visible,
+    onHide,
+    useruid,
+}: SupportContactDialogProps): JSX.Element => {
+    const [supportHistoryData, setSupportHistoryData] = useState<SupportHistory[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableExpandedRows[]>([]);
+
+    useEffect(() => {
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        if (authUser && visible) {
+            getSupportMessages(useruid).then((response) => {
+                // eslint-disable-next-line no-console
+                console.log(response);
+                response && setSupportHistoryData(response);
+            });
+        }
+    }, [useruid, visible]);
 
     const rowExpansionTemplate = (data: SupportHistory) => {
         return <div className='datatable-hidden'>{data.body}</div>;
