@@ -4,7 +4,7 @@ import "./index.css";
 import { useEffect, useState } from "react";
 import { DataTable, DataTableExpandedRows, DataTableRowClickEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { getSupportMessages } from "http/services/support.service";
+import { getLatestSupportMessages, getSupportMessages } from "http/services/support.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
@@ -46,6 +46,10 @@ export const SupportHistoryDialog = ({
                 // eslint-disable-next-line no-console
                 console.log(response);
                 response && setSupportHistoryData(response);
+            });
+            getLatestSupportMessages(useruid).then((response) => {
+                // eslint-disable-next-line no-console
+                console.log(response);
             });
         }
     }, [useruid, visible]);
