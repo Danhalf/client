@@ -1,6 +1,6 @@
 import { DashboardDialog } from "dashboard/common/dialog";
 import { InputText } from "primereact/inputtext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DialogProps } from "primereact/dialog";
 import "./index.css";
 import { AuthUser } from "http/services/auth.service";
@@ -17,8 +17,6 @@ export const UserProfileDialog = ({
 }: UserProfileDialogProps): JSX.Element => {
     const [user, setUser] = useState<AuthUser>(authUser);
     const [newPassword, setNewPassword] = useState<boolean>(false);
-
-    useEffect(() => {}, []);
 
     const handleSendSupportContact = (): void => {
         return;

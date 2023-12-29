@@ -12,6 +12,8 @@
 .profile-row__title {
     flex: 0 1 40%;
     font-weight: 600;
+    text-align: right;
+    padding-right: 25px;
 }
 
 .profile-row__value {
@@ -22,7 +24,7 @@
 }
 
 .profile-row__value input,
-.profile-row__value>div {
+.profile-row__value > div {
     width: 100%;
 }
 
