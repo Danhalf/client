@@ -3,7 +3,7 @@ import { authorizedUserApiInstance } from "http/index";
 
 export const getSupportMessages = async (useruid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any[]>(`logs/${useruid}/support`);
+        const request = await authorizedUserApiInstance.get<any[]>(`log/${useruid}/support`);
         return request.data;
     } catch (error) {
         // TODO: add error handler
@@ -12,7 +12,7 @@ export const getSupportMessages = async (useruid: string) => {
 
 export const getLatestSupportMessages = async (useruid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any[]>(`logs/${useruid}/latest`);
+        const request = await authorizedUserApiInstance.get<any[]>(`log/${useruid}/latest`);
         return request.data;
     } catch (error) {
         // TODO: add error handler
