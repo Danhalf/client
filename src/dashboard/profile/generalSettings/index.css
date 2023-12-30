@@ -1,0 +1,11 @@
+.general-settings {
+    width: 1020px;
+}
+
+.general-settings__tab .p-tabview-nav {
+    flex-direction: column;
+    width: 294px;
+    border: none;
+    min-height: 527px;
+    border-right: 5px solid var(--admss-app-light-blue);
+}
