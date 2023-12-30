@@ -2,10 +2,21 @@
     width: 1020px;
 }
 
-.general-settings__tab .p-tabview-nav {
+.general-settings__tabs .p-tabview-nav {
     flex-direction: column;
     width: 294px;
     border: none;
     min-height: 527px;
     border-right: 5px solid var(--admss-app-light-blue);
+    gap: 10px;
+}
+
+.general-settings__tabs > .p-tabview-nav-container a.p-tabview-nav-link {
+    color: var(--admss-app-primary);
+    border: none;
+}
+
+.general-settings__tabs > .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+    color: var(--admss-app-primary);
+    background: var(--admss-app-light-blue);
 }
