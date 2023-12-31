@@ -2,8 +2,14 @@
     width: 1020px;
 }
 
+.general-settings__tabs {
+    display: flex;
+    border-right: 2px solid var(--admss-app-light-blue);
+}
+
 .general-settings__tabs .p-tabview-nav {
     flex-direction: column;
+    flex: 0 0;
     width: 294px;
     border: none;
     min-height: 527px;
