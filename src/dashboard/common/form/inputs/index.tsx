@@ -1,61 +1,36 @@
 import { useState } from "react";
-import { RadioButton, RadioButtonChangeEvent } from "primereact/radiobutton";
+import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
+import "./index.css";
 
-export const DashboardRadio = (): JSX.Element => {
-    const [ingredient, setIngredient] = useState<string>("");
+interface DashboardRadioProps {
+    radioArray: RadioButtonProps[];
+}
+
+export const DashboardRadio = ({ radioArray }: DashboardRadioProps): JSX.Element => {
+    const [radioValue, setRadioValue] = useState<string | number>("" || 0);
 
     return (
-        <div className='card flex justify-content-center'>
-            <div className='flex flex-wrap gap-3'>
-                <div className='flex align-items-center'>
-                    <RadioButton
-                        inputId='ingredient1'
-                        name='pizza'
-                        value='Cheese'
-                        onChange={(e: RadioButtonChangeEvent) => setIngredient(e.value)}
-                        checked={ingredient === "Cheese"}
-                    />
-                    <label htmlFor='ingredient1' className='ml-2'>
-                        Cheese
+        <div className='flex flex-wrap gap-3 justify-content-between dashboard-radio'>
+            {radioArray.map(({ name, title, value }) => (
+                <div
+                    key={name}
+                    className='flex align-items-center justify-content-between dashboard-radio__item radio-item border-round'
+                >
+                    <div className='radio-item__input flex align-items-center justify-content-center'>
+                        <RadioButton
+                            inputId={name}
+                            name={name}
+                            value={value}
+                            onChange={(e: RadioButtonChangeEvent) => setRadioValue(e.value)}
+                            checked={radioValue === value}
+                        />
+                    </div>
+
+                    <label htmlFor={name} className='radio-item__label'>
+                        {title}
                     </label>
                 </div>
-                <div className='flex align-items-center'>
-                    <RadioButton
-                        inputId='ingredient2'
-                        name='pizza'
-                        value='Mushroom'
-                        onChange={(e: RadioButtonChangeEvent) => setIngredient(e.value)}
-                        checked={ingredient === "Mushroom"}
-                    />
-                    <label htmlFor='ingredient2' className='ml-2'>
-                        Mushroom
-                    </label>
-                </div>
-                <div className='flex align-items-center'>
-                    <RadioButton
-                        inputId='ingredient3'
-                        name='pizza'
-                        value='Pepper'
-                        onChange={(e: RadioButtonChangeEvent) => setIngredient(e.value)}
-                        checked={ingredient === "Pepper"}
-                    />
-                    <label htmlFor='ingredient3' className='ml-2'>
-                        Pepper
-                    </label>
-                </div>
-                <div className='flex align-items-center'>
-                    <RadioButton
-                        inputId='ingredient4'
-                        name='pizza'
-                        value='Onion'
-                        onChange={(e: RadioButtonChangeEvent) => setIngredient(e.value)}
-                        checked={ingredient === "Onion"}
-                    />
-                    <label htmlFor='ingredient4' className='ml-2'>
-                        Onion
-                    </label>
-                </div>
-            </div>
+            ))}
         </div>
     );
 };

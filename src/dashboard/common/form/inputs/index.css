@@ -1,0 +1,23 @@
+.radio-item {
+    width: 250px;
+    height: 50px;
+    flex-shrink: 0;
+    border: 1px solid var(--admss-app-light-grey);
+}
+
+.dashboard-radio .radio-item__input {
+    order: 2;
+    border-left: 1px solid var(--admss-app-light-grey);
+    height: 100%;
+    background-color: var(--admss-app-lightest-grey);
+    padding: 0 10px;
+}
+
+.dashboard-radio .radio-item__label {
+    padding-left: 10px;
+    order: 1;
+}
+
+.dashboard-radio .p-radiobutton-checked .p-radiobutton-box.p-highlight {
+    border: var(--admss-app-dark-green) solid 4px;
+}

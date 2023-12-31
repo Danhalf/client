@@ -16,28 +16,38 @@ interface TabItem {
     component: JSX.Element;
 }
 
-const tabItems: TabItem[] = [
-    { settingName: "Deals", component: <SettingsDeals /> },
-    { settingName: "Fees", component: <SettingsFees /> },
-    { settingName: "Taxes", component: <SettingsTaxes /> },
-    { settingName: "Stock# for new inventory ", component: <SettingsStockNew /> },
-    { settingName: "Stock# for trade-in inventory", component: <SettingsStockTradeIn /> },
-    { settingName: "Account Settings", component: <SettingsAccount /> },
-    { settingName: "Contract Settings", component: <SettingsContract /> },
-    { settingName: "Lease Settings", component: <SettingsLease /> },
-];
-
 export const GeneralSettingsDialog = ({ visible, onHide }: DialogProps): JSX.Element => {
     const handleSendSupportContact = (): void => {
         onHide();
         return;
     };
 
+    const tabItems: TabItem[] = [
+        {
+            settingName: "Deals",
+            component: (
+                <SettingsDeals
+                    settings={[
+                        { name: "deal1", title: "Default deal type", value: 0 },
+                        { name: "deal3", title: "Default deal status", value: 1 },
+                    ]}
+                />
+            ),
+        },
+        { settingName: "Fees", component: <SettingsFees /> },
+        { settingName: "Taxes", component: <SettingsTaxes /> },
+        { settingName: "Stock# for new inventory ", component: <SettingsStockNew /> },
+        { settingName: "Stock# for trade-in inventory", component: <SettingsStockTradeIn /> },
+        { settingName: "Account Settings", component: <SettingsAccount /> },
+        { settingName: "Contract Settings", component: <SettingsContract /> },
+        { settingName: "Lease Settings", component: <SettingsLease /> },
+    ];
+
     return (
         <>
             <DashboardDialog
                 className='dialog__general-settings general-settings'
-                footer='Send'
+                footer='Save'
                 header='General settings'
                 visible={visible}
                 onHide={onHide}
@@ -45,7 +55,9 @@ export const GeneralSettingsDialog = ({ visible, onHide }: DialogProps): JSX.Ele
             >
                 <TabView className='general-settings__tabs'>
                     {tabItems.map(({ settingName, component }) => {
-                        return <TabPanel header={settingName} children={component} />;
+                        return (
+                            <TabPanel header={settingName} children={component} key={settingName} />
+                        );
                     })}
                 </TabView>
             </DashboardDialog>
