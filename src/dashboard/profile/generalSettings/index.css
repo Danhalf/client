@@ -30,4 +30,5 @@
 .general-settings__tabs > .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
     color: var(--admss-app-primary);
     background: var(--admss-app-light-blue);
+    border-radius: 0;
 }

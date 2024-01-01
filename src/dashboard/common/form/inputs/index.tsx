@@ -41,20 +41,47 @@ export const CurrencyInput = ({ name, value, title, ...props }: InputNumberProps
     return (
         <div
             key={name}
-            className='flex align-items-center justify-content-between dashboard-number__item number-item'
+            className='flex align-items-center justify-content-between dashboard-currency__item currency-item'
         >
-            <label htmlFor={name} className='number-item__label'>
+            <label htmlFor={name} className='currency-item__label'>
                 {title}
             </label>
-            <div className='number-item__input flex justify-content-center'>
-                <div className='number-item__icon'>$</div>
+            <div className='currency-item__input flex justify-content-center'>
+                <div className='currency-item__icon input-icon input-icon--left'>$</div>
                 <InputNumber
                     {...props}
+                    minFractionDigits={2}
+                    locale='en-US'
                     inputId={name}
                     name={name}
                     value={inputValue}
                     onChange={(e: InputNumberChangeEvent) => setInputValue(e.value)}
                 />
+            </div>
+        </div>
+    );
+};
+
+export const PercentInput = ({ name, value, title, ...props }: InputNumberProps): JSX.Element => {
+    const [inputValue, setInputValue] = useState<number | null>(value || 0);
+    return (
+        <div
+            key={name}
+            className='flex align-items-center justify-content-between dashboard-percent__item percent-item'
+        >
+            <label htmlFor={name} className='percent-item__label'>
+                {title}
+            </label>
+            <div className='percent-item__input flex justify-content-center'>
+                <InputNumber
+                    {...props}
+                    inputId={name}
+                    minFractionDigits={2}
+                    name={name}
+                    value={inputValue}
+                    onChange={(e: InputNumberChangeEvent) => setInputValue(e.value)}
+                />
+                <div className='percent-item__icon input-icon input-icon--right'>%</div>
             </div>
         </div>
     );
