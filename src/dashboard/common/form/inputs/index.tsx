@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
+import { InputNumber, InputNumberChangeEvent, InputNumberProps } from "primereact/inputnumber";
 
 interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
@@ -31,6 +32,30 @@ export const DashboardRadio = ({ radioArray }: DashboardRadioProps): JSX.Element
                     </label>
                 </div>
             ))}
+        </div>
+    );
+};
+
+export const CurrencyInput = ({ name, value, title, ...props }: InputNumberProps): JSX.Element => {
+    const [inputValue, setInputValue] = useState<number | null>(value || 0);
+    return (
+        <div
+            key={name}
+            className='flex align-items-center justify-content-between dashboard-number__item number-item'
+        >
+            <label htmlFor={name} className='number-item__label'>
+                {title}
+            </label>
+            <div className='number-item__input flex justify-content-center'>
+                <div className='number-item__icon'>$</div>
+                <InputNumber
+                    {...props}
+                    inputId={name}
+                    name={name}
+                    value={inputValue}
+                    onChange={(e: InputNumberChangeEvent) => setInputValue(e.value)}
+                />
+            </div>
         </div>
     );
 };

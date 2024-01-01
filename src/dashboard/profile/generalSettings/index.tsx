@@ -56,7 +56,12 @@ export const GeneralSettingsDialog = ({ visible, onHide }: DialogProps): JSX.Ele
                 <TabView className='general-settings__tabs'>
                     {tabItems.map(({ settingName, component }) => {
                         return (
-                            <TabPanel header={settingName} children={component} key={settingName} />
+                            <TabPanel
+                                header={settingName}
+                                children={component}
+                                key={settingName}
+                                className='general-settings__panel'
+                            />
                         );
                     })}
                 </TabView>
