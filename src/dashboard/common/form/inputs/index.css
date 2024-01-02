@@ -47,10 +47,6 @@
 
 /* Currency input */
 
-.currency-item {
-    margin-bottom: 20px;
-}
-
 .currency-item__input,
 .currency-item__input input {
     height: 48px;
