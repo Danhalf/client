@@ -47,7 +47,17 @@ export const GeneralSettingsDialog = ({ visible, onHide }: DialogProps): JSX.Ele
                 />
             ),
         },
-        { settingName: "Stock# for trade-in inventory", component: <SettingsStockTradeIn /> },
+        {
+            settingName: "Stock# for trade-in inventory",
+            component: (
+                <SettingsStockTradeIn
+                    radioSettings={[
+                        { name: "6vin", title: "Last 6 of VIN", value: 0 },
+                        { name: "8vin", title: "Last 8 of VIN", value: 1 },
+                    ]}
+                />
+            ),
+        },
         { settingName: "Account Settings", component: <SettingsAccount /> },
         { settingName: "Contract Settings", component: <SettingsContract /> },
         { settingName: "Lease Settings", component: <SettingsLease /> },
