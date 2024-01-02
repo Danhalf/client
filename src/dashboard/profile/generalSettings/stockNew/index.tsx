@@ -15,7 +15,7 @@ interface SettingsStockNewProps {
 }
 
 export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewProps) => {
-    const [value, setValue] = useState<number>(50);
+    const [value, setValue] = useState<number>(5);
     return (
         <div className='stock-new'>
             <div className='text-lg pb-4 font-semibold'>Stock# for new inventory</div>
@@ -30,20 +30,25 @@ export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewPr
                 <InputText placeholder='Suffix' className='stock-new__input' />
             </div>
             <DashboardRadio radioArray={radioSettings} />
-            <div className='my-4'>
-                <InputText
-                    value={String(value)}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                        setValue(Number(e.target.value))
-                    }
-                    className='w-full'
-                />
-                <Slider
-                    value={value}
-                    onChange={(e: SliderChangeEvent) => setValue(Number(e.value))}
-                    max={10}
-                    className='w-full'
-                />
+            <div className='flex my-4'>
+                <label htmlFor={settings} className='ml-2'>
+                    Fixed digits
+                </label>
+                <div className='flex-1 ml-8'>
+                    <InputText
+                        value={String(value)}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            setValue(Number(e.target.value))
+                        }
+                        className='w-full'
+                    />
+                    <Slider
+                        value={value}
+                        onChange={(e: SliderChangeEvent) => setValue(Number(e.value))}
+                        max={10}
+                        className='w-full'
+                    />
+                </div>
             </div>
         </div>
     );
