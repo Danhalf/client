@@ -17,8 +17,8 @@ interface SettingsStockNewProps {
 export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewProps) => {
     const [value, setValue] = useState<number>(5);
     return (
-        <div className='stock-new'>
-            <div className='text-lg pb-4 font-semibold'>Stock# for new inventory</div>
+        <div className='stock-new flex flex-column gap-4'>
+            <div className='text-lg font-semibold'>Stock# for new inventory</div>
             <div className='flex align-items-center'>
                 <Checkbox inputId={settings} name={settings} value={settings} checked />
                 <label htmlFor={settings} className='ml-2'>
@@ -26,11 +26,17 @@ export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewPr
                 </label>
             </div>
             <div className='flex align-items-center justify-content-between'>
-                <InputText placeholder='Prefix' className='stock-new__input' />
-                <InputText placeholder='Suffix' className='stock-new__input' />
+                <span className='p-float-label'>
+                    <InputText id='stock-new-prefix' className='stock-new__input' />
+                    <label htmlFor='stock-new-prefix'>Prefix</label>
+                </span>
+                <span className='p-float-label'>
+                    <InputText id='stock-new-suffix' className='stock-new__input' />
+                    <label htmlFor='stock-new-suffix'>Suffix</label>
+                </span>
             </div>
             <DashboardRadio radioArray={radioSettings} />
-            <div className='flex my-4'>
+            <div className='flex'>
                 <label htmlFor={settings} className='ml-2'>
                     Fixed digits
                 </label>

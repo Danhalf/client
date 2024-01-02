@@ -17,8 +17,8 @@ interface SettingsStockTradeInProps {
 export const SettingsStockTradeIn = ({ settings, radioSettings }: SettingsStockTradeInProps) => {
     const [value, setValue] = useState<number>(5);
     return (
-        <div className='stock-trade-in'>
-            <div className='text-lg pb-4 font-semibold'>Stock# for trade-in</div>
+        <div className='stock-trade-in flex flex-column gap-4'>
+            <div className='text-lg font-semibold'>Stock# for trade-in</div>
             <div className='flex justify-content-between'>
                 <div className='flex align-items-center stock-trade-in__input'>
                     <Checkbox inputId={settings} name={settings} value={settings} checked />
@@ -34,11 +34,17 @@ export const SettingsStockTradeIn = ({ settings, radioSettings }: SettingsStockT
                 </div>
             </div>
             <div className='flex align-items-center justify-content-between'>
-                <InputText placeholder='Prefix' className='stock-trade-in__input' />
-                <InputText placeholder='Suffix' className='stock-trade-in__input' />
+                <span className='p-float-label'>
+                    <InputText id='stock-trade-in-prefix' className='stock-trade-in__input' />
+                    <label htmlFor='stock-trade-in-prefix'>Prefix</label>
+                </span>
+                <span className='p-float-label'>
+                    <InputText id='stock-trade-in-suffix' className='stock-trade-in__input' />
+                    <label htmlFor='stock-trade-in-suffix'>Suffix</label>
+                </span>
             </div>
             <DashboardRadio radioArray={radioSettings} />
-            <div className='flex my-4'>
+            <div className='flex'>
                 <label htmlFor={settings} className='ml-2'>
                     Fixed digits
                 </label>

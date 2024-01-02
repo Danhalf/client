@@ -27,8 +27,25 @@
     border: none;
 }
 
+.p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+    box-shadow: none;
+}
+
 .general-settings__tabs > .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
     color: var(--admss-app-primary);
     background: var(--admss-app-light-blue);
     border-radius: 0;
+}
+
+.general-settings .p-slider .p-slider-handle {
+    border-radius: 50%;
+    background: #fff;
+}
+
+.general-settings .p-slider .p-slider-handle:focus {
+    box-shadow: none;
+}
+
+.general-settings .p-inputtext:enabled:focus + label {
+    margin: 0;
 }
