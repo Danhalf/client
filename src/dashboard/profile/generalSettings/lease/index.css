@@ -14,6 +14,11 @@
     height: 50px;
 }
 
+.lease-settings__factor-label {
+    width: 112px;
+    margin-right: 22px;
+}
+
 .lease-settings__mileage-label {
     width: 81px;
 }

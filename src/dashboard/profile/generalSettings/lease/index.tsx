@@ -1,7 +1,6 @@
-import { CurrencyInput, PercentInput } from "dashboard/common/form/inputs";
+import { CurrencyInput } from "dashboard/common/form/inputs";
 import { Dropdown } from "primereact/dropdown";
 import "./index.css";
-import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 
 export const SettingsLease = () => {
