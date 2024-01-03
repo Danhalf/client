@@ -16,7 +16,18 @@
 
 .lease-settings__factor-label {
     width: 112px;
-    margin-right: 22px;
+}
+
+.lease-settings__factor-input input {
+    width: 116px;
+}
+
+.lease-settings-currency .currency-item__input input {
+    width: 98px;
+}
+
+.lease-settings-currency .input {
+    width: 116px;
 }
 
 .lease-settings__mileage-label {

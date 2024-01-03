@@ -8,7 +8,7 @@ export const SettingsLease = () => {
         <div className='lease-settings flex flex-column gap-4'>
             <div className='text-lg font-semibold'>Lease Settings</div>
             <div className='lease-settings__row'>
-                <div className='flex align-items-center'>
+                <div className='flex align-items-center justify-content-between'>
                     <label
                         htmlFor='lease-settings__factor'
                         className='lease-settings__factor-label'
