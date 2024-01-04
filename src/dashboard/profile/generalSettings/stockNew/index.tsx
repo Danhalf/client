@@ -3,7 +3,7 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { DashboardRadio } from "dashboard/common/form/inputs";
 import { Slider, SliderChangeEvent } from "primereact/slider";
-import {  useState } from "react";
+import { useState } from "react";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 
 interface SettingsStockNewProps {
@@ -28,12 +28,12 @@ export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewPr
             </div>
             <div className='flex align-items-center justify-content-between'>
                 <span className='p-float-label'>
-                    <InputText id='stock-new-prefix' className='stock-new__input' />
-                    <label htmlFor='stock-new-prefix'>Prefix</label>
+                    <InputText className='stock-new__input' />
+                    <label className='float-label'>Prefix</label>
                 </span>
                 <span className='p-float-label'>
-                    <InputText id='stock-new-suffix' className='stock-new__input' />
-                    <label htmlFor='stock-new-suffix'>Suffix</label>
+                    <InputText className='stock-new__input' />
+                    <label className='float-label'>Suffix</label>
                 </span>
             </div>
             <DashboardRadio radioArray={radioSettings} />
@@ -43,11 +43,9 @@ export const SettingsStockNew = ({ settings, radioSettings }: SettingsStockNewPr
                 </label>
                 <div className='flex-1 ml-8'>
                     <InputNumber
-                        value={(value)}
+                        value={value}
                         max={10}
-                        onChange={(e: InputNumberChangeEvent) =>
-                            setValue(Number(e.value))
-                        }
+                        onChange={(e: InputNumberChangeEvent) => setValue(Number(e.value))}
                         className='w-full'
                     />
                     <Slider
