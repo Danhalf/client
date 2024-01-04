@@ -16,23 +16,17 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
         <div className='account flex flex-column gap-4'>
             <div className='text-lg font-semibold'>Account Settings</div>
             <div className='flex justify-content-between align-items-center account-start-number'>
-                <label
-                    htmlFor='account-start-number'
-                    className='account-start-number__label ml-2 wrap'
-                >
+                <label className='account-start-number__label ml-2 wrap'>
                     Start number (starts from 0 by default)
                 </label>
                 <InputText
                     value={"0"}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => {}}
-                    id='account-start-number'
                     className='account-start-number__input'
                 />
             </div>
             <div className='flex align-items-center'>
-                <label htmlFor={settings} className='ml-2'>
-                    Fixed digits
-                </label>
+                <label className='ml-2'>Fixed digits</label>
                 <div className='flex-1 ml-8'>
                     <InputNumber
                         value={valueDigits}
@@ -50,12 +44,12 @@ export const SettingsAccount = ({ settings }: SettingsAccountProps) => {
             </div>
             <div className='flex align-items-center justify-content-between'>
                 <span className='p-float-label'>
-                    <InputText id='account-prefix' className='account__input' />
-                    <label htmlFor='account-prefix'>Prefix</label>
+                    <InputText className='account__input' />
+                    <label>Prefix</label>
                 </span>
                 <span className='p-float-label'>
-                    <InputText id='account-suffix' className='account__input' />
-                    <label htmlFor='account-suffix'>Suffix</label>
+                    <InputText className='account__input' />
+                    <label>Suffix</label>
                 </span>
             </div>
             <div className='flex align-items-center justify-content-between'>

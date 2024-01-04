@@ -22,6 +22,6 @@
     width: 361px;
 }
 
-.account-percentage label {
+.account-percentage .percent-item__label {
     width: 106px;
 }
