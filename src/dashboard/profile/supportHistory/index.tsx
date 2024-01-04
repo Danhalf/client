@@ -4,28 +4,10 @@ import "./index.css";
 import { useEffect, useState } from "react";
 import { DataTable, DataTableExpandedRows, DataTableRowClickEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { getLatestSupportMessages, getSupportMessages } from "http/services/support.service";
+import { SupportHistory, getSupportMessages } from "http/services/support.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
-
-const formatDate = (date: Date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const seconds = date.getSeconds().toString().padStart(2, "0");
-
-    return `${day}.${month}.${year} ${hours}:${minutes}:${seconds}`;
-};
-
-interface SupportHistory {
-    from: string;
-    theme: string;
-    date: string;
-    body: string;
-}
 
 interface SupportContactDialogProps extends DialogProps {
     useruid: string;
@@ -43,19 +25,13 @@ export const SupportHistoryDialog = ({
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser && visible) {
             getSupportMessages(useruid).then((response) => {
-                // eslint-disable-next-line no-console
-                console.log(response);
                 response && setSupportHistoryData(response);
-            });
-            getLatestSupportMessages(useruid).then((response) => {
-                // eslint-disable-next-line no-console
-                console.log(response);
             });
         }
     }, [useruid, visible]);
 
     const rowExpansionTemplate = (data: SupportHistory) => {
-        return <div className='datatable-hidden'>{data.body}</div>;
+        return <div className='datatable-hidden'>{data.message}</div>;
     };
 
     const handleRowClick = (e: DataTableRowClickEvent) => {
@@ -77,9 +53,9 @@ export const SupportHistoryDialog = ({
                 onRowClick={handleRowClick}
                 rowHover
             >
-                <Column header='From' field='from' />
-                <Column header='Theme' field='theme' />
-                <Column header='Date' field='date' />
+                <Column header='From' field='useruid' />
+                <Column header='Theme' field='topic' />
+                <Column header='Date' field='created' />
             </DataTable>
         </DashboardDialog>
     );
