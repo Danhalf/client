@@ -1,31 +1,35 @@
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 
 /* eslint-disable jsx-a11y/anchor-is-valid */
-interface InventoryMenuItem extends MenuItem {
-    itemIndex: number;
+
+export interface InventoryItem extends MenuItem {
+    itemLabel: string;
+    itemIndex?: number;
+    component?: JSX.Element;
 }
 
-interface Inventory {
+export interface Inventory {
     label: string;
-    items: InventoryMenuItem[];
-    sectionId?: number;
+    items: InventoryItem[];
+    sectionId: number;
     startIndex: number;
-    getLength?: () => number;
+    getLength: () => number;
 }
 
-class InventorySection implements Inventory {
+export class InventorySection implements Inventory {
     static instancesCount: number = 0;
     static itemIndex: number = 0;
     sectionId: number;
     label: string;
     startIndex: number = 0;
-    items: InventoryMenuItem[];
+    items: InventoryItem[];
 
-    constructor({ label, items }: { label: string; items: string[] }) {
+    constructor({ label, items }: { label: string; items: InventoryItem[] }) {
         this.sectionId = ++InventorySection.instancesCount;
         this.label = label;
-        this.items = items.map((label) => ({
-            label,
+        this.items = items.map(({ itemLabel, component }) => ({
+            itemLabel,
+            component,
             itemIndex: InventorySection.itemIndex++,
             template: (item: MenuItem, options: MenuItemOptions) => this.newTemplate(item, options),
         }));
@@ -59,27 +63,10 @@ class InventorySection implements Inventory {
     }
 }
 
-const sections = [
-    {
-        label: "Vehicle",
-        items: [
-            "General",
-            "Description",
-            "Options",
-            "Checks",
-            "Inspections",
-            "Keys",
-            "Disclosures",
-            "Other",
-        ],
-    },
-    {
-        label: "Purchase",
-        items: ["Floorplan", "Consign", "Title", "Purchases", "Expenses", "Payments"],
-    },
-    { label: "Media data", items: ["Images", "Video", "Audio", "Documents"] },
-];
-
-export const inventorySections: InventorySection[] = sections.map(
-    (sectionData) => new InventorySection(sectionData)
-);
+// const sections = [
+//     {
+//         label: "Purchase",
+//         items: ["Floorplan", "Consign", "Title", "Purchases", "Expenses", "Payments"],
+//     },
+//     { label: "Media data", items: ["Images", "Video", "Audio", "Documents"] },
+// ];

@@ -3,13 +3,21 @@ import { Steps } from "primereact/steps";
 import "./index.css";
 import { useEffect, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { InventoryVehicle } from "./vehicle";
-import { inventorySections } from "../common";
+import { InventoryVehicle, InventoryVehicleData } from "./vehicle";
+// import { inventorySections } from "../common";
 import { Button } from "primereact/button";
+import { InventorySection } from "../common";
+import React from "react";
+
+export const inventorySections = [InventoryVehicleData].map(
+    (sectionData) => new InventorySection(sectionData)
+);
 
 export const CreateInventory = () => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(6);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    const [isValidData, setIsValidData] = useState<boolean>(false);
 
     const accordionSteps = inventorySections.map((item) => item.startIndex);
     const itemsMenuCount = inventorySections.reduce(
@@ -52,7 +60,12 @@ export const CreateInventory = () => {
                                             header={section.label}
                                         >
                                             <Steps
-                                                model={section.items}
+                                                model={section.items.map(
+                                                    ({ itemLabel, template }) => ({
+                                                        label: itemLabel,
+                                                        template,
+                                                    })
+                                                )}
                                                 activeIndex={stepActiveIndex - section.startIndex}
                                                 className='vertical-step-menu'
                                                 pt={{
@@ -68,11 +81,25 @@ export const CreateInventory = () => {
                                 </Accordion>
                             </div>
                             <div className='col-8 flex flex-column'>
-                                <InventoryVehicle
-                                    itemsLength={inventorySections[0].getLength() - 1}
-                                    menuIndex={stepActiveIndex}
-                                    setMenuIndex={setStepActiveIndex}
-                                />
+                                <InventoryVehicle>
+                                    {inventorySections.map((section) => (
+                                        <React.Fragment key={section.sectionId}>
+                                            {section.items.map((item, index) => (
+                                                <div
+                                                    key={index}
+                                                    style={{
+                                                        display:
+                                                            stepActiveIndex === index
+                                                                ? "block"
+                                                                : "none",
+                                                    }}
+                                                >
+                                                    {item.component}
+                                                </div>
+                                            ))}
+                                        </React.Fragment>
+                                    ))}
+                                </InventoryVehicle>
                                 <div className='flex justify-content-end gap-3'>
                                     <Button
                                         onClick={() => setStepActiveIndex((prev) => --prev)}
@@ -92,7 +119,7 @@ export const CreateInventory = () => {
                                     </Button>
                                     <Button
                                         onClick={() => {}}
-                                        // disabled={menuIndex !== itemsLength}
+                                        disabled={!isValidData}
                                         className='uppercase px-6'
                                     >
                                         Save
