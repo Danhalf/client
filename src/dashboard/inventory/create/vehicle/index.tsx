@@ -3,7 +3,7 @@ import "./index.css";
 
 interface InventoryVehicleProps {
     menuIndex: number;
-    itemsLength: number;
+    itemsLength?: number;
     setMenuIndex: (index: number) => void;
 }
 
