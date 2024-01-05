@@ -6,7 +6,6 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    min-height: 840px;
 }
 
 .create-inventory__accordion {
@@ -25,6 +24,7 @@
     .p-accordion-header-link[aria-expanded="true"] {
     border: none;
     background: white;
+    box-shadow: none;
     background-color: white;
 }
 
