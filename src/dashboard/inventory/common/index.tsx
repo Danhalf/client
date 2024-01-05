@@ -62,11 +62,3 @@ export class InventorySection implements Inventory {
         return this.items.length;
     }
 }
-
-// const sections = [
-//     {
-//         label: "Purchase",
-//         items: ["Floorplan", "Consign", "Title", "Purchases", "Expenses", "Payments"],
-//     },
-//     { label: "Media data", items: ["Images", "Video", "Audio", "Documents"] },
-// ];

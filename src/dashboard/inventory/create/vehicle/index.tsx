@@ -24,10 +24,8 @@ export const InventoryVehicleData: Pick<Inventory, "label" | "items"> = {
     ],
 };
 
-export const InventoryVehicle = ({ children }: PropsWithChildren<{}>): JSX.Element => {
-    return (
-        <>
-            <div className='flex flex-grow-1 inventory-vehicle'>{children}</div>
-        </>
-    );
+interface VehicleOptionsProps extends PropsWithChildren {}
+
+export const InventoryVehicle = ({ children }: VehicleOptionsProps): JSX.Element => {
+    return <div className='flex flex-grow-1 inventory-vehicle'>{children}</div>;
 };

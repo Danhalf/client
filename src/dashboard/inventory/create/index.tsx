@@ -8,13 +8,17 @@ import { InventoryVehicle, InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
 import { InventorySection } from "../common";
 import React from "react";
+import { InventoryPurchaseData } from "./purchase";
+import { InventoryMediaData } from "./mediaData";
 
-export const inventorySections = [InventoryVehicleData].map(
-    (sectionData) => new InventorySection(sectionData)
-);
+export const inventorySections = [
+    InventoryVehicleData,
+    InventoryPurchaseData,
+    InventoryMediaData,
+].map((sectionData) => new InventorySection(sectionData));
 
 export const CreateInventory = () => {
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(6);
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     const [isValidData, setIsValidData] = useState<boolean>(false);
