@@ -2,15 +2,35 @@
     min-height: 983px;
 }
 
-.create-inventory__content {
+.create-inventory__card {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     min-height: 840px;
 }
 
-.vertical-step-menu.p-steps {
-    display: flex;
+.create-inventory__accordion {
+    min-height: 705px;
+    border: none;
+    border-right: 2px solid var(--admss-app-light-blue);
+}
+
+.create-inventory__accordion .p-accordion-header .p-accordion-header-link,
+.create-inventory__accordion .p-accordion-header.p-highlight:hover .p-accordion-header-link:hover,
+.create-inventory__accordion
+    .p-accordion-header:not(.p-highlight):not(.p-disabled):hover
+    .p-accordion-header-link,
+.create-inventory__accordion
+    .p-accordion-header.p-highlight
+    .p-accordion-header-link[aria-expanded="true"] {
+    border: none;
+    background: white;
+    background-color: white;
+}
+
+.create-inventory__accordion .p-accordion-content {
+    padding: 0;
+    border: none;
 }
 
 .vertical-step-menu.p-steps .p-steps-item::before {
@@ -32,7 +52,7 @@
     position: absolute;
     top: 11px;
     width: 1px;
-    height: 210%;
+    height: 40px;
     background: #ccc;
 }
 
@@ -44,7 +64,7 @@
     position: absolute;
     bottom: 11px;
     width: 1px;
-    height: 210%;
+    height: 40px;
     background: #ccc;
 }
 

@@ -2,7 +2,9 @@ import { Steps } from "primereact/steps";
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
 import "./index.css";
 import { useState } from "react";
+import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
+import { InventoryVehicle } from "./vehicle";
 
 const newTemplate = (item: MenuItem, options: MenuItemOptions) => {
     return (
@@ -14,7 +16,6 @@ const newTemplate = (item: MenuItem, options: MenuItemOptions) => {
             data-pc-section='action'
         >
             <span
-                //  className={`p-steps-number flex-grow-0  bg-white border-circle ${options.iconClassName}`}
                 className={"vertical-nav__icon p-steps-number border-circle "}
                 data-pc-section='step'
             ></span>
@@ -61,7 +62,8 @@ const itemsWithTemplate = items.map((item: MenuItem) => ({
 }));
 
 export const CreateInventory = () => {
-    const [activeIndex, setActiveIndex] = useState<number>(0);
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
+    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number>(0);
 
     return (
         <div className='grid'>
@@ -70,43 +72,55 @@ export const CreateInventory = () => {
                     <div className='card-header'>
                         <h2 className='card-header__title uppercase m-0'>Create new inventory</h2>
                     </div>
-                    <div className='card-content create-inventory__content'>
+                    <div className='card-content create-inventory__card'>
                         <div className='grid'>
                             <div className='col-4'>
-                                <Steps
-                                    model={itemsWithTemplate}
-                                    activeIndex={activeIndex}
-                                    className='vertical-step-menu'
-                                    pt={{
-                                        menu: { className: "flex-column w-full" },
-                                        step: { className: "border-circle create-inventory-step" },
-                                    }}
-                                />
+                                <Accordion
+                                    activeIndex={accordionActiveIndex}
+                                    className='create-inventory__accordion'
+                                >
+                                    <AccordionTab pt={{}} header='Vehicle'>
+                                        <Steps
+                                            model={itemsWithTemplate}
+                                            activeIndex={stepActiveIndex}
+                                            className='vertical-step-menu'
+                                            pt={{
+                                                menu: { className: "flex-column w-full" },
+                                                step: {
+                                                    className:
+                                                        "border-circle create-inventory-step",
+                                                },
+                                            }}
+                                        />
+                                    </AccordionTab>
+                                    <AccordionTab header='Purchase'></AccordionTab>
+                                    <AccordionTab header='Media data'></AccordionTab>
+                                </Accordion>
                             </div>
                             <div className='col-8 flex flex-column'>
-                                <div className='flex flex-grow-1'></div>
+                                <InventoryVehicle />
                             </div>
                         </div>
                         <div className='flex justify-content-end gap-3'>
                             <Button
-                                onClick={() => setActiveIndex((prev) => --prev)}
-                                disabled={!activeIndex}
+                                onClick={() => setStepActiveIndex((prev) => --prev)}
+                                disabled={!stepActiveIndex}
                                 className='uppercase  px-6'
                                 outlined
                             >
                                 Back
                             </Button>
                             <Button
-                                onClick={() => setActiveIndex((prev) => ++prev)}
-                                disabled={activeIndex >= items.length - 1}
+                                onClick={() => setStepActiveIndex((prev) => ++prev)}
+                                disabled={stepActiveIndex >= items.length - 1}
                                 className='uppercase px-6'
                                 outlined
                             >
                                 Next
                             </Button>
                             <Button
-                                onClick={() => setActiveIndex((prev) => ++prev)}
-                                disabled={activeIndex !== items.length - 1}
+                                onClick={() => setStepActiveIndex((prev) => ++prev)}
+                                disabled={stepActiveIndex !== items.length - 1}
                                 className='uppercase px-6'
                             >
                                 Save
