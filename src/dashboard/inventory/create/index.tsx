@@ -3,8 +3,7 @@ import { Steps } from "primereact/steps";
 import "./index.css";
 import { useEffect, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { InventoryVehicle, InventoryVehicleData } from "./vehicle";
-// import { inventorySections } from "../common";
+import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
 import { InventorySection } from "../common";
 import React from "react";
@@ -51,7 +50,7 @@ export const CreateInventory = () => {
                     </div>
                     <div className='card-content create-inventory__card'>
                         <div className='grid'>
-                            <div className='col-4'>
+                            <div className='col-4 p-0'>
                                 <Accordion
                                     activeIndex={accordionActiveIndex}
                                     onTabChange={(e) => setAccordionActiveIndex(e.index)}
@@ -84,27 +83,27 @@ export const CreateInventory = () => {
                                     ))}
                                 </Accordion>
                             </div>
-                            <div className='col-8 flex flex-column'>
-                                <InventoryVehicle>
-                                    {inventorySections.map((section) => (
-                                        <React.Fragment key={section.sectionId}>
-                                            {section.items.map((item, index) => (
-                                                <div
-                                                    key={index}
-                                                    style={{
-                                                        display:
-                                                            stepActiveIndex === index
-                                                                ? "block"
-                                                                : "none",
-                                                    }}
-                                                >
-                                                    {item.component}
+                            <div className='col-8 flex flex-column p-0 '>
+                                <div className='flex flex-grow-1'>
+                                    {inventorySections.map((section) =>
+                                        section.items.map((item) => (
+                                            <div
+                                                key={item.itemIndex}
+                                                className={`${
+                                                    stepActiveIndex === item.itemIndex
+                                                        ? "block new-inventory-form"
+                                                        : "hidden"
+                                                }`}
+                                            >
+                                                <div className='new-inventory-form__title uppercase'>
+                                                    {item.itemLabel}
                                                 </div>
-                                            ))}
-                                        </React.Fragment>
-                                    ))}
-                                </InventoryVehicle>
-                                <div className='flex justify-content-end gap-3'>
+                                                {item.component}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                                <div className='flex justify-content-end gap-3 mt-5 mr-3'>
                                     <Button
                                         onClick={() => setStepActiveIndex((prev) => --prev)}
                                         disabled={!stepActiveIndex}

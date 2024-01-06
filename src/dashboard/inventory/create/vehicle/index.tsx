@@ -7,7 +7,6 @@ import { VehicleInspections } from "./inspections";
 import { VehicleKeys } from "./keys";
 import { VehicleOther } from "./other";
 import { VehicleOptions } from "./options";
-import { PropsWithChildren } from "react";
 import { Inventory } from "dashboard/inventory/common";
 
 export const InventoryVehicleData: Pick<Inventory, "label" | "items"> = {
@@ -22,10 +21,4 @@ export const InventoryVehicleData: Pick<Inventory, "label" | "items"> = {
         { itemLabel: "Disclosures", component: <VehicleDisclosures /> },
         { itemLabel: "Other", component: <VehicleOther /> },
     ],
-};
-
-interface VehicleOptionsProps extends PropsWithChildren {}
-
-export const InventoryVehicle = ({ children }: VehicleOptionsProps): JSX.Element => {
-    return <div className='flex flex-grow-1 inventory-vehicle'>{children}</div>;
 };

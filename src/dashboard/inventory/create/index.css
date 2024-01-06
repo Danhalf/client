@@ -11,7 +11,7 @@
 .create-inventory__accordion {
     min-height: 705px;
     border: none;
-    border-right: 2px solid var(--admss-app-light-blue);
+    /* border-right: 2px solid var(--admss-app-light-blue); */
 }
 
 .create-inventory__accordion .p-accordion-header .p-accordion-header-link,
@@ -92,4 +92,18 @@
     .p-menuitem-link.vertical-nav
     .p-steps-number {
     border: 1px solid var(--admss-app-primary-main-green);
+}
+
+.new-inventory-form {
+    width: 100%;
+    padding: 0 40px;
+    min-height: 705px;
+    border-right: 2px solid var(--admss-app-light-blue);
+    border-left: 2px solid var(--admss-app-light-blue);
+}
+
+.new-inventory-form__title {
+    margin-bottom: 40px;
+    font-size: 20px;
+    font-weight: 700;
 }

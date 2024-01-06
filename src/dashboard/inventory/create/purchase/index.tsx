@@ -1,5 +1,4 @@
 import { Inventory } from "dashboard/inventory/common";
-import { PropsWithChildren } from "react";
 
 export const InventoryPurchaseData: Pick<Inventory, "label" | "items"> = {
     label: "Purchase",
@@ -11,12 +10,4 @@ export const InventoryPurchaseData: Pick<Inventory, "label" | "items"> = {
         { itemLabel: "Expenses" },
         { itemLabel: "Payments" },
     ],
-};
-
-export const InventoryPurchase = ({ children }: PropsWithChildren<{}>): JSX.Element => {
-    return (
-        <>
-            <div className='flex flex-grow-1 inventory-purchase'>{children}</div>
-        </>
-    );
 };
