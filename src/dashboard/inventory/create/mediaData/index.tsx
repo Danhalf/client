@@ -1,7 +1,11 @@
-export const InventoryMediaData = () => {
-    return (
-        <>
-            <div className='flex flex-grow-1'>Media data</div>
-        </>
-    );
+import { Inventory } from "dashboard/inventory/common";
+
+export const InventoryMediaData: Pick<Inventory, "label" | "items"> = {
+    label: "Media data",
+    items: [
+        { itemLabel: "Images" },
+        { itemLabel: "Video" },
+        { itemLabel: "Audio" },
+        { itemLabel: "Documents" },
+    ],
 };
