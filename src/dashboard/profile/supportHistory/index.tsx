@@ -53,7 +53,7 @@ export const SupportHistoryDialog = ({
                 onRowClick={handleRowClick}
                 rowHover
             >
-                <Column header='From' field='useruid' />
+                <Column header='From' field='username' />
                 <Column header='Theme' field='topic' />
                 <Column header='Date' field='created' />
             </DataTable>

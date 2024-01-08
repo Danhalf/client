@@ -20,6 +20,7 @@ export interface SupportHistory {
     topic: string;
     updated: string;
     useruid: string;
+    username: string;
 }
 
 export const getSupportMessages = async (useruid: string) => {
