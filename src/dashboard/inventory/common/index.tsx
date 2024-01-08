@@ -17,14 +17,14 @@ export interface Inventory {
 }
 
 export class InventorySection implements Inventory {
-    static instancesCount: number = 0;
-    static itemIndex: number = 0;
-    sectionId: number;
-    label: string;
-    startIndex: number = 0;
-    items: InventoryItem[];
+    private static instancesCount: number = 0;
+    private static itemIndex: number = 0;
+    public sectionId: number;
+    public label: string;
+    public startIndex: number = 0;
+    public items: InventoryItem[];
 
-    constructor({ label, items }: { label: string; items: InventoryItem[] }) {
+    public constructor({ label, items }: { label: string; items: InventoryItem[] }) {
         this.sectionId = ++InventorySection.instancesCount;
         this.label = label;
         this.items = items.map(({ itemLabel, component }) => ({

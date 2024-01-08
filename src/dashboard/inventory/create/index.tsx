@@ -5,8 +5,7 @@ import { useEffect, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
-import { InventorySection } from "../common";
-import React from "react";
+import { InventoryItem, InventorySection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./mediaData";
 
@@ -86,7 +85,7 @@ export const CreateInventory = () => {
                             <div className='col-8 flex flex-column p-0 '>
                                 <div className='flex flex-grow-1'>
                                     {inventorySections.map((section) =>
-                                        section.items.map((item) => (
+                                        section.items.map((item: InventoryItem) => (
                                             <div
                                                 key={item.itemIndex}
                                                 className={`${
