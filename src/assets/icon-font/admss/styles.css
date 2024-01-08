@@ -23,8 +23,8 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-[class^="admss-"]:before,
-[class*=" admss-"]:before {
+[class^="adms-"]:before,
+[class*=" adms-"]:before {
     font-family: "admss" !important;
     font-style: normal !important;
     font-weight: normal !important;
@@ -36,63 +36,63 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-.admss-icon-arrow-bottom:before {
+.adms-arrow-bottom:before {
     content: "\61";
 }
-.admss-icon-arrow-left:before {
+.adms-arrow-left:before {
     content: "\62";
 }
-.admss-icon-arrow-right:before {
+.adms-arrow-right:before {
     content: "\63";
 }
-.admss-icon-arrow-top:before {
+.adms-arrow-top:before {
     content: "\64";
 }
-.admss-icon-blank:before {
+.adms-blank:before {
     content: "\65";
 }
-.admss-icon-close:before {
+.adms-close:before {
     content: "\66";
 }
-.admss-icon-email:before {
+.adms-email:before {
     content: "\67";
 }
-.admss-icon-help:before {
+.adms-help:before {
     content: "\68";
 }
-.admss-icon-hide:before {
+.adms-hide:before {
     content: "\69";
 }
-.admss-icon-location:before {
+.adms-location:before {
     content: "\6a";
 }
-.admss-icon-logout:before {
+.adms-logout:before {
     content: "\6b";
 }
-.admss-icon-password:before {
+.adms-password:before {
     content: "\6c";
 }
-.admss-icon-print:before {
+.adms-print:before {
     content: "\6d";
 }
-.admss-icon-search:before {
+.adms-search:before {
     content: "\6e";
 }
-.admss-icon-settings:before {
+.adms-settings:before {
     content: "\6f";
 }
-.admss-icon-show:before {
+.adms-show:before {
     content: "\70";
 }
-.admss-icon-sign-up:before {
+.adms-sign-up:before {
     content: "\71";
 }
-.admss-icon-support-history:before {
+.adms-support-history:before {
     content: "\72";
 }
-.admss-icon-user:before {
+.adms-user:before {
     content: "\73";
 }
-.admss-icon-username-my-profile:before {
+.adms-username-my-profile:before {
     content: "\74";
 }
