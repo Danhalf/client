@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
-import "./index.css";
 import { useEffect, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InventoryVehicleData } from "./vehicle";
@@ -8,6 +7,7 @@ import { Button } from "primereact/button";
 import { InventoryItem, InventorySection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./mediaData";
+import "./index.css";
 
 export const inventorySections = [
     InventoryVehicleData,
@@ -102,32 +102,32 @@ export const CreateInventory = () => {
                                         ))
                                     )}
                                 </div>
-                                <div className='flex justify-content-end gap-3 mt-5 mr-3'>
-                                    <Button
-                                        onClick={() => setStepActiveIndex((prev) => --prev)}
-                                        disabled={!stepActiveIndex}
-                                        className='uppercase  px-6'
-                                        outlined
-                                    >
-                                        Back
-                                    </Button>
-                                    <Button
-                                        onClick={() => setStepActiveIndex((prev) => ++prev)}
-                                        disabled={stepActiveIndex >= itemsMenuCount}
-                                        className='uppercase px-6'
-                                        outlined
-                                    >
-                                        Next
-                                    </Button>
-                                    <Button
-                                        onClick={() => {}}
-                                        disabled={!isValidData}
-                                        className='uppercase px-6'
-                                    >
-                                        Save
-                                    </Button>
-                                </div>
                             </div>
+                        </div>
+                        <div className='flex justify-content-end gap-3 mt-5 mr-3'>
+                            <Button
+                                onClick={() => setStepActiveIndex((prev) => --prev)}
+                                disabled={!stepActiveIndex}
+                                className='uppercase  px-6'
+                                outlined
+                            >
+                                Back
+                            </Button>
+                            <Button
+                                onClick={() => setStepActiveIndex((prev) => ++prev)}
+                                disabled={stepActiveIndex >= itemsMenuCount}
+                                className='uppercase px-6'
+                                outlined
+                            >
+                                Next
+                            </Button>
+                            <Button
+                                onClick={() => {}}
+                                disabled={!isValidData}
+                                className='uppercase px-6'
+                            >
+                                Save
+                            </Button>
                         </div>
                     </div>
                 </div>

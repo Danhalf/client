@@ -1,17 +1,12 @@
-.create-inventory {
-    min-height: 983px;
-}
-
 .create-inventory__card {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    margin-bottom: 45px;
 }
 
 .create-inventory__accordion {
-    min-height: 705px;
     border: none;
-    /* border-right: 2px solid var(--admss-app-light-blue); */
 }
 
 .create-inventory__accordion .p-accordion-header .p-accordion-header-link,
