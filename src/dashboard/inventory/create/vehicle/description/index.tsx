@@ -1,7 +1,7 @@
 import { Dropdown } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
+import { ReactElement } from "react";
 
-export const VehicleDescription = (): JSX.Element => {
+export const VehicleDescription = (): ReactElement => {
     return (
         <div className='grid vehicle-description row-gap-2'>
             <div className='col-6'>
