@@ -64,3 +64,39 @@
     width: 81px;
     border-radius: 4px 0 0 4px;
 }
+
+/* Bordered checkbox */
+
+.bordered-checkbox {
+    border: 1px solid var(--admss-app-light-grey);
+    border-radius: 5px;
+    padding-left: 10px;
+}
+
+.bordered-checkbox > .p-inputgroup-addon {
+    height: 100%;
+    border: none;
+    border-left: 1px solid var(--admss-app-light-grey);
+}
+.bordered-checkbox > .p-inputgroup-addon .p-checkbox-box {
+    border-color: var(--admss-app-light-grey);
+}
+
+.bordered-checkbox > .p-inputgroup-addon .p-checkbox-box.p-focus {
+    box-shadow: none;
+}
+
+/* Search input  */
+
+.search-input__wrapper,
+.search-input__wrapper > .p-inputtext {
+    width: 100%;
+}
+
+.search-input__wrapper > .p-inputtext {
+    border-radius: 5px 0 0 5px;
+}
+
+.search-input__icon {
+    height: 100%;
+}
