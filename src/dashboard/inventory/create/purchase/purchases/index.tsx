@@ -77,7 +77,7 @@ export const PurchasePurchases = (): ReactElement => (
             </span>
         </div>
         <div className='col-3'>
-            <DateInput placeholder='Check Date' />
+            <DateInput name='Check Date' />
         </div>
         <div className='col-3'>
             <span className='p-float-label'>
