@@ -1,11 +1,4 @@
-import {
-    BorderedCheckbox,
-    CurrencyInput,
-    DateInput,
-    PercentInput,
-    SearchInput,
-} from "dashboard/common/form/inputs";
-import { InputText } from "primereact/inputtext";
+import { BorderedCheckbox, CurrencyInput } from "dashboard/common/form/inputs";
 import { ReactElement } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
