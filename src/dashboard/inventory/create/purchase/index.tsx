@@ -3,6 +3,7 @@ import { PurchaseFloorplan } from "./froorplan";
 import { PurchaseConsign } from "./consign";
 import { PurchaseTitle } from "./title";
 import { PurchasePurchases } from "./purchases";
+import { PurchasePayments } from "./payments";
 
 export const InventoryPurchaseData: Pick<Inventory, "label" | "items"> = {
     label: "Purchase",
@@ -12,6 +13,6 @@ export const InventoryPurchaseData: Pick<Inventory, "label" | "items"> = {
         { itemLabel: "Title", component: <PurchaseTitle /> },
         { itemLabel: "Purchases", component: <PurchasePurchases /> },
         { itemLabel: "Expenses" },
-        { itemLabel: "Payments" },
+        { itemLabel: "Payments", component: <PurchasePayments /> },
     ],
 };
