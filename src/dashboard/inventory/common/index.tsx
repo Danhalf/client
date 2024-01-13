@@ -40,9 +40,8 @@ export class InventorySection implements Inventory {
         return (
             <a
                 href='#'
-                role='presentation'
-                data-pc-section='action'
-                {...options}
+                id={`menu-${InventorySection.itemIndex}`}
+                onClick={options.onClick}
                 className={`${options.className} vertical-nav flex-row align-items-center justify-content-start w-full`}
             >
                 <label

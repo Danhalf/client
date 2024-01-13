@@ -15,6 +15,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 export default function Accounts() {
     const [accounts, setAccounts] = useState<any[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);

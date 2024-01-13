@@ -8,6 +8,7 @@ import { InventoryItem, InventorySection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./mediaData";
 import "./index.css";
+import { useStore } from "store/hooks";
 
 export const inventorySections = [
     InventoryVehicleData,
@@ -16,6 +17,10 @@ export const inventorySections = [
 ].map((sectionData) => new InventorySection(sectionData));
 
 export const CreateInventory = () => {
+    const store = useStore();
+    const { activeStep } = store.stepperStore;
+    // eslint-disable-next-line no-console
+    console.log(activeStep);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
