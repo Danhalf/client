@@ -2,13 +2,20 @@ import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { useEffect, useState } from "react";
+import { observer } from "mobx-react-lite";
+import { useStore } from "store/hooks";
 
-export const VehicleGeneral = (): JSX.Element => {
+export const VehicleGeneral = observer(() => {
     const [isFormValid, setIsFormValid] = useState<boolean>(false);
 
+    const store = useStore().stepperStore;
+
+    const { setStepValid, steps } = store;
+
     useEffect(() => {
+        setStepValid(4, true);
         // eslint-disable-next-line no-console
-        console.log(isFormValid);
+        console.log(steps);
     }, [isFormValid]);
 
     return (
@@ -74,4 +81,4 @@ export const VehicleGeneral = (): JSX.Element => {
             </div>
         </div>
     );
-};
+});

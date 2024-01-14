@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, observable } from "mobx";
 
 export class RootStore {
     public stepperStore: StepperStore;
@@ -8,26 +8,36 @@ export class RootStore {
     }
 }
 
+class Step {
+    public index: number;
+    public isValid: boolean = false;
+
+    public constructor(index: number) {
+        this.index = index;
+        // this.isValid = false;
+    }
+}
+
 export class StepperStore {
     public rootStore: RootStore;
-    activeStep = 0;
-    isStepValid = false;
+    steps: Step[] = [];
 
     public constructor(rootStore: RootStore) {
-        makeAutoObservable(this, { rootStore: false });
+        makeAutoObservable(this, { steps: observable });
         this.rootStore = rootStore;
     }
 
-    setActiveStep(step: number) {
-        this.activeStep = step;
+    createStep(index: number): Step | null {
+        if (this.steps.some((step) => step.index === index)) {
+            return null;
+        }
+        const step = new Step(index);
+        this.steps.push(step);
+        return step;
     }
 
-    setStepValid() {
-        this.isStepValid = true;
-    }
-
-    setStepInvalid() {
-        this.isStepValid = false;
+    setStepValid(index: number, valid: boolean) {
+        this.steps.map((step) => (step.index === index ? { ...step, valid } : step));
     }
 }
 

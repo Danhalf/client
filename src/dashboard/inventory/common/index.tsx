@@ -1,10 +1,12 @@
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
+import { useStore } from "store/hooks";
 
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 export interface InventoryItem extends MenuItem {
     itemLabel: string;
     itemIndex?: number;
+    itemValid?: boolean;
     component?: JSX.Element;
 }
 
@@ -19,6 +21,7 @@ export interface Inventory {
 export class InventorySection implements Inventory {
     private static instancesCount: number = 0;
     private static itemIndex: number = 0;
+    private static itemValid: boolean = false;
     public sectionId: number;
     public label: string;
     public startIndex: number = 0;

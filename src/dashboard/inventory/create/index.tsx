@@ -17,14 +17,19 @@ export const inventorySections = [
 ].map((sectionData) => new InventorySection(sectionData));
 
 export const CreateInventory = () => {
-    const store = useStore();
-    const { activeStep } = store.stepperStore;
-    // eslint-disable-next-line no-console
-    console.log(activeStep);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     const [isValidData, setIsValidData] = useState<boolean>(false);
+
+    const store = useStore().stepperStore;
+
+    const { createStep } = store;
+    inventorySections.forEach((section) => {
+        section.items.forEach((item: any) => {
+            createStep(item.itemIndex);
+        });
+    });
 
     const accordionSteps = inventorySections.map((item) => item.startIndex);
     const itemsMenuCount = inventorySections.reduce(
