@@ -10,7 +10,7 @@ import {
     getInventoryInteriorColorsList,
 } from "http/services/inventory-service";
 
-export const VehicleGeneral = (): JSX.Element => {
+export const VehicleGeneral = (): ReactElement => {
     const [selectedMakes, setSelectedMakes] = useState<string>("");
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [selectedColor, setSelectedColor] = useState<string>("");
@@ -33,14 +33,6 @@ export const VehicleGeneral = (): JSX.Element => {
         if (option) {
             return (
                 <div className='flex align-items-center'>
-                    {option?.logo && (
-                        <img
-                            alt={option?.name}
-                            src='https://imgur.com/CF9I4yL.png'
-                            className='mr-2'
-                            style={{ width: "30px" }}
-                        />
-                    )}
                     <div>{option?.name}</div>
                 </div>
             );
@@ -51,14 +43,6 @@ export const VehicleGeneral = (): JSX.Element => {
     const makesOptionTemplate = (option: MakesListData) => {
         return (
             <div className='flex align-items-center'>
-                {option?.logo && (
-                    <img
-                        alt={option?.name}
-                        src='https://imgur.com/CF9I4yL.png'
-                        className='mr-2'
-                        style={{ width: "30px" }}
-                    />
-                )}
                 <div>{option?.name}</div>
             </div>
         );
