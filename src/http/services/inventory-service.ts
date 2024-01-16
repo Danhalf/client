@@ -4,7 +4,6 @@ import { AxiosResponse } from "axios";
 import { BaseResponse } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
-import { Url } from "url";
 
 export interface Inventory {
     BodyStyle: string;
@@ -79,12 +78,12 @@ export const fetchInventoryList = async <T>(endpoint: EndpointType): Promise<T |
     }
 };
 
-type ListData = {
+export type ListData = {
     index?: number;
     name: string;
 };
 
-export type MakesListData = ListData & { logo: Url };
+export type MakesListData = ListData & { logo: string };
 
 export const getInventoryOptionsList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("options");
