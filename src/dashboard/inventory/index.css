@@ -1,21 +1,21 @@
-.create-inventory__card {
+.inventory__card {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     margin-bottom: 45px;
 }
 
-.create-inventory__accordion {
+.inventory__accordion {
     border: none;
     width: 343px;
 }
 
-.create-inventory__accordion .p-accordion-header .p-accordion-header-link,
-.create-inventory__accordion .p-accordion-header.p-highlight:hover .p-accordion-header-link:hover,
-.create-inventory__accordion
+.inventory__accordion .p-accordion-header .p-accordion-header-link,
+.inventory__accordion .p-accordion-header.p-highlight:hover .p-accordion-header-link:hover,
+.inventory__accordion
     .p-accordion-header:not(.p-highlight):not(.p-disabled):hover
     .p-accordion-header-link,
-.create-inventory__accordion
+.inventory__accordion
     .p-accordion-header.p-highlight
     .p-accordion-header-link[aria-expanded="true"] {
     border: none;
@@ -24,12 +24,12 @@
     background-color: white;
 }
 
-.create-inventory__accordion .p-steps .p-steps-item .p-menuitem-link:not(.p-disabled):focus,
-.create-inventory__accordion .p-steps .p-steps-item .p-menuitem-link:focus {
+.inventory__accordion .p-steps .p-steps-item .p-menuitem-link:not(.p-disabled):focus,
+.inventory__accordion .p-steps .p-steps-item .p-menuitem-link:focus {
     box-shadow: none;
 }
 
-.create-inventory__accordion .p-accordion-content {
+.inventory__accordion .p-accordion-content {
     padding: 0;
     border: none;
 }
@@ -95,7 +95,7 @@
     border: 1px solid var(--admss-app-primary-main-green);
 }
 
-.new-inventory-form {
+.inventory-form {
     width: 100%;
     padding: 0 40px;
     min-height: 705px;
@@ -103,7 +103,7 @@
     border-left: 2px solid var(--admss-app-light-blue);
 }
 
-.new-inventory-form__title {
+.inventory-form__title {
     margin-bottom: 40px;
     font-size: 20px;
     font-weight: 700;
