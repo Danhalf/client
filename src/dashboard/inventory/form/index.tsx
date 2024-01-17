@@ -7,7 +7,7 @@ import { Button } from "primereact/button";
 import { InventoryItem, InventorySection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./mediaData";
-import "./index.css";
+import { useParams } from "react-router-dom";
 
 export const inventorySections = [
     InventoryVehicleData,
@@ -15,7 +15,8 @@ export const inventorySections = [
     InventoryMediaData,
 ].map((sectionData) => new InventorySection(sectionData));
 
-export const CreateInventory = () => {
+export const InventoryForm = () => {
+    const { id } = useParams();
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
@@ -43,17 +44,19 @@ export const CreateInventory = () => {
     return (
         <div className='grid'>
             <div className='col-12'>
-                <div className='card create-inventory'>
+                <div className='card inventory'>
                     <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Create new inventory</h2>
+                        <h2 className='card-header__title uppercase m-0'>
+                            {id ? "Edit" : "Create new"} inventory
+                        </h2>
                     </div>
-                    <div className='card-content create-inventory__card'>
+                    <div className='card-content inventory__card'>
                         <div className='grid flex-nowrap'>
                             <div className='p-0'>
                                 <Accordion
                                     activeIndex={accordionActiveIndex}
                                     onTabChange={(e) => setAccordionActiveIndex(e.index)}
-                                    className='create-inventory__accordion'
+                                    className='inventory__accordion'
                                     multiple
                                 >
                                     {inventorySections.map((section) => (
@@ -77,8 +80,7 @@ export const CreateInventory = () => {
                                                 pt={{
                                                     menu: { className: "flex-column w-full" },
                                                     step: {
-                                                        className:
-                                                            "border-circle create-inventory-step",
+                                                        className: "border-circle inventory-step",
                                                     },
                                                 }}
                                             />
@@ -94,11 +96,11 @@ export const CreateInventory = () => {
                                                 key={item.itemIndex}
                                                 className={`${
                                                     stepActiveIndex === item.itemIndex
-                                                        ? "block new-inventory-form"
+                                                        ? "block inventory-form"
                                                         : "hidden"
                                                 }`}
                                             >
-                                                <div className='new-inventory-form__title uppercase'>
+                                                <div className='inventory-form__title uppercase'>
                                                     {item.itemLabel}
                                                 </div>
                                                 {item.component}
@@ -112,7 +114,7 @@ export const CreateInventory = () => {
                             <Button
                                 onClick={() => setStepActiveIndex((prev) => --prev)}
                                 disabled={!stepActiveIndex}
-                                className='uppercase  px-6'
+                                className='uppercase px-6'
                                 outlined
                             >
                                 Back

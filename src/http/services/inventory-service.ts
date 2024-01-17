@@ -67,6 +67,15 @@ export const getInventoryList = async (uid: string, queryParams: QueryParams) =>
     }
 };
 
+export const getInventoryInfo = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<Inventory[]>(`inventory/${uid}/info`);
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
 export const fetchInventoryList = async <T>(endpoint: EndpointType): Promise<T | undefined> => {
     try {
         const response: AxiosResponse<T> = await authorizedUserApiInstance.get(
