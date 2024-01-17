@@ -1,7 +1,7 @@
-import { Dropdown, DropdownProps } from "primereact/dropdown";
+import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
-import { ReactElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     ListData,
     MakesListData,
@@ -9,14 +9,18 @@ import {
     getInventoryExteriorColorsList,
     getInventoryInteriorColorsList,
 } from "http/services/inventory-service";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
+import { InputNumber } from "primereact/inputnumber";
 
-export const VehicleGeneral = (): ReactElement => {
-    const [selectedMakes, setSelectedMakes] = useState<string>("");
+export const VehicleGeneral = observer(() => {
+    const store = useStore().inventoryStore;
+    const { inventory, changeInventory } = store;
+
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
-    const [selectedColor, setSelectedColor] = useState<string>("");
     const [colorList, setColorList] = useState<ListData[]>([]);
-    const [selectedInterior, setSelectedInterior] = useState<string>("");
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
+
     useEffect(() => {
         getInventoryAutomakesList().then((list) => {
             list && setAutomakesList(list);
@@ -29,37 +33,30 @@ export const VehicleGeneral = (): ReactElement => {
         });
     }, []);
 
-    const selectedMakesTemplate = (option: MakesListData, props: DropdownProps) => {
-        if (option) {
-            return (
-                <div className='flex align-items-center'>
-                    <div>{option?.name}</div>
-                </div>
-            );
-        }
-        return <span>{props.placeholder}</span>;
-    };
-
-    const makesOptionTemplate = (option: MakesListData) => {
-        return (
-            <div className='flex align-items-center'>
-                <div>{option?.name}</div>
-            </div>
-        );
-    };
-
     return (
         <div className='grid vehicle-general row-gap-2'>
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <InputText className='vehicle-general__text-input w-full' />
+                    <InputText
+                        className='vehicle-general__text-input w-full'
+                        value={inventory?.VIN}
+                        onChange={({ target }) =>
+                            changeInventory({ key: "VIN", value: target.value })
+                        }
+                    />
                     <label className='float-label'>VIN (required)</label>
                 </span>
             </div>
 
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <InputText className='vehicle-general__text-input w-full' />
+                    <InputText
+                        className='vehicle-general__text-input w-full'
+                        value={inventory?.StockNo}
+                        onChange={({ target }) =>
+                            changeInventory({ key: "StockNo", value: target.value })
+                        }
+                    />
                     <label className='float-label'>Stock#</label>
                 </span>
             </div>
@@ -67,11 +64,10 @@ export const VehicleGeneral = (): ReactElement => {
                 {automakesList.length ? (
                     <Dropdown
                         optionLabel='name'
-                        value={selectedMakes}
-                        onChange={(e) => setSelectedMakes(e.value)}
+                        value={inventory?.Make}
+                        required
+                        onChange={({ value }) => changeInventory({ key: "Make", value })}
                         options={automakesList}
-                        valueTemplate={selectedMakesTemplate}
-                        itemTemplate={makesOptionTemplate}
                         placeholder='Make (required)'
                         className='w-full vehicle-general__dropdown'
                     />
@@ -93,22 +89,31 @@ export const VehicleGeneral = (): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='vehicle-general__text-input w-full' />
+                    <InputText
+                        className='vehicle-general__text-input w-full'
+                        required
+                        value={inventory?.Year}
+                    />
                     <label className='float-label'>Year (required)</label>
                 </span>
             </div>
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='vehicle-general__text-input w-full' />
+                    <InputNumber
+                        className='vehicle-general__number-input w-full'
+                        required
+                        value={inventory?.mileage}
+                    />
                     <label className='float-label'>Mileage (required)</label>
                 </span>
             </div>
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
-                    value={selectedColor}
-                    onChange={(e) => setSelectedColor(e.value)}
+                    value={inventory?.ExteriorColor}
+                    required
+                    onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
                     options={colorList}
                     placeholder='Color'
                     className='w-full vehicle-general__dropdown'
@@ -118,8 +123,9 @@ export const VehicleGeneral = (): ReactElement => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
-                    value={selectedInterior}
-                    onChange={(e) => setSelectedInterior(e.value)}
+                    value={inventory?.InteriorColor}
+                    required
+                    onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
                     options={interiorList}
                     placeholder='Interior color'
                     className='w-full vehicle-general__dropdown'
@@ -127,4 +133,4 @@ export const VehicleGeneral = (): ReactElement => {
             </div>
         </div>
     );
-};
+});

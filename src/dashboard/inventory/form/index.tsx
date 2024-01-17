@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
 import { useEffect, useState } from "react";
@@ -8,6 +9,7 @@ import { InventoryItem, InventorySection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./mediaData";
 import { useParams } from "react-router-dom";
+import { useStore } from "store/hooks";
 
 export const inventorySections = [
     InventoryVehicleData,
@@ -21,6 +23,16 @@ export const InventoryForm = () => {
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     const [isValidData, setIsValidData] = useState<boolean>(false);
+
+    const store = useStore().inventoryStore;
+    const { getInventory, clearInventory } = store;
+
+    useEffect(() => {
+        id && getInventory(id);
+        return () => {
+            clearInventory();
+        };
+    }, [id, store]);
 
     const accordionSteps = inventorySections.map((item) => item.startIndex);
     const itemsMenuCount = inventorySections.reduce(
@@ -38,7 +50,6 @@ export const InventoryForm = () => {
                 });
             }
         });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stepActiveIndex]);
 
     return (
