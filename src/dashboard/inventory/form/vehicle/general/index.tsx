@@ -23,7 +23,13 @@ export const VehicleGeneral = observer(() => {
 
     useEffect(() => {
         getInventoryAutomakesList().then((list) => {
-            list && setAutomakesList(list);
+            if (list) {
+                const upperCasedList = list.map((item) => ({
+                    ...item,
+                    name: item.name.toUpperCase(),
+                }));
+                setAutomakesList(upperCasedList);
+            }
         });
         getInventoryExteriorColorsList().then((list) => {
             list && setColorList(list);
@@ -70,6 +76,7 @@ export const VehicleGeneral = observer(() => {
             <div className='col-6'>
                 <Dropdown
                     optionLabel='name'
+                    optionValue='name'
                     value={inventory?.Make}
                     required
                     onChange={({ value }) => changeInventory({ key: "Make", value })}
@@ -82,6 +89,9 @@ export const VehicleGeneral = observer(() => {
             <div className='col-6'>
                 <Dropdown
                     optionLabel='name'
+                    optionValue='name'
+                    value={inventory?.Model}
+                    options={[{ name: inventory?.Model }]}
                     placeholder='Model (required)'
                     className='w-full vehicle-general__dropdown'
                 />
@@ -110,6 +120,7 @@ export const VehicleGeneral = observer(() => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
+                    optionValue='name'
                     value={inventory?.ExteriorColor}
                     required
                     onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
@@ -122,6 +133,7 @@ export const VehicleGeneral = observer(() => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
+                    optionValue='name'
                     value={inventory?.InteriorColor}
                     required
                     onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
