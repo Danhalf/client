@@ -1,7 +1,7 @@
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import {
     ListData,
     MakesListData,
@@ -13,7 +13,7 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { InputNumber } from "primereact/inputnumber";
 
-export const VehicleGeneral = observer(() => {
+export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, isLoading } = store;
 
@@ -124,7 +124,7 @@ export const VehicleGeneral = observer(() => {
                     value={inventory?.ExteriorColor}
                     required
                     onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
-                    options={colorList}
+                    options={[...colorList, { name: inventory?.ExteriorColor }]}
                     placeholder='Color'
                     className='w-full vehicle-general__dropdown'
                 />
@@ -137,7 +137,7 @@ export const VehicleGeneral = observer(() => {
                     value={inventory?.InteriorColor}
                     required
                     onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
-                    options={interiorList}
+                    options={[...interiorList, { name: inventory?.InteriorColor }]}
                     placeholder='Interior color'
                     className='w-full vehicle-general__dropdown'
                 />
