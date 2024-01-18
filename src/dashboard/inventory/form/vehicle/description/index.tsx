@@ -13,7 +13,7 @@ import { useStore } from "store/hooks";
 
 export const VehicleDescription = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventory, changeInventory, isLoading } = store;
+    const { inventory, changeInventory } = store;
     const [transmissionList, setTransmissionList] = useState<ListData[]>([]);
     const [fuelList, setFuelList] = useState<ListData[]>([]);
     const [driveLineList, setDriveLineList] = useState<ListData[]>([]);
