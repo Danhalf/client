@@ -53,9 +53,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     <InputText
                         className='vehicle-general__text-input w-full'
                         value={inventory?.VIN}
-                        onChange={({ target }) =>
-                            changeInventory({ key: "VIN", value: target.value })
-                        }
+                        onChange={({ target: { value } }) => changeInventory({ key: "VIN", value })}
                     />
                     <label className='float-label'>VIN (required)</label>
                 </span>
@@ -66,8 +64,8 @@ export const VehicleGeneral = observer((): ReactElement => {
                     <InputText
                         className='vehicle-general__text-input w-full'
                         value={inventory?.StockNo}
-                        onChange={({ target }) =>
-                            changeInventory({ key: "StockNo", value: target.value })
+                        onChange={({ target: { value } }) =>
+                            changeInventory({ key: "StockNo", value })
                         }
                     />
                     <label className='float-label'>Stock#</label>
