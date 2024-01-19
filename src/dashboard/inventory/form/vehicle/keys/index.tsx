@@ -6,26 +6,26 @@ import { observer } from "mobx-react-lite";
 
 export const VehicleKeys = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventory } = store;
+    const { intentoryExtData } = store;
     return (
         <div className='grid vehicle-keys row-gap-2'>
             <div className='col-3'>
-                <BorderedCheckbox name='Keys missing' checked={!!inventory.extdata.keysMissing} />
+                <BorderedCheckbox name='Keys missing' checked={!!intentoryExtData.keysMissing} />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
                     name='Duplicate Keys'
-                    checked={!!inventory.extdata.keysDuplicate}
+                    checked={!!intentoryExtData.keysDuplicate}
                 />
             </div>
             <div className='col-3'>
-                <BorderedCheckbox name='Has Remote' checked={!!inventory.extdata.keysHasRemote} />
+                <BorderedCheckbox name='Has Remote' checked={!!intentoryExtData.keysHasRemote} />
             </div>
 
             <div className='col-6'>
                 <InputText
                     placeholder='Key number/ Location'
-                    value={inventory.extdata.keyNumber}
+                    value={intentoryExtData.keyNumber}
                     className='w-full vehicle-keys__dropdown'
                 />
             </div>

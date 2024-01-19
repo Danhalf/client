@@ -1,5 +1,7 @@
 import {
     Inventory,
+    InventoryExtData,
+    InventoryOptionsInfo,
     getInventoryInfo,
     initialInventoryState,
 } from "http/services/inventory-service";
@@ -18,7 +20,9 @@ export class RootStore {
 
 class InventoryStore {
     public rootStore: RootStore;
-    public inventory: Inventory = initialInventoryState;
+    public inventory: Inventory = {} as Inventory;
+    public intentoryOptions: InventoryOptionsInfo[] = [];
+    public intentoryExtData: InventoryExtData = {} as InventoryExtData;
     public isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -30,30 +34,40 @@ class InventoryStore {
         this.isLoading = true;
         try {
             const response = await getInventoryInfo(itemuid);
-            this.rootStore.inventoryStore.inventory = response || initialInventoryState;
-            this.rootStore.inventoryStore.isLoading = false;
+            if (response) {
+                const { extdata, options_info, ...inventory } = response;
+                this.rootStore.inventoryStore.inventory = inventory || ({} as Inventory);
+                this.rootStore.inventoryStore.intentoryOptions = options_info || [];
+                this.rootStore.inventoryStore.intentoryExtData =
+                    extdata || ({} as InventoryExtData);
+                this.rootStore.inventoryStore.isLoading = false;
+            }
         } catch (error) {
             this.rootStore.inventoryStore.isLoading = false;
         }
     };
 
     changeInventory = action(({ key, value }: { key: keyof Inventory; value: string | number }) => {
-        if (this.rootStore.inventoryStore.inventory) {
-            //@ts-ignore
-            this.rootStore.inventoryStore.inventory[key] = value;
+        if (
+            this.rootStore.inventoryStore.inventory &&
+            key !== "extdata" &&
+            key !== "options_info"
+        ) {
+            (this.rootStore.inventoryStore.inventory as Record<typeof key, string | number>)[key] =
+                value;
         }
     });
 
     changeInventoryOptions = action((optionName: string) => {
-        const inventory = this.rootStore.inventoryStore.inventory;
-        if (inventory) {
-            const { options_info } = inventory;
+        const inventoryStore = this.rootStore.inventoryStore;
+        if (inventoryStore) {
+            const { intentoryOptions } = inventoryStore;
 
-            if (options_info.includes(optionName)) {
-                const updatedOptions = options_info.filter((option) => option !== optionName);
-                inventory.options_info = updatedOptions;
+            if (intentoryOptions.includes(optionName)) {
+                const updatedOptions = intentoryOptions.filter((option) => option !== optionName);
+                inventoryStore.intentoryOptions = updatedOptions;
             } else {
-                inventory.options_info.push(optionName);
+                inventoryStore.intentoryOptions.push(optionName);
             }
         }
     });

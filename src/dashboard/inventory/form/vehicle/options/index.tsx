@@ -8,7 +8,7 @@ import { observer } from "mobx-react-lite";
 export const VehicleOptions = observer((): ReactElement => {
     const store = useStore().inventoryStore;
 
-    const { inventory, changeInventoryOptions } = store;
+    const { intentoryOptions, changeInventoryOptions } = store;
     const [options, setOptions] = useState<ListData[]>([]);
 
     useEffect(() => {
@@ -41,7 +41,7 @@ export const VehicleOptions = observer((): ReactElement => {
                             inputId={option.name}
                             name={option.name}
                             onChange={() => changeInventoryOptions(option.name)}
-                            checked={inventory.options_info.includes(option.name)}
+                            checked={intentoryOptions.includes(option.name)}
                         />
                         <label htmlFor={option.name} className='ml-2'>
                             {option.name}
