@@ -6,19 +6,19 @@ import { useStore } from "store/hooks";
 
 export const VehicleInspections = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { intentoryExtData } = store;
+    const { inventoryExtData } = store;
     return (
         <div className='grid vehicle-inspections row-gap-2'>
             <div className='col-6'>
                 <InputText
-                    value={intentoryExtData.inspNumber}
+                    value={inventoryExtData.inspNumber}
                     placeholder='Inspection Number'
                     className='w-full vehicle-inspections__dropdown'
                 />
             </div>
 
             <div className='col-3'>
-                <DateInput value={new Date(intentoryExtData.inspDate)} name='Date' />
+                <DateInput value={new Date(inventoryExtData.inspDate)} name='Date' />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox name='Emissions Check' checked={false} />

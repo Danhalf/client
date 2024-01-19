@@ -21,8 +21,8 @@ export class RootStore {
 class InventoryStore {
     public rootStore: RootStore;
     public inventory: Inventory = {} as Inventory;
-    public intentoryOptions: InventoryOptionsInfo[] = [];
-    public intentoryExtData: InventoryExtData = {} as InventoryExtData;
+    public inventoryOptions: InventoryOptionsInfo[] = [];
+    public inventoryExtData: InventoryExtData = {} as InventoryExtData;
     public isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -37,8 +37,8 @@ class InventoryStore {
             if (response) {
                 const { extdata, options_info, ...inventory } = response;
                 this.rootStore.inventoryStore.inventory = inventory || ({} as Inventory);
-                this.rootStore.inventoryStore.intentoryOptions = options_info || [];
-                this.rootStore.inventoryStore.intentoryExtData =
+                this.rootStore.inventoryStore.inventoryOptions = options_info || [];
+                this.rootStore.inventoryStore.inventoryExtData =
                     extdata || ({} as InventoryExtData);
                 this.rootStore.inventoryStore.isLoading = false;
             }
@@ -58,16 +58,26 @@ class InventoryStore {
         }
     });
 
-    changeInventoryOptions = action((optionName: string) => {
+    changeInventoryExtData = action(
+        ({ key, value }: { key: keyof InventoryExtData; value: string | number }) => {
+            const inventoryStore = this.rootStore.inventoryStore;
+            if (inventoryStore) {
+                const { inventoryExtData } = inventoryStore;
+                (inventoryExtData as Record<typeof key, string | number>)[key] = value;
+            }
+        }
+    );
+
+    changeInventoryOptions = action((optionName: InventoryOptionsInfo) => {
         const inventoryStore = this.rootStore.inventoryStore;
         if (inventoryStore) {
-            const { intentoryOptions } = inventoryStore;
+            const { inventoryOptions } = inventoryStore;
 
-            if (intentoryOptions.includes(optionName)) {
-                const updatedOptions = intentoryOptions.filter((option) => option !== optionName);
-                inventoryStore.intentoryOptions = updatedOptions;
+            if (inventoryOptions.includes(optionName)) {
+                const updatedOptions = inventoryOptions.filter((option) => option !== optionName);
+                inventoryStore.inventoryOptions = updatedOptions;
             } else {
-                inventoryStore.intentoryOptions.push(optionName);
+                inventoryStore.inventoryOptions.push(optionName);
             }
         }
     });

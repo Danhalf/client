@@ -114,11 +114,10 @@ export const PercentInput = ({
 };
 
 export const BorderedCheckbox = ({
-    checked,
     name,
     height = "50px",
+    ...props
 }: CheckboxProps): ReactElement => {
-    const [isChecked, setIsChecked] = useState<boolean>(checked);
     return (
         <div
             style={{
@@ -128,7 +127,7 @@ export const BorderedCheckbox = ({
         >
             <label>{name}</label>
             <span className='p-inputgroup-addon'>
-                <Checkbox checked={isChecked} onChange={() => setIsChecked((prev) => !prev)} />
+                <Checkbox {...props} />
             </span>
         </div>
     );

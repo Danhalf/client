@@ -131,7 +131,6 @@ export interface InventoryExtData {
 }
 
 export type InventoryOptionsInfo =
-    | string
     | "A/C"
     | "Automatic Climate Control"
     | "Anti-Lock Brakes"
@@ -288,9 +287,10 @@ export type ListData = {
 };
 
 export type MakesListData = ListData & { logo: string };
+export type OptionsListData = ListData & { name: InventoryOptionsInfo };
 
-export const getInventoryOptionsList = async (): Promise<ListData[] | undefined> =>
-    await fetchInventoryList<ListData[]>("options");
+export const getInventoryOptionsList = async (): Promise<OptionsListData[] | undefined> =>
+    await fetchInventoryList<OptionsListData[]>("options");
 export const getInventoryBodyTypesList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("bodytypes");
 export const getInventoryExteriorColorsList = async (): Promise<ListData[] | undefined> =>
