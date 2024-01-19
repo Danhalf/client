@@ -44,6 +44,20 @@ class InventoryStore {
         }
     });
 
+    changeInventoryOptions = action((optionName: string) => {
+        const inventory = this.rootStore.inventoryStore.inventory;
+        if (inventory) {
+            const { options_info } = inventory;
+
+            if (options_info.includes(optionName)) {
+                const updatedOptions = options_info.filter((option) => option !== optionName);
+                inventory.options_info = updatedOptions;
+            } else {
+                inventory.options_info.push(optionName);
+            }
+        }
+    });
+
     clearInventory = () => (this.rootStore.inventoryStore.inventory = initialInventoryState);
 }
 

@@ -60,7 +60,7 @@ interface ExtData {
     fpReductionDate: number;
     fpReduxAmt: number;
     fpRemainBal: number;
-    inspDate: number;
+    inspDate: string;
     inspEmissions: number;
     inspNumber: string;
     inspSafety: number;
