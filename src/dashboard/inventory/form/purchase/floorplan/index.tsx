@@ -4,7 +4,6 @@ import {
     DateInput,
     SearchInput,
 } from "dashboard/common/form/inputs";
-import { InventoryExtData } from "http/services/inventory-service";
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import { useStore } from "store/hooks";
