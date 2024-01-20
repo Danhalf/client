@@ -1,5 +1,5 @@
 import { Checkbox } from "primereact/checkbox";
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
@@ -25,20 +25,6 @@ export const VehicleChecks = observer((): ReactElement => {
         },
         changeInventoryExtData,
     } = store;
-
-    // { name: "AutoCheck done", value: 1, id: "autoCheck" },
-    // { name: "State inspection Performed", value: 1, id: "stateInspection" },
-    // { name: "Oil and Filter inspected and changed", value: 0, id: "oilFilter" },
-    // { name: "User defined inspection", value: 1, id: "userInspection1" },
-    // { name: "User defined inspection", value: 0, id: "userInspection2" },
-    // { name: "User defined inspection", value: 1, id: "userInspection3" },
-    // { name: "User defined inspection", value: 0, id: "userInspection4" },
-    // { name: "User defined inspection", value: 1, id: "userInspection5" },
-    // { name: "User defined inspection", value: 0, id: "userInspection6" },
-    // { name: "User defined inspection", value: 1, id: "userInspection7" },
-    // { name: "User defined inspection", value: 0, id: "userInspection8" },
-    // { name: "User defined inspection", value: 1, id: "userInspection9" },
-    // { name: "User defined inspection", value: 0, id: "userInspection10" },
 
     const handleChange = (key: keyof InventoryExtData, value: number) => {
         changeInventoryExtData({ key, value: !!value ? 0 : 1 });

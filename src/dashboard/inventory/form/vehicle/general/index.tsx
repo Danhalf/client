@@ -82,6 +82,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={inventory?.Model}
+                    //TODO: add options
                     options={[{ name: inventory?.Model }]}
                     onChange={({ value }) => changeInventory({ key: "Model", value })}
                     placeholder='Model (required)'
