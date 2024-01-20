@@ -31,7 +31,18 @@ export const VehicleInspections = observer((): ReactElement => {
             </div>
 
             <div className='col-3'>
-                <DateInput value={new Date(inspDate)} name='Date' />
+                <DateInput
+                    value={new Date(inspDate)}
+                    onChange={({ value }) => {
+                        if (value instanceof Date) {
+                            changeInventoryExtData({
+                                key: "inspDate",
+                                value: value.getTime(),
+                            });
+                        }
+                    }}
+                    name='Date'
+                />
             </div>
             <div className='col-3'>
                 <BorderedCheckbox
@@ -53,10 +64,10 @@ export const VehicleInspections = observer((): ReactElement => {
                     value={new Date(inspStickerExp)}
                     onChange={({ value }) => {
                         if (value instanceof Date) {
-                            const millisecondsSinceEpoch = value.getTime();
-                            // використовуйте millisecondsSinceEpoch як вам потрібно
-                            // eslint-disable-next-line no-console
-                            console.log(millisecondsSinceEpoch);
+                            changeInventoryExtData({
+                                key: "inspStickerExp",
+                                value: value.getTime(),
+                            });
                         }
                     }}
                     name='Sticker Exp. Date'
