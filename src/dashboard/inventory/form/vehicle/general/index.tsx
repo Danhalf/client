@@ -15,7 +15,7 @@ import { InputNumber } from "primereact/inputnumber";
 
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventory, changeInventory, isLoading } = store;
+    const { inventory, changeInventory } = store;
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
@@ -38,13 +38,6 @@ export const VehicleGeneral = observer((): ReactElement => {
             list && setInteriorList(list);
         });
     }, []);
-
-    if (isLoading)
-        return (
-            <div className='flex justify-content-center align-items-center w-full h-full'>
-                Loading...
-            </div>
-        );
 
     return (
         <div className='grid vehicle-general row-gap-2'>
