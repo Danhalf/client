@@ -28,6 +28,7 @@ export const VehicleDisclosures = observer((): ReactElement => {
     const handleChange = (key: keyof InventoryExtData, value: number) => {
         changeInventoryExtData({ key, value: !!value ? 0 : 1 });
     };
+
     return (
         <div className='grid vehicle-disclosures row-gap-2'>
             <div className='col-3'>

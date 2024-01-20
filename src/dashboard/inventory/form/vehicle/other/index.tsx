@@ -44,6 +44,7 @@ export const VehicleOther = observer((): ReactElement => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
+                    //TODO: add value, options, onChange
                     placeholder='Location name'
                     className='w-full vehicle-other__dropdown'
                 />
