@@ -10,7 +10,6 @@ import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./mediaData";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
-import { ProgressSpinner } from "primereact/progressspinner";
 import { ProgressBar } from "primereact/progressbar";
 
 export const inventorySections = [
@@ -25,7 +24,7 @@ export const InventoryForm = () => {
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
 
     const store = useStore().inventoryStore;
-    const { getInventory, clearInventory, isLoading } = store;
+    const { getInventory, clearInventory } = store;
 
     useEffect(() => {
         id && getInventory(id);

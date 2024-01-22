@@ -82,7 +82,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     value={inventory?.Model}
+                    //TODO: add options
                     options={[{ name: inventory?.Model }]}
+                    onChange={({ value }) => changeInventory({ key: "Model", value })}
                     placeholder='Model (required)'
                     className='w-full vehicle-general__dropdown'
                 />
@@ -93,6 +95,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                         className='vehicle-general__text-input w-full'
                         required
                         value={inventory?.Year}
+                        onChange={({ target: { value } }) =>
+                            changeInventory({ key: "Year", value })
+                        }
                     />
                     <label className='float-label'>Year (required)</label>
                 </span>
@@ -104,6 +109,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                         className='vehicle-general__number-input w-full'
                         required
                         value={inventory?.mileage}
+                        onChange={({ value }) =>
+                            value && changeInventory({ key: "mileage", value })
+                        }
                     />
                     <label className='float-label'>Mileage (required)</label>
                 </span>
