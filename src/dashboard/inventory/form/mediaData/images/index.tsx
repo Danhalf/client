@@ -81,35 +81,31 @@ export const ImagesMedia = () => {
 
     const emptyTemplate = () => {
         return (
-            <>
-                <div className='flex align-items-center flex-column'>
-                    <i
-                        className='pi pi-cloud-upload mt-3 p-5'
-                        style={{
-                            fontSize: "4em",
-                            borderRadius: "50%",
-                            color: "var(--admss-app-medium-blue)",
-                        }}
-                    ></i>
-                    <span
-                        style={{ fontSize: "1.2em", color: "var(--admss-app-primary)" }}
-                        className=''
-                    >
-                        Drag and Drop Images Here
-                    </span>
+            <div className='grid'>
+                <div className='flex align-items-center flex-column col-12'>
+                    <i className='pi pi-cloud-upload media__upload-icon' />
+                    <span className=' media__upload-icon-label'>Drag and Drop Images Here</span>
                 </div>
-                <div
-                    style={{
-                        backgroundColor: "transparent",
-                        display: "flex",
-                        alignItems: "center",
-                    }}
-                >
-                    <Button type='button' className='p-button' onClick={() => {}}>
+                <div className='col-12 flex justify-content-center align-items-center'>
+                    <hr className='media__line mr-4 flex-1' />
+                    <span>or</span>
+                    <hr className='media__line ml-4 flex-1' />
+                </div>
+                <div className='w-full flex justify-content-center flex-wrap'>
+                    <Button type='button' className='p-button media__button' onClick={() => {}}>
                         Choose from files
                     </Button>
+                    <div className='flex w-full justify-content-center align-items-center gap-2'>
+                        <span className='media__upload-text-info'>Up to 16 items</span>
+                        <span className='media__upload-text-info media__upload-text-info--bold'>
+                            Maximal size is 8 Mb
+                        </span>
+                        <Tag className='media__upload-tag' value='png' />
+                        <Tag className='media__upload-tag' value='jpeg' />
+                        <Tag className='media__upload-tag' value='tiff' />
+                    </div>
                 </div>
-            </>
+            </div>
         );
     };
 
@@ -127,7 +123,7 @@ export const ImagesMedia = () => {
     };
 
     return (
-        <div>
+        <div className='media'>
             <Toast ref={toast}></Toast>
 
             <Tooltip target='.custom-choose-btn' content='Choose from files' position='bottom' />

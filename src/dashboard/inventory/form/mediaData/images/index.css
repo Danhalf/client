@@ -1,0 +1,52 @@
+.p-button.media__button {
+    background: var(--admss-app-main-blue);
+    border: none;
+    outline: none;
+    font-size: 20px;
+}
+
+.p-button.media__button:hover {
+    background: var(--admss-app-medium-blue);
+}
+
+.p-button.media__button:focus,
+.p-button.media__button:active {
+    box-shadow: none;
+}
+
+.media__button:hover {
+    background: var(--admss-app-main-blue);
+}
+
+.media__upload-icon {
+    font-size: 4em;
+    color: var(--admss-app-medium-blue);
+}
+
+.media__upload-icon-label {
+    color: var(--admss-app-primary);
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.media .p-fileupload-content {
+    border-color: var(--admss-app-medium-blue);
+    border-radius: 5px;
+}
+
+.media__upload-tag {
+    background: var(--admss-app-medium-blue);
+    cursor: default;
+    border: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--admss-app-darkest-blue);
+}
+
+.media__upload-text-info {
+    font-size: 14px;
+}
+
+.media__line {
+    border-top: 1px solid var(--admss-app-medium-blue);
+}
