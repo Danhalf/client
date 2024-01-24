@@ -35,18 +35,45 @@
 }
 
 .media__upload-tag {
-    background: var(--admss-app-medium-blue);
+    background: var(--admss-app-light-blue);
     cursor: default;
     border: none;
     font-weight: 600;
     text-transform: uppercase;
     color: var(--admss-app-darkest-blue);
+    margin: 0 5px;
 }
 
 .media__upload-text-info {
     font-size: 14px;
+    margin: 0 18px;
+}
+
+.media__upload-text-info--bold {
+    font-weight: 700;
 }
 
 .media__line {
     border-top: 1px solid var(--admss-app-medium-blue);
+    margin-top: 12px;
+}
+
+.media-input {
+    display: flex;
+    justify-content: space-between;
+}
+
+.media-input__dropdown,
+.media-input__button {
+    width: 23%;
+}
+
+.media-input__text {
+    width: 48%;
+}
+
+.media-input__text,
+.media-input__dropdown {
+    height: 50px;
+    align-items: center;
 }
