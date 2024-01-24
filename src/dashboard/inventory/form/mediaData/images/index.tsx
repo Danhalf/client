@@ -3,18 +3,12 @@ import { ReactElement, useRef, useState } from "react";
 // import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { Toast } from "primereact/toast";
-import {
-    FileUpload,
-    FileUploadHeaderTemplateOptions,
-    FileUploadProps,
-    FileUploadSelectEvent,
-    FileUploadUploadEvent,
-    ItemTemplateOptions,
-} from "primereact/fileupload";
-import { ProgressBar } from "primereact/progressbar";
+import { FileUpload, FileUploadUploadEvent, ItemTemplateOptions } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { Tooltip } from "primereact/tooltip";
 import { Tag } from "primereact/tag";
+import { Dropdown } from "primereact/dropdown";
+import { InputText } from "primereact/inputtext";
 
 // export const ImagesMedia = observer((): ReactElement => {
 //  const store = useStore().inventoryStore;
@@ -25,7 +19,7 @@ import { Tag } from "primereact/tag";
 //  )
 // });
 
-export const ImagesMedia = () => {
+export const ImagesMedia = observer(() => {
     const toast = useRef<Toast>(null);
     const [totalSize, setTotalSize] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
@@ -57,10 +51,6 @@ export const ImagesMedia = () => {
         callback();
     };
 
-    // const headerTemplate = (options: FileUploadHeaderTemplateOptions) => {
-    //     return <></>;
-    // };
-
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
         const file = inFile as File;
         return (
@@ -86,20 +76,20 @@ export const ImagesMedia = () => {
                     <i className='pi pi-cloud-upload media__upload-icon' />
                     <span className=' media__upload-icon-label'>Drag and Drop Images Here</span>
                 </div>
-                <div className='col-12 flex justify-content-center align-items-center'>
+                <div className='col-12 flex justify-content-center align-items-center media__upload-splitter'>
                     <hr className='media__line mr-4 flex-1' />
                     <span>or</span>
                     <hr className='media__line ml-4 flex-1' />
                 </div>
-                <div className='w-full flex justify-content-center flex-wrap'>
+                <div className='w-full flex justify-content-center flex-wrap mt-4'>
                     <Button type='button' className='p-button media__button' onClick={() => {}}>
                         Choose from files
                     </Button>
-                    <div className='flex w-full justify-content-center align-items-center gap-2'>
-                        <span className='media__upload-text-info'>Up to 16 items</span>
+                    <div className='flex w-full justify-content-center align-items-center mt-4'>
                         <span className='media__upload-text-info media__upload-text-info--bold'>
-                            Maximal size is 8 Mb
+                            Up to 16 items
                         </span>
+                        <span className='media__upload-text-info'>Maximal size is 8 Mb</span>
                         <Tag className='media__upload-tag' value='png' />
                         <Tag className='media__upload-tag' value='jpeg' />
                         <Tag className='media__upload-tag' value='tiff' />
@@ -123,19 +113,14 @@ export const ImagesMedia = () => {
     };
 
     return (
-        <div className='media'>
-            <Toast ref={toast}></Toast>
-
-            <Tooltip target='.custom-choose-btn' content='Choose from files' position='bottom' />
-            <Tooltip target='.custom-upload-btn' content='Upload' position='bottom' />
-
+        <div className='media grid'>
             <FileUpload
                 ref={fileUploadRef}
                 name='demo[]'
                 url='/api/upload'
                 multiple
                 accept='image/*'
-                maxFileSize={1000000}
+                maxFileSize={8000000}
                 onUpload={onTemplateUpload}
                 //  onSelect={onTemplateSelect}
                 headerTemplate={<></>}
@@ -144,7 +129,13 @@ export const ImagesMedia = () => {
                 chooseOptions={chooseOptions}
                 uploadOptions={uploadOptions}
                 cancelOptions={cancelOptions}
+                className='col-12'
             />
+            <div className='col-12 mt-4 media-input'>
+                <Dropdown className='media-input__dropdown' placeholder='Category' />
+                <InputText className='media-input__text' placeholder='Comment' />
+                <Button className='p-button media-input__button'>Save</Button>
+            </div>
         </div>
     );
-};
+});
