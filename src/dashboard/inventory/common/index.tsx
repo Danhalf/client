@@ -1,11 +1,12 @@
 import { MenuItem, MenuItemOptions } from "primereact/menuitem";
+import { ReactElement } from "react";
 
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
 export interface InventoryItem extends MenuItem {
     itemLabel: string;
     itemIndex?: number;
-    component?: JSX.Element;
+    component?: ReactElement;
 }
 
 export interface Inventory {
@@ -42,7 +43,7 @@ export class InventorySection implements Inventory {
                 href='#'
                 role='presentation'
                 data-pc-section='action'
-                {...options}
+                onClick={options.onClick}
                 className={`${options.className} vertical-nav flex-row align-items-center justify-content-start w-full`}
             >
                 <label
