@@ -14,6 +14,7 @@ export interface ContactType {
 
 export interface ContactUser {
     ZIP: string;
+    city: string;
     companyName: string;
     contactuid: string;
     created: string;
@@ -23,9 +24,9 @@ export interface ContactUser {
     email2: string;
     firstName: string;
     lastName: string;
-    fullName: string;
     messager1: string;
     messager2: string;
+    middleName: string;
     phone1: string;
     phone2: string;
     state: string;
