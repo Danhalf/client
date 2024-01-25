@@ -5,21 +5,11 @@ import { observer } from "mobx-react-lite";
 import { Toast } from "primereact/toast";
 import { FileUpload, FileUploadUploadEvent, ItemTemplateOptions } from "primereact/fileupload";
 import { Button } from "primereact/button";
-import { Tooltip } from "primereact/tooltip";
 import { Tag } from "primereact/tag";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 
-// export const ImagesMedia = observer((): ReactElement => {
-//  const store = useStore().inventoryStore;
-//  const { inventory, changeInventory } = store;
-
-//  return (
-
-//  )
-// });
-
-export const ImagesMedia = observer(() => {
+export const ImagesMedia = observer((): ReactElement => {
     const toast = useRef<Toast>(null);
     const [totalSize, setTotalSize] = useState(0);
 
@@ -55,7 +45,7 @@ export const ImagesMedia = observer(() => {
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
         const file = inFile as File;
         return (
-            <div className='flex align-items-center flex-wrap'>
+            <div className='flex align-items-center'>
                 <div className='flex align-items-center'>
                     <img
                         alt={file.name}
@@ -68,7 +58,7 @@ export const ImagesMedia = observer(() => {
                 <Button
                     type='button'
                     icon='pi pi-times'
-                    className='p-button-outlined p-button-rounded p-button-danger'
+                    className='p-button media__remove-button'
                     onClick={() => onTemplateRemove(file, props.onRemove)}
                 />
             </div>
@@ -123,12 +113,10 @@ export const ImagesMedia = observer(() => {
             <FileUpload
                 ref={fileUploadRef}
                 name='demo[]'
-                url='/api/upload'
                 multiple
                 accept='image/*'
                 maxFileSize={8000000}
                 onUpload={onTemplateUpload}
-                //  onSelect={onTemplateSelect}
                 headerTemplate={<></>}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate}
@@ -136,6 +124,9 @@ export const ImagesMedia = observer(() => {
                 uploadOptions={uploadOptions}
                 cancelOptions={cancelOptions}
                 className='col-12'
+                pt={{
+                    content: {},
+                }}
             />
             <div className='col-12 mt-4 media-input'>
                 <Dropdown className='media-input__dropdown' placeholder='Category' />
@@ -144,6 +135,12 @@ export const ImagesMedia = observer(() => {
                     Save
                 </Button>
             </div>
+            <div className='media__uploaded media-uploaded'>
+                <h2 className='media-uploaded__title uppercase m-0'>uploaded images</h2>
+                <span className='media-uploaded__label mx-2'>(0)</span>
+                <hr className='media-uploaded__line flex-1' />
+            </div>
+            <div className='media__images'>No images added yet.</div>
         </div>
     );
 });
