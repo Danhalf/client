@@ -3,10 +3,10 @@
 import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { InventoryVehicleData } from "./vehicle";
+import { InventoryVehicleData } from "./options";
 import { Button } from "primereact/button";
 import { ContactItem, ContactSection } from "../common";
-import { InventoryPurchaseData } from "./purchase";
+import { InventoryPurchaseData } from "./info";
 import { useParams } from "react-router-dom";
 import { ProgressBar } from "primereact/progressbar";
 import { ContactUser, getContacts } from "http/services/contacts-service";
