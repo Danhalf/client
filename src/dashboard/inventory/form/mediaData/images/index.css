@@ -68,6 +68,14 @@
     width: 23%;
 }
 
+.media-input__button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+}
+
 .media-input__text {
     width: 48%;
 }

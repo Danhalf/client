@@ -22,6 +22,7 @@ import { InputText } from "primereact/inputtext";
 export const ImagesMedia = observer(() => {
     const toast = useRef<Toast>(null);
     const [totalSize, setTotalSize] = useState(0);
+
     const fileUploadRef = useRef<FileUpload>(null);
 
     const onTemplateSelect = (e: FileUploadUploadEvent) => {
@@ -56,7 +57,12 @@ export const ImagesMedia = observer(() => {
         return (
             <div className='flex align-items-center flex-wrap'>
                 <div className='flex align-items-center'>
-                    <img alt={file.name} role='presentation' width={100} />
+                    <img
+                        alt={file.name}
+                        src={URL.createObjectURL(file)}
+                        role='presentation'
+                        width={100}
+                    />
                     <span className='flex flex-column text-left ml-3'>{file.name}</span>
                 </div>
                 <Button
@@ -134,7 +140,9 @@ export const ImagesMedia = observer(() => {
             <div className='col-12 mt-4 media-input'>
                 <Dropdown className='media-input__dropdown' placeholder='Category' />
                 <InputText className='media-input__text' placeholder='Comment' />
-                <Button className='p-button media-input__button'>Save</Button>
+                <Button severity='secondary' className='p-button media-input__button'>
+                    Save
+                </Button>
             </div>
         </div>
     );
