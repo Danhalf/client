@@ -52,7 +52,7 @@ export const getContactsCategories = async () => {
     }
 };
 
-export const getContacts = async (uid: string, queryParams: QueryParams) => {
+export const getContacts = async (uid: string, queryParams?: QueryParams) => {
     try {
         const request = await authorizedUserApiInstance.get<ContactUser[]>(`contacts/${uid}/list`, {
             params: queryParams,
@@ -68,6 +68,15 @@ export const getContactsAmount = async (uid: string, queryParams: QueryParams) =
         const request = await authorizedUserApiInstance.get<TotalUsers>(`contacts/${uid}/list`, {
             params: queryParams,
         });
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getContactInfo = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<ContactUser>(`contact/${uid}/info`);
         return request.data;
     } catch (error) {
         // TODO: add error handler

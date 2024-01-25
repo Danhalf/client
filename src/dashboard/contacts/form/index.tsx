@@ -8,8 +8,11 @@ import { Button } from "primereact/button";
 import { ContactItem, ContactSection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
 import { useParams } from "react-router-dom";
-import { useStore } from "store/hooks";
 import { ProgressBar } from "primereact/progressbar";
+import { ContactUser, getContacts } from "http/services/contacts-service";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { AuthUser } from "http/services/auth.service";
+import { getKeyValue } from "services/local-storage.service";
 
 export const contactSections = [InventoryVehicleData, InventoryPurchaseData].map(
     (sectionData) => new ContactSection(sectionData)
@@ -19,16 +22,13 @@ export const ContactForm = () => {
     const { id } = useParams();
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
-
-    const store = useStore().inventoryStore;
-    const { getInventory, clearInventory } = store;
+    const [contacts, setContacts] = useState<ContactUser[]>([]);
 
     useEffect(() => {
-        id && getInventory(id);
-        return () => {
-            clearInventory();
-        };
-    }, [id, store]);
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        if (authUser)
+            getContacts(authUser.useruid).then((response) => response && setContacts(response));
+    }, [id]);
 
     const accordionSteps = contactSections.map((item) => item.startIndex);
     const itemsMenuCount = contactSections.reduce((acc, current) => acc + current.getLength(), -1);
@@ -122,7 +122,13 @@ export const ContactForm = () => {
                                                                 />
                                                             }
                                                         >
-                                                            {item.component}
+                                                            <pre>
+                                                                {JSON.stringify(
+                                                                    contacts[item.itemIndex],
+                                                                    null,
+                                                                    2
+                                                                )}
+                                                            </pre>
                                                         </Suspense>
                                                     )}
                                                 </div>
