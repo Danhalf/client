@@ -1,8 +1,10 @@
 import {
     Inventory,
     InventoryExtData,
+    InventoryMedia,
     InventoryOptionsInfo,
     getInventoryInfo,
+    getInventoryMediaItemList,
     initialInventoryState,
 } from "http/services/inventory-service";
 import { action, configure, makeAutoObservable } from "mobx";
@@ -21,8 +23,10 @@ export class RootStore {
 class InventoryStore {
     public rootStore: RootStore;
     private _inventory: Inventory = {} as Inventory;
+    private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
+    private _inventoryMedia: InventoryMedia[] = [];
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -39,6 +43,9 @@ class InventoryStore {
     public get inventoryExtData() {
         return this._inventoryExtData;
     }
+    public get inventoryMedia() {
+        return this._inventoryMedia;
+    }
     public get isLoading() {
         return this._isLoading;
     }
@@ -49,27 +56,34 @@ class InventoryStore {
             const response = await getInventoryInfo(itemuid);
             if (response) {
                 const { extdata, options_info, ...inventory } = response;
-                this.rootStore.inventoryStore._inventory = inventory || ({} as Inventory);
-                this.rootStore.inventoryStore._inventoryOptions = options_info || [];
-                this.rootStore.inventoryStore._inventoryExtData =
-                    extdata || ({} as InventoryExtData);
-                this.rootStore.inventoryStore._isLoading = false;
+                this._inventory = inventory || ({} as Inventory);
+                this._inventoryOptions = options_info || [];
+                this._inventoryExtData = extdata || ({} as InventoryExtData);
+                this._inventoryID = inventory.itemuid;
             }
         } catch (error) {
-            this.rootStore.inventoryStore._isLoading = false;
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public getInventoryMedia = async () => {
+        this._isLoading = true;
+        try {
+            const response = await getInventoryMediaItemList(this._inventoryID);
+            if (response) {
+                this._inventoryMedia = response;
+            }
+        } catch (error) {
+        } finally {
+            this._isLoading = false;
         }
     };
 
     public changeInventory = action(
         ({ key, value }: { key: keyof Inventory; value: string | number }) => {
-            if (
-                this.rootStore.inventoryStore._inventory &&
-                key !== "extdata" &&
-                key !== "options_info"
-            ) {
-                (this.rootStore.inventoryStore._inventory as Record<typeof key, string | number>)[
-                    key
-                ] = value;
+            if (this._inventory && key !== "extdata" && key !== "options_info") {
+                (this._inventory as Record<typeof key, string | number>)[key] = value;
             }
         }
     );

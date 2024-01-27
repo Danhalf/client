@@ -1,5 +1,5 @@
 import "./index.css";
-import { ReactElement, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Toast } from "primereact/toast";
 import { FileUpload, FileUploadUploadEvent, ItemTemplateOptions } from "primereact/fileupload";
@@ -7,8 +7,16 @@ import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
+import { useStore } from "store/hooks";
 
 export const ImagesMedia = observer((): ReactElement => {
+    const store = useStore().inventoryStore;
+    const { getInventoryMedia, inventoryMedia } = store;
+
+    useEffect(() => {
+        getInventoryMedia();
+    }, []);
+
     const toast = useRef<Toast>(null);
     const [totalSize, setTotalSize] = useState(0);
 

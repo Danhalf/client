@@ -247,6 +247,19 @@ type EndpointType =
     | "status"
     | "group";
 
+export interface InventoryMedia {
+    contenttype: number;
+    created: string;
+    index: number;
+    inventoryuid: string;
+    itemuid: string;
+    mediauid: string;
+    notes: string;
+    type: number;
+    updated: string;
+    useruid: string;
+}
+
 export const getInventoryList = async (uid: string, queryParams: QueryParams) => {
     try {
         const request = await authorizedUserApiInstance.get<Inventory[] | TotalInventoryList>(
@@ -317,3 +330,25 @@ export const getInventoryStatusList = async (): Promise<ListData[] | undefined> 
     await fetchInventoryList<ListData[]>("status");
 export const getInventoryGroupList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("group");
+
+export const getInventoryMediaItemList = async (
+    inventoryID: string
+): Promise<any[] | undefined> => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryMedia[]>(
+            `inventory/${inventoryID}/media`
+        );
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getInventoryMediaItem = async (mediaID: string): Promise<any[] | undefined> => {
+    try {
+        const request = await authorizedUserApiInstance.get<any[]>(`media/${mediaID}/media`);
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
