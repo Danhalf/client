@@ -195,38 +195,6 @@ export interface Inventory {
     useruid: string;
 }
 
-export const initialInventoryState: Inventory = {
-    BodyStyle: "",
-    Category: "",
-    Cylinders: "",
-    DriveLine: "",
-    Engine: "",
-    ExteriorColor: "",
-    GroupClass: 0,
-    GroupClassName: "",
-    InteriorColor: "",
-    Make: "",
-    Model: "",
-    Notes: "",
-    Options: 0,
-    Status: "",
-    StockNo: "",
-    Transmission: "",
-    TypeOfFuel: "",
-    VIN: "",
-    VINimageUID: "",
-    Year: "",
-    created: "",
-    extdata: {} as InventoryExtData,
-    itemuid: "",
-    mileage: 0,
-    name: "",
-    options_info: [],
-    status: "",
-    updated: "",
-    useruid: "",
-};
-
 export interface TotalInventoryList extends BaseResponse {
     total: number;
 }
@@ -333,7 +301,7 @@ export const getInventoryGroupList = async (): Promise<ListData[] | undefined> =
 
 export const getInventoryMediaItemList = async (
     inventoryID: string
-): Promise<any[] | undefined> => {
+): Promise<InventoryMedia[] | undefined> => {
     try {
         const request = await authorizedUserApiInstance.get<InventoryMedia[]>(
             `inventory/${inventoryID}/media`

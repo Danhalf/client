@@ -8,13 +8,14 @@ import { Tag } from "primereact/tag";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
+import { getInventoryMediaItem } from "http/services/inventory-service";
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { getInventoryMedia, inventoryMedia } = store;
+    const { inventoryImages } = store;
 
     useEffect(() => {
-        getInventoryMedia();
+        getInventoryMediaItem(inventoryImages[0]);
     }, []);
 
     const toast = useRef<Toast>(null);

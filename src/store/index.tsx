@@ -1,11 +1,9 @@
 import {
     Inventory,
     InventoryExtData,
-    InventoryMedia,
     InventoryOptionsInfo,
     getInventoryInfo,
     getInventoryMediaItemList,
-    initialInventoryState,
 } from "http/services/inventory-service";
 import { action, configure, makeAutoObservable } from "mobx";
 
@@ -23,10 +21,12 @@ export class RootStore {
 class InventoryStore {
     public rootStore: RootStore;
     private _inventory: Inventory = {} as Inventory;
-    private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
-    private _inventoryMedia: InventoryMedia[] = [];
+    private _inventoryImagesID: string[] = [];
+    private _inventoryVideoID: string[] = [];
+    private _inventoryAudioID: string[] = [];
+    private _inventoryDocumentsID: string[] = [];
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -43,8 +43,8 @@ class InventoryStore {
     public get inventoryExtData() {
         return this._inventoryExtData;
     }
-    public get inventoryMedia() {
-        return this._inventoryMedia;
+    public get inventoryImages() {
+        return this._inventoryImagesID;
     }
     public get isLoading() {
         return this._isLoading;
@@ -59,7 +59,6 @@ class InventoryStore {
                 this._inventory = inventory || ({} as Inventory);
                 this._inventoryOptions = options_info || [];
                 this._inventoryExtData = extdata || ({} as InventoryExtData);
-                this._inventoryID = inventory.itemuid;
             }
         } catch (error) {
         } finally {
@@ -67,12 +66,30 @@ class InventoryStore {
         }
     };
 
-    public getInventoryMedia = async () => {
+    public getInventoryMedia = async (itemuid: string) => {
         this._isLoading = true;
         try {
-            const response = await getInventoryMediaItemList(this._inventoryID);
+            const response = await getInventoryMediaItemList(itemuid);
             if (response) {
-                this._inventoryMedia = response;
+                response.forEach(({ contenttype, itemuid }) => {
+                    switch (contenttype) {
+                        case 0:
+                            this._inventoryImagesID.push(itemuid);
+                            break;
+                        case 1:
+                            this._inventoryVideoID.push(itemuid);
+                            break;
+                        case 2:
+                            this._inventoryAudioID.push(itemuid);
+                            break;
+                        case 3:
+                            this._inventoryDocumentsID.push(itemuid);
+                            break;
+
+                        default:
+                            break;
+                    }
+                });
             }
         } catch (error) {
         } finally {
@@ -112,8 +129,12 @@ class InventoryStore {
         }
     });
 
-    public clearInventory = () =>
-        (this.rootStore.inventoryStore._inventory = initialInventoryState);
+    public clearInventory = () => {
+        this._inventory = {} as Inventory;
+        this._inventoryOptions = [];
+        this._inventoryExtData = {} as InventoryExtData;
+        this._inventoryImagesID = [];
+    };
 
     public set isLoading(state: boolean) {
         this._isLoading = state;
