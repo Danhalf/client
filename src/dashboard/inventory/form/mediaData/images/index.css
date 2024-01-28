@@ -163,9 +163,11 @@
     justify-content: space-around;
 }
 
-.image-info__text {
+.image-info__item {
     color: var(--admss-app-primary);
     font-size: 14px;
+    display: flex;
+    align-items: center;
 }
 
 .image-info__text--bold {

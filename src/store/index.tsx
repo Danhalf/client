@@ -71,19 +71,19 @@ class InventoryStore {
         try {
             const response = await getInventoryMediaItemList(itemuid);
             if (response) {
-                response.forEach(({ contenttype, itemuid }) => {
+                response.forEach(({ contenttype, mediauid }) => {
                     switch (contenttype) {
                         case 0:
-                            this._inventoryImagesID.push(itemuid);
+                            this._inventoryImagesID.push(mediauid);
                             break;
                         case 1:
-                            this._inventoryVideoID.push(itemuid);
+                            this._inventoryVideoID.push(mediauid);
                             break;
                         case 2:
-                            this._inventoryAudioID.push(itemuid);
+                            this._inventoryAudioID.push(mediauid);
                             break;
                         case 3:
-                            this._inventoryDocumentsID.push(itemuid);
+                            this._inventoryDocumentsID.push(mediauid);
                             break;
 
                         default:

@@ -21,7 +21,9 @@ export const ImagesMedia = observer((): ReactElement => {
     ]);
 
     useEffect(() => {
-        getInventoryMediaItem(inventoryImages[0]);
+        inventoryImages.forEach((image) => {
+            getInventoryMediaItem(image).then((item: any) => {});
+        });
     }, []);
 
     const toast = useRef<Toast>(null);
@@ -156,13 +158,30 @@ export const ImagesMedia = observer((): ReactElement => {
                                       height='75'
                                   />
                                   <div className='media-images__info image-info'>
-                                      <div className='image-info__text image-info__text--bold'>
-                                          Exterior
+                                      <div className='image-info__item'>
+                                          <span className='image-info__icon'>
+                                              <i className='pi pi-th-large' />
+                                          </span>
+                                          <span className='image-info__text--bold'>Exterior</span>
                                       </div>
-                                      <div className='image-info__text'>
-                                          Renewed colour and new tires
+                                      <div className='image-info__item'>
+                                          <span className='image-info__icon'>
+                                              <span className='image-info__icon'>
+                                                  <i className='pi pi-comment' />
+                                              </span>
+                                          </span>
+                                          <span className='image-info__text'>
+                                              Renewed colour and new tires
+                                          </span>
                                       </div>
-                                      <div className='image-info__text'>10/11/2023 08:51:39</div>
+                                      <div className='image-info__item'>
+                                          <span className='image-info__icon'>
+                                              <i className='pi pi-calendar' />
+                                          </span>
+                                          <span className='image-info__text'>
+                                              10/11/2023 08:51:39
+                                          </span>
+                                      </div>
                                   </div>
                               </div>
                           );
