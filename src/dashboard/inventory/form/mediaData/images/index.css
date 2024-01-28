@@ -142,11 +142,32 @@
     font-weight: 700;
 }
 
-.media__images {
+.media-images {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     padding-top: 50px;
     color: var(--admss-app-light-grey);
+}
+
+.media-images__item {
+    display: flex;
+    width: 50%;
+}
+
+.image-info {
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.image-info__text {
+    color: var(--admss-app-primary);
+    font-size: 14px;
+}
+
+.image-info__text--bold {
+    font-weight: 600;
 }
