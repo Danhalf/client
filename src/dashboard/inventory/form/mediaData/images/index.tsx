@@ -26,7 +26,7 @@ export const ImagesMedia = observer((): ReactElement => {
         inventoryImages.forEach((image) => {
             getInventoryMediaItem(image).then((item: any) => {});
         });
-    }, []);
+    }, [inventoryImages]);
 
     const toast = useRef<Toast>(null);
     const [totalSize, setTotalSize] = useState(0);
