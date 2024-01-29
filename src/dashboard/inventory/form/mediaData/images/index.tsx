@@ -142,7 +142,13 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded images</h2>
-                <span className='media-uploaded__label mx-2'>({images.length})</span>
+                <span
+                    className={`media-uploaded__label mx-2 uploaded-count ${
+                        images.length && "uploaded-count--blue"
+                    }`}
+                >
+                    ({images.length})
+                </span>
                 <hr className='media-uploaded__line flex-1' />
             </div>
             <div className='media-images'>
@@ -151,11 +157,15 @@ export const ImagesMedia = observer((): ReactElement => {
                           return (
                               <div className='media-images__item'>
                                   <Image
-                                      className='media-images__image'
                                       src={image}
                                       alt='inventory-item'
                                       width='75'
                                       height='75'
+                                      pt={{
+                                          image: {
+                                              className: "media-images__image",
+                                          },
+                                      }}
                                   />
                                   <div className='media-images__info image-info'>
                                       <div className='image-info__item'>
