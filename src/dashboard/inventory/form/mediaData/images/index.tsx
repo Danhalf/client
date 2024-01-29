@@ -10,15 +10,17 @@ import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
 import { getInventoryMediaItem } from "http/services/inventory-service";
 import { Image } from "primereact/image";
+import { Checkbox } from "primereact/checkbox";
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventoryImages } = store;
-    const [images, setImages] = useState<string[]>([
+    const [images] = useState<string[]>([
         "https://dummyjson.com/image/150",
         "https://dummyjson.com/image/150",
         "https://dummyjson.com/image/150",
     ]);
+    const [checked, setChecked] = useState<boolean>(false);
 
     useEffect(() => {
         inventoryImages.forEach((image) => {
@@ -150,12 +152,29 @@ export const ImagesMedia = observer((): ReactElement => {
                     ({images.length})
                 </span>
                 <hr className='media-uploaded__line flex-1' />
+                <label className='cursor-pointer media-uploaded__label'>
+                    <Checkbox
+                        checked={checked}
+                        onChange={() => {
+                            setChecked(!checked);
+                        }}
+                        className='media-uploaded__checkbox'
+                    />
+                    Export to Web
+                </label>
             </div>
             <div className='media-images'>
                 {images.length
                     ? images.map((image) => {
                           return (
                               <div className='media-images__item'>
+                                  {checked && (
+                                      <Checkbox
+                                          checked={false}
+                                          className='media-uploaded__checkbox'
+                                      />
+                                  )}
+
                                   <Image
                                       src={image}
                                       alt='inventory-item'
@@ -192,6 +211,9 @@ export const ImagesMedia = observer((): ReactElement => {
                                               10/11/2023 08:51:39
                                           </span>
                                       </div>
+                                  </div>
+                                  <div className='media-images__close'>
+                                      <i className='pi pi-times' />
                                   </div>
                               </div>
                           );
