@@ -163,9 +163,9 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length
-                    ? images.map((image, index) => {
+                    ? images.map((image) => {
                           return (
-                              <div key={index} className='media-images__item'>
+                              <div key={image} className='media-images__item'>
                                   {checked && (
                                       <Checkbox
                                           checked={false}
