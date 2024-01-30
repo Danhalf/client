@@ -15,16 +15,14 @@ import { Checkbox } from "primereact/checkbox";
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventoryImages } = store;
-    const [images] = useState<string[]>([
-        "https://dummyjson.com/image/150",
-        "https://dummyjson.com/image/150",
-        "https://dummyjson.com/image/150",
-    ]);
+    const [images, setImages] = useState<string[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
 
     useEffect(() => {
         inventoryImages.forEach((image) => {
-            getInventoryMediaItem(image).then((item: any) => {});
+            getInventoryMediaItem(image).then((item: any) => {
+                setImages((prev) => [...prev, item]);
+            });
         });
     }, [inventoryImages]);
 
@@ -165,9 +163,9 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length
-                    ? images.map((image) => {
+                    ? images.map((image, index) => {
                           return (
-                              <div className='media-images__item'>
+                              <div key={index} className='media-images__item'>
                                   {checked && (
                                       <Checkbox
                                           checked={false}
