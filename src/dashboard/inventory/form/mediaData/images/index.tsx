@@ -5,7 +5,7 @@ import { Toast } from "primereact/toast";
 import {
     FileUpload,
     FileUploadHeaderTemplateOptions,
-    FileUploadProps,
+    FileUploadSelectEvent,
     FileUploadUploadEvent,
     ItemTemplateOptions,
 } from "primereact/fileupload";
@@ -20,57 +20,69 @@ import { Checkbox } from "primereact/checkbox";
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryImages } = store;
+    const { inventoryImagesID, saveInventoryImages, fileImages } = store;
     const [images, setImages] = useState<string[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
+    const toast = useRef<Toast>(null);
+    const [totalCount, setTotalCount] = useState(0);
+    const fileUploadRef = useRef<FileUpload>(null);
 
     useEffect(() => {
-        inventoryImages.forEach((image) => {
+        inventoryImagesID.forEach((image) => {
             image &&
                 getInventoryMediaItem(image).then((item: any) => {
                     setImages((prev) => [...prev, item]);
                 });
         });
-    }, [inventoryImages]);
+    }, [inventoryImagesID]);
 
-    const toast = useRef<Toast>(null);
-    const [totalSize, setTotalSize] = useState(0);
-
-    const fileUploadRef = useRef<FileUpload>(null);
+    const onTemplateSelect = (e: FileUploadSelectEvent) => {
+        store.fileImages = e.files;
+        setTotalCount(e.files.length);
+    };
 
     const onTemplateUpload = (e: FileUploadUploadEvent) => {
-        let _totalSize = 0;
-
-        e.files.forEach((file) => {
-            _totalSize += file.size || 0;
-        });
-
-        setTotalSize(_totalSize);
+        setTotalCount(e.files.length);
         toast.current?.show({ severity: "info", summary: "Success", detail: "File Uploaded" });
     };
 
     const onTemplateRemove = (file: File, callback: Function) => {
-        setTotalSize(totalSize - file.size);
+        const newFiles = fileImages.filter((item) => item.name !== file.name);
+        store.fileImages = newFiles;
+        setTotalCount(newFiles.length);
         callback();
+    };
+
+    const handleUploadFiles = () => {
+        saveInventoryImages().then((res) => {
+            if (res) {
+                store.fileImages = [];
+                fileUploadRef.current?.clear();
+            }
+        });
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
         const file = inFile as File;
         return (
-            <div className='flex align-items-center'>
+            <div className='flex align-items-center presentation'>
                 <div className='flex align-items-center'>
                     <img
                         alt={file.name}
                         src={URL.createObjectURL(file)}
                         role='presentation'
-                        width={100}
+                        width={29}
+                        height={29}
+                        className='presentation__image'
                     />
-                    <span className='flex flex-column text-left ml-3'>{file.name}</span>
+                    <span className='presentation__label flex flex-column text-left ml-3'>
+                        {file.name}
+                    </span>
                 </div>
                 <Button
                     type='button'
                     icon='pi pi-times'
-                    className='p-button media__remove-button'
+                    className='p-button presentation__remove-button'
                     onClick={() => onTemplateRemove(file, props.onRemove)}
                 />
             </div>
@@ -79,17 +91,27 @@ export const ImagesMedia = observer((): ReactElement => {
 
     const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
         return (
-            <div className='w-full flex justify-content-center flex-wrap mb-3'>
-                {chooseButton}
-                <div className='flex w-full justify-content-center align-items-center mt-4'>
-                    <span className='media__upload-text-info media__upload-text-info--bold'>
-                        Up to 16 items
-                    </span>
-                    <span className='media__upload-text-info'>Maximal size is 8 Mb</span>
-                    <Tag className='media__upload-tag' value='png' />
-                    <Tag className='media__upload-tag' value='jpeg' />
-                    <Tag className='media__upload-tag' value='tiff' />
-                </div>
+            <div className='w-full flex justify-content-center flex-wrap mb-3 image-choose'>
+                {totalCount ? (
+                    <div className='image-choose__selected flex align-items-center'>
+                        To upload more drag and drop images
+                        <span className='bold mx-3'>or</span>
+                        {chooseButton}
+                    </div>
+                ) : (
+                    <>
+                        {chooseButton}
+                        <div className='flex w-full justify-content-center align-items-center mt-4'>
+                            <span className='media__upload-text-info media__upload-text-info--bold'>
+                                Up to {} items
+                            </span>
+                            <span className='media__upload-text-info'>Maximal size is 8 Mb</span>
+                            <Tag className='media__upload-tag' value='png' />
+                            <Tag className='media__upload-tag' value='jpeg' />
+                            <Tag className='media__upload-tag' value='tiff' />
+                        </div>
+                    </>
+                )}
             </div>
         );
     };
@@ -115,20 +137,11 @@ export const ImagesMedia = observer((): ReactElement => {
         label: "Choose from files",
         icon: "none",
     };
-    const uploadOptions = {
-        icon: "pi pi-fw pi-cloud-upload",
-        className: "custom-upload-btn p-button-success p-button-rounded p-button-outlined",
-    };
-    const cancelOptions = {
-        icon: "pi pi-fw pi-times",
-        className: "custom-cancel-btn p-button-danger p-button-rounded p-button-outlined",
-    };
 
     return (
         <div className='media grid'>
             <FileUpload
                 ref={fileUploadRef}
-                name='demo[]'
                 multiple
                 accept='image/*'
                 maxFileSize={8000000}
@@ -136,19 +149,20 @@ export const ImagesMedia = observer((): ReactElement => {
                 headerTemplate={chooseTemplate}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate}
+                onSelect={onTemplateSelect}
                 chooseOptions={chooseOptions}
-                uploadOptions={uploadOptions}
-                cancelOptions={cancelOptions}
                 progressBarTemplate={<></>}
                 className='col-12'
-                pt={{
-                    chooseButton: {},
-                }}
             />
             <div className='col-12 mt-4 media-input'>
                 <Dropdown className='media-input__dropdown' placeholder='Category' />
                 <InputText className='media-input__text' placeholder='Comment' />
-                <Button severity='secondary' className='p-button media-input__button'>
+                <Button
+                    severity={totalCount ? "success" : "secondary"}
+                    disabled={!totalCount}
+                    className='p-button media-input__button'
+                    onClick={handleUploadFiles}
+                >
                     Save
                 </Button>
             </div>
