@@ -19,8 +19,7 @@ import { Checkbox } from "primereact/checkbox";
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryImagesID, saveInventoryImages, fileImages, isLoading, getInventoryMedia } =
-        store;
+    const { inventoryImagesID, saveInventoryImages, fileImages, isLoading } = store;
     const [images, setImages] = useState<string[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
     const [totalCount, setTotalCount] = useState(0);
