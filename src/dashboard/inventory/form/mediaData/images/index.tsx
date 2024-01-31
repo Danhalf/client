@@ -19,19 +19,25 @@ import { Checkbox } from "primereact/checkbox";
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryImagesID, saveInventoryImages, fileImages } = store;
+    const { inventoryImagesID, saveInventoryImages, fileImages, isLoading, getInventoryMedia } =
+        store;
     const [images, setImages] = useState<string[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
-    useEffect(() => {
+    const getInventoryImagesID = () => {
         inventoryImagesID.forEach((image) => {
             image &&
                 getInventoryMediaItem(image).then((item: any) => {
                     setImages((prev) => [...prev, item]);
                 });
         });
+    };
+
+    useEffect(() => {
+        getInventoryImagesID();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inventoryImagesID]);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
@@ -53,8 +59,10 @@ export const ImagesMedia = observer((): ReactElement => {
     const handleUploadFiles = () => {
         saveInventoryImages().then((res) => {
             if (res) {
+                setImages([]);
                 store.fileImages = [];
                 fileUploadRef.current?.clear();
+                getInventoryImagesID();
             }
         });
     };
@@ -156,7 +164,7 @@ export const ImagesMedia = observer((): ReactElement => {
                 <InputText className='media-input__text' placeholder='Comment' />
                 <Button
                     severity={totalCount ? "success" : "secondary"}
-                    disabled={!totalCount}
+                    disabled={!totalCount || isLoading}
                     className='p-button media-input__button'
                     onClick={handleUploadFiles}
                 >
@@ -186,9 +194,9 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length ? (
-                    images.map((image) => {
+                    images.map((image, index) => {
                         return (
-                            <div key={image} className='media-images__item'>
+                            <div key={index} className='media-images__item'>
                                 {checked && (
                                     <Checkbox
                                         checked={false}
