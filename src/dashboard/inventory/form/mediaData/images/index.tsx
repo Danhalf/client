@@ -27,10 +27,13 @@ export const ImagesMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
 
     const getInventoryImagesID = () => {
-        inventoryImagesID.forEach((image) => {
+        inventoryImagesID.forEach((image: string) => {
             image &&
-                getInventoryMediaItem(image).then((item: any) => {
-                    setImages((prev) => [...prev, item]);
+                getInventoryMediaItem(image).then((item: string | undefined) => {
+                    if (item) {
+                        if (images.some((image) => image === item)) return;
+                        item && setImages((prev) => [...prev, item]);
+                    }
                 });
         });
     };
@@ -59,8 +62,6 @@ export const ImagesMedia = observer((): ReactElement => {
     const handleUploadFiles = () => {
         saveInventoryImages().then((res) => {
             if (res) {
-                setImages([]);
-                store.fileImages = [];
                 fileUploadRef.current?.clear();
                 getInventoryImagesID();
             }
