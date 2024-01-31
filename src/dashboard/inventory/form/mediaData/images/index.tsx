@@ -2,7 +2,13 @@ import "./index.css";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Toast } from "primereact/toast";
-import { FileUpload, FileUploadUploadEvent, ItemTemplateOptions } from "primereact/fileupload";
+import {
+    FileUpload,
+    FileUploadHeaderTemplateOptions,
+    FileUploadProps,
+    FileUploadUploadEvent,
+    ItemTemplateOptions,
+} from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
 import { Dropdown } from "primereact/dropdown";
@@ -20,9 +26,10 @@ export const ImagesMedia = observer((): ReactElement => {
 
     useEffect(() => {
         inventoryImages.forEach((image) => {
-            getInventoryMediaItem(image).then((item: any) => {
-                setImages((prev) => [...prev, item]);
-            });
+            image &&
+                getInventoryMediaItem(image).then((item: any) => {
+                    setImages((prev) => [...prev, item]);
+                });
         });
     }, [inventoryImages]);
 
@@ -70,6 +77,23 @@ export const ImagesMedia = observer((): ReactElement => {
         );
     };
 
+    const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
+        return (
+            <div className='w-full flex justify-content-center flex-wrap mb-3'>
+                {chooseButton}
+                <div className='flex w-full justify-content-center align-items-center mt-4'>
+                    <span className='media__upload-text-info media__upload-text-info--bold'>
+                        Up to 16 items
+                    </span>
+                    <span className='media__upload-text-info'>Maximal size is 8 Mb</span>
+                    <Tag className='media__upload-tag' value='png' />
+                    <Tag className='media__upload-tag' value='jpeg' />
+                    <Tag className='media__upload-tag' value='tiff' />
+                </div>
+            </div>
+        );
+    };
+
     const emptyTemplate = () => {
         return (
             <div className='grid'>
@@ -82,27 +106,14 @@ export const ImagesMedia = observer((): ReactElement => {
                     <span>or</span>
                     <hr className='media__line ml-4 flex-1' />
                 </div>
-                <div className='w-full flex justify-content-center flex-wrap mt-4'>
-                    <Button type='button' className='p-button media__button' onClick={() => {}}>
-                        Choose from files
-                    </Button>
-                    <div className='flex w-full justify-content-center align-items-center mt-4'>
-                        <span className='media__upload-text-info media__upload-text-info--bold'>
-                            Up to 16 items
-                        </span>
-                        <span className='media__upload-text-info'>Maximal size is 8 Mb</span>
-                        <Tag className='media__upload-tag' value='png' />
-                        <Tag className='media__upload-tag' value='jpeg' />
-                        <Tag className='media__upload-tag' value='tiff' />
-                    </div>
-                </div>
             </div>
         );
     };
 
     const chooseOptions = {
-        icon: "pi pi-fw pi-images",
-        className: "button-primary",
+        className: "media__button",
+        label: "Choose from files",
+        icon: "none",
     };
     const uploadOptions = {
         icon: "pi pi-fw pi-cloud-upload",
@@ -122,15 +133,16 @@ export const ImagesMedia = observer((): ReactElement => {
                 accept='image/*'
                 maxFileSize={8000000}
                 onUpload={onTemplateUpload}
-                headerTemplate={<></>}
+                headerTemplate={chooseTemplate}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate}
                 chooseOptions={chooseOptions}
                 uploadOptions={uploadOptions}
                 cancelOptions={cancelOptions}
+                progressBarTemplate={<></>}
                 className='col-12'
                 pt={{
-                    content: {},
+                    chooseButton: {},
                 }}
             />
             <div className='col-12 mt-4 media-input'>
@@ -162,61 +174,63 @@ export const ImagesMedia = observer((): ReactElement => {
                 </label>
             </div>
             <div className='media-images'>
-                {images.length
-                    ? images.map((image) => {
-                          return (
-                              <div key={image} className='media-images__item'>
-                                  {checked && (
-                                      <Checkbox
-                                          checked={false}
-                                          className='media-uploaded__checkbox'
-                                      />
-                                  )}
+                {images.length ? (
+                    images.map((image) => {
+                        return (
+                            <div key={image} className='media-images__item'>
+                                {checked && (
+                                    <Checkbox
+                                        checked={false}
+                                        className='media-uploaded__checkbox'
+                                    />
+                                )}
 
-                                  <Image
-                                      src={image}
-                                      alt='inventory-item'
-                                      width='75'
-                                      height='75'
-                                      pt={{
-                                          image: {
-                                              className: "media-images__image",
-                                          },
-                                      }}
-                                  />
-                                  <div className='media-images__info image-info'>
-                                      <div className='image-info__item'>
-                                          <span className='image-info__icon'>
-                                              <i className='pi pi-th-large' />
-                                          </span>
-                                          <span className='image-info__text--bold'>Exterior</span>
-                                      </div>
-                                      <div className='image-info__item'>
-                                          <span className='image-info__icon'>
-                                              <span className='image-info__icon'>
-                                                  <i className='pi pi-comment' />
-                                              </span>
-                                          </span>
-                                          <span className='image-info__text'>
-                                              Renewed colour and new tires
-                                          </span>
-                                      </div>
-                                      <div className='image-info__item'>
-                                          <span className='image-info__icon'>
-                                              <i className='pi pi-calendar' />
-                                          </span>
-                                          <span className='image-info__text'>
-                                              10/11/2023 08:51:39
-                                          </span>
-                                      </div>
-                                  </div>
-                                  <div className='media-images__close'>
-                                      <i className='pi pi-times' />
-                                  </div>
-                              </div>
-                          );
-                      })
-                    : "No images added yet."}
+                                <Image
+                                    src={image}
+                                    alt='inventory-item'
+                                    width='75'
+                                    height='75'
+                                    pt={{
+                                        image: {
+                                            className: "media-images__image",
+                                        },
+                                    }}
+                                />
+                                <div className='media-images__info image-info'>
+                                    <div className='image-info__item'>
+                                        <span className='image-info__icon'>
+                                            <i className='pi pi-th-large' />
+                                        </span>
+                                        <span className='image-info__text--bold'>Exterior</span>
+                                    </div>
+                                    <div className='image-info__item'>
+                                        <span className='image-info__icon'>
+                                            <span className='image-info__icon'>
+                                                <i className='pi pi-comment' />
+                                            </span>
+                                        </span>
+                                        <span className='image-info__text'>
+                                            Renewed colour and new tires
+                                        </span>
+                                    </div>
+                                    <div className='image-info__item'>
+                                        <span className='image-info__icon'>
+                                            <i className='pi pi-calendar' />
+                                        </span>
+                                        <span className='image-info__text'>
+                                            10/11/2023 08:51:39
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className='media-images__close'>
+                                    <i className='pi pi-times' />
+                                </div>
+                            </div>
+                        );
+                    })
+                ) : (
+                    <div className='w-full text-center'>No images added yet.</div>
+                )}
             </div>
         </div>
     );
