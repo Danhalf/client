@@ -1,7 +1,6 @@
 import "./index.css";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { Toast } from "primereact/toast";
 import {
     FileUpload,
     FileUploadHeaderTemplateOptions,
@@ -23,7 +22,6 @@ export const ImagesMedia = observer((): ReactElement => {
     const { inventoryImagesID, saveInventoryImages, fileImages } = store;
     const [images, setImages] = useState<string[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
-    const toast = useRef<Toast>(null);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
@@ -43,7 +41,6 @@ export const ImagesMedia = observer((): ReactElement => {
 
     const onTemplateUpload = (e: FileUploadUploadEvent) => {
         setTotalCount(e.files.length);
-        toast.current?.show({ severity: "info", summary: "Success", detail: "File Uploaded" });
     };
 
     const onTemplateRemove = (file: File, callback: Function) => {
