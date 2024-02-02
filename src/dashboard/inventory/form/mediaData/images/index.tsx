@@ -67,6 +67,8 @@ export const ImagesMedia = observer((): ReactElement => {
         });
     };
 
+    const handleDeleteImage = () => {};
+
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
         const file = inFile as File;
         return (

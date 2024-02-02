@@ -406,3 +406,14 @@ export const pairMediaWithInventoryItem = async (inventoryUid: string, mediaitem
         // TODO: add error handler
     }
 };
+
+export const deleteMediaImage = async (itemuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post(`inventory/${itemuid}/deletemedia`);
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO add error handler
+    }
+};
