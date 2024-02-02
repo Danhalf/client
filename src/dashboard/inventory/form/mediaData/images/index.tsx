@@ -16,22 +16,28 @@ import { useStore } from "store/hooks";
 import { getInventoryMediaItem } from "http/services/inventory-service";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
+import { Status } from "common/models/base-response";
+
+interface ImageItem {
+    src: string;
+    mediauid: string;
+}
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryImagesID, saveInventoryImages, fileImages, isLoading } = store;
-    const [images, setImages] = useState<string[]>([]);
+    const { inventoryImagesID, saveInventoryImages, fileImages, isLoading, removeImage } = store;
+    const [images, setImages] = useState<ImageItem[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
     const getInventoryImagesID = () => {
-        inventoryImagesID.forEach((image: string) => {
-            image &&
-                getInventoryMediaItem(image).then((item: string | undefined) => {
+        inventoryImagesID.forEach((imageID: string) => {
+            imageID &&
+                getInventoryMediaItem(imageID).then((item: string | undefined) => {
                     if (item) {
-                        if (images.some((image) => image === item)) return;
-                        item && setImages((prev) => [...prev, item]);
+                        if (images.some((image) => image.src === item)) return;
+                        item && setImages((prev) => [...prev, { mediauid: imageID, src: item }]);
                     }
                 });
         });
@@ -67,7 +73,11 @@ export const ImagesMedia = observer((): ReactElement => {
         });
     };
 
-    const handleDeleteImage = () => {};
+    const handleDeleteImage = (mediauid: string) => {
+        removeImage(mediauid).then((res) => {
+            res === Status.OK && getInventoryImagesID();
+        });
+    };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
         const file = inFile as File;
@@ -196,9 +206,9 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length ? (
-                    images.map((image, index) => {
+                    images.map(({ mediauid, src }) => {
                         return (
-                            <div key={index} className='media-images__item'>
+                            <div key={mediauid} className='media-images__item'>
                                 {checked && (
                                     <Checkbox
                                         checked={false}
@@ -207,7 +217,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                 )}
 
                                 <Image
-                                    src={image}
+                                    src={src}
                                     alt='inventory-item'
                                     width='75'
                                     height='75'
@@ -243,9 +253,12 @@ export const ImagesMedia = observer((): ReactElement => {
                                         </span>
                                     </div>
                                 </div>
-                                <div className='media-images__close'>
+                                <button
+                                    className='media-images__close'
+                                    onClick={() => handleDeleteImage(mediauid)}
+                                >
                                     <i className='pi pi-times' />
-                                </div>
+                                </button>
                             </div>
                         );
                     })
