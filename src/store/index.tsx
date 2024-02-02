@@ -4,6 +4,7 @@ import {
     InventoryExtData,
     InventoryOptionsInfo,
     createMediaItemRecord,
+    deleteMediaImage,
     getInventoryInfo,
     getInventoryMediaItemList,
     pairMediaWithInventoryItem,
@@ -183,6 +184,25 @@ class InventoryStore {
             });
 
             await Promise.all(uploadPromises);
+
+            return Status.OK;
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
+        } finally {
+            this._isLoading = false;
+        }
+    });
+
+    public removeImage = action(async (imageuid: string): Promise<Status | undefined> => {
+        try {
+            this._isLoading = true;
+
+            try {
+                await deleteMediaImage(imageuid);
+            } catch (error) {
+                // TODO: add error handler
+            }
 
             return Status.OK;
         } catch (error) {
