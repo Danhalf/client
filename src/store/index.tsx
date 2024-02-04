@@ -1,5 +1,10 @@
 import { Status } from "common/models/base-response";
-import { Inventory, InventoryExtData, InventoryOptionsInfo } from "common/models/inventory";
+import {
+    Inventory,
+    InventoryExtData,
+    InventoryMediaItemID,
+    InventoryOptionsInfo,
+} from "common/models/inventory";
 import {
     createMediaItemRecord,
     deleteMediaImage,
@@ -28,7 +33,7 @@ class InventoryStore {
     private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
-    private _inventoryImagesID: string[] = [];
+    private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
     private _inventoryVideoID: string[] = [];
     private _inventoryAudioID: string[] = [];
     private _inventoryDocumentsID: string[] = [];
@@ -85,10 +90,10 @@ class InventoryStore {
         try {
             const response = await getInventoryMediaItemList(itemuid);
             if (response) {
-                response.forEach(({ contenttype, mediauid }) => {
+                response.forEach(({ contenttype, mediauid, itemuid }) => {
                     switch (contenttype) {
                         case 0:
-                            this._inventoryImagesID.push(mediauid);
+                            this._inventoryImagesID.push({ itemuid, mediauid });
                             break;
                         case 1:
                             this._inventoryVideoID.push(mediauid);
@@ -173,7 +178,6 @@ class InventoryStore {
                                 this._inventoryID,
                                 uploadMediaResponse.itemuid
                             );
-                            this._inventoryImagesID.push(uploadMediaResponse.itemuid);
                         }
                     }
                 } catch (error) {
@@ -215,7 +219,7 @@ class InventoryStore {
         this._fileImages = files;
     }
 
-    public set inventoryImagesID(images: string[]) {
+    public set inventoryImagesID(images: Partial<InventoryMediaItemID>[]) {
         this._inventoryImagesID = images;
     }
 

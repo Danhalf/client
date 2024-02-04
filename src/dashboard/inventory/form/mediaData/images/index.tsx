@@ -17,27 +17,35 @@ import { getInventoryMediaItem } from "http/services/inventory-service";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
 import { Status } from "common/models/base-response";
+import { InventoryMediaItemID } from "common/models/inventory";
 
 interface ImageItem {
     src: string;
-    mediauid: string;
+    itemuid: string;
 }
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventoryImagesID, saveInventoryImages, fileImages, isLoading, removeImage } = store;
+    const {
+        inventoryImagesID,
+        saveInventoryImages,
+        fileImages,
+        getInventoryMedia,
+        isLoading,
+        removeImage,
+    } = store;
     const [images, setImages] = useState<ImageItem[]>([]);
     const [checked, setChecked] = useState<boolean>(false);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
     const getInventoryImagesID = () => {
-        inventoryImagesID.forEach((imageID: string) => {
-            imageID &&
-                getInventoryMediaItem(imageID).then((item: string | undefined) => {
+        inventoryImagesID.forEach(({ mediauid, itemuid }: Partial<InventoryMediaItemID>) => {
+            mediauid &&
+                getInventoryMediaItem(mediauid).then((item: string | undefined) => {
                     if (item) {
                         if (images.some((image) => image.src === item)) return;
-                        item && setImages((prev) => [...prev, { mediauid: imageID, src: item }]);
+                        item && setImages((prev) => [...prev, { itemuid: itemuid!, src: item }]);
                     }
                 });
         });
@@ -68,14 +76,14 @@ export const ImagesMedia = observer((): ReactElement => {
         saveInventoryImages().then((res) => {
             if (res) {
                 fileUploadRef.current?.clear();
-                getInventoryImagesID();
+                getInventoryMedia().then(getInventoryImagesID);
             }
         });
     };
 
     const handleDeleteImage = (mediauid: string) => {
         removeImage(mediauid).then((res) => {
-            res === Status.OK && getInventoryImagesID();
+            res === Status.OK && getInventoryMedia().then(getInventoryImagesID);
         });
     };
 
@@ -206,9 +214,9 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length ? (
-                    images.map(({ mediauid, src }) => {
+                    images.map(({ itemuid, src }) => {
                         return (
-                            <div key={mediauid} className='media-images__item'>
+                            <div key={itemuid} className='media-images__item'>
                                 {checked && (
                                     <Checkbox
                                         checked={false}
@@ -255,7 +263,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                 </div>
                                 <button
                                     className='media-images__close'
-                                    onClick={() => handleDeleteImage(mediauid)}
+                                    onClick={() => handleDeleteImage(itemuid)}
                                 >
                                     <i className='pi pi-times' />
                                 </button>
