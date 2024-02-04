@@ -1,8 +1,6 @@
 import { Status } from "common/models/base-response";
+import { Inventory, InventoryExtData, InventoryOptionsInfo } from "common/models/inventory";
 import {
-    Inventory,
-    InventoryExtData,
-    InventoryOptionsInfo,
     createMediaItemRecord,
     deleteMediaImage,
     getInventoryInfo,
