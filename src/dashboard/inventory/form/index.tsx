@@ -11,6 +11,7 @@ import { InventoryMediaData } from "./mediaData";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ProgressBar } from "primereact/progressbar";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 export const inventorySections = [
     InventoryVehicleData,
@@ -26,7 +27,7 @@ export const InventoryForm = () => {
     const { id } = useParams();
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(DELETE_ACTIVE_INDEX);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
-
+    const [confirmActive, serConfirmActive] = useState<boolean>(false);
     const store = useStore().inventoryStore;
     const { getInventory, getInventoryMedia, clearInventory, saveInventory } = store;
     const navigate = useNavigate();
@@ -64,7 +65,9 @@ export const InventoryForm = () => {
         });
     };
 
-    const handleDeleteInventory = () => {};
+    const handleDeleteInventory = () => {
+        serConfirmActive(true);
+    };
 
     return (
         <Suspense>
@@ -212,6 +215,7 @@ export const InventoryForm = () => {
                     </div>
                 </div>
             </div>
+            <ConfirmModal active={confirmActive} />
         </Suspense>
     );
 };
