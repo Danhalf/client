@@ -18,9 +18,13 @@ export const inventorySections = [
     InventoryMediaData,
 ].map((sectionData) => new InventorySection(sectionData));
 
+const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
+const ITEMS_MENU_COUNT = inventorySections.reduce((acc, current) => acc + current.getLength(), -1);
+const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
+
 export const InventoryForm = () => {
     const { id } = useParams();
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(DELETE_ACTIVE_INDEX);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
 
     const store = useStore().inventoryStore;
@@ -39,14 +43,8 @@ export const InventoryForm = () => {
         };
     }, [id, store]);
 
-    const accordionSteps = inventorySections.map((item) => item.startIndex);
-    const itemsMenuCount = inventorySections.reduce(
-        (acc, current) => acc + current.getLength(),
-        -1
-    );
-
     useEffect(() => {
-        accordionSteps.forEach((step, index) => {
+        ACCORDION_STEPS.forEach((step, index) => {
             if (step - 1 < stepActiveIndex) {
                 return setAccordionActiveIndex((prev) => {
                     const updatedArray = Array.isArray(prev) ? [...prev] : [0];
@@ -65,6 +63,8 @@ export const InventoryForm = () => {
             }
         });
     };
+
+    const handleDeleteInventory = () => {};
 
     return (
         <Suspense>
@@ -121,9 +121,9 @@ export const InventoryForm = () => {
                                     {id && (
                                         <Button
                                             icon='pi pi-times'
-                                            className='p-button gap-2 inventory__delete-button w-full'
+                                            className='p-button gap-2 inventory__delete-nav w-full'
                                             severity='danger'
-                                            onClick={() => setStepActiveIndex(itemsMenuCount + 1)}
+                                            onClick={() => setStepActiveIndex(DELETE_ACTIVE_INDEX)}
                                         >
                                             Delete inventory
                                         </Button>
@@ -160,7 +160,7 @@ export const InventoryForm = () => {
                                                 </div>
                                             ))
                                         )}
-                                        {stepActiveIndex === itemsMenuCount + 1 && (
+                                        {stepActiveIndex === DELETE_ACTIVE_INDEX && (
                                             <div className='inventory-form'>
                                                 <div className='inventory-form__title inventory-form__title--danger uppercase'>
                                                     Delete inventory
@@ -174,22 +174,39 @@ export const InventoryForm = () => {
                                 <Button
                                     onClick={() => setStepActiveIndex((prev) => --prev)}
                                     disabled={!stepActiveIndex}
-                                    className='uppercase px-6'
+                                    className='uppercase px-6 inventory__button'
                                     outlined
                                 >
                                     Back
                                 </Button>
                                 <Button
                                     onClick={() => setStepActiveIndex((prev) => ++prev)}
-                                    disabled={stepActiveIndex >= itemsMenuCount}
-                                    className='uppercase px-6'
+                                    disabled={stepActiveIndex >= ITEMS_MENU_COUNT}
+                                    severity={
+                                        stepActiveIndex === DELETE_ACTIVE_INDEX
+                                            ? "secondary"
+                                            : "success"
+                                    }
+                                    className='uppercase px-6 inventory__button'
                                     outlined
                                 >
                                     Next
                                 </Button>
-                                <Button onClick={handleSave} className='uppercase px-6'>
-                                    Save
-                                </Button>
+                                {stepActiveIndex === DELETE_ACTIVE_INDEX ? (
+                                    <Button
+                                        onClick={handleDeleteInventory}
+                                        className='p-button uppercase px-6 inventory__button inventory__button--danger'
+                                    >
+                                        Delete
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={handleSave}
+                                        className='uppercase px-6 inventory__button'
+                                    >
+                                        Save
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>
