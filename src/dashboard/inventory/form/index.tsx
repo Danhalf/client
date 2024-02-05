@@ -118,6 +118,16 @@ export const InventoryForm = () => {
                                             </AccordionTab>
                                         ))}
                                     </Accordion>
+                                    {id && (
+                                        <Button
+                                            icon='pi pi-times'
+                                            className='p-button gap-2 inventory__delete-button w-full'
+                                            severity='danger'
+                                            onClick={() => setStepActiveIndex(itemsMenuCount + 1)}
+                                        >
+                                            Delete inventory
+                                        </Button>
+                                    )}
                                 </div>
                                 <div className='w-full flex flex-column p-0'>
                                     <div className='flex flex-grow-1'>
@@ -149,6 +159,13 @@ export const InventoryForm = () => {
                                                     )}
                                                 </div>
                                             ))
+                                        )}
+                                        {stepActiveIndex === itemsMenuCount + 1 && (
+                                            <div className='inventory-form'>
+                                                <div className='inventory-form__title inventory-form__title--danger uppercase'>
+                                                    Delete inventory
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
