@@ -1,14 +1,19 @@
 import { useEffect, useRef } from "react";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { ConfirmDialog, ConfirmDialogProps, confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
+import "./index.css";
 
-export const ConfirmModal = ({ message, active }: { message?: string; active: boolean }) => {
+interface ConfirmModalProps extends ConfirmDialogProps {
+    bodyMessage?: string;
+}
+
+export const ConfirmModal = ({ bodyMessage, visible, onHide, ...props }: ConfirmModalProps) => {
     const toast = useRef<Toast>(null);
 
     useEffect(() => {
-        active && showTemplate();
+        visible && showTemplate();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [active]);
+    }, [visible]);
 
     const accept = () => {
         toast.current &&
@@ -32,16 +37,21 @@ export const ConfirmModal = ({ message, active }: { message?: string; active: bo
 
     const showTemplate = () => {
         confirmDialog({
-            header: "Confirmation",
-            message: (
-                <div className='flex flex-column align-items-center w-full gap-3 border-bottom-1 surface-border'>
-                    <i className='pi pi-exclamation-circle text-6xl text-primary-500'></i>
-                    <span>{message || "Please confirm to proceed moving forward."}</span>
+            header: (
+                <div className='confirm-header'>
+                    <i className='pi pi-times-circle confirm-header__icon' />
+                    <div className='confirm-header__title'>Are you sure?</div>
                 </div>
             ),
-
+            message: (
+                <div className='text-center w-full confirm-body'>
+                    {bodyMessage || "Please confirm to proceed moving forward."}
+                </div>
+            ),
+            ...props,
             accept,
             reject,
+            onHide,
         });
     };
 
