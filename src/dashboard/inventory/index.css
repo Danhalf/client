@@ -139,3 +139,8 @@
     background-color: var(--admss-app-red);
     opacity: 0.6;
 }
+
+.p-dropdown-panel .p-dropdown-header {
+    border: none;
+    background-color: var(--admss-app-light-blue);
+}
