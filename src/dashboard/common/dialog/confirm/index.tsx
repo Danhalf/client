@@ -5,9 +5,16 @@ import "./index.css";
 
 interface ConfirmModalProps extends ConfirmDialogProps {
     bodyMessage?: string;
+    confirmAction?: () => void;
 }
 
-export const ConfirmModal = ({ bodyMessage, visible, onHide, ...props }: ConfirmModalProps) => {
+export const ConfirmModal = ({
+    bodyMessage,
+    confirmAction,
+    visible,
+    onHide,
+    ...props
+}: ConfirmModalProps) => {
     const toast = useRef<Toast>(null);
 
     useEffect(() => {
@@ -16,6 +23,7 @@ export const ConfirmModal = ({ bodyMessage, visible, onHide, ...props }: Confirm
     }, [visible]);
 
     const accept = () => {
+        confirmAction && confirmAction();
         toast.current &&
             toast.current.show({
                 severity: "info",
