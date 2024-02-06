@@ -184,9 +184,12 @@ export const pairMediaWithInventoryItem = async (inventoryUid: string, mediaitem
     }
 };
 
-export const deleteMediaImage = async (itemuid: string) => {
+export const deleteInventory = async (inventoryuid: string, data: Record<string, string>) => {
     try {
-        const response = await authorizedUserApiInstance.post(`inventory/${itemuid}/deletemedia`);
+        const response = await authorizedUserApiInstance.post<any>(
+            `inventory/${inventoryuid}/delete`,
+            data
+        );
         if (response.status === 200) {
             return response.data;
         }
@@ -195,17 +198,13 @@ export const deleteMediaImage = async (itemuid: string) => {
     }
 };
 
-export const deleteInventory = async (inventoryuid: string, data: Record<string, string>) => {
+export const deleteMediaImage = async (itemuid: string) => {
     try {
-        const response = await authorizedUserApiInstance.post<any>(
-            `inventory/${inventoryuid}/delete`,
-            data
-        );
-
+        const response = await authorizedUserApiInstance.post(`inventory/${itemuid}/deletemedia`);
         if (response.status === 200) {
             return response.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        // TODO add error handler
     }
 };
