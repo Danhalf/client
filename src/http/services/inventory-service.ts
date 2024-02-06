@@ -190,7 +190,10 @@ export const deleteInventory = async (inventoryuid: string, data: Record<string,
             `inventory/${inventoryuid}/delete`,
             data
         );
-  } catch (error) {
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
         // TODO add error handler
     }
 };
