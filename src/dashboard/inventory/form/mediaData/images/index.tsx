@@ -83,7 +83,15 @@ export const ImagesMedia = observer((): ReactElement => {
 
     const handleDeleteImage = (mediauid: string) => {
         removeImage(mediauid).then((res) => {
-            res === Status.OK && getInventoryMedia().then(getInventoryImagesID);
+            store.inventoryImagesID = [];
+            res === Status.OK &&
+                getInventoryMedia().then((res) => {
+                    res === Status.OK && getInventoryImagesID();
+                    const filteredImages = [...images].filter(
+                        (image) => image.itemuid !== mediauid
+                    );
+                    setImages(filteredImages);
+                });
         });
     };
 

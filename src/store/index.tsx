@@ -85,7 +85,7 @@ class InventoryStore {
         }
     };
 
-    public getInventoryMedia = async (itemuid: string = this._inventoryID) => {
+    public getInventoryMedia = async (itemuid: string = this._inventoryID): Promise<Status> => {
         this._isLoading = true;
         try {
             const response = await getInventoryMediaItemList(itemuid);
@@ -110,7 +110,9 @@ class InventoryStore {
                     }
                 });
             }
+            return Status.OK;
         } catch (error) {
+            return Status.ERROR;
         } finally {
             this._isLoading = false;
         }
