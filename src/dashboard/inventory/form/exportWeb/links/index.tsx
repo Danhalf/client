@@ -4,10 +4,10 @@ import { ReactElement } from "react";
 
 export const ExportWebLinks = observer((): ReactElement => {
     return (
-        <div className='grid export-web-price row-gap-2'>
+        <div className='grid export-web-links row-gap-2'>
             <InputTextarea
                 placeholder='VDP Link (Vehicle Detail Page)'
-                className='w-full export-web-price__text-area'
+                className='w-full export-web-links__text-area'
                 pt={{
                     root: {
                         style: {
@@ -22,7 +22,7 @@ export const ExportWebLinks = observer((): ReactElement => {
             <div className='col-12'>
                 <InputTextarea
                     placeholder='Video URL'
-                    className='w-full export-web-price__text-area'
+                    className='w-full export-web-links__text-area'
                     pt={{
                         root: {
                             style: {
@@ -31,9 +31,11 @@ export const ExportWebLinks = observer((): ReactElement => {
                         },
                     }}
                 />
+            </div>
+            <div className='col-12'>
                 <InputTextarea
                     placeholder='Photo URL'
-                    className='w-full export-web-price__text-area'
+                    className='w-full export-web-links__text-area'
                     pt={{
                         root: {
                             style: {
