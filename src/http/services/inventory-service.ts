@@ -88,11 +88,11 @@ export const getInventoryDeleteReasonsList = async (
     useruid: string
 ): Promise<string[] | unknown> => {
     try {
-        const request = await authorizedUserApiInstance.get<InventoryMedia[]>(
+        const request = await authorizedUserApiInstance.get<string[]>(
             `inventory/${useruid}/listdeletionreasons`
         );
         if (request.status === 200) {
-            return request.data;
+            return request.data as string[];
         } else throw new Error();
     } catch (error) {
         return error;
