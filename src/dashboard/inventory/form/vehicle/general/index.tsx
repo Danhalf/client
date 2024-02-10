@@ -45,7 +45,20 @@ export const VehicleGeneral = observer((): ReactElement => {
     const handleVINchange = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
         changeInventory({ key: "VIN", value });
         if (value.length === VIN_VALID_LENGTH) {
-            inventoryDecodeVIN(value);
+            inventoryDecodeVIN(value).then((response) => {
+                if (response) {
+                    // eslint-disable-next-line no-console
+                    console.log(response);
+                    changeInventory({ key: "Make", value: response.Make });
+                    changeInventory({ key: "Model", value: response.Model });
+                    changeInventory({ key: "Year", value: response.Year });
+                    changeInventory({ key: "Transmission", value: response.Transmission });
+                    changeInventory({ key: "TypeOfFuel", value: response.TypeOfFuel });
+                    changeInventory({ key: "DriveLine", value: response.DriveLine });
+                    changeInventory({ key: "Cylinders", value: response.Cylinders });
+                    changeInventory({ key: "Engine", value: response.Engine });
+                }
+            });
         }
     };
 
@@ -82,7 +95,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     filter
                     required
                     onChange={({ value }) => changeInventory({ key: "Make", value })}
-                    options={automakesList}
+                    options={[...automakesList, { name: inventory.Make }]}
                     placeholder='Make (required)'
                     className='w-full vehicle-general__dropdown'
                 />
