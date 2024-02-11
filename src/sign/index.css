@@ -43,10 +43,12 @@
 .sign-in__password {
     position: relative;
 }
+
 .sign-in__password .sign__icon {
     position: absolute;
     right: 0.75em;
 }
+
 .sign-in__password .sign__icon--toggle {
     right: 2em;
     font-size: 1.1rem;
