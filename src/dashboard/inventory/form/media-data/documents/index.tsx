@@ -3,7 +3,6 @@ import { ReactElement, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { LimitationsPanel } from "dashboard/common/tooltip";
 import { Button } from "primereact/button";
-import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from "primereact/dropdown";
 import {
     FileUpload,
@@ -21,7 +20,6 @@ const limitations = {
 };
 
 export const DocumentsMedia = observer((): ReactElement => {
-    const [checked, setChecked] = useState<boolean>(false);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
