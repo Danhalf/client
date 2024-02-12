@@ -175,7 +175,7 @@ export const ImagesMedia = observer((): ReactElement => {
                 ref={fileUploadRef}
                 multiple
                 accept='image/*'
-                maxFileSize={8000000}
+                maxFileSize={limitations.maxSize * 1000000}
                 onUpload={onTemplateUpload}
                 headerTemplate={chooseTemplate}
                 itemTemplate={itemTemplate}

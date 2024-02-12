@@ -13,7 +13,10 @@
     align-items: center;
 }
 
-.limitations__button.p-button:hover {
+.limitations__button.p-button:hover,
+.limitations__button.p-button:active,
+.limitations__button.p-button:focus {
+    box-shadow: none;
     border: none;
     background-color: var(--admss-app-main-blue);
 }

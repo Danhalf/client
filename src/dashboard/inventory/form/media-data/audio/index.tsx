@@ -146,7 +146,7 @@ export const AudioMedia = observer((): ReactElement => {
                 ref={fileUploadRef}
                 multiple
                 accept='audio/*'
-                maxFileSize={8000000}
+                maxFileSize={limitations.maxSize * 1000000}
                 onUpload={onTemplateUpload}
                 headerTemplate={chooseTemplate}
                 itemTemplate={itemTemplate}
@@ -169,16 +169,6 @@ export const AudioMedia = observer((): ReactElement => {
             <div className='media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded audio files</h2>
                 <hr className='media-uploaded__line flex-1' />
-                <label className='cursor-pointer media-uploaded__label'>
-                    <Checkbox
-                        checked={checked}
-                        onChange={() => {
-                            setChecked(!checked);
-                        }}
-                        className='media-uploaded__checkbox'
-                    />
-                    Export to Web
-                </label>
             </div>
             <div className='media-audios'>
                 <div className='w-full text-center'>No audio files added yet.</div>
