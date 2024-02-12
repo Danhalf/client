@@ -1,20 +1,45 @@
-import { Tooltip, TooltipProps } from "primereact/tooltip";
 import { ReactElement } from "react";
 import "./index.css";
 
-interface DashboardTooltipProps extends TooltipProps {}
-export const DashboardTooltip = (props: DashboardTooltipProps): ReactElement => {
-    return (
-        <div className='tooltip'>
-            <Tooltip target='.custom-target-icon' {...props} />
+// interface LimitationsPanelProps extends TooltipProps {}
+// export const LimitationsPanel = (props: LimitationsPanelProps): ReactElement => {
+//     return (
+//         <div className='tooltip'>
+//             <Tooltip target='.custom-target-icon' content='hello' position='mouse' {...props} />
+//             <i className='custom-target-icon icon adms-help p-text-secondary p-overlay-badge tooltip__icon' />
+//         </div>
+//     );
+// };
 
-            <i
-                className='custom-target-icon icon adms-help p-text-secondary p-overlay-badge tooltip__icon'
-                data-pr-tooltip='No notifications'
-                data-pr-position='right'
-                data-pr-at='right+5 top'
-                data-pr-my='left center-2'
-            />
+import { useRef } from "react";
+import { OverlayPanel, OverlayPanelProps } from "primereact/overlaypanel";
+import { Button } from "primereact/button";
+
+interface LimitationsPanelProps extends OverlayPanelProps {}
+export const LimitationsPanel = (props: LimitationsPanelProps): ReactElement => {
+    const op = useRef<OverlayPanel>(null);
+    return (
+        <div className='limitations'>
+            <Button
+                type='button'
+                onClick={(e) => {
+                    op.current?.toggle(e);
+                }}
+                className='p-button limitations__button'
+            >
+                <i className='custom-target-icon icon adms-help p-text-secondary p-overlay-badge limitations__icon' />
+            </Button>
+            <OverlayPanel
+                ref={op}
+                dismissable={false}
+                className='limitations__panel shadow-3'
+                pt={{
+                    root: {},
+                }}
+            >
+                <div className='limitations__title'>Limitations</div>
+                <div className='limitations__body'>{props.children}</div>
+            </OverlayPanel>
         </div>
     );
 };

@@ -15,7 +15,7 @@ import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
-import { DashboardTooltip } from "dashboard/common/tooltip";
+import { LimitationsPanel } from "dashboard/common/tooltip";
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -105,7 +105,25 @@ export const ImagesMedia = observer((): ReactElement => {
                             <Tag className='media__upload-tag' value='png' />
                             <Tag className='media__upload-tag' value='jpeg' />
                             <Tag className='media__upload-tag' value='tiff' />
-                            <DashboardTooltip position='right' />
+                            <div className='media-tooltip'>
+                                <LimitationsPanel>
+                                    <p>
+                                        <b>Supported formats</b>: PNG, JPEG, TIFF
+                                    </p>
+                                    <p>
+                                        <b>Minimal resolution</b>: 512x512
+                                    </p>
+                                    <p>
+                                        <b>Maximal resolution</b>: 8192x8192
+                                    </p>
+                                    <p>
+                                        <b>Maximal size</b>: 8 MBytes
+                                    </p>
+                                    <p>
+                                        <b>Batch upload</b>: Up to 16 items
+                                    </p>
+                                </LimitationsPanel>
+                            </div>
                         </div>
                     </>
                 )}
