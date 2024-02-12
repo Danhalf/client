@@ -1,14 +1,21 @@
 .limitations__panel {
     border-radius: 10px;
+    width: 330px;
 }
 .limitations__button {
     border-radius: 50%;
+    border: none;
     background: var(--admss-app-medium-blue);
     width: 38px;
     height: 38px;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.limitations__button.p-button:hover {
+    border: none;
+    background-color: var(--admss-app-main-blue);
 }
 
 .limitations__title {
@@ -22,7 +29,7 @@
 }
 
 .limitations__icon {
-    font-size: 2.4rem;
+    font-size: 2.6rem;
     cursor: pointer;
     color: #fff;
     line-height: 1;

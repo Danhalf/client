@@ -1,16 +1,6 @@
 import { ReactElement } from "react";
 import "./index.css";
 
-// interface LimitationsPanelProps extends TooltipProps {}
-// export const LimitationsPanel = (props: LimitationsPanelProps): ReactElement => {
-//     return (
-//         <div className='tooltip'>
-//             <Tooltip target='.custom-target-icon' content='hello' position='mouse' {...props} />
-//             <i className='custom-target-icon icon adms-help p-text-secondary p-overlay-badge tooltip__icon' />
-//         </div>
-//     );
-// };
-
 import { useRef } from "react";
 import { OverlayPanel, OverlayPanelProps } from "primereact/overlaypanel";
 import { Button } from "primereact/button";
@@ -29,15 +19,8 @@ export const LimitationsPanel = (props: LimitationsPanelProps): ReactElement => 
             >
                 <i className='custom-target-icon icon adms-help p-text-secondary p-overlay-badge limitations__icon' />
             </Button>
-            <OverlayPanel
-                ref={op}
-                dismissable={false}
-                className='limitations__panel shadow-3'
-                pt={{
-                    root: {},
-                }}
-            >
-                <div className='limitations__title'>Limitations</div>
+            <OverlayPanel ref={op} dismissable={false} className='limitations__panel shadow-3'>
+                <div className='limitations__title'>Limitations:</div>
                 <div className='limitations__body'>{props.children}</div>
             </OverlayPanel>
         </div>
