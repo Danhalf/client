@@ -15,6 +15,7 @@ import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
+import { DashboardTooltip } from "dashboard/common/tooltip";
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -96,7 +97,7 @@ export const ImagesMedia = observer((): ReactElement => {
                 ) : (
                     <>
                         {chooseButton}
-                        <div className='flex w-full justify-content-center align-items-center mt-4'>
+                        <div className='flex w-full justify-content-center align-items-center mt-4 relative'>
                             <span className='media__upload-text-info media__upload-text-info--bold'>
                                 Up to 16 items
                             </span>
@@ -104,6 +105,7 @@ export const ImagesMedia = observer((): ReactElement => {
                             <Tag className='media__upload-tag' value='png' />
                             <Tag className='media__upload-tag' value='jpeg' />
                             <Tag className='media__upload-tag' value='tiff' />
+                            <DashboardTooltip position='right' />
                         </div>
                     </>
                 )}
