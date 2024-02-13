@@ -22,7 +22,7 @@
     font-size: 16px;
     line-height: 1;
 }
-.info-panel__icon-wrapper {
+.info-panel__button {
     background: var(--admss-app-light-blue);
     border-radius: 50%;
     width: 40px;
@@ -34,10 +34,18 @@
     cursor: pointer;
 }
 
+.info-panel__button.p-button:hover,
+.info-panel__button.p-button:active,
+.info-panel__button.p-button:focus {
+    box-shadow: none;
+    border: none;
+    background-color: var(--admss-app-main-blue);
+}
+
 .info-panel__icon {
     color: #fff;
     line-height: 1;
-    font-size: 24px;
+    font-size: 16px;
 }
 
 .info-panel__icon-wrapper:hover {
