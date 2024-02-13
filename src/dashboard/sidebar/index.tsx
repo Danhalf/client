@@ -43,6 +43,7 @@ export default function Sidebar() {
                 </li>
                 <li className='sidebar-nav__item'>
                     <Link to='/dashboard/export-web' className='sidebar-nav__link'>
+                        {/* TODO: change icon */}
                         <div className='sidebar-nav__icon reports'></div>
                         <span>Export to Web</span>
                     </Link>
