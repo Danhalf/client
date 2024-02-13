@@ -12,8 +12,9 @@ import {
 } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
+import { MediaLimitations } from "common/models/inventory";
 
-const limitations = {
+const limitations: MediaLimitations = {
     formats: ["PDF"],
     maxSize: 8,
     maxUpload: 16,

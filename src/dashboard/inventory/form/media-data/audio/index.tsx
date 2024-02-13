@@ -12,8 +12,9 @@ import {
 } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
+import { MediaLimitations } from "common/models/inventory";
 
-const limitations = {
+const limitations: MediaLimitations = {
     formats: ["WAV", "MP3", "MP4"],
     codecs: "PCM (WAV), MP3, AAC (MP4)",
     maxDuration: 300,

@@ -13,8 +13,9 @@ import {
 } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
+import { MediaLimitations } from "common/models/inventory";
 
-const limitations = {
+const limitations: MediaLimitations = {
     formats: ["MP4", "MKV", "MOV"],
     codecs: "H.264, HEVC",
     minResolution: "1280x720 (up to 60P)",

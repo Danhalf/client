@@ -16,8 +16,9 @@ import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
 import { LimitationsPanel } from "dashboard/common/tooltip";
+import { MediaLimitations } from "common/models/inventory";
 
-const limitations = {
+const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
     minResolution: "512x512",
     maxResolution: "8192x8192",
