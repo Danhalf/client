@@ -15,7 +15,7 @@ import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
-import { LimitationsPanel } from "dashboard/common/tooltip";
+import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { MediaLimitations } from "common/models/inventory";
 
 const limitations: MediaLimitations = {
@@ -117,7 +117,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                 <Tag key={format} className='media__upload-tag' value={format} />
                             ))}
                             <div className='media-tooltip'>
-                                <LimitationsPanel>
+                                <InfoOverlayPanel>
                                     <p>
                                         <b>Supported formats</b>:{" "}
                                         {limitations.formats.map((format, index) => (
@@ -139,7 +139,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                     <p>
                                         <b>Batch upload</b>: Up to {limitations.maxUpload} items
                                     </p>
-                                </LimitationsPanel>
+                                </InfoOverlayPanel>
                             </div>
                         </div>
                     </>

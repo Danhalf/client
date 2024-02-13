@@ -1,7 +1,7 @@
 import "./index.css";
 import { ReactElement, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { LimitationsPanel } from "dashboard/common/tooltip";
+import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import {
@@ -82,7 +82,7 @@ export const DocumentsMedia = observer((): ReactElement => {
                                 <Tag key={format} className='media__upload-tag' value={format} />
                             ))}
                             <div className='media-tooltip'>
-                                <LimitationsPanel>
+                                <InfoOverlayPanel>
                                     <p>
                                         <b>Supported formats: </b>
                                         {limitations.formats.map((format, index) => (
@@ -98,7 +98,7 @@ export const DocumentsMedia = observer((): ReactElement => {
                                     <p>
                                         <b>Batch upload</b>: Up to {limitations.maxUpload} items
                                     </p>
-                                </LimitationsPanel>
+                                </InfoOverlayPanel>
                             </div>
                         </div>
                     </>
