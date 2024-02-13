@@ -9,19 +9,19 @@ interface InfoOverlayPanelProps extends OverlayPanelProps {}
 export const InfoOverlayPanel = (props: InfoOverlayPanelProps): ReactElement => {
     const op = useRef<OverlayPanel>(null);
     return (
-        <div className='limitations'>
+        <div className='info-panel'>
             <Button
                 type='button'
                 onClick={(e) => {
                     op.current?.toggle(e);
                 }}
-                className='p-button limitations__button'
+                className='p-button info-panel__button'
             >
-                <i className='custom-target-icon icon adms-help p-text-secondary p-overlay-badge limitations__icon' />
+                <i className='custom-target-icon icon adms-help p-text-secondary p-overlay-badge info-panel__icon' />
             </Button>
-            <OverlayPanel ref={op} dismissable={false} className='limitations__panel shadow-3'>
-                <div className='limitations__title'>Limitations:</div>
-                <div className='limitations__body'>{props.children}</div>
+            <OverlayPanel ref={op} dismissable={false} className='info-panel__panel shadow-3'>
+                <div className='info-panel__title'>info-panel:</div>
+                <div className='info-panel__body'>{props.children}</div>
             </OverlayPanel>
         </div>
     );

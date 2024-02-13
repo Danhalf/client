@@ -1,8 +1,8 @@
-.limitations__panel {
+.info-panel__panel {
     border-radius: 10px;
     width: 330px;
 }
-.limitations__button {
+.info-panel__button {
     border-radius: 50%;
     border: none;
     background: var(--admss-app-medium-blue);
@@ -13,25 +13,25 @@
     align-items: center;
 }
 
-.limitations__button.p-button:hover,
-.limitations__button.p-button:active,
-.limitations__button.p-button:focus {
+.info-panel__button.p-button:hover,
+.info-panel__button.p-button:active,
+.info-panel__button.p-button:focus {
     box-shadow: none;
     border: none;
     background-color: var(--admss-app-main-blue);
 }
 
-.limitations__title {
+.info-panel__title {
     font-size: 16px;
     font-weight: 700;
     color: var(--admss-app-main-blue);
 }
 
-.limitations__body {
+.info-panel__body {
     font-size: 16px;
 }
 
-.limitations__icon {
+.info-panel__icon {
     font-size: 2.6rem;
     cursor: pointer;
     color: #fff;
