@@ -117,7 +117,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                 <Tag key={format} className='media__upload-tag' value={format} />
                             ))}
                             <div className='media-tooltip'>
-                                <InfoOverlayPanel>
+                                <InfoOverlayPanel panelTitle='Limitations:'>
                                     <p>
                                         <b>Supported formats</b>:{" "}
                                         {limitations.formats.map((format, index) => (

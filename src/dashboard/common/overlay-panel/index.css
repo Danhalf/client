@@ -1,6 +1,6 @@
 .info-panel__panel {
     border-radius: 10px;
-    width: 330px;
+    min-width: 330px;
 }
 .info-panel__button {
     border-radius: 50%;

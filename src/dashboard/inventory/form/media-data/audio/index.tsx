@@ -84,7 +84,7 @@ export const AudioMedia = observer((): ReactElement => {
                                 <Tag key={format} className='media__upload-tag' value={format} />
                             ))}
                             <div className='media-tooltip'>
-                                <InfoOverlayPanel>
+                                <InfoOverlayPanel panelTitle='Limitations:'>
                                     <p>
                                         <b> Supported codecs</b>: {limitations.codecs}
                                     </p>
