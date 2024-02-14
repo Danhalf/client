@@ -1,6 +1,6 @@
 import { Inventory } from "dashboard/inventory/common";
 
-export const InventoryVehicleData: Pick<Inventory, "label" | "items"> = {
+export const ContactInfoData: Pick<Inventory, "label" | "items"> = {
     label: "Options",
     items: [
         { itemLabel: "General" },

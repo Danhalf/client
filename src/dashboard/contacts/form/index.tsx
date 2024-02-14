@@ -3,15 +3,16 @@
 import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { InventoryVehicleData } from "./options";
 import { Button } from "primereact/button";
 import { ContactItem, ContactSection } from "../common";
-import { InventoryPurchaseData } from "./info";
 import { useParams } from "react-router-dom";
 import { ProgressBar } from "primereact/progressbar";
 import { ContactUser, getContactInfo } from "http/services/contacts-service";
+import { GeneralInfoData } from "./general-info";
+import { ContactInfoData } from "./contact-info";
+import { ContactMediaData } from "./media-data";
 
-export const contactSections = [InventoryVehicleData, InventoryPurchaseData].map(
+export const contactSections = [GeneralInfoData, ContactInfoData, ContactMediaData].map(
     (sectionData) => new ContactSection(sectionData)
 );
 
@@ -117,9 +118,7 @@ export const ContactForm = () => {
                                                                 />
                                                             }
                                                         >
-                                                            <pre>
-                                                                {JSON.stringify(contact, null, 2)}
-                                                            </pre>
+                                                            {item.component}
                                                         </Suspense>
                                                     )}
                                                 </div>
