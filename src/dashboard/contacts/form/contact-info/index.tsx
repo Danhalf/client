@@ -1,13 +1,15 @@
 import { Inventory } from "dashboard/inventory/common";
+import { lazy } from "react";
+
+const ContactsSocialInfo = lazy(() =>
+    import("./contacts").then((module) => ({ default: module.ContactsSocialInfo }))
+);
 
 export const ContactInfoData: Pick<Inventory, "label" | "items"> = {
-    label: "Options",
+    label: "Contact Information",
     items: [
-        { itemLabel: "General" },
-        { itemLabel: "Description" },
-        { itemLabel: "Checks" },
-        { itemLabel: "Inspections" },
-        { itemLabel: "Keys" },
-        { itemLabel: "Disclosures" },
+        { itemLabel: "Contacts", component: <ContactsSocialInfo /> },
+        { itemLabel: "Company/Workplace" },
+        { itemLabel: "Prospecting and notes" },
     ],
 };

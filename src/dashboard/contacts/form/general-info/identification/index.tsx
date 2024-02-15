@@ -7,19 +7,12 @@ import { DateInput } from "dashboard/common/form/inputs";
 import {
     FileUpload,
     FileUploadHeaderTemplateOptions,
-    FileUploadSelectEvent,
-    FileUploadUploadEvent,
     ItemTemplateOptions,
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
 
 export const ContactsIdentificationInfo = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
-    const onTemplateSelect = (e: FileUploadSelectEvent) => {};
-
-    const onTemplateUpload = (e: FileUploadUploadEvent) => {};
-
-    const onTemplateRemove = (file: File, callback: Function) => {};
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
         const file = inFile as File;
@@ -42,7 +35,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     type='button'
                     icon='pi pi-times'
                     className='p-button presentation__remove-button'
-                    onClick={() => onTemplateRemove(file, props.onRemove)}
                 />
             </div>
         );
@@ -50,7 +42,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
 
     const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
         return (
-            <div className='col-6 ml-auto flex justify-content-center flex-wrap mb-3 image-choose'>
+            <div className='col-6 ml-auto flex justify-content-center flex-wrap mb-3'>
                 {chooseButton}
             </div>
         );
@@ -133,11 +125,21 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <FileUpload
                     ref={fileUploadRef}
                     accept='image/*'
-                    onUpload={onTemplateUpload}
                     headerTemplate={chooseTemplate}
                     itemTemplate={itemTemplate}
                     emptyTemplate={emptyTemplate}
-                    onSelect={onTemplateSelect}
+                    progressBarTemplate={<></>}
+                    className='col-12'
+                />
+            </div>
+            <div className='col-6 identification-dl'>
+                <div className='identification-dl__title'>Backside</div>
+                <FileUpload
+                    ref={fileUploadRef}
+                    accept='image/*'
+                    headerTemplate={chooseTemplate}
+                    itemTemplate={itemTemplate}
+                    emptyTemplate={emptyTemplate}
                     progressBarTemplate={<></>}
                     className='col-12'
                 />
