@@ -15,7 +15,7 @@ import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
 
 const limitations: MediaLimitations = {
-    formats: ["PDF"],
+    formats: ["PDF", "PNG", "JPEG", "TIFF"],
     maxSize: 8,
     maxUpload: 16,
 };

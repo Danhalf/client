@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
