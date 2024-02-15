@@ -37,7 +37,7 @@ export const ContactsProspecting = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <Button className='w-full'>
-                    <i className='icon adms-add-item-round mr-2' />
+                    <i className='pi pi-plus mr-2 text-xs pt-1' />
                     Add another Vehicle
                 </Button>
             </div>
@@ -48,7 +48,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                     className='w-full contacts-prospecting__text-area'
                 />
             </div>
-            <div className='col-12'>
+            <div className='col-12 flex justify-content-end '>
                 <Button className='px-4'>Schedule Call Back</Button>
             </div>
         </div>

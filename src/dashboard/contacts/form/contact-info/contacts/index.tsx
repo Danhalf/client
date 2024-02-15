@@ -14,7 +14,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <Button className='w-full'>
-                    <i className='icon adms-add-item-round mr-2' />
+                    <i className='pi pi-plus mr-2 text-xs pt-1' />
                     Add another email address
                 </Button>
             </div>
@@ -27,7 +27,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <Button className='w-full'>
-                    <i className='icon adms-add-item-round mr-2' />
+                    <i className='pi pi-plus mr-2 text-xs pt-1' />
                     Add another phone number
                 </Button>
             </div>
