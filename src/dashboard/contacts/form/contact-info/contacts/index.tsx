@@ -1,7 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
-import "./index.css";
 import { Button } from "primereact/button";
 
 export const ContactsSocialInfo = observer((): ReactElement => {
