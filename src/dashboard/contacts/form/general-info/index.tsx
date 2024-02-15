@@ -5,7 +5,13 @@ const ContactsGeneral = lazy(() =>
     import("./general").then((module) => ({ default: module.ContactsGeneralInfo }))
 );
 const ContactsGeneralAddress = lazy(() =>
-    import("./adress").then((module) => ({ default: module.ContactsAddressInfo }))
+    import("./address").then((module) => ({ default: module.ContactsAddressInfo }))
+);
+const ContactsMailingAddress = lazy(() =>
+    import("./mailing-address").then((module) => ({ default: module.ContactsMailingAddressInfo }))
+);
+const ContactsIdentification = lazy(() =>
+    import("./identification").then((module) => ({ default: module.ContactsIdentificationInfo }))
 );
 
 export const GeneralInfoData: Pick<Inventory, "label" | "items"> = {
@@ -13,7 +19,7 @@ export const GeneralInfoData: Pick<Inventory, "label" | "items"> = {
     items: [
         { itemLabel: "General", component: <ContactsGeneral /> },
         { itemLabel: "Address", component: <ContactsGeneralAddress /> },
-        { itemLabel: "Mailing address" },
-        { itemLabel: "Identification" },
+        { itemLabel: "Mailing address", component: <ContactsMailingAddress /> },
+        { itemLabel: "Identification", component: <ContactsIdentification /> },
     ],
 };
