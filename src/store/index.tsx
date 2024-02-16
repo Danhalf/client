@@ -287,6 +287,7 @@ class InventoryStore {
         this._inventoryOptions = [];
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
+        this._inventoryExportWeb = {} as InventoryWebInfo;
     };
 }
 
