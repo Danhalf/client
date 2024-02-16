@@ -226,3 +226,14 @@ export const deleteMediaImage = async (itemuid: string) => {
         // TODO add error handler
     }
 };
+
+export const getInventoryWebInfo = async (inventoryuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any>(
+            `inventory/${inventoryuid}/webinfo`
+        );
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
