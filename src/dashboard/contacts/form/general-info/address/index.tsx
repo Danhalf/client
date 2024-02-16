@@ -26,6 +26,8 @@ export const ContactsAddressInfo = observer((): ReactElement => {
                     filter
                     placeholder='State'
                     value={contact?.state}
+                    //TODO: missing options
+                    options={[{ name: contact.state }]}
                     className='w-full address-info__dropdown'
                 />
             </div>

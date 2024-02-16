@@ -16,6 +16,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder='Title'
+                    //TODO: add missing contact.title
                     className='w-full general-info__dropdown'
                 />
             </div>
@@ -56,6 +57,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     optionValue='name'
                     value={contact.type}
                     filter
+                    //TODO: missing options
                     placeholder='Type (required)'
                     className='w-full general-info__dropdown'
                 />

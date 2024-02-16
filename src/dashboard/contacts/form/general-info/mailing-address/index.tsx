@@ -3,13 +3,19 @@ import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
 import "./index.css";
+import { useStore } from "store/hooks";
 
 export const ContactsMailingAddressInfo = observer((): ReactElement => {
+    const store = useStore().contactStore;
+    const { contact } = store;
     return (
         <div className='grid mailing-address-info row-gap-2'>
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <InputText className='mailing-address-info__text-input w-full' />
+                    <InputText
+                        className='mailing-address-info__text-input w-full'
+                        value={contact.streetAddress}
+                    />
                     <label className='float-label'>Street address</label>
                 </span>
             </div>
@@ -19,20 +25,29 @@ export const ContactsMailingAddressInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder='State'
+                    value={contact?.state}
+                    //TODO: missing options
+                    options={[{ name: contact.state }]}
                     className='w-full mailing-address-info__dropdown'
                 />
             </div>
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='mailing-address-info__text-input w-full' />
+                    <InputText
+                        className='mailing-address-info__text-input w-full'
+                        value={contact.city}
+                    />
                     <label className='float-label'>City</label>
                 </span>
             </div>
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='mailing-address-info__text-input w-full' />
+                    <InputText
+                        className='mailing-address-info__text-input w-full'
+                        value={contact.ZIP}
+                    />
                     <label className='float-label'>Zip Code</label>
                 </span>
             </div>
