@@ -10,8 +10,11 @@ import {
     ItemTemplateOptions,
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
+import { useStore } from "store/hooks";
 
 export const ContactsIdentificationInfo = observer((): ReactElement => {
+    const store = useStore().contactStore;
+    const { contact } = store;
     const fileUploadRef = useRef<FileUpload>(null);
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -74,13 +77,20 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder="DL's State"
+                    //TODO: need to confirm that the value is correct
+                    value={contact?.extdata.Buyer_DL_State}
+                    //TODO: missing DL state options
                     className='w-full identification-info__dropdown'
                 />
             </div>
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='identification-info__text-input w-full' />
+                    <InputText
+                        className='identification-info__text-input w-full'
+                        //TODO: need to confirm that the value is correct
+                        value={contact?.extdata.Buyer_Driver_License_Num}
+                    />
                     <label className='float-label'>Driver License's Number</label>
                 </span>
             </div>
@@ -88,6 +98,8 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
             <div className='col-3 mr-2'>
                 <DateInput
                     placeholder="DL's exp. date"
+                    //TODO: need to confirm that the value is correct
+                    value={contact?.extdata.Buyer_DL_Exp_Date}
                     className='identification-info__date-input w-full'
                 />
             </div>
@@ -98,13 +110,19 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder='Sex'
+                    //TODO: need to confirm that the value is correct
+                    value={contact?.extdata.Buyer_Sex}
                     className='w-full identification-info__dropdown'
                 />
             </div>
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='identification-info__text-input w-full' />
+                    <InputText
+                        className='identification-info__text-input w-full'
+                        //TODO: need to confirm that the value is correct
+                        value={contact?.extdata.Buyer_SS_Number}
+                    />
                     <label className='float-label'>Social Security Number</label>
                 </span>
             </div>
@@ -112,6 +130,8 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
             <div className='col-3'>
                 <DateInput
                     placeholder='Date of Birth'
+                    //TODO: need to confirm that the value is correct
+                    value={contact?.extdata.Buyer_Date_Of_Birth}
                     className='identification-info__date-input w-full'
                 />
             </div>
