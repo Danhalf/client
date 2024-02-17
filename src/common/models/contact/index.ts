@@ -252,6 +252,7 @@ export interface Contact {
     dluidback: string;
     type: number;
     extdata: ExtData;
+    status: Status;
 }
 
 export interface ContactsCategories {

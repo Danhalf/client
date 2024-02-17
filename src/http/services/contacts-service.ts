@@ -39,7 +39,9 @@ export const getContactsAmount = async (uid: string, queryParams: QueryParams) =
 export const getContactInfo = async (uid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<Contact>(`contacts/${uid}/info`);
-        return request.data;
+        if (request.data.status === Status.OK) {
+            return request.data;
+        }
     } catch (error) {
         // TODO: add error handler
     }
