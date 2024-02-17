@@ -11,6 +11,7 @@ import {
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
+import { STATES_LIST } from "common/constants/states";
 
 const SexList = [
     {
@@ -89,7 +90,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     placeholder="DL's State"
                     //TODO: need to confirm that the value is correct
                     value={contact?.extdata.Buyer_DL_State}
-                    //TODO: missing DL state options
+                    options={STATES_LIST}
                     className='w-full identification-info__dropdown'
                 />
             </div>
