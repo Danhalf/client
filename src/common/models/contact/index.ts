@@ -1,3 +1,5 @@
+import { BaseResponse, Status } from "../base-response";
+
 export interface ExtData {
     created: number;
     updated: number;
@@ -250,4 +252,43 @@ export interface Contact {
     dluidback: string;
     type: number;
     extdata: ExtData;
+}
+
+export interface ContactsCategories {
+    status: Status.OK;
+    contact_types: ContactType[];
+}
+
+export interface ContactType {
+    id: number;
+    name: string;
+}
+
+export interface ContactUser {
+    ZIP: string;
+    city: string;
+    companyName: string;
+    contactuid: string;
+    created: string;
+    dluidback: string;
+    dluidfront: string;
+    email1: string;
+    email2: string;
+    firstName: string;
+    lastName: string;
+    messager1: string;
+    messager2: string;
+    middleName: string;
+    phone1: string;
+    phone2: string;
+    state: string;
+    streetAddress: string;
+    type: number;
+    updated: string;
+    userName: string;
+    useruid: string;
+}
+
+export interface TotalUsers extends BaseResponse {
+    total: number;
 }
