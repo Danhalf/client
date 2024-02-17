@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useRef } from "react";
+import { ReactElement, useRef, useState } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
 import {
@@ -12,7 +12,17 @@ import {
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 
+const SexList = [
+    {
+        name: "M",
+    },
+    {
+        name: "F",
+    },
+];
+
 export const ContactsIdentificationInfo = observer((): ReactElement => {
+    const [sex, setSex] = useState<string>("");
     const store = useStore().contactStore;
     const { contact } = store;
     const fileUploadRef = useRef<FileUpload>(null);
@@ -111,7 +121,9 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     filter
                     placeholder='Sex'
                     //TODO: need to confirm that the value is correct
-                    value={contact?.extdata.Buyer_Sex}
+                    value={contact?.extdata.Buyer_Sex || sex}
+                    options={SexList}
+                    onChange={({ target: { value } }) => setSex(value)}
                     className='w-full identification-info__dropdown'
                 />
             </div>

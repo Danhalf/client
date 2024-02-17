@@ -27,12 +27,11 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     useEffect(() => {
         if (id) {
             getContactsTypeList(id).then((response) => {
-                // eslint-disable-next-line no-console
-                console.log(response);
                 response && setTypeList(response);
             });
         }
     }, [id]);
+
     return (
         <div className='grid general-info row-gap-2'>
             <div className='col-4'>

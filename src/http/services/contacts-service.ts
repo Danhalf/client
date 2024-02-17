@@ -57,3 +57,16 @@ export const getContactsTypeList = async (uid: string) => {
         // TODO: add error handler
     }
 };
+
+export const getContactsSalesmanList = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<ContactsCategories>(
+            `user/${uid}/salespersons`
+        );
+        if (request.data.status === Status.OK) {
+            return request.data.contact_types;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
