@@ -83,8 +83,8 @@
 .vertical-step-menu.p-steps
     .p-steps-item[aria-selected="true"]
     .p-menuitem-link.vertical-nav
-    .p-steps-number::after {
-    background-color: var(--admss-app-primary-main-green);
+    .p-steps-number::before {
+    background-color: #ccc;
 }
 
 .vertical-step-menu .p-menuitem-link.vertical-nav {

@@ -24,7 +24,6 @@ interface MenuOptions extends MenuItemOptions {
 export class InventorySection implements Inventory {
     private static instancesCount: number = 0;
     private static itemIndex: number = 0;
-    private _allItemsIndex: number = 0;
     private _activeIndex: number = 0;
     public sectionId: number;
     public label: string;
@@ -62,7 +61,7 @@ export class InventorySection implements Inventory {
                 <label
                     className={`vertical-nav__icon p-steps-number ${
                         InventorySection.instancesCount > this.items.length ||
-                        (index < this._activeIndex && "p-steps-number--green")
+                        (index <= this._activeIndex && "p-steps-number--green")
                     } border-circle`}
                 />
                 <span className={`${options.labelClassName} vertical-nav__label`}>
