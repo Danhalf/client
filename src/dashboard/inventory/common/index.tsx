@@ -24,6 +24,7 @@ interface MenuOptions extends MenuItemOptions {
 export class InventorySection implements Inventory {
     private static instancesCount: number = 0;
     private static itemIndex: number = 0;
+    private _allItemsIndex: number = 0;
     private _activeIndex: number = 0;
     public sectionId: number;
     public label: string;
@@ -43,13 +44,13 @@ export class InventorySection implements Inventory {
             itemIndex: InventorySection.itemIndex++,
             template: (item: MenuItem, options: MenuItemOptions) => {
                 (options as MenuOptions)?.active && (this._activeIndex = index);
-                return this.newTemplate(item, options);
+                return this.newTemplate(item, options, index);
             },
         }));
         this.startIndex = InventorySection.itemIndex - this.items.length;
     }
 
-    private newTemplate(item: MenuItem, options: MenuItemOptions): JSX.Element {
+    private newTemplate(item: MenuItem, options: MenuItemOptions, index: number): JSX.Element {
         return (
             <a
                 href='#'
@@ -60,7 +61,8 @@ export class InventorySection implements Inventory {
             >
                 <label
                     className={`vertical-nav__icon p-steps-number ${
-                        InventorySection.itemIndex >= this._activeIndex && "p-steps-number--green"
+                        InventorySection.instancesCount > this.items.length ||
+                        (index < this._activeIndex && "p-steps-number--green")
                     } border-circle`}
                 />
                 <span className={`${options.labelClassName} vertical-nav__label`}>
