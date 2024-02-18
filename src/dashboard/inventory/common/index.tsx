@@ -17,22 +17,13 @@ export interface Inventory {
     getLength: () => number;
 }
 
-interface MenuOptions extends MenuItemOptions {
-    active: boolean;
-}
-
 export class InventorySection implements Inventory {
     private static instancesCount: number = 0;
     private static itemIndex: number = 0;
-    private _activeIndex: number = 0;
     public sectionId: number;
     public label: string;
     public startIndex: number = 0;
     public items: InventoryItem[];
-
-    set activeIndex(value: number) {
-        this._activeIndex = value;
-    }
 
     public constructor({ label, items }: { label: string; items: InventoryItem[] }) {
         this.sectionId = ++InventorySection.instancesCount;
@@ -42,31 +33,33 @@ export class InventorySection implements Inventory {
             component,
             itemIndex: InventorySection.itemIndex++,
             template: (item: MenuItem, options: MenuItemOptions) => {
-                (options as MenuOptions)?.active && (this._activeIndex = index);
                 return this.newTemplate(item, options, index);
             },
         }));
         this.startIndex = InventorySection.itemIndex - this.items.length;
     }
 
-    private newTemplate(item: MenuItem, options: MenuItemOptions, index: number): JSX.Element {
+    private newTemplate(
+        item: MenuItem,
+        { props, onClick, className, labelClassName }: MenuItemOptions,
+        index: number
+    ): JSX.Element {
+        const isGreen =
+            (InventorySection.instancesCount > this.items.length || index <= props.activeIndex) &&
+            props.activeIndex !== 0;
+
         return (
             <a
                 href='#'
-                role='presentation'
-                data-pc-section='action'
-                onClick={options.onClick}
-                className={`${options.className} vertical-nav flex-row align-items-center justify-content-start w-full`}
+                onClick={onClick}
+                className={`${className} vertical-nav flex-row align-items-center justify-content-start w-full`}
             >
                 <label
                     className={`vertical-nav__icon p-steps-number ${
-                        InventorySection.instancesCount > this.items.length ||
-                        (index <= this._activeIndex && "p-steps-number--green")
+                        isGreen && "p-steps-number--green"
                     } border-circle`}
                 />
-                <span className={`${options.labelClassName} vertical-nav__label`}>
-                    {item.label}
-                </span>
+                <span className={`${labelClassName} vertical-nav__label`}>{item.label}</span>
             </a>
         );
     }
