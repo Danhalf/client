@@ -9,11 +9,11 @@ import { InputText } from "primereact/inputtext";
 import { Column } from "primereact/column";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
-import { Inventory } from "common/models/inventory";
 import { getExportToWebList } from "http/services/export-to-web.service";
+import { ExportWebList } from "common/models/export-web";
 
 export const ExportToWeb = () => {
-    const [exportsToWeb, setExportsToWeb] = useState<Inventory[]>([]);
+    const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
@@ -47,8 +47,7 @@ export const ExportToWeb = () => {
             top: lazyState.rows,
         };
         if (authUser) {
-            //TODO: add params
-            getExportToWebList(authUser.useruid).then((response) => {
+            getExportToWebList(authUser.useruid, params).then((response) => {
                 if (Array.isArray(response)) {
                     setExportsToWeb(response);
                 } else {
@@ -104,16 +103,19 @@ export const ExportToWeb = () => {
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
                                 >
-                                    <Column field='make' header='Make'></Column>
-                                    <Column field='model' header='Model'></Column>
-                                    <Column field='year' header='Year'></Column>
-                                    <Column field='vin' header='VIN'></Column>
-                                    <Column field='media' header='Media'></Column>
-                                    <Column field='status' header='Status'></Column>
+                                    <Column sortable field='Make' header='Make' />
+                                    <Column sortable field='Model' header='Model' />
+                                    <Column sortable field='Year' header='Year' />
+                                    <Column sortable field='VIN' header='VIN' />
+                                    {/* TODO: missed media value */}
+                                    <Column sortable field='Media' header='Media' />
+                                    <Column sortable field='Status' header='Status' />
+                                    {/* TODO: missed lastexportdate value */}
                                     <Column
+                                        sortable
                                         field='lastexportdate'
                                         header='Last Export Date'
-                                    ></Column>
+                                    />
                                 </DataTable>
                             </div>
                         </div>
