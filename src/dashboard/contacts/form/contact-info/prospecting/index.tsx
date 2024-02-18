@@ -6,36 +6,35 @@ import { DateInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
-import { useParams } from "react-router-dom";
-import { ContactType } from "common/models/contact";
 import { getContactsSalesmanList } from "http/services/contacts-service";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { AuthUser } from "http/services/auth.service";
+import { getKeyValue } from "services/local-storage.service";
 
 export const ContactsProspecting = observer((): ReactElement => {
-    const { id } = useParams();
-
     const store = useStore().contactStore;
     const { contact } = store;
     const [salesperson, setSalesperson] = useState<string>("");
-    const [salespersonsList, setSalespersonsList] = useState<ContactType[]>([]);
+    const [salespersonsList, setSalespersonsList] = useState<unknown[]>([]);
 
     useEffect(() => {
-        if (id) {
-            getContactsSalesmanList(id).then((response) => {
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        if (authUser) {
+            getContactsSalesmanList(authUser.useruid).then((response) => {
                 response && setSalespersonsList(response);
             });
         }
-    }, [id]);
+    }, []);
 
     return (
         <div className='grid contacts-prospecting row-gap-2'>
             <div className='col-6'>
                 <Dropdown
-                    optionLabel='name'
-                    optionValue='name'
+                    optionLabel='username'
+                    optionValue='useruid'
                     filter
                     //TODO: missing init value
                     value={salesperson}
-                    //TODO: API list is not working
                     options={salespersonsList}
                     onChange={({ target: { value } }) => setSalesperson(value)}
                     placeholder='Attending Salesman'

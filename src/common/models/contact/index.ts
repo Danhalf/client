@@ -293,3 +293,13 @@ export interface ContactUser {
 export interface TotalUsers extends BaseResponse {
     total: number;
 }
+
+export interface SalespersonsList {
+    created: string;
+    createdbyuid: string;
+    creatorusername: string;
+    enabled: number;
+    updated: string;
+    username: string;
+    useruid: string;
+}

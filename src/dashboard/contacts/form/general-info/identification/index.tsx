@@ -88,7 +88,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder="DL's State"
-                    //TODO: need to confirm that the value is correct
                     value={contact?.extdata.Buyer_DL_State}
                     options={STATES_LIST}
                     className='w-full identification-info__dropdown'
@@ -99,7 +98,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='identification-info__text-input w-full'
-                        //TODO: need to confirm that the value is correct
                         value={contact?.extdata.Buyer_Driver_License_Num}
                     />
                     <label className='float-label'>Driver License's Number</label>
@@ -109,7 +107,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
             <div className='col-3 mr-2'>
                 <DateInput
                     placeholder="DL's exp. date"
-                    //TODO: need to confirm that the value is correct
                     value={contact?.extdata.Buyer_DL_Exp_Date}
                     className='identification-info__date-input w-full'
                 />
@@ -121,7 +118,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder='Sex'
-                    //TODO: need to confirm that the value is correct
                     value={contact?.extdata.Buyer_Sex || sex}
                     options={SexList}
                     onChange={({ target: { value } }) => setSex(value)}
@@ -133,7 +129,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='identification-info__text-input w-full'
-                        //TODO: need to confirm that the value is correct
                         value={contact?.extdata.Buyer_SS_Number}
                     />
                     <label className='float-label'>Social Security Number</label>
@@ -143,7 +138,6 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
             <div className='col-3'>
                 <DateInput
                     placeholder='Date of Birth'
-                    //TODO: need to confirm that the value is correct
                     value={contact?.extdata.Buyer_Date_Of_Birth}
                     className='identification-info__date-input w-full'
                 />

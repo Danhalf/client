@@ -5,7 +5,7 @@ import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
-import { getContactsTypeList } from "http/services/contacts-service";
+import { getContactsTypeList } from "http/services/getContactsTypeList";
 import { ContactType } from "common/models/contact";
 
 const titleList = [
@@ -19,7 +19,6 @@ const titleList = [
 
 export const ContactsGeneralInfo = observer((): ReactElement => {
     const { id } = useParams();
-    const [title, setTitle] = useState<string>("");
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
     const { contact } = store;
@@ -40,10 +39,9 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     optionValue='name'
                     filter
                     placeholder='Title'
-                    //TODO: missing init API value
-                    value={title}
+                    value={contact.extdata?.Buyer_Salutation}
                     options={titleList}
-                    onChange={({ target: { value } }) => setTitle(value)}
+                    onChange={({ target: { value } }) => {}}
                     className='w-full general-info__dropdown'
                 />
             </div>
