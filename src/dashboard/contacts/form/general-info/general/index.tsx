@@ -5,8 +5,8 @@ import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
-import { getContactsTypeList } from "http/services/getContactsTypeList";
 import { ContactType } from "common/models/contact";
+import { getContactsTypeList } from "http/services/contacts-service";
 
 const titleList = [
     {
