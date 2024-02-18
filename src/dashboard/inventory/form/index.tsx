@@ -20,6 +20,8 @@ import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 
+import { useLocation } from "react-router-dom";
+
 export const inventorySections = [
     InventoryVehicleData,
     InventoryPurchaseData,
@@ -30,10 +32,14 @@ export const inventorySections = [
 const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
 const ITEMS_MENU_COUNT = inventorySections.reduce((acc, current) => acc + current.getLength(), -1);
 const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
+const STEP = "step";
 
 export const InventoryForm = () => {
     const { id } = useParams();
-    const [stepActiveIndex, setStepActiveIndex] = useState<number>(0);
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const tabParam = Number(searchParams.get(STEP));
+    const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
@@ -117,21 +123,28 @@ export const InventoryForm = () => {
                                                 header={section.label}
                                             >
                                                 <Steps
-                                                    model={section.items.map(
-                                                        ({ itemLabel, template }) => ({
-                                                            label: itemLabel,
-                                                            template,
-                                                        })
-                                                    )}
                                                     readOnly={false}
                                                     activeIndex={
                                                         stepActiveIndex - section.startIndex
                                                     }
-                                                    onSelect={(e) =>
+                                                    onSelect={(e) => {
                                                         setStepActiveIndex(
                                                             e.index + section.startIndex
-                                                        )
-                                                    }
+                                                        );
+                                                    }}
+                                                    model={section.items.map(
+                                                        ({ itemLabel, template }, idx) => ({
+                                                            label: itemLabel,
+                                                            template,
+                                                            command: () => {
+                                                                navigate(
+                                                                    `/dashboard/inventory/${id}?${STEP}=${
+                                                                        section.startIndex + idx
+                                                                    }`
+                                                                );
+                                                            },
+                                                        })
+                                                    )}
                                                     className='vertical-step-menu'
                                                     pt={{
                                                         menu: { className: "flex-column w-full" },
