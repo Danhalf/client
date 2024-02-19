@@ -245,6 +245,9 @@ export interface Contact {
     phone2: string;
     email1: string;
     email2: string;
+    emails: string[];
+    phones: string[];
+    messagers: string[];
     messager1: string;
     messager2: string;
     companyName: string;
