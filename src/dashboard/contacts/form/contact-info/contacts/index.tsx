@@ -30,7 +30,11 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                             </span>
                         </div>
                         <div className='col-6'>
-                            <Button className='w-full' onClick={() => setEmails([...emails, ""])}>
+                            <Button
+                                className='w-full'
+                                disabled={!emails[index].length}
+                                onClick={() => setEmails([...emails, ""])}
+                            >
                                 <i className='pi pi-plus mr-2 text-xs pt-1' />
                                 Add another email address
                             </Button>
@@ -39,21 +43,36 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 );
             })}
 
-            <div className='col-6'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='contacts-social__text-input w-full'
-                        value={contact.phone1}
-                    />
-                    <label className='float-label'>Phone Number</label>
-                </span>
-            </div>
-            <div className='col-6'>
-                <Button className='w-full'>
-                    <i className='pi pi-plus mr-2 text-xs pt-1' />
-                    Add another phone number
-                </Button>
-            </div>
+            {phones.map((phone, index) => {
+                return (
+                    <>
+                        <div className='col-6'>
+                            <span className='p-float-label'>
+                                <InputText
+                                    className='contacts-social__text-input w-full'
+                                    value={phone}
+                                    onChange={(e) => {
+                                        const newPhones = [...phones];
+                                        newPhones[index] = e.target.value;
+                                        setPhones(newPhones);
+                                    }}
+                                />
+                                <label className='float-label'>Phone Number</label>
+                            </span>
+                        </div>
+                        <div className='col-6'>
+                            <Button
+                                className='w-full'
+                                disabled={!phones[index].length}
+                                onClick={() => setPhones([...phones, ""])}
+                            >
+                                <i className='pi pi-plus mr-2 text-xs pt-1' />
+                                Add another phone number
+                            </Button>
+                        </div>
+                    </>
+                );
+            })}
 
             <hr className='form-line' />
 
