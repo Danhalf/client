@@ -1,12 +1,14 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
 import {
     FileUpload,
     FileUploadHeaderTemplateOptions,
+    FileUploadSelectEvent,
+    FileUploadUploadEvent,
     ItemTemplateOptions,
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
@@ -25,8 +27,38 @@ const SexList = [
 export const ContactsIdentificationInfo = observer((): ReactElement => {
     const [sex, setSex] = useState<string>("");
     const store = useStore().contactStore;
-    const { contact } = store;
+    const { contact, setImagesDL, getImagesDL, removeImagesDL } = store;
     const fileUploadRef = useRef<FileUpload>(null);
+
+    useEffect(() => {
+        getImagesDL();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const onTemplateSelect = (e: FileUploadSelectEvent) => {};
+
+    const onTemplateUpload = (e: FileUploadUploadEvent) => {};
+
+    const onTemplateRemove = (file: File, callback: Function) => {
+        removeImagesDL().then((res) => {
+            handleUploadFiles();
+        });
+        callback();
+    };
+
+    const handleUploadFiles = () => {
+        setImagesDL().then((res) => {
+            if (res) {
+                fileUploadRef.current?.clear();
+            }
+        });
+    };
+
+    const handleDeleteImage = () => {
+        removeImagesDL().then((res) => {
+            handleUploadFiles();
+        });
+    };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
         const file = inFile as File;
@@ -48,6 +80,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <Button
                     type='button'
                     icon='pi pi-times'
+                    onClick={handleDeleteImage}
                     className='p-button presentation__remove-button'
                 />
             </div>
@@ -153,8 +186,10 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     ref={fileUploadRef}
                     accept='image/*'
                     headerTemplate={chooseTemplate}
+                    onUpload={onTemplateUpload}
                     itemTemplate={itemTemplate}
                     emptyTemplate={emptyTemplate}
+                    onSelect={onTemplateSelect}
                     progressBarTemplate={<></>}
                     className='col-12'
                 />

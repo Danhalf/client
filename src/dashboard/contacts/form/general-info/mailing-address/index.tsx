@@ -23,11 +23,10 @@ export const ContactsMailingAddressInfo = observer((): ReactElement => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
-                    optionValue='name'
+                    optionValue='id'
                     filter
                     placeholder='State'
                     value={contact?.state}
-                    //TODO: missing options
                     options={STATES_LIST}
                     className='w-full mailing-address-info__dropdown'
                 />
