@@ -90,7 +90,7 @@ export const InventoryForm = () => {
             stepActiveIndex >= ACCORDION_STEPS[ACCORDION_STEPS.length - 1] &&
             !isInventoryWebExported
         ) {
-            getInventoryExportWeb();
+            getInventoryExportWeb(id);
             setIsInventoryWebExported(true);
         }
     }, [stepActiveIndex]);

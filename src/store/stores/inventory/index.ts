@@ -125,10 +125,10 @@ export class InventoryStore {
         }
     };
 
-    public getInventoryExportWeb = async () => {
+    public getInventoryExportWeb = async (id = this._inventoryID) => {
         this._isLoading = true;
         try {
-            const response = await getInventoryWebInfo(this._inventoryID);
+            const response = await getInventoryWebInfo(id);
             if (response) {
                 this._inventoryExportWeb = response;
             }
