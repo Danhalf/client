@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { Checkbox } from "primereact/checkbox";
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import "./index.css";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
@@ -11,7 +11,6 @@ export const ExportWebPrice = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const {
         inventoryExportWeb: {
-            enabled,
             ModelCode,
             CostPrice,
             ListPrice,
@@ -21,12 +20,15 @@ export const ExportWebPrice = observer((): ReactElement => {
             ExtraPrice3,
         },
     } = store;
+    const [checked, setChecked] = useState<boolean>(true);
     return (
         <div className='grid export-web-price row-gap-2'>
             <label className='cursor-pointer export-web-price__label'>
                 <Checkbox
-                    checked={Boolean(enabled)}
-                    onChange={() => {}}
+                    checked={checked}
+                    onChange={() => {
+                        setChecked(!checked);
+                    }}
                     className='export-web-price__checkbox'
                 />
                 Export to Web
