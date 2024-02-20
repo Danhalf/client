@@ -1,12 +1,13 @@
 import { Status } from "common/models/base-response";
-import { Contact } from "common/models/contact";
+import { Contact, ExtData } from "common/models/contact";
 import { getContactInfo } from "http/services/contacts-service";
-import { makeAutoObservable } from "mobx";
+import { action, makeAutoObservable, observable } from "mobx";
 import { RootStore } from "store";
 
 export class ContactStore {
     public rootStore: RootStore;
-    private _contact: Contact = {} as Contact;
+    private _contact: Contact = observable({}) as Contact;
+    private _contactExtData: ExtData = {} as ExtData;
     private _contactID: string = "";
     protected _isLoading = false;
     private _frontSiteDL: File = {} as File;
@@ -19,6 +20,10 @@ export class ContactStore {
 
     public get contact() {
         return this._contact;
+    }
+
+    public get contactExtData() {
+        return this._contactExtData;
     }
 
     public get frontSideDL() {
@@ -45,6 +50,7 @@ export class ContactStore {
                 const contact = response;
                 this._contactID = response.contactuid;
                 this._contact = contact || ({} as Contact);
+                this._contactExtData = contact.extdata || ({} as ExtData);
             }
         } catch (error) {
         } finally {
@@ -62,6 +68,14 @@ export class ContactStore {
             this._isLoading = false;
         }
     };
+
+    public changeContact = action((key: keyof Omit<Contact, "extdata">, value: string | number) => {
+        this._contact[key] = value as never;
+    });
+
+    public changeContactExtData = action((key: keyof ExtData, value: string | number) => {
+        this._contact.extdata[key] = value as never;
+    });
 
     public setImagesDL = async (): Promise<any> => {
         this._isLoading = true;
@@ -87,5 +101,8 @@ export class ContactStore {
 
     public clearContact = () => {
         this._contact = {} as Contact;
+        this._backSiteDL = {} as File;
+        this._frontSiteDL = {} as File;
+        this._contactExtData = {} as ExtData;
     };
 }
