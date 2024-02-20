@@ -21,6 +21,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 
 import { useLocation } from "react-router-dom";
+import { PrintForms } from "./print-forms";
 
 export const inventorySections = [
     InventoryVehicleData,
@@ -31,7 +32,8 @@ export const inventorySections = [
 
 const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
 const ITEMS_MENU_COUNT = inventorySections.reduce((acc, current) => acc + current.getLength(), -1);
-const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
+const PRINT_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
+const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 2;
 const STEP = "step";
 
 export const InventoryForm = () => {
@@ -85,7 +87,7 @@ export const InventoryForm = () => {
 
     useEffect(() => {
         ACCORDION_STEPS.forEach((step, index) => {
-            if (step - 1 < stepActiveIndex) {
+            if (step - 1 < stepActiveIndex && stepActiveIndex < ACCORDION_STEPS.length) {
                 return setAccordionActiveIndex((prev) => {
                     const updatedArray = Array.isArray(prev) ? [...prev] : [0];
                     updatedArray[index] = index;
@@ -180,6 +182,18 @@ export const InventoryForm = () => {
                                     </Accordion>
                                     {id && (
                                         <Button
+                                            icon='pi pi-print'
+                                            className={`p-button gap-2 inventory__print-nav ${
+                                                stepActiveIndex === PRINT_ACTIVE_INDEX &&
+                                                "inventory__print-nav--active"
+                                            } w-full`}
+                                            onClick={() => setStepActiveIndex(PRINT_ACTIVE_INDEX)}
+                                        >
+                                            Print forms
+                                        </Button>
+                                    )}
+                                    {id && (
+                                        <Button
                                             icon='pi pi-times'
                                             className='p-button gap-2 inventory__delete-nav w-full'
                                             severity='danger'
@@ -219,6 +233,15 @@ export const InventoryForm = () => {
                                                     )}
                                                 </div>
                                             ))
+                                        )}
+
+                                        {stepActiveIndex === PRINT_ACTIVE_INDEX && (
+                                            <div className='inventory-form'>
+                                                <div className='inventory-form__title uppercase'>
+                                                    Print history
+                                                </div>
+                                                <PrintForms />
+                                            </div>
                                         )}
                                         {stepActiveIndex === DELETE_ACTIVE_INDEX && (
                                             <div className='inventory-form'>
