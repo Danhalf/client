@@ -16,6 +16,7 @@ import {
     getInventoryMediaItem,
     deleteMediaImage,
     getInventoryWebInfo,
+    getInventoryWebInfoHistory,
 } from "http/services/inventory-service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
@@ -32,6 +33,7 @@ export class InventoryStore {
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
     private _inventoryExportWeb: InventoryWebInfo = {} as InventoryWebInfo;
+    private _inventoryExportWebHistory: unknown[] = [];
 
     private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
     private _uploadFileImages: File[] = [];
@@ -61,6 +63,9 @@ export class InventoryStore {
     }
     public get uploadFileImages() {
         return this._uploadFileImages;
+    }
+    public get inventoryExportWebHistory() {
+        return this._inventoryExportWebHistory;
     }
     public get images() {
         return this._images;
@@ -131,6 +136,19 @@ export class InventoryStore {
             const response = await getInventoryWebInfo(id);
             if (response) {
                 this._inventoryExportWeb = response;
+            }
+        } catch (error) {
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public getInventoryExportWebHistory = async (id = this._inventoryID) => {
+        this._isLoading = true;
+        try {
+            const response = await getInventoryWebInfoHistory(id);
+            if (response) {
+                this._inventoryExportWebHistory = response;
             }
         } catch (error) {
         } finally {

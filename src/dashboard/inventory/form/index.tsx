@@ -47,9 +47,16 @@ export const InventoryForm = () => {
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
     const store = useStore().inventoryStore;
-    const { getInventory, clearInventory, saveInventory, getInventoryExportWeb } = store;
+    const {
+        getInventory,
+        clearInventory,
+        saveInventory,
+        getInventoryExportWeb,
+        getInventoryExportWebHistory,
+    } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
+
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
@@ -92,6 +99,7 @@ export const InventoryForm = () => {
         ) {
             if (id) {
                 getInventoryExportWeb(id);
+                getInventoryExportWebHistory(id);
                 setIsInventoryWebExported(true);
             }
         }

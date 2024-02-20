@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import { AxiosResponse } from "axios";
+import { BaseResponse } from "common/models/base-response";
 import {
     Inventory,
     TotalInventoryList,
@@ -9,6 +10,7 @@ import {
     InventoryMedia,
     InventorySetResponse,
     CreateMediaItemRecordResponse,
+    InventoryWebInfo,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -187,7 +189,7 @@ export const uploadInventoryMedia = async (inventoryUid: string, inventoryData: 
 
 export const pairMediaWithInventoryItem = async (inventoryUid: string, mediaitemuid: string) => {
     try {
-        const response = await authorizedUserApiInstance.post<any>(
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
             `inventory/${inventoryUid}/media`,
             {
                 mediaitemuid,
@@ -204,7 +206,7 @@ export const pairMediaWithInventoryItem = async (inventoryUid: string, mediaitem
 
 export const deleteInventory = async (inventoryuid: string, data: Record<string, string>) => {
     try {
-        const response = await authorizedUserApiInstance.post<any>(
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
             `inventory/${inventoryuid}/delete`,
             data
         );
@@ -218,7 +220,9 @@ export const deleteInventory = async (inventoryuid: string, data: Record<string,
 
 export const deleteMediaImage = async (itemuid: string) => {
     try {
-        const response = await authorizedUserApiInstance.post(`inventory/${itemuid}/deletemedia`);
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `inventory/${itemuid}/deletemedia`
+        );
         if (response.status === 200) {
             return response.data;
         }
@@ -229,8 +233,19 @@ export const deleteMediaImage = async (itemuid: string) => {
 
 export const getInventoryWebInfo = async (inventoryuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any>(
+        const request = await authorizedUserApiInstance.get<InventoryWebInfo>(
             `inventory/${inventoryuid}/webinfo`
+        );
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getInventoryWebInfoHistory = async (inventoryuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<unknown[]>(
+            `external/${inventoryuid}/history`
         );
         return request.data;
     } catch (error) {
