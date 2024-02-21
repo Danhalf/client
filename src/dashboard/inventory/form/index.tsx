@@ -55,6 +55,7 @@ export const InventoryForm = () => {
         saveInventory,
         getInventoryExportWeb,
         getInventoryExportWebHistory,
+        getPrintList,
     } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
@@ -103,9 +104,15 @@ export const InventoryForm = () => {
                 getInventoryExportWeb(id);
                 getInventoryExportWebHistory(id);
                 setIsInventoryWebExported(true);
+                stepActiveIndex === PRINT_ACTIVE_INDEX && getPrintList(id);
             }
         }
     }, [stepActiveIndex]);
+
+    const handleActivePrintForms = () => {
+        navigate(getUrl(PRINT_ACTIVE_INDEX));
+        setStepActiveIndex(PRINT_ACTIVE_INDEX);
+    };
 
     const handleSave = () => {
         saveInventory().then((res) => {
@@ -182,12 +189,12 @@ export const InventoryForm = () => {
                                     </Accordion>
                                     {id && (
                                         <Button
-                                            icon='pi pi-print'
+                                            icon='icon adms-print'
                                             className={`p-button gap-2 inventory__print-nav ${
                                                 stepActiveIndex === PRINT_ACTIVE_INDEX &&
                                                 "inventory__print-nav--active"
                                             } w-full`}
-                                            onClick={() => setStepActiveIndex(PRINT_ACTIVE_INDEX)}
+                                            onClick={handleActivePrintForms}
                                         >
                                             Print forms
                                         </Button>

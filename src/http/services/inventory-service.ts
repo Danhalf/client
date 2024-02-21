@@ -257,3 +257,16 @@ export const getInventoryWebInfoHistory = async (inventoryuid: string) => {
         // TODO: add error handler
     }
 };
+
+export const getInventoryPrintForms = async (inventoryuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any[]>(
+            `print/${inventoryuid}/listforms`
+        );
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
