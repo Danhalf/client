@@ -12,6 +12,7 @@ import {
     CreateMediaItemRecordResponse,
     InventoryWebInfo,
     InventoryExportWebHistory,
+    InventoryPrintForm,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -260,7 +261,7 @@ export const getInventoryWebInfoHistory = async (inventoryuid: string) => {
 
 export const getInventoryPrintForms = async (inventoryuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any[]>(
+        const request = await authorizedUserApiInstance.get<InventoryPrintForm[]>(
             `print/${inventoryuid}/listforms`
         );
         if (request.status === 200) {

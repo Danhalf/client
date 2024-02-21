@@ -6,6 +6,7 @@ import {
     InventoryMediaItemID,
     InventoryWebInfo,
     InventoryExportWebHistory,
+    InventoryPrintForm,
 } from "common/models/inventory";
 import {
     getInventoryInfo,
@@ -45,7 +46,7 @@ export class InventoryStore {
     private _inventoryAudioID: string[] = [];
     private _inventoryDocumentsID: string[] = [];
 
-    private _printList: Record<string, string>[] = [];
+    private _printList: InventoryPrintForm[] = [];
 
     protected _isLoading = false;
 
@@ -74,6 +75,10 @@ export class InventoryStore {
     }
     public get images() {
         return this._images;
+    }
+
+    public get printList() {
+        return this._printList;
     }
 
     public get isLoading() {
@@ -315,5 +320,6 @@ export class InventoryStore {
         this._inventoryImagesID = [];
         this._exportWeb = {} as InventoryWebInfo;
         this._exportWebHistory = [] as InventoryExportWebHistory[];
+        this._printList = [] as InventoryPrintForm[];
     };
 }
