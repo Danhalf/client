@@ -271,3 +271,22 @@ export const getInventoryPrintForms = async (inventoryuid: string) => {
         // TODO: add error handler
     }
 };
+export const getInventoryPrintFormTemplate = async (inventoryuid: string, templateuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any>(
+            `print/${inventoryuid}/${templateuid}/form`,
+            {
+                responseType: "arraybuffer",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/pdf",
+                },
+            }
+        );
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};

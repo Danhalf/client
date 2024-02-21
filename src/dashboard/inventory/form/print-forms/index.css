@@ -1,4 +1,4 @@
-.p-button.inventory-print__button {
+.p-button.inventory-print__action-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -18,4 +18,9 @@
 .p-datatable.inventory-print__table .p-datatable-tbody > tr.p-highlight {
     background: #ddfee6;
     color: var(--admss-app-blue-text);
+}
+
+.inventory-print__button {
+    font-weight: 700;
+    font-size: 24px;
 }
