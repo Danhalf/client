@@ -22,12 +22,20 @@ import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
 import { DashboardDialog } from "dashboard/common/dialog";
 
-interface AdvancedSearch {
-    stock?: string;
-    make?: string;
-    model?: string;
-    VIN?: string;
-}
+const createStringifySearchQuery = (obj: Record<string, string>): string => {
+    let searchQueryString = "";
+    if (Object.values(obj).every((value) => !value)) {
+        return searchQueryString;
+    }
+    Object.entries(obj).forEach(([key, value], index) => {
+        if (value.length > 0) {
+            searchQueryString += `${index > 0 ? "+" : ""}${value}.${key}`;
+        }
+    });
+    return searchQueryString;
+};
+
+interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
 export default function Inventories(): ReactElement {
     const [inventories, setInventories] = useState<Inventory[]>([]);
@@ -65,6 +73,24 @@ export default function Inventories(): ReactElement {
         }
     }, []);
 
+    const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
+        if (authUser) {
+            if (total) {
+                getInventoryList(authUser.useruid, { ...params, total: 1 }).then((response) => {
+                    response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
+                });
+            }
+            getInventoryList(authUser.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    setInventories(response);
+                    setAdvancedSearch({});
+                } else {
+                    setInventories([]);
+                }
+            });
+        }
+    };
+
     useEffect(() => {
         const params: QueryParams = {
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
@@ -74,27 +100,29 @@ export default function Inventories(): ReactElement {
             skip: lazyState.first,
             top: lazyState.rows,
         };
-        if (authUser) {
-            getInventoryList(authUser.useruid, params).then((response) => {
-                if (Array.isArray(response)) {
-                    setInventories(response);
-                } else {
-                    setInventories([]);
-                }
-            });
-        }
-    }, [lazyState, authUser, globalSearch, advancedSearch]);
+        handleGetInventoryList(params);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lazyState, authUser, globalSearch]);
 
     const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string) => {
         setAdvancedSearch((prevSearch) => {
             const newSearch = { ...prevSearch, [key]: value };
 
-            const isAnyValueEmpty = Object.values(newSearch).every((value) => !value.trim().length);
+            const isAnyValueEmpty = Object.values(newSearch).every(
+                (value) => typeof value === "string" && !value.trim().length
+            );
 
             setButtonDisabled(isAnyValueEmpty);
 
             return newSearch;
         });
+    };
+
+    const handleAdvancedSearch = () => {
+        const params = createStringifySearchQuery(advancedSearch);
+        handleGetInventoryList({ ...lazyState, qry: params }, true);
+
+        setDialogVisible(false);
     };
 
     return (
@@ -177,10 +205,7 @@ export default function Inventories(): ReactElement {
                     header='Advanced search'
                     visible={dialogVisible}
                     buttonDisabled={buttonDisabled}
-                    action={() => {
-                        setDialogVisible(false);
-                        setAdvancedSearch({});
-                    }}
+                    action={handleAdvancedSearch}
                     onHide={() => {
                         setButtonDisabled(true);
                         setDialogVisible(false);
@@ -191,7 +216,7 @@ export default function Inventories(): ReactElement {
                             <InputText
                                 className='w-full'
                                 onChange={({ target }) =>
-                                    handleSetAdvancedSearch("stock", target.value)
+                                    handleSetAdvancedSearch("StockNo", target.value)
                                 }
                             />
                             <label className='float-label'>Stock#</label>
@@ -200,7 +225,7 @@ export default function Inventories(): ReactElement {
                             <InputText
                                 className='w-full'
                                 onChange={({ target }) =>
-                                    handleSetAdvancedSearch("make", target.value)
+                                    handleSetAdvancedSearch("Make", target.value)
                                 }
                             />
                             <label className='float-label'>Make</label>
@@ -209,7 +234,7 @@ export default function Inventories(): ReactElement {
                             <InputText
                                 className='w-full'
                                 onChange={({ target }) =>
-                                    handleSetAdvancedSearch("model", target.value)
+                                    handleSetAdvancedSearch("Model", target.value)
                                 }
                             />
                             <label className='float-label'>Model</label>
