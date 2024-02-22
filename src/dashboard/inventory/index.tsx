@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -20,13 +20,23 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
+import { DashboardDialog } from "dashboard/common/dialog";
 
-export default function Inventories() {
+interface AdvancedSearch {
+    stock?: string;
+    make?: string;
+    model?: string;
+    VIN?: string;
+}
+
+export default function Inventories(): ReactElement {
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
+    const [advancedSearch, setAdvancedSearch] = useState<AdvancedSearch>({});
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
@@ -106,6 +116,7 @@ export default function Inventories() {
                                     label='Advanced search'
                                     severity='success'
                                     type='button'
+                                    onClick={() => setDialogVisible(true)}
                                 />
                                 <span className='p-input-icon-right'>
                                     <i className='pi pi-search' />
@@ -147,6 +158,52 @@ export default function Inventories() {
                         </div>
                     </div>
                 </div>
+                <DashboardDialog
+                    className='search-dialog'
+                    footer='Search'
+                    header='Advanced search'
+                    visible={dialogVisible}
+                    buttonDisabled={
+                        !Object.keys(advancedSearch).length ||
+                        Object.values(advancedSearch).some((value) => !value)
+                    }
+                    onHide={() => setDialogVisible(false)}
+                >
+                    <div className='flex flex-column gap-4 pt-4'>
+                        <span className='p-float-label'>
+                            <InputText
+                                className='w-full'
+                                onChange={({ target }) =>
+                                    setAdvancedSearch({ stock: target.value })
+                                }
+                            />
+                            <label className='float-label'>Stock#</label>
+                        </span>
+                        <span className='p-float-label'>
+                            <InputText
+                                className='w-full'
+                                onChange={({ target }) => setAdvancedSearch({ make: target.value })}
+                            />
+                            <label className='float-label'>Make</label>
+                        </span>
+                        <span className='p-float-label'>
+                            <InputText
+                                className='w-full'
+                                onChange={({ target }) =>
+                                    setAdvancedSearch({ model: target.value })
+                                }
+                            />
+                            <label className='float-label'>Model</label>
+                        </span>
+                        <span className='p-float-label'>
+                            <InputText
+                                className='w-full'
+                                onChange={({ target }) => setAdvancedSearch({ VIN: target.value })}
+                            />
+                            <label className='float-label'>VIN</label>
+                        </span>
+                    </div>
+                </DashboardDialog>
             </div>
         </div>
     );
