@@ -137,7 +137,9 @@ export const InventoryForm = () => {
                                 <div className='p-0'>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
-                                        onTabChange={(e) => setAccordionActiveIndex(+e.index)}
+                                        onTabChange={(e) =>
+                                            setAccordionActiveIndex(Number(e.index))
+                                        }
                                         className='inventory__accordion'
                                     >
                                         {inventorySections.map((section) => (
