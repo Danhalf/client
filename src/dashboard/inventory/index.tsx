@@ -37,6 +37,7 @@ export default function Inventories(): ReactElement {
     const [advancedSearch, setAdvancedSearch] = useState<AdvancedSearch>({});
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+    const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
     const navigate = useNavigate();
 
@@ -82,7 +83,19 @@ export default function Inventories(): ReactElement {
                 }
             });
         }
-    }, [lazyState, authUser, globalSearch]);
+    }, [lazyState, authUser, globalSearch, advancedSearch]);
+
+    const handleSetAdvancedSearch = (key: keyof AdvancedSearch, value: string) => {
+        setAdvancedSearch((prevSearch) => {
+            const newSearch = { ...prevSearch, [key]: value };
+
+            const isAnyValueEmpty = Object.values(newSearch).every((value) => !value.trim().length);
+
+            setButtonDisabled(isAnyValueEmpty);
+
+            return newSearch;
+        });
+    };
 
     return (
         <div className='grid'>
@@ -163,18 +176,22 @@ export default function Inventories(): ReactElement {
                     footer='Search'
                     header='Advanced search'
                     visible={dialogVisible}
-                    buttonDisabled={
-                        !Object.keys(advancedSearch).length ||
-                        Object.values(advancedSearch).some((value) => !value)
-                    }
-                    onHide={() => setDialogVisible(false)}
+                    buttonDisabled={buttonDisabled}
+                    action={() => {
+                        setDialogVisible(false);
+                        setAdvancedSearch({});
+                    }}
+                    onHide={() => {
+                        setButtonDisabled(true);
+                        setDialogVisible(false);
+                    }}
                 >
                     <div className='flex flex-column gap-4 pt-4'>
                         <span className='p-float-label'>
                             <InputText
                                 className='w-full'
                                 onChange={({ target }) =>
-                                    setAdvancedSearch({ stock: target.value })
+                                    handleSetAdvancedSearch("stock", target.value)
                                 }
                             />
                             <label className='float-label'>Stock#</label>
@@ -182,7 +199,9 @@ export default function Inventories(): ReactElement {
                         <span className='p-float-label'>
                             <InputText
                                 className='w-full'
-                                onChange={({ target }) => setAdvancedSearch({ make: target.value })}
+                                onChange={({ target }) =>
+                                    handleSetAdvancedSearch("make", target.value)
+                                }
                             />
                             <label className='float-label'>Make</label>
                         </span>
@@ -190,7 +209,7 @@ export default function Inventories(): ReactElement {
                             <InputText
                                 className='w-full'
                                 onChange={({ target }) =>
-                                    setAdvancedSearch({ model: target.value })
+                                    handleSetAdvancedSearch("model", target.value)
                                 }
                             />
                             <label className='float-label'>Model</label>
@@ -198,7 +217,9 @@ export default function Inventories(): ReactElement {
                         <span className='p-float-label'>
                             <InputText
                                 className='w-full'
-                                onChange={({ target }) => setAdvancedSearch({ VIN: target.value })}
+                                onChange={({ target }) =>
+                                    handleSetAdvancedSearch("VIN", target.value)
+                                }
                             />
                             <label className='float-label'>VIN</label>
                         </span>
