@@ -22,6 +22,9 @@ import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
 import { DashboardDialog } from "dashboard/common/dialog";
 
+const isObjectEmpty = (obj: Record<string, string>) =>
+    Object.values(obj).every((value) => !value.trim().length);
+
 const createStringifySearchQuery = (obj: Record<string, string>): string => {
     let searchQueryString = "";
     if (Object.values(obj).every((value) => !value)) {
@@ -83,7 +86,6 @@ export default function Inventories(): ReactElement {
             getInventoryList(authUser.useruid, params).then((response) => {
                 if (Array.isArray(response)) {
                     setInventories(response);
-                    setAdvancedSearch({});
                 } else {
                     setInventories([]);
                 }
@@ -92,9 +94,12 @@ export default function Inventories(): ReactElement {
     };
 
     useEffect(() => {
+        const isAdvancedSearchEmpty = isObjectEmpty(advancedSearch);
+
         const params: QueryParams = {
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
+            ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(advancedSearch) }),
             ...(globalSearch && { qry: globalSearch }),
             ...(lazyState.sortField && { column: lazyState.sortField }),
             skip: lazyState.first,
@@ -108,9 +113,7 @@ export default function Inventories(): ReactElement {
         setAdvancedSearch((prevSearch) => {
             const newSearch = { ...prevSearch, [key]: value };
 
-            const isAnyValueEmpty = Object.values(newSearch).every(
-                (value) => typeof value === "string" && !value.trim().length
-            );
+            const isAnyValueEmpty = isObjectEmpty(newSearch);
 
             setButtonDisabled(isAnyValueEmpty);
 
@@ -215,6 +218,7 @@ export default function Inventories(): ReactElement {
                         <span className='p-float-label'>
                             <InputText
                                 className='w-full'
+                                value={advancedSearch?.StockNo}
                                 onChange={({ target }) =>
                                     handleSetAdvancedSearch("StockNo", target.value)
                                 }
@@ -224,6 +228,7 @@ export default function Inventories(): ReactElement {
                         <span className='p-float-label'>
                             <InputText
                                 className='w-full'
+                                value={advancedSearch?.Make}
                                 onChange={({ target }) =>
                                     handleSetAdvancedSearch("Make", target.value)
                                 }
@@ -233,6 +238,7 @@ export default function Inventories(): ReactElement {
                         <span className='p-float-label'>
                             <InputText
                                 className='w-full'
+                                value={advancedSearch?.Model}
                                 onChange={({ target }) =>
                                     handleSetAdvancedSearch("Model", target.value)
                                 }
@@ -242,6 +248,7 @@ export default function Inventories(): ReactElement {
                         <span className='p-float-label'>
                             <InputText
                                 className='w-full'
+                                value={advancedSearch?.VIN}
                                 onChange={({ target }) =>
                                     handleSetAdvancedSearch("VIN", target.value)
                                 }
