@@ -43,7 +43,7 @@ export const InventoryForm = observer(() => {
 
     const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
-    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
+    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number>(0);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
@@ -88,11 +88,7 @@ export const InventoryForm = observer(() => {
     useEffect(() => {
         ACCORDION_STEPS.forEach((step, index) => {
             if (step - 1 < stepActiveIndex) {
-                return setAccordionActiveIndex((prev) => {
-                    const updatedArray = Array.isArray(prev) ? [...prev] : [0];
-                    updatedArray[index] = index;
-                    return updatedArray;
-                });
+                return setAccordionActiveIndex(index);
             }
         });
         if (
@@ -154,9 +150,10 @@ export const InventoryForm = observer(() => {
                                 <div className='p-0'>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
-                                        onTabChange={(e) => setAccordionActiveIndex(e.index)}
+                                        onTabChange={(e) =>
+                                            setAccordionActiveIndex(Number(e.index))
+                                        }
                                         className='inventory__accordion'
-                                        multiple
                                     >
                                         {inventorySections.map((section) => (
                                             <AccordionTab
