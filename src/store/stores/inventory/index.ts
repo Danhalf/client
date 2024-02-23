@@ -1,4 +1,3 @@
-import { InventoryExportWebData } from "./../../../dashboard/inventory/form/export-web/index";
 import { Status } from "common/models/base-response";
 import {
     Inventory,

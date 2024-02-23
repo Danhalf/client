@@ -7,6 +7,7 @@ export const ExportWebDates = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const {
         inventoryExportWeb: { InStockDate, LastModifiedDate, LastExportDate },
+        changeExportWeb,
     } = store;
 
     const stockDate = String(InStockDate);
@@ -16,7 +17,13 @@ export const ExportWebDates = observer((): ReactElement => {
     return (
         <div className='grid export-web-dates row-gap-2'>
             <div className='col-3'>
-                <DateInput value={stockDate} name='In Stock Date' />
+                <DateInput
+                    value={stockDate}
+                    name='In Stock Date'
+                    onChange={({ value }) =>
+                        value && changeExportWeb({ key: "InStockDate", value: value as string })
+                    }
+                />
             </div>
 
             <hr className='form-line' />

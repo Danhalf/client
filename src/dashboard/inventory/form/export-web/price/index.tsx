@@ -54,22 +54,56 @@ export const ExportWebPrice = observer((): ReactElement => {
                     value={ListPrice}
                     labelPosition='top'
                     title='List price (required)'
+                    onChange={({ value }) => value && changeExportWeb({ key: "ListPrice", value })}
                 />
             </div>
             <div className='col-3'>
-                <CurrencyInput value={SpecialPrice} labelPosition='top' title='Special price' />
+                <CurrencyInput
+                    value={SpecialPrice}
+                    labelPosition='top'
+                    title='Special price'
+                    onChange={({ value }) =>
+                        value && changeExportWeb({ key: "SpecialPrice", value })
+                    }
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput value={CostPrice} labelPosition='top' title='Cost price' />
+                <CurrencyInput
+                    value={CostPrice}
+                    labelPosition='top'
+                    title='Cost price'
+                    onChange={({ value }) => value && changeExportWeb({ key: "CostPrice", value })}
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput value={ExtraPrice1} labelPosition='top' title='Extra price 1' />
+                <CurrencyInput
+                    value={ExtraPrice1}
+                    labelPosition='top'
+                    title='Extra price 1'
+                    onChange={({ value }) =>
+                        value && changeExportWeb({ key: "ExtraPrice1", value })
+                    }
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput value={ExtraPrice2} labelPosition='top' title='Extra price 2' />
+                <CurrencyInput
+                    value={ExtraPrice2}
+                    labelPosition='top'
+                    title='Extra price 2'
+                    onChange={({ value }) =>
+                        value && changeExportWeb({ key: "ExtraPrice2", value })
+                    }
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput value={ExtraPrice3} labelPosition='top' title='Extra price 3' />
+                <CurrencyInput
+                    value={ExtraPrice3}
+                    labelPosition='top'
+                    title='Extra price 3'
+                    onChange={({ value }) =>
+                        value && changeExportWeb({ key: "ExtraPrice3", value })
+                    }
+                />
             </div>
 
             <hr className='form-line' />

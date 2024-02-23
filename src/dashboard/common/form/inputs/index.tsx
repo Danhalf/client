@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactElement, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
 import { InputNumber, InputNumberChangeEvent, InputNumberProps } from "primereact/inputnumber";
@@ -164,11 +164,43 @@ export const SearchInput = ({
     );
 };
 
-export const DateInput = ({ name, ...props }: CalendarProps): ReactElement => (
-    <div className='p-inputgroup flex-1 w-full date-input'>
-        <Calendar placeholder={name} {...props} className='date-input__calendar' />
-        <span className='p-inputgroup-addon'>
-            <i className='adms-calendar' />
-        </span>
-    </div>
-);
+export const DateInput = ({ name, value, ...props }: CalendarProps): ReactElement => {
+    const [date, setDate] = useState(value);
+    useEffect(() => {
+        if (!!value && typeof value === "string") {
+            const date = new Date(Number(value));
+            const fullDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+            setDate(fullDate);
+            // eslint-disable-next-line no-console
+            console.log(date);
+        }
+    }, [value]);
+
+    const dateToNumber = (date: string) => {
+        const [day, month, year] = date.split("/");
+        setDate(new Date(Number(year), Number(month) - 1, Number(day)));
+    };
+
+    return (
+        <div
+            key={name}
+            className='flex align-items-center justify-content-between date-item relative'
+        >
+            <label htmlFor={name} className={"date-item__label label-top"}>
+                {name}
+            </label>
+            <div className='date-item__input flex justify-content-center'>
+                <Calendar
+                    inputId={name}
+                    value={date}
+                    onChange={(e: any) => dateToNumber(e.value)}
+                    {...props}
+                />
+                <div className='date-item__icon input-icon input-icon-right'>
+                    <i className='adms-calendar' />
+                </div>
+            </div>
+            {date?.toString()}
+        </div>
+    );
+};
