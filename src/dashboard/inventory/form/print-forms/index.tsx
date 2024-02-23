@@ -18,7 +18,18 @@ export const PrintForms = observer((): ReactElement => {
     const [selectedPrints, setSelectedPrints] = useState<InventoryPrintForm[] | null>(null);
 
     const handlePrintForm = (templateuid: string) => {
-        id && getInventoryPrintFormTemplate(id, templateuid);
+        id &&
+            getInventoryPrintFormTemplate(id, templateuid).then((response: any) => {
+                if (!response) {
+                    return;
+                }
+                const url = window.URL.createObjectURL(new Blob([response]));
+                const link = document.createElement("a");
+                link.href = url;
+                link.setAttribute("download", "myFile.pdf");
+                document.body.appendChild(link);
+                link.click();
+            });
     };
 
     const handlePrintSelectedForms = () => {

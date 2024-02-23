@@ -15,6 +15,7 @@ import {
     InventoryPrintForm,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
+import { writeFile } from "fs/promises";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getInventoryList = async (uid: string, queryParams: QueryParams) => {
@@ -276,11 +277,7 @@ export const getInventoryPrintFormTemplate = async (inventoryuid: string, templa
         const request = await authorizedUserApiInstance.get<any>(
             `print/${inventoryuid}/${templateuid}/form`,
             {
-                responseType: "arraybuffer",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/pdf",
-                },
+                responseType: "blob",
             }
         );
         if (request.status === 200) {
