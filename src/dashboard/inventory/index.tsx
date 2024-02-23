@@ -128,12 +128,16 @@ export default function Inventories(): ReactElement {
         setDialogVisible(false);
     };
 
-    const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
+    interface TableColumnProps extends ColumnProps {
+        field: keyof Inventory | "Price";
+    }
+
+    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
         { field: "StockNo", header: "StockNo" },
         { field: "Make", header: "Make" },
         { field: "Model", header: "Model" },
         { field: "Year", header: "Year" },
-        { field: "Color", header: "Color" },
+        { field: "ExteriorColor", header: "Color" },
         { field: "mileage", header: "Miles" },
         { field: "Price", header: "Price" },
     ];

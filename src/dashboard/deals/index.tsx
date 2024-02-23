@@ -126,6 +126,8 @@ export default function Deals() {
                                     totalRecords={totalRecords}
                                     onPage={pageChanged}
                                     onSort={sortData}
+                                    reorderableColumns
+                                    resizableColumns
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
                                 >

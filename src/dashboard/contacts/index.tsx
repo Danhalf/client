@@ -86,9 +86,12 @@ export default function Contacts() {
             });
         }
     }, [selectedCategory, lazyState, authUser, globalSearch]);
+    interface TableColumnProps extends ColumnProps {
+        field: keyof ContactUser;
+    }
 
-    const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-        { field: "fullName", header: "Name" },
+    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+        { field: "userName", header: "Name" },
         { field: "phone1", header: "Work Phone" },
         { field: "phone2", header: "Home Phone" },
         { field: "streetAddress", header: "Address" },
