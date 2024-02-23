@@ -19,6 +19,7 @@ export const ExportWebPrice = observer((): ReactElement => {
             ExtraPrice2,
             ExtraPrice3,
         },
+        changeExportWeb,
     } = store;
     const [checked, setChecked] = useState<boolean>(true);
     return (
@@ -38,7 +39,13 @@ export const ExportWebPrice = observer((): ReactElement => {
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='export-web-price__text-input w-full' value={ModelCode} />
+                    <InputText
+                        className='export-web-price__text-input w-full'
+                        value={ModelCode}
+                        onChange={({ target: { value } }) =>
+                            changeExportWeb({ key: "ModelCode", value })
+                        }
+                    />
                     <label className='float-label'>Model Code</label>
                 </span>
             </div>

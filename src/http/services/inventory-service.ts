@@ -257,3 +257,21 @@ export const getInventoryWebInfoHistory = async (inventoryuid: string) => {
         // TODO: add error handler
     }
 };
+
+export const setInventoryExportWeb = async (
+    inventoryUid: string,
+    inventoryData: Partial<InventoryWebInfo>
+): Promise<InventorySetResponse | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<InventorySetResponse>(
+            `inventory/${inventoryUid || 0}/webadd`,
+            inventoryData
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};

@@ -1,3 +1,4 @@
+import { InventoryExportWebData } from "./../../../dashboard/inventory/form/export-web/index";
 import { Status } from "common/models/base-response";
 import {
     Inventory,
@@ -18,6 +19,7 @@ import {
     deleteMediaImage,
     getInventoryWebInfo,
     getInventoryWebInfoHistory,
+    setInventoryExportWeb,
 } from "http/services/inventory-service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
@@ -189,10 +191,26 @@ export class InventoryStore {
         }
     });
 
+    public changeExportWeb = action(
+        ({ key, value }: { key: keyof InventoryWebInfo; value: string | number }) => {
+            const inventoryStore = this.rootStore.inventoryStore;
+            if (inventoryStore) {
+                const { inventoryExportWeb } = inventoryStore;
+                (inventoryExportWeb as Record<typeof key, string | number>)[key] = value;
+            }
+        }
+    );
+
     public saveInventory = action(async (): Promise<string | undefined> => {
         try {
-            const response = await setInventory(this._inventoryID, this._inventory);
-            if (response?.status === Status.OK) return response.itemuid;
+            const inventoryResponse = await setInventory(this._inventoryID, this._inventory);
+            const webResponse = await setInventoryExportWeb(
+                this._inventoryID,
+                this._inventoryExportWeb
+            );
+            await Promise.all([inventoryResponse, webResponse]).then((response) =>
+                response.every((item) => item?.status === Status.OK)
+            );
         } catch (error) {
             // TODO: add error handler
             return undefined;
