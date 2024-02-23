@@ -8,7 +8,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { getAccountsList } from "http/services/accounts.service";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column } from "primereact/column";
+import { Column, ColumnProps } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
@@ -63,6 +63,13 @@ export default function Accounts() {
             });
         }
     }, [lazyState, authUser, globalSearch]);
+
+    const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
+        { field: "accountnumber", header: "Account" },
+        { field: "accounttype", header: "Type" },
+        { field: "accountstatus", header: "Name" },
+        { field: "created", header: "Date" },
+    ];
 
     return (
         <div className='grid'>
@@ -120,14 +127,15 @@ export default function Accounts() {
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
                                 >
-                                    <Column
-                                        field='accountnumber'
-                                        header='Account'
-                                        sortable
-                                    ></Column>
-                                    <Column field='accounttype' header='Type' sortable></Column>
-                                    <Column field='accountstatus' header='Name' sortable></Column>
-                                    <Column field='created' header='Date' sortable></Column>
+                                    {renderColumnsData.map(({ field, header }) => (
+                                        <Column
+                                            field={field}
+                                            header={header}
+                                            key={field}
+                                            sortable
+                                            headerClassName='cursor-move'
+                                        />
+                                    ))}
                                 </DataTable>
                             </div>
                         </div>
