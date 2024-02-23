@@ -174,6 +174,7 @@ export default function Contacts() {
                                             header={header}
                                             key={field}
                                             sortable
+                                            headerClassName='cursor-move'
                                         />
                                     ))}
                                 </DataTable>
