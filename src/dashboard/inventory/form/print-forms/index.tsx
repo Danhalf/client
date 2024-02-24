@@ -20,15 +20,13 @@ export const PrintForms = observer((): ReactElement => {
     const handlePrintForm = (templateuid: string) => {
         id &&
             getInventoryPrintFormTemplate(id, templateuid).then((response: any) => {
-                if (!response) {
-                    return;
-                }
-                const url = window.URL.createObjectURL(new Blob([response]));
-                const link = document.createElement("a");
-                link.href = url;
-                link.setAttribute("download", "myFile.pdf");
-                document.body.appendChild(link);
-                link.click();
+                setTimeout(() => {
+                    const url = new Blob([response], { type: "application/pdf" });
+                    let link = document.createElement("a");
+                    link.href = window.URL.createObjectURL(url);
+                    link.download = "PrintForm.pdf";
+                    link.click();
+                }, 5000);
             });
     };
 
