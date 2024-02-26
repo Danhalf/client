@@ -164,43 +164,40 @@ export const SearchInput = ({
     );
 };
 
-export const DateInput = ({ name, value, ...props }: CalendarProps): ReactElement => {
-    const [date, setDate] = useState(value);
+interface DateInputProps extends CalendarProps {
+    date?: number;
+}
+
+export const DateInput = ({ date, name, value, ...props }: DateInputProps): ReactElement => {
+    const [innerDate, setInnerDate] = useState<Date>(new Date());
+
     useEffect(() => {
-        if (!!value && typeof value === "string") {
-            const date = new Date(Number(value));
-            const fullDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-            setDate(fullDate);
-            // eslint-disable-next-line no-console
-            console.log(date);
+        if (!!date) {
+            const currentDate = new Date(Number(date));
+            setInnerDate(currentDate);
         }
-    }, [value]);
+    }, [date]);
 
-    const dateToNumber = (date: string) => {
-        const [day, month, year] = date.split("/");
-        setDate(new Date(Number(year), Number(month) - 1, Number(day)));
-    };
-
+    const dateToNumber = (selectedDate: Date) => setInnerDate(selectedDate);
     return (
         <div
             key={name}
             className='flex align-items-center justify-content-between date-item relative'
         >
-            <label htmlFor={name} className={"date-item__label label-top"}>
+            <label htmlFor={name} className='date-item__label label-top'>
                 {name}
             </label>
             <div className='date-item__input flex justify-content-center'>
                 <Calendar
                     inputId={name}
-                    value={date}
-                    onChange={(e: any) => dateToNumber(e.value)}
+                    value={innerDate}
+                    onChange={(e) => dateToNumber(e.value as Date)}
                     {...props}
                 />
                 <div className='date-item__icon input-icon input-icon-right'>
                     <i className='adms-calendar' />
                 </div>
             </div>
-            {date?.toString()}
         </div>
     );
 };
