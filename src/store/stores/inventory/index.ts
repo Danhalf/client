@@ -222,12 +222,15 @@ export class InventoryStore {
     public saveInventory = action(async (): Promise<string | undefined> => {
         try {
             const inventoryResponse = await setInventory(this._inventoryID, this._inventory);
+            if (!this.exportWebActive) {
+                return inventoryResponse?.status === Status.OK ? this._inventoryID : undefined;
+            }
             const webResponse = await setInventoryExportWeb(this._inventoryID, this._exportWeb);
             await Promise.all([inventoryResponse, webResponse]).then((response) =>
-                response.every((item) => item?.status === Status.OK)
+                response.every((item) => item?.status === Status.OK) ? this._inventoryID : undefined
             );
         } catch (error) {
-            // TODO: add error handler
+            // TODO: add error handlers
             return undefined;
         }
     });
