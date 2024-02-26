@@ -36,6 +36,8 @@ export class InventoryStore {
     private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
+
+    private _exportWebActive: boolean = false;
     private _exportWeb: InventoryWebInfo = {} as InventoryWebInfo;
     private _exportWebHistory: InventoryExportWebHistory[] = [];
 
@@ -68,6 +70,9 @@ export class InventoryStore {
     public get inventoryExportWeb() {
         return this._exportWeb;
     }
+    public get exportWebActive() {
+        return this._exportWebActive;
+    }
     public get uploadFileImages() {
         return this._uploadFileImages;
     }
@@ -84,6 +89,10 @@ export class InventoryStore {
 
     public get isLoading() {
         return this._isLoading;
+    }
+
+    public set exportWebActive(state: boolean) {
+        this._exportWebActive = state;
     }
 
     public set isLoading(state: boolean) {
