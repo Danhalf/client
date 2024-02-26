@@ -15,7 +15,6 @@ import {
     InventoryPrintForm,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
-import { writeFile } from "fs/promises";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getInventoryList = async (uid: string, queryParams: QueryParams) => {
