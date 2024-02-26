@@ -213,10 +213,7 @@ export class InventoryStore {
     public saveInventory = action(async (): Promise<string | undefined> => {
         try {
             const inventoryResponse = await setInventory(this._inventoryID, this._inventory);
-            const webResponse = await setInventoryExportWeb(
-                this._inventoryID,
-                this._inventoryExportWeb
-            );
+            const webResponse = await setInventoryExportWeb(this._inventoryID, this._exportWeb);
             await Promise.all([inventoryResponse, webResponse]).then((response) =>
                 response.every((item) => item?.status === Status.OK)
             );
