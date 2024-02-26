@@ -16,16 +16,19 @@ export const PrintForms = observer((): ReactElement => {
     const { printList } = store;
 
     const [selectedPrints, setSelectedPrints] = useState<InventoryPrintForm[] | null>(null);
+    const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
 
     const handlePrintForm = (templateuid: string) => {
         id &&
             getInventoryPrintFormTemplate(id, templateuid).then((response: any) => {
+                setIsButtonDisabled(true);
                 setTimeout(() => {
                     const url = new Blob([response], { type: "application/pdf" });
                     let link = document.createElement("a");
                     link.href = window.URL.createObjectURL(url);
                     link.download = "PrintForm.pdf";
                     link.click();
+                    setIsButtonDisabled(false);
                 }, 5000);
             });
     };
@@ -42,6 +45,7 @@ export const PrintForms = observer((): ReactElement => {
                 className='p-button inventory-print__action-button'
                 outlined
                 icon='icon adms-print'
+                disabled={isButtonDisabled}
                 onClick={() => handlePrintForm(rowData.itemuid)}
             >
                 Print
@@ -76,6 +80,7 @@ export const PrintForms = observer((): ReactElement => {
                     <Button
                         className='p-button inventory-print__button'
                         onClick={handlePrintSelectedForms}
+                        disabled={isButtonDisabled}
                     >
                         Print Selected
                     </Button>
