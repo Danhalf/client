@@ -21,6 +21,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 
 import { useLocation } from "react-router-dom";
+import { observer } from "mobx-react-lite";
 import { PrintForms } from "./print-forms";
 
 export const inventorySections = [
@@ -36,7 +37,7 @@ const PRINT_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
 const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 2;
 const STEP = "step";
 
-export const InventoryForm = () => {
+export const InventoryForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
@@ -44,7 +45,7 @@ export const InventoryForm = () => {
 
     const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
-    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
+    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number>(0);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
@@ -55,6 +56,7 @@ export const InventoryForm = () => {
         saveInventory,
         getInventoryExportWeb,
         getInventoryExportWebHistory,
+        inventory,
         getPrintList,
     } = store;
     const navigate = useNavigate();
@@ -88,12 +90,8 @@ export const InventoryForm = () => {
 
     useEffect(() => {
         ACCORDION_STEPS.forEach((step, index) => {
-            if (step - 1 < stepActiveIndex && stepActiveIndex < ACCORDION_STEPS.length) {
-                return setAccordionActiveIndex((prev) => {
-                    const updatedArray = Array.isArray(prev) ? [...prev] : [0];
-                    updatedArray[index] = index;
-                    return updatedArray;
-                });
+            if (step - 1 < stepActiveIndex) {
+                return setAccordionActiveIndex(index);
             }
         });
         if (
@@ -132,22 +130,39 @@ export const InventoryForm = () => {
 
     return (
         <Suspense>
-            <div className='grid'>
+            <div className='grid relative'>
+                <Button
+                    icon='pi pi-times'
+                    className='p-button close-button'
+                    onClick={() => navigate("/dashboard/inventory")}
+                />
                 <div className='col-12'>
                     <div className='card inventory'>
                         <div className='card-header'>
                             <h2 className='card-header__title uppercase m-0'>
                                 {id ? "Edit" : "Create new"} inventory
                             </h2>
+                            <div className='card-header-info'>
+                                Stock#{" "}
+                                <span className='card-header-info__data'>{inventory?.StockNo}</span>
+                                Make{" "}
+                                <span className='card-header-info__data'>{inventory?.Make}</span>
+                                Model{" "}
+                                <span className='card-header-info__data'>{inventory?.Model}</span>
+                                Year{" "}
+                                <span className='card-header-info__data'>{inventory?.Year}</span>
+                                VIN <span className='card-header-info__data'>{inventory?.VIN}</span>
+                            </div>
                         </div>
                         <div className='card-content inventory__card'>
                             <div className='grid flex-nowrap'>
                                 <div className='p-0'>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
-                                        onTabChange={(e) => setAccordionActiveIndex(e.index)}
+                                        onTabChange={(e) =>
+                                            setAccordionActiveIndex(Number(e.index))
+                                        }
                                         className='inventory__accordion'
-                                        multiple
                                     >
                                         {inventorySections.map((section) => (
                                             <AccordionTab
@@ -363,4 +378,4 @@ export const InventoryForm = () => {
             />
         </Suspense>
     );
-};
+});
