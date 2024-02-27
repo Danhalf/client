@@ -1,4 +1,4 @@
-import { ChangeEvent, ReactElement } from "react";
+import { ReactElement } from "react";
 import { DashboardDialog, DashboardDialogProps } from "..";
 import { InputText } from "primereact/inputtext";
 
@@ -11,18 +11,17 @@ interface AdvancedSearchDialogProps<T> extends DashboardDialogProps {
     buttonDisabled: boolean;
     onInputChange: (key: keyof T, value: string) => void;
     fields: SearchField<T>[];
+    onSearchClear?: (key: keyof T) => void;
 }
 export const AdvancedSearchDialog = <T,>({
     visible,
     buttonDisabled,
     onHide,
     onInputChange,
+    onSearchClear,
     fields,
     action,
 }: AdvancedSearchDialogProps<T>): ReactElement => {
-    const handleInputClear = async (key: keyof T) => {
-        onInputChange(key, "");
-    };
     return (
         <DashboardDialog
             className='search-dialog'
@@ -42,10 +41,10 @@ export const AdvancedSearchDialog = <T,>({
                                 value={value ?? ""}
                                 onChange={({ target }) => onInputChange(key, target.value)}
                             />
-                            {value && (
+                            {value && onSearchClear && (
                                 <i
                                     className='pi pi-times cursor-pointer'
-                                    onClick={() => handleInputClear(key)}
+                                    onClick={() => onSearchClear(key)}
                                 />
                             )}
                             <label className='float-label'>{key}</label>

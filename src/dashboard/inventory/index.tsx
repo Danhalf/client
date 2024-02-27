@@ -128,6 +128,19 @@ export default function Inventories(): ReactElement {
         setDialogVisible(false);
     };
 
+    const handleClearAdvancedSearchField = (key: keyof AdvancedSearch) => {
+        setAdvancedSearch((prev) => {
+            const updatedSearch = { ...prev };
+            delete updatedSearch[key];
+            return updatedSearch;
+        });
+
+        const updatedSearch = { ...advancedSearch };
+        delete updatedSearch[key];
+        const params = createStringifySearchQuery(updatedSearch);
+        handleGetInventoryList({ ...lazyState, qry: params });
+    };
+
     interface TableColumnProps extends ColumnProps {
         field: keyof Inventory | "Price";
     }
@@ -247,6 +260,7 @@ export default function Inventories(): ReactElement {
                         setDialogVisible(false);
                     }}
                     action={handleAdvancedSearch}
+                    onSearchClear={handleClearAdvancedSearchField}
                     onInputChange={handleSetAdvancedSearch}
                     fields={searchFields}
                 />
