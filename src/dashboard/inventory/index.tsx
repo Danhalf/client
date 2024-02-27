@@ -128,17 +128,22 @@ export default function Inventories(): ReactElement {
         setDialogVisible(false);
     };
 
-    const handleClearAdvancedSearchField = (key: keyof AdvancedSearch) => {
+    const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
+        setButtonDisabled(true);
         setAdvancedSearch((prev) => {
             const updatedSearch = { ...prev };
             delete updatedSearch[key];
             return updatedSearch;
         });
 
-        const updatedSearch = { ...advancedSearch };
-        delete updatedSearch[key];
-        const params = createStringifySearchQuery(updatedSearch);
-        handleGetInventoryList({ ...lazyState, qry: params });
+        try {
+            const updatedSearch = { ...advancedSearch };
+            delete updatedSearch[key];
+            const params = createStringifySearchQuery(updatedSearch);
+            await handleGetInventoryList({ ...lazyState, qry: params });
+        } finally {
+            setButtonDisabled(false);
+        }
     };
 
     interface TableColumnProps extends ColumnProps {

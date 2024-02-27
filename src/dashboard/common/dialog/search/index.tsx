@@ -1,14 +1,13 @@
 import { ReactElement } from "react";
 import { DashboardDialog, DashboardDialogProps } from "..";
 import { InputText } from "primereact/inputtext";
+import "./index.css";
 
 export interface SearchField<T> {
     key: keyof T & string;
     value: string | undefined;
 }
 interface AdvancedSearchDialogProps<T> extends DashboardDialogProps {
-    visible: boolean;
-    buttonDisabled: boolean;
     onInputChange: (key: keyof T, value: string) => void;
     fields: SearchField<T>[];
     onSearchClear?: (key: keyof T) => void;
@@ -43,7 +42,7 @@ export const AdvancedSearchDialog = <T,>({
                             />
                             {value && onSearchClear && (
                                 <i
-                                    className='pi pi-times cursor-pointer'
+                                    className='pi pi-times cursor-pointer search-dialog__clear'
                                     onClick={() => onSearchClear(key)}
                                 />
                             )}
