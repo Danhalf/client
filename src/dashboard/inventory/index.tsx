@@ -20,7 +20,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
-import { DashboardDialog } from "dashboard/common/dialog";
+import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
 
 const isObjectEmpty = (obj: Record<string, string>) =>
     Object.values(obj).every((value) => !value.trim().length);
@@ -142,6 +142,25 @@ export default function Inventories(): ReactElement {
         { field: "Price", header: "Price" },
     ];
 
+    const searchFields: SearchField<AdvancedSearch>[] = [
+        {
+            key: "StockNo",
+            value: advancedSearch?.StockNo,
+        },
+        {
+            key: "Make",
+            value: advancedSearch?.Make,
+        },
+        {
+            key: "Model",
+            value: advancedSearch?.Model,
+        },
+        {
+            key: "VIN",
+            value: advancedSearch?.VIN,
+        },
+    ];
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -220,61 +239,17 @@ export default function Inventories(): ReactElement {
                         </div>
                     </div>
                 </div>
-                <DashboardDialog
-                    className='search-dialog'
-                    footer='Search'
-                    header='Advanced search'
+                <AdvancedSearchDialog<AdvancedSearch>
                     visible={dialogVisible}
                     buttonDisabled={buttonDisabled}
-                    action={handleAdvancedSearch}
                     onHide={() => {
                         setButtonDisabled(true);
                         setDialogVisible(false);
                     }}
-                >
-                    <div className='flex flex-column gap-4 pt-4'>
-                        <span className='p-float-label'>
-                            <InputText
-                                className='w-full'
-                                value={advancedSearch?.StockNo}
-                                onChange={({ target }) =>
-                                    handleSetAdvancedSearch("StockNo", target.value)
-                                }
-                            />
-                            <label className='float-label'>Stock#</label>
-                        </span>
-                        <span className='p-float-label'>
-                            <InputText
-                                className='w-full'
-                                value={advancedSearch?.Make}
-                                onChange={({ target }) =>
-                                    handleSetAdvancedSearch("Make", target.value)
-                                }
-                            />
-                            <label className='float-label'>Make</label>
-                        </span>
-                        <span className='p-float-label'>
-                            <InputText
-                                className='w-full'
-                                value={advancedSearch?.Model}
-                                onChange={({ target }) =>
-                                    handleSetAdvancedSearch("Model", target.value)
-                                }
-                            />
-                            <label className='float-label'>Model</label>
-                        </span>
-                        <span className='p-float-label'>
-                            <InputText
-                                className='w-full'
-                                value={advancedSearch?.VIN}
-                                onChange={({ target }) =>
-                                    handleSetAdvancedSearch("VIN", target.value)
-                                }
-                            />
-                            <label className='float-label'>VIN</label>
-                        </span>
-                    </div>
-                </DashboardDialog>
+                    action={handleAdvancedSearch}
+                    onInputChange={handleSetAdvancedSearch}
+                    fields={searchFields}
+                />
             </div>
         </div>
     );
