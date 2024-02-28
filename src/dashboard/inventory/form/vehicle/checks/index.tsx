@@ -3,11 +3,14 @@ import { ReactElement } from "react";
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
-import { InventoryExtData } from "common/models/inventory";
+import { Inventory, InventoryExtData } from "common/models/inventory";
 
 export const VehicleChecks = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const {
+        inventory: { FactoryCertified, DealerCertified },
+        changeInventoryExtData,
+        changeInventory,
         inventoryExtData: {
             chkAutocheckChecked,
             chkInspected,
@@ -22,14 +25,18 @@ export const VehicleChecks = observer((): ReactElement => {
             chkCustom7,
             chkCustom8,
             chkCustom9,
-            FactoryCertified,
-            DealerCertified,
         },
-        changeInventoryExtData,
     } = store;
 
-    const handleChange = (key: keyof InventoryExtData, value: number) => {
-        changeInventoryExtData({ key, value: !!value ? 0 : 1 });
+    const handleChange = (
+        key: keyof InventoryExtData | keyof Pick<Inventory, "DealerCertified" | "FactoryCertified">,
+        value: number
+    ) => {
+        if (key === "DealerCertified" || key === "FactoryCertified") {
+            changeInventory({ key, value: !!value ? 0 : 1 });
+        } else {
+            changeInventoryExtData({ key, value: !!value ? 0 : 1 });
+        }
     };
 
     return (
