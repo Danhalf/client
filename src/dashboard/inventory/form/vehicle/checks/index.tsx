@@ -22,6 +22,8 @@ export const VehicleChecks = observer((): ReactElement => {
             chkCustom7,
             chkCustom8,
             chkCustom9,
+            FactoryCertified,
+            DealerCertified,
         },
         changeInventoryExtData,
     } = store;
@@ -55,12 +57,32 @@ export const VehicleChecks = observer((): ReactElement => {
                 </div>
                 <div className='vehicle-checks__checkbox flex align-items-center'>
                     <Checkbox
+                        inputId='DealerCertified'
+                        onChange={() => handleChange("DealerCertified", DealerCertified)}
+                        checked={!!DealerCertified}
+                    />
+                    <label htmlFor='DealerCertified' className='ml-2'>
+                        Dealer Certified
+                    </label>
+                </div>
+                <div className='vehicle-checks__checkbox flex align-items-center'>
+                    <Checkbox
                         inputId='chkOil'
                         onChange={() => handleChange("chkOil", chkOil)}
                         checked={!!chkOil}
                     />
                     <label htmlFor='chkOil' className='ml-2'>
                         Oil and Filter inspected and changed
+                    </label>
+                </div>
+                <div className='vehicle-checks__checkbox flex align-items-center'>
+                    <Checkbox
+                        inputId='FactoryCertified'
+                        onChange={() => handleChange("FactoryCertified", FactoryCertified)}
+                        checked={!!FactoryCertified}
+                    />
+                    <label htmlFor='FactoryCertified' className='ml-2'>
+                        Factory Certified
                     </label>
                 </div>
             </div>

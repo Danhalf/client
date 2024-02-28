@@ -21,6 +21,8 @@ export interface InventoryExtData {
     chkCustom7: number;
     chkCustom8: number;
     chkCustom9: number;
+    FactoryCertified: number;
+    DealerCertified: number;
     chkInspected: number;
     chkOil: number;
     created: string;
