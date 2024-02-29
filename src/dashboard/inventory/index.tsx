@@ -23,7 +23,6 @@ import "./index.css";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { ROWS_PER_PAGE } from "common/settings";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
-import { Dropdown } from "primereact/dropdown";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -214,17 +213,17 @@ export default function Inventories(): ReactElement {
 
     const header = (
         <div className='grid datatable-controls'>
-            <div className='col-2'>
+            <div className='col-3'>
                 <MultiSelect
                     value={activeColumns}
                     options={columns}
                     optionLabel='header'
                     onChange={onColumnToggle}
-                    className='w-full bg-transparent'
+                    className='w-full pb-0 h-full flex align-items-center'
                     display='chip'
                 />
             </div>
-            <div className='col-4'>
+            <div className='col-3'>
                 <div className='contact-top-controls'>
                     <Button
                         className='contact-top-controls__button m-r-20px'
