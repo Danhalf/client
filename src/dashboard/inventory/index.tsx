@@ -21,6 +21,15 @@ import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
+import { Dropdown } from "primereact/dropdown";
+
+interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
+
+interface TableColumnProps extends ColumnProps {
+    field: keyof Inventory | "Price";
+}
+
+type TableColumnsList = Pick<TableColumnProps, "header" | "field">[];
 
 const isObjectEmpty = (obj: Record<string, string>) =>
     Object.values(obj).every((value) => !value.trim().length);
@@ -45,7 +54,15 @@ const createStringifySearchQuery = (obj: Record<string, string>): string => {
         .join("");
 };
 
-interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
+const initialColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+    { field: "StockNo", header: "StockNo" },
+    { field: "Make", header: "Make" },
+    { field: "Model", header: "Model" },
+    { field: "Year", header: "Year" },
+    { field: "ExteriorColor", header: "Color" },
+    { field: "mileage", header: "Miles" },
+    { field: "Price", header: "Price" },
+];
 
 export default function Inventories(): ReactElement {
     const [inventories, setInventories] = useState<Inventory[]>([]);
@@ -56,6 +73,8 @@ export default function Inventories(): ReactElement {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+
+    const [activeColumns, setActiveColumns] = useState<TableColumnsList>(initialColumnsData);
 
     const navigate = useNavigate();
 
@@ -161,20 +180,6 @@ export default function Inventories(): ReactElement {
         }
     };
 
-    interface TableColumnProps extends ColumnProps {
-        field: keyof Inventory | "Price";
-    }
-
-    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
-        { field: "StockNo", header: "StockNo" },
-        { field: "Make", header: "Make" },
-        { field: "Model", header: "Model" },
-        { field: "Year", header: "Year" },
-        { field: "ExteriorColor", header: "Color" },
-        { field: "mileage", header: "Miles" },
-        { field: "Price", header: "Price" },
-    ];
-
     const searchFields: SearchField<AdvancedSearch>[] = [
         {
             key: "StockNo",
@@ -203,7 +208,12 @@ export default function Inventories(): ReactElement {
                     </div>
                     <div className='card-content'>
                         <div className='grid datatable-controls'>
-                            <div className='col-6'>
+                            <div className='col-2'>
+                                <div className='contact-top-controls'>
+                                    <Dropdown placeholder='Columns' />
+                                </div>
+                            </div>
+                            <div className='col-4'>
                                 <div className='contact-top-controls'>
                                     <Button
                                         className='contact-top-controls__button m-r-20px'
@@ -263,7 +273,7 @@ export default function Inventories(): ReactElement {
                                         navigate(itemuid)
                                     }
                                 >
-                                    {renderColumnsData.map(({ field, header }) => (
+                                    {activeColumns.map(({ field, header }) => (
                                         <Column
                                             field={field}
                                             header={header}
