@@ -19,6 +19,8 @@ import { DatatableQueries, initialDataTableQueries } from "common/models/datatab
 import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
+
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { ROWS_PER_PAGE } from "common/settings";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
 import { Dropdown } from "primereact/dropdown";
@@ -29,7 +31,7 @@ interface TableColumnProps extends ColumnProps {
     field: keyof Inventory | "Price";
 }
 
-type TableColumnsList = (Pick<TableColumnProps, "header" | "field"> & { active: boolean })[];
+type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
 
 const isObjectEmpty = (obj: Record<string, string>) =>
     Object.values(obj).every((value) => !value.trim().length);
@@ -54,14 +56,14 @@ const createStringifySearchQuery = (obj: Record<string, string>): string => {
         .join("");
 };
 
-const initialColumnsData: TableColumnsList = [
-    { field: "StockNo", header: "Stock#", active: true },
-    { field: "Make", header: "Make", active: true },
-    { field: "Model", header: "Model", active: true },
-    { field: "Year", header: "Year", active: true },
-    { field: "ExteriorColor", header: "Color", active: true },
-    { field: "mileage", header: "Miles", active: true },
-    { field: "Price", header: "Price", active: true },
+const columns: TableColumnsList[] = [
+    { field: "StockNo", header: "Stock#" },
+    { field: "Make", header: "Make" },
+    { field: "Model", header: "Model" },
+    { field: "Year", header: "Year" },
+    { field: "ExteriorColor", header: "Color" },
+    { field: "mileage", header: "Miles" },
+    { field: "Price", header: "Price" },
 ];
 
 export default function Inventories(): ReactElement {
@@ -74,7 +76,7 @@ export default function Inventories(): ReactElement {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
-    const [activeColumns, setActiveColumns] = useState<TableColumnsList>(initialColumnsData);
+    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(columns);
 
     const navigate = useNavigate();
 
@@ -101,6 +103,17 @@ export default function Inventories(): ReactElement {
             });
         }
     }, []);
+
+    const onColumnToggle = (event: MultiSelectChangeEvent) => {
+        let selectedColumns = event.value;
+        let orderedSelectedColumns = columns.filter((col) =>
+            selectedColumns.some(
+                (sCol: Pick<TableColumnProps, "field">) => sCol.field === col.field
+            )
+        );
+
+        setActiveColumns(orderedSelectedColumns);
+    };
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
@@ -199,6 +212,57 @@ export default function Inventories(): ReactElement {
         },
     ];
 
+    const header = (
+        <div className='grid datatable-controls'>
+            <div className='col-2'>
+                <MultiSelect
+                    value={activeColumns}
+                    options={columns}
+                    optionLabel='header'
+                    onChange={onColumnToggle}
+                    className='w-full bg-transparent'
+                    display='chip'
+                />
+            </div>
+            <div className='col-4'>
+                <div className='contact-top-controls'>
+                    <Button
+                        className='contact-top-controls__button m-r-20px'
+                        icon='pi pi-plus-circle'
+                        severity='success'
+                        type='button'
+                        onClick={() => navigate("create")}
+                    />
+                    <Button
+                        severity='success'
+                        type='button'
+                        icon='pi pi-print'
+                        onClick={printTableData}
+                    />
+                </div>
+            </div>
+            <div className='col-6 text-right'>
+                <Button
+                    className='contact-top-controls__button m-r-20px'
+                    label='Advanced search'
+                    severity='success'
+                    type='button'
+                    onClick={() => setDialogVisible(true)}
+                />
+                <span className='p-input-icon-right'>
+                    <i
+                        className={`pi pi-${!globalSearch ? "search" : "times cursor-pointer"}`}
+                        onClick={() => setGlobalSearch("")}
+                    />
+                    <InputText
+                        value={globalSearch}
+                        onChange={(e) => setGlobalSearch(e.target.value)}
+                    />
+                </span>
+            </div>
+        </div>
+    );
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -207,51 +271,6 @@ export default function Inventories(): ReactElement {
                         <h2 className='card-header__title uppercase m-0'>Inventory</h2>
                     </div>
                     <div className='card-content'>
-                        <div className='grid datatable-controls'>
-                            <div className='col-2'>
-                                <div className='contact-top-controls'>
-                                    <Dropdown placeholder='Columns' />
-                                </div>
-                            </div>
-                            <div className='col-4'>
-                                <div className='contact-top-controls'>
-                                    <Button
-                                        className='contact-top-controls__button m-r-20px'
-                                        icon='pi pi-plus-circle'
-                                        severity='success'
-                                        type='button'
-                                        onClick={() => navigate("create")}
-                                    />
-                                    <Button
-                                        severity='success'
-                                        type='button'
-                                        icon='pi pi-print'
-                                        onClick={printTableData}
-                                    />
-                                </div>
-                            </div>
-                            <div className='col-6 text-right'>
-                                <Button
-                                    className='contact-top-controls__button m-r-20px'
-                                    label='Advanced search'
-                                    severity='success'
-                                    type='button'
-                                    onClick={() => setDialogVisible(true)}
-                                />
-                                <span className='p-input-icon-right'>
-                                    <i
-                                        className={`pi pi-${
-                                            !globalSearch ? "search" : "times cursor-pointer"
-                                        }`}
-                                        onClick={() => setGlobalSearch("")}
-                                    />
-                                    <InputText
-                                        value={globalSearch}
-                                        onChange={(e) => setGlobalSearch(e.target.value)}
-                                    />
-                                </span>
-                            </div>
-                        </div>
                         <div className='grid'>
                             <div className='col-12'>
                                 <DataTable
@@ -268,6 +287,7 @@ export default function Inventories(): ReactElement {
                                     sortField={lazyState.sortField}
                                     reorderableColumns
                                     resizableColumns
+                                    header={header}
                                     rowClassName={() => "hover:text-primary cursor-pointer"}
                                     onRowClick={({ data: { itemuid } }: DataTableRowClickEvent) =>
                                         navigate(itemuid)
