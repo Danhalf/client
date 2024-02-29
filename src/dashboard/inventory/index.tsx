@@ -29,7 +29,7 @@ interface TableColumnProps extends ColumnProps {
     field: keyof Inventory | "Price";
 }
 
-type TableColumnsList = Pick<TableColumnProps, "header" | "field">[];
+type TableColumnsList = (Pick<TableColumnProps, "header" | "field"> & { active: boolean })[];
 
 const isObjectEmpty = (obj: Record<string, string>) =>
     Object.values(obj).every((value) => !value.trim().length);
@@ -54,14 +54,14 @@ const createStringifySearchQuery = (obj: Record<string, string>): string => {
         .join("");
 };
 
-const initialColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
-    { field: "StockNo", header: "StockNo" },
-    { field: "Make", header: "Make" },
-    { field: "Model", header: "Model" },
-    { field: "Year", header: "Year" },
-    { field: "ExteriorColor", header: "Color" },
-    { field: "mileage", header: "Miles" },
-    { field: "Price", header: "Price" },
+const initialColumnsData: TableColumnsList = [
+    { field: "StockNo", header: "Stock#", active: true },
+    { field: "Make", header: "Make", active: true },
+    { field: "Model", header: "Model", active: true },
+    { field: "Year", header: "Year", active: true },
+    { field: "ExteriorColor", header: "Color", active: true },
+    { field: "mileage", header: "Miles", active: true },
+    { field: "Price", header: "Price", active: true },
 ];
 
 export default function Inventories(): ReactElement {
