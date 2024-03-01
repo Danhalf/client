@@ -13,6 +13,7 @@ import { getExportToWebList } from "http/services/export-to-web.service";
 import { ExportWebList } from "common/models/export-web";
 import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
+import "./index.css";
 
 export const ExportToWeb = () => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
@@ -152,13 +153,14 @@ export const ExportToWeb = () => {
                                                 <div className='flex gap-3'>
                                                     <Checkbox checked={false} />
                                                     <i
-                                                        className='icon adms-edit-item cursor-pointer'
+                                                        className='icon adms-edit-item cursor-pointer export-web__icon'
                                                         onClick={() => {
                                                             navigate(
                                                                 `/dashboard/inventory/${options.itemuid}`
                                                             );
                                                         }}
                                                     />
+                                                    <i className='pi pi-angle-down' />
                                                 </div>
                                             );
                                         }}
