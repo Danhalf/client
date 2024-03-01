@@ -27,7 +27,7 @@ import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/searc
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
 interface TableColumnProps extends ColumnProps {
-    field: keyof Inventory | "Price";
+    field: keyof Inventory | "Price" | "Audit" | "Misc";
 }
 
 type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
@@ -63,6 +63,11 @@ const columns: TableColumnsList[] = [
     { field: "ExteriorColor", header: "Color" },
     { field: "mileage", header: "Miles" },
     { field: "Price", header: "Price" },
+    { field: "Audit", header: "Audit" },
+    { field: "Misc", header: "Misc" },
+    { field: "VIN", header: "VIN" },
+    { field: "Status", header: "Status" },
+    { field: "BodyStyle", header: "Body" },
 ];
 
 export default function Inventories(): ReactElement {
