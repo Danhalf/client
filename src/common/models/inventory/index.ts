@@ -55,7 +55,7 @@ export interface InventoryExtData {
     fpReductionDate: number;
     fpReduxAmt: number;
     fpRemainBal: number;
-    inspDate: string;
+    inspDate: number;
     inspEmissions: number;
     inspNumber: string;
     inspSafety: number;

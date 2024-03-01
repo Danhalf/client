@@ -221,7 +221,13 @@ export class InventoryStore {
 
     public saveInventory = action(async (): Promise<string | undefined> => {
         try {
-            const inventoryResponse = await setInventory(this._inventoryID, this._inventory);
+            this._isLoading = true;
+            const inventoryData: Inventory = {
+                ...this.inventory,
+                extdata: this.inventoryExtData,
+                options_info: this.inventoryOptions,
+            };
+            const inventoryResponse = await setInventory(this._inventoryID, inventoryData);
             if (!this.exportWebActive) {
                 return inventoryResponse?.status === Status.OK ? this._inventoryID : undefined;
             }
@@ -232,6 +238,8 @@ export class InventoryStore {
         } catch (error) {
             // TODO: add error handlers
             return undefined;
+        } finally {
+            this._isLoading = false;
         }
     });
 
