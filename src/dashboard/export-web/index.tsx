@@ -6,7 +6,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column, ColumnProps } from "primereact/column";
+import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
 import { getExportToWebList } from "http/services/export-to-web.service";
@@ -60,6 +60,8 @@ export const ExportToWeb = () => {
     interface TableColumnProps extends ColumnProps {
         field: keyof ExportWebList | "media";
     }
+
+    const cellEditor = (options: ColumnEditorOptions) => {};
 
     const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
         { field: "Make", header: "Make" },
@@ -126,6 +128,11 @@ export const ExportToWeb = () => {
                                             header={header}
                                             key={field}
                                             sortable
+                                            editor={(data: any) => {
+                                                // eslint-disable-next-line no-console
+                                                console.log(data);
+                                                return <></>;
+                                            }}
                                             headerClassName='cursor-move'
                                         />
                                     ))}
