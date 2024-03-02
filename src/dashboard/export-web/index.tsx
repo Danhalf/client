@@ -14,6 +14,7 @@ import { ExportWebList } from "common/models/export-web";
 import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
+import { setInventory } from "http/services/inventory-service";
 
 export const ExportToWeb = () => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
@@ -66,13 +67,32 @@ export const ExportToWeb = () => {
         field: keyof ExportWebList | "media" | "Price";
     }
 
+    const handleEditedValueSet = (
+        key: "Enter" | unknown,
+        field: keyof ExportWebList,
+        value: string,
+        id: string
+    ) => {
+        if (key === "Enter") {
+            setInventory(id, { [field]: value });
+        }
+    };
+
     const cellEditor = (options: ColumnEditorOptions) => {
         return (
             <InputText
                 type='text'
                 className='h-full m-0 py-0 px-2 w-full'
                 value={options.value}
-                onChange={(e) => options.editorCallback!(e.target.value)}
+                onChange={(evt) => options.editorCallback!(evt.target.value)}
+                onKeyDown={(evt) =>
+                    handleEditedValueSet(
+                        evt.key,
+                        options.field as keyof ExportWebList,
+                        options.value,
+                        options.rowData.itemuid
+                    )
+                }
             />
         );
     };
