@@ -64,7 +64,7 @@ export const ExportToWeb = () => {
     }, [lazyState, authUser, globalSearch]);
 
     interface TableColumnProps extends ColumnProps {
-        field: keyof ExportWebList | "media" | "Price";
+        field: keyof ExportWebList | "media";
     }
 
     const handleEditedValueSet = (
@@ -74,6 +74,9 @@ export const ExportToWeb = () => {
         id: string
     ) => {
         if (key === "Enter") {
+            if (field === "Price") {
+                setInventory(id, { Price: Number(value) });
+            }
             setInventory(id, { [field]: value });
         }
     };
@@ -110,7 +113,7 @@ export const ExportToWeb = () => {
         { field: "Price", header: "Price" },
     ];
 
-    const allowedEditableFields: Partial<keyof ExportWebList | "Price">[] = [
+    const allowedEditableFields: Partial<keyof ExportWebList>[] = [
         "ExteriorColor",
         "mileage",
         "Price",
