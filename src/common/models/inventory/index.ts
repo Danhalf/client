@@ -1,4 +1,18 @@
+/* eslint-disable no-unused-vars */
 import { BaseResponse, Status } from "../base-response";
+
+export enum MediaType {
+    mtUnknown,
+    mtPhoto,
+    mtPhotoPreview,
+    mtVideo,
+    mtVideoPreview,
+    mtAudio,
+    mtPDFDocument,
+    mtJSONDocument,
+    mtBinaryData,
+    mtDocument,
+}
 
 export interface InventoryExtData {
     bgAsIs: number;
