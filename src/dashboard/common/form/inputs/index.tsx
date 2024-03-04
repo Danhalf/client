@@ -56,7 +56,6 @@ export const CurrencyInput = ({
     labelPosition = "left",
     ...props
 }: CurrencyInputProps): ReactElement => {
-    const [inputValue, setInputValue] = useState<number | null>(value || 0);
     return (
         <div
             key={name}
@@ -67,13 +66,7 @@ export const CurrencyInput = ({
             </label>
             <div className='currency-item__input flex justify-content-center'>
                 <div className='currency-item__icon input-icon input-icon-left'>$</div>
-                <InputNumber
-                    {...props}
-                    minFractionDigits={2}
-                    locale='en-US'
-                    value={inputValue}
-                    onChange={(e: InputNumberChangeEvent) => setInputValue(e.value)}
-                />
+                <InputNumber minFractionDigits={2} locale='en-US' value={value} {...props} />
             </div>
         </div>
     );
