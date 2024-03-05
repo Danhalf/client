@@ -1,5 +1,5 @@
 import { BorderedCheckbox, CurrencyInput, DateInput } from "dashboard/common/form/inputs";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
@@ -7,8 +7,17 @@ import { DataTable } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { observer } from "mobx-react-lite";
+import { ListData, getInventoryExpenseTypesList } from "http/services/inventory-service";
+import { useStore } from "store/hooks";
+import { useParams } from "react-router-dom";
 
 export const PurchaseExpenses = observer((): ReactElement => {
+    const [expensesTypeList, setExpensesTypeList] = useState<ListData[]>([]);
+
+    const store = useStore().inventoryStore;
+    const { getInventoryExpenses } = store;
+    const { id } = useParams();
+
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "Date", header: "Date" },
         { field: "Type", header: "Type" },
@@ -16,6 +25,14 @@ export const PurchaseExpenses = observer((): ReactElement => {
         { field: "NotBillable", header: "Not Billable" },
         { field: "Vendor", header: "Vendor" },
     ];
+
+    useEffect(() => {
+        getInventoryExpenseTypesList().then((data) => data && setExpensesTypeList(data));
+        if (id) {
+            getInventoryExpenses(id);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <>
@@ -25,7 +42,14 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <DateInput name='Date' />
                     </div>
                     <div className='col-6'>
-                        <Dropdown placeholder='Type' filter className='w-full' />
+                        <Dropdown
+                            placeholder='Type'
+                            optionLabel='name'
+                            optionValue='name'
+                            filter
+                            options={expensesTypeList}
+                            className='w-full'
+                        />
                     </div>
                     <div className='col-12'>
                         <Dropdown placeholder='Vendor' filter className='w-full' />

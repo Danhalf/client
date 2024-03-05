@@ -13,6 +13,7 @@ import {
     InventoryWebInfo,
     InventoryExportWebHistory,
     InventoryPrintForm,
+    InventoryExpenses,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -40,7 +41,9 @@ export const getInventoryInfo = async (uid: string) => {
     }
 };
 
-export const fetchInventoryList = async <T>(endpoint: EndpointType): Promise<T | undefined> => {
+export const fetchInventoryList = async <T>(
+    endpoint: EndpointType | string
+): Promise<T | undefined> => {
     try {
         const response: AxiosResponse<T> = await authorizedUserApiInstance.get(
             `inventory/list/constants/${endpoint}`
@@ -88,6 +91,8 @@ export const getInventoryStatusList = async (): Promise<ListData[] | undefined> 
     await fetchInventoryList<ListData[]>("status");
 export const getInventoryGroupList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("group");
+export const getAutoMakeModelList = async (make: string): Promise<ListData[] | undefined> =>
+    await fetchInventoryList<ListData[]>(make);
 
 export const getInventoryDeleteReasonsList = async (
     useruid: string
@@ -289,6 +294,7 @@ export const getInventoryPrintForms = async (inventoryuid: string) => {
         // TODO: add error handler
     }
 };
+
 export const getInventoryPrintFormTemplate = async (inventoryuid: string, templateuid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<any>(
@@ -296,6 +302,36 @@ export const getInventoryPrintFormTemplate = async (inventoryuid: string, templa
             {
                 responseType: "blob",
             }
+        );
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getInventoryExpensesData = async (inventoryuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryExpenses>(
+            `inventory/${inventoryuid}/expenses`
+        );
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const setInventoryExpensesData = async (
+    expenseuid: string,
+    expenseData: Partial<InventoryExpenses>
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<InventorySetResponse>(
+            `inventory/${expenseuid}/expense`,
+            expenseData
         );
         if (request.status === 200) {
             return request.data;

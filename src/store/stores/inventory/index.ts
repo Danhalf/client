@@ -8,6 +8,7 @@ import {
     InventoryExportWebHistory,
     InventoryPrintForm,
     Audit,
+    InventoryExpenses,
 } from "common/models/inventory";
 import {
     getInventoryInfo,
@@ -22,6 +23,7 @@ import {
     getInventoryWebInfoHistory,
     getInventoryPrintForms,
     setInventoryExportWeb,
+    getInventoryExpensesData,
 } from "http/services/inventory-service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
@@ -37,6 +39,7 @@ export class InventoryStore {
     private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
+    private _inventoryExpenses: InventoryExpenses = {} as InventoryExpenses;
     private _inventoryAudit: Audit = {} as Audit;
 
     private _exportWebActive: boolean = false;
@@ -71,6 +74,9 @@ export class InventoryStore {
     }
     public get inventoryExtData() {
         return this._inventoryExtData;
+    }
+    public get inventoryExpenses() {
+        return this._inventoryExpenses;
     }
     public get inventoryExportWeb() {
         return this._exportWeb;
@@ -171,6 +177,19 @@ export class InventoryStore {
         }
     };
 
+    public getInventoryExpenses = async (id = this._inventoryID): Promise<void> => {
+        this._isLoading = true;
+        try {
+            const response = await getInventoryExpensesData(id);
+            if (response) {
+                this._inventoryExpenses = response;
+            }
+        } catch (error) {
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
     public getInventoryExportWebHistory = async (id = this._inventoryID): Promise<void> => {
         this._isLoading = true;
         try {
@@ -224,6 +243,16 @@ export class InventoryStore {
             (inventoryAudit as Record<typeof key, string | number>)[key] = newValue;
         }
     });
+
+    public changeExpenses = action(
+        ({ key, value }: { key: keyof InventoryExpenses; value: string | number }) => {
+            const inventoryStore = this.rootStore.inventoryStore;
+            if (inventoryStore) {
+                const { inventoryExpenses } = inventoryStore;
+                (inventoryExpenses as Record<typeof key, string | number>)[key] = value;
+            }
+        }
+    );
 
     public changeExportWeb = action(
         ({ key, value }: { key: keyof InventoryWebInfo; value: string | number }) => {

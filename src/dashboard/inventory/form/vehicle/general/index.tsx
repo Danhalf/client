@@ -23,6 +23,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
+    const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
 
@@ -43,6 +44,10 @@ export const VehicleGeneral = observer((): ReactElement => {
             list && setInteriorList(list);
         });
     }, []);
+
+    const getSelectedMakesModelData = () => {
+        getInventoryAutomakesList().then((list) => {});
+    };
 
     const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
         if (option) {
