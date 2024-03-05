@@ -220,7 +220,14 @@ export const PurchaseTitle = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-3'>
-                <Dropdown placeholder='State' filter className='w-full' />
+                <Dropdown
+                    placeholder='State'
+                    filter
+                    optionLabel='name'
+                    optionValue='id'
+                    className='w-full purchase-title__dropdown'
+                    options={STATES_LIST}
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
