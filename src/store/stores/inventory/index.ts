@@ -269,7 +269,11 @@ export class InventoryStore {
             this._isLoading = true;
             const inventoryData: Inventory = {
                 ...this.inventory,
-                extdata: this.inventoryExtData,
+                extdata: {
+                    ...this.inventoryExtData,
+                    fpReduxAmt: this.inventoryExtData?.fpReduxAmt * 100,
+                    fpRemainBal: this.inventoryExtData?.fpRemainBal * 100,
+                },
                 options_info: this.inventoryOptions,
                 Audit: this.inventoryAudit,
             };
