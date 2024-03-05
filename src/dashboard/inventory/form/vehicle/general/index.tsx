@@ -5,6 +5,7 @@ import { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import {
     ListData,
     MakesListData,
+    getAutoMakeModelList,
     getInventoryAutomakesList,
     getInventoryExteriorColorsList,
     getInventoryInteriorColorsList,
@@ -45,8 +46,21 @@ export const VehicleGeneral = observer((): ReactElement => {
         });
     }, []);
 
-    const getSelectedMakesModelData = () => {
-        getInventoryAutomakesList().then((list) => {});
+    useEffect(() => {
+        if (inventory.Make) handleSelectMake(inventory.Make);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [inventory.Make]);
+
+    const handleSelectMake = (make: string) => {
+        changeInventory({ key: "Make", value: make });
+        const makeSting = make.toLowerCase().replaceAll(" ", "");
+        getAutoMakeModelList(makeSting).then((list) => {
+            if (list && Object.keys(list).length) {
+                setAutomakesModelList(list);
+            } else {
+                setAutomakesModelList([{ id: 0, name: inventory.Model }]);
+            }
+        });
     };
 
     const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
@@ -136,8 +150,8 @@ export const VehicleGeneral = observer((): ReactElement => {
                     value={inventory?.Make}
                     filter
                     required
-                    onChange={({ value }) => changeInventory({ key: "Make", value })}
                     options={[...automakesList, { name: inventory.Make }]}
+                    onChange={({ target: { value } }) => handleSelectMake(value)}
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
                     placeholder='Make (required)'
@@ -152,8 +166,12 @@ export const VehicleGeneral = observer((): ReactElement => {
                     value={inventory?.Model}
                     filter
                     //TODO: add options
-                    options={[{ name: inventory?.Model }]}
-                    onChange={({ value }) => changeInventory({ key: "Model", value })}
+                    options={automakesModelList}
+                    onChange={({ value }) => {
+                        // eslint-disable-next-line no-console
+                        console.log(value);
+                        changeInventory({ key: "Model", value });
+                    }}
                     placeholder='Model (required)'
                     className='w-full vehicle-general__dropdown'
                 />
