@@ -76,7 +76,7 @@ export const VehicleDisclosures = observer((): ReactElement => {
             <div className='col-3'>
                 <Dropdown
                     optionLabel='name'
-                    optionValue='name'
+                    optionValue='id'
                     value={damSalvageState}
                     filter
                     onChange={({ value }) =>
