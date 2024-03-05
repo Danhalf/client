@@ -167,11 +167,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     filter
                     //TODO: add options
                     options={automakesModelList}
-                    onChange={({ value }) => {
-                        // eslint-disable-next-line no-console
-                        console.log(value);
-                        changeInventory({ key: "Model", value });
-                    }}
+                    onChange={({ value }) => changeInventory({ key: "Model", value })}
                     placeholder='Model (required)'
                     className='w-full vehicle-general__dropdown'
                 />
