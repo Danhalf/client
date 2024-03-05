@@ -1,4 +1,5 @@
 import { STATES_LIST } from "common/constants/states";
+import { TITLE_STATUS_LIST } from "common/constants/title-status";
 import { DateInput, SearchInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
 import { Checkbox } from "primereact/checkbox";
@@ -51,9 +52,12 @@ export const PurchaseTitle = observer((): ReactElement => {
             <div className='col-3'>
                 <Dropdown
                     placeholder='Status'
+                    optionLabel='name'
+                    optionValue='id'
                     filter
                     className='w-full purchase-title__dropdown'
                     value={titleStatus}
+                    options={TITLE_STATUS_LIST}
                     onChange={({ value }) => changeInventoryExtData({ key: "titleStatus", value })}
                 />
             </div>
