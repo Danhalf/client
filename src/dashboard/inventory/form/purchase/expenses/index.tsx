@@ -6,8 +6,9 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
+import { observer } from "mobx-react-lite";
 
-export const PurchaseExpenses = (): ReactElement => {
+export const PurchaseExpenses = observer((): ReactElement => {
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "Date", header: "Date" },
         { field: "Type", header: "Type" },
@@ -69,4 +70,4 @@ export const PurchaseExpenses = (): ReactElement => {
             </div>
         </>
     );
-};
+});
