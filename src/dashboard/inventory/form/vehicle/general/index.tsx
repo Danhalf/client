@@ -1,7 +1,7 @@
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
-import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import { ChangeEvent, ReactElement, useCallback, useEffect, useState } from "react";
 import {
     ListData,
     MakesListData,
@@ -46,22 +46,20 @@ export const VehicleGeneral = observer((): ReactElement => {
         });
     }, []);
 
-    useEffect(() => {
-        if (inventory.Make) handleSelectMake(inventory.Make);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inventory.Make]);
-
-    const handleSelectMake = (make: string) => {
-        changeInventory({ key: "Make", value: make });
-        const makeSting = make.toLowerCase().replaceAll(" ", "");
+    const handleSelectMake = useCallback(() => {
+        const makeSting = inventory.Make.toLowerCase().replaceAll(" ", "");
         getAutoMakeModelList(makeSting).then((list) => {
             if (list && Object.keys(list).length) {
                 setAutomakesModelList(list);
             } else {
-                setAutomakesModelList([{ id: 0, name: inventory.Model }]);
+                setAutomakesModelList([]);
             }
         });
-    };
+    }, [inventory.Make]);
+
+    useEffect(() => {
+        if (inventory.Make) handleSelectMake();
+    }, [handleSelectMake, inventory.Make]);
 
     const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
         if (option) {
@@ -151,7 +149,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     filter
                     required
                     options={[...automakesList, { name: inventory.Make }]}
-                    onChange={({ target: { value } }) => handleSelectMake(value)}
+                    onChange={({ target: { value } }) => changeInventory({ key: "Make", value })}
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
                     placeholder='Make (required)'
