@@ -15,6 +15,7 @@ export const PurchaseTitle = observer((): ReactElement => {
             titleHolderAddress,
             titleHolderName,
             titleHolderPhone,
+            titleHolderZIP,
             titleIsTradeIn,
             titleNumber,
             titleState,
@@ -23,6 +24,7 @@ export const PurchaseTitle = observer((): ReactElement => {
             titlePrevAddress,
             titlePrevName,
             titlePrevPhone,
+            titlePrevZIP,
             titleReceived,
             titleReceivedDate,
         },
@@ -179,7 +181,13 @@ export const PurchaseTitle = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='purchase-title__text-input w-full' />
+                    <InputText
+                        className='purchase-title__text-input w-full'
+                        value={titleHolderZIP}
+                        onChange={({ target: { value } }) =>
+                            changeInventoryExtData({ key: "titleHolderZIP", value })
+                        }
+                    />
                     <label className='float-label'>Zip Code</label>
                 </span>
             </div>
@@ -231,7 +239,13 @@ export const PurchaseTitle = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='purchase-title__text-input w-full' />
+                    <InputText
+                        className='purchase-title__text-input w-full'
+                        value={titlePrevZIP}
+                        onChange={({ target: { value } }) =>
+                            changeInventoryExtData({ key: "titlePrevZIP", value })
+                        }
+                    />
                     <label className='float-label'>Zip Code</label>
                 </span>
             </div>
