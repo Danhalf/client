@@ -13,7 +13,6 @@ import {
     InventoryWebInfo,
     InventoryExportWebHistory,
     InventoryPrintForm,
-    InventoryExpenses,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -302,36 +301,6 @@ export const getInventoryPrintFormTemplate = async (inventoryuid: string, templa
             {
                 responseType: "blob",
             }
-        );
-        if (request.status === 200) {
-            return request.data;
-        }
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
-
-export const getInventoryExpensesData = async (inventoryuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<InventoryExpenses>(
-            `inventory/${inventoryuid}/expenses`
-        );
-        if (request.status === 200) {
-            return request.data;
-        }
-    } catch (error) {
-        // TODO: add error handler
-    }
-};
-
-export const setInventoryExpensesData = async (
-    expenseuid: string,
-    expenseData: Partial<InventoryExpenses>
-) => {
-    try {
-        const request = await authorizedUserApiInstance.post<InventorySetResponse>(
-            `inventory/${expenseuid}/expense`,
-            expenseData
         );
         if (request.status === 200) {
             return request.data;

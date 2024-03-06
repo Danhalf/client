@@ -1,3 +1,4 @@
+import { AccountPayment } from "common/models/accounts";
 import { Status } from "common/models/base-response";
 import {
     Inventory,
@@ -8,8 +9,8 @@ import {
     InventoryExportWebHistory,
     InventoryPrintForm,
     Audit,
-    InventoryExpenses,
 } from "common/models/inventory";
+import { getAccountPayment } from "http/services/accounts.service";
 import {
     getInventoryInfo,
     getInventoryMediaItemList,
@@ -23,7 +24,6 @@ import {
     getInventoryWebInfoHistory,
     getInventoryPrintForms,
     setInventoryExportWeb,
-    getInventoryExpensesData,
 } from "http/services/inventory-service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
@@ -39,7 +39,7 @@ export class InventoryStore {
     private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
-    private _inventoryExpenses: InventoryExpenses = {} as InventoryExpenses;
+    private _inventoryPayments: AccountPayment = {} as AccountPayment;
     private _inventoryAudit: Audit = {} as Audit;
 
     private _exportWebActive: boolean = false;
@@ -75,8 +75,8 @@ export class InventoryStore {
     public get inventoryExtData() {
         return this._inventoryExtData;
     }
-    public get inventoryExpenses() {
-        return this._inventoryExpenses;
+    public get inventoryPayments() {
+        return this._inventoryPayments;
     }
     public get inventoryExportWeb() {
         return this._exportWeb;
@@ -177,12 +177,12 @@ export class InventoryStore {
         }
     };
 
-    public getInventoryExpenses = async (id = this._inventoryID): Promise<void> => {
+    public getInventoryPayments = async (id = this._inventoryID): Promise<void> => {
         this._isLoading = true;
         try {
-            const response = await getInventoryExpensesData(id);
+            const response = await getAccountPayment(id);
             if (response) {
-                this._inventoryExpenses = response;
+                this._inventoryPayments = response;
             }
         } catch (error) {
         } finally {
@@ -243,16 +243,6 @@ export class InventoryStore {
             (inventoryAudit as Record<typeof key, string | number>)[key] = newValue;
         }
     });
-
-    public changeExpenses = action(
-        ({ key, value }: { key: keyof InventoryExpenses; value: string | number }) => {
-            const inventoryStore = this.rootStore.inventoryStore;
-            if (inventoryStore) {
-                const { inventoryExpenses } = inventoryStore;
-                (inventoryExpenses as Record<typeof key, string | number>)[key] = value;
-            }
-        }
-    );
 
     public changeExportWeb = action(
         ({ key, value }: { key: keyof InventoryWebInfo; value: string | number }) => {

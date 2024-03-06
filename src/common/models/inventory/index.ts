@@ -209,25 +209,6 @@ export interface Audit {
     JustArrived: number;
 }
 
-export interface InventoryExpenses {
-    status: string;
-    error: string;
-    info: string;
-    message: string;
-    id: number;
-    created: string;
-    updated: string;
-    itemuid: string;
-    useruid: string;
-    inventoryuid: string;
-    comment: string;
-    type: number;
-    type_name: string;
-    value: number;
-    value_text: string;
-    lastexportdate: string;
-}
-
 export interface Inventory {
     Age: number;
     BodyStyle: string;

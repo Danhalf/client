@@ -1,5 +1,5 @@
 import { BorderedCheckbox, CurrencyInput } from "dashboard/common/form/inputs";
-import { ReactElement } from "react";
+import { ReactElement, useEffect } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
@@ -7,6 +7,7 @@ import { DataTable } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
+import { useParams } from "react-router-dom";
 
 export const PurchasePayments = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -14,7 +15,16 @@ export const PurchasePayments = observer((): ReactElement => {
         inventoryExtData: { payExpenses, payPack, payPaid, paySalesTaxPaid },
         changeInventoryExtData,
         saveInventory,
+        getInventoryPayments,
     } = store;
+    const { id } = useParams();
+
+    useEffect(() => {
+        if (id) {
+            getInventoryPayments(id);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "Date", header: "Date" },
