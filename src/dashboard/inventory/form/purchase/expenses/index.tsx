@@ -1,5 +1,5 @@
 import { BorderedCheckbox, CurrencyInput, DateInput } from "dashboard/common/form/inputs";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
@@ -7,15 +7,28 @@ import { DataTable } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { Dropdown } from "primereact/dropdown";
 import { observer } from "mobx-react-lite";
-import { ListData, getInventoryExpenseTypesList } from "http/services/inventory-service";
+import { ListData } from "http/services/inventory-service";
 import { useParams } from "react-router-dom";
 import { Expenses } from "common/models/expenses";
-import { getExpensesList, getExpensesTotal, setExpensesItem } from "http/services/expenses.service";
+import {
+    getExpensesList,
+    getExpensesListTypes,
+    getExpensesListVendors,
+    getExpensesTotal,
+    setExpensesItem,
+} from "http/services/expenses.service";
+import { AuthUser } from "http/services/auth.service";
+import { getKeyValue } from "services/local-storage.service";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { Contact } from "common/models/contact";
 
 export const PurchaseExpenses = observer((): ReactElement => {
+    const [user, setUser] = useState<AuthUser | null>(null);
+    const { id } = useParams();
+
     const [expensesTypeList, setExpensesTypeList] = useState<ListData[]>([]);
+    const [expensesVendorList, setExpensesVendorList] = useState<Contact[]>([]);
     const [expensesList, setExpensesList] = useState<Expenses[]>([]);
-    const [expenseId, setExpenseId] = useState<number>(0);
     const [expenseDate, setExpenseDate] = useState<string>("");
     const [expenseType, setExpenseType] = useState<number>(0);
     const [expenseAmount, setExpenseAmount] = useState<number>(0);
@@ -23,8 +36,6 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const [expenseVendor, setExpenseVendor] = useState<string>("");
     const [expenseNotes, setExpenseNotes] = useState<string>("");
     const [expenseTotal, setExpenseTotal] = useState<string>("$ 0.00");
-
-    const { id } = useParams();
 
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "operationdate", header: "Date" },
@@ -34,29 +45,39 @@ export const PurchaseExpenses = observer((): ReactElement => {
         { field: "vendor", header: "Vendor" },
     ];
 
-    const getExpenses = () => {
+    const getExpenses = useCallback(() => {
         if (id) {
             getExpensesList(id).then((response) => {
                 if (response) {
                     setExpensesList(response);
-                    setExpenseId(response[0]?.id);
-                    setExpenseDate(response[0]?.operationdate);
-                    setExpenseType(response[0]?.type);
-                    setExpenseAmount(response[0]?.amount);
-                    setExpenseVendor(response[0]?.vendor);
-                    setExpenseNotes(response[0]?.comment);
                 }
             });
             getExpensesTotal(id).then(
                 (response) => response?.total && setExpenseTotal(response.total)
             );
         }
-    };
+    }, [id]);
 
     useEffect(() => {
-        getInventoryExpenseTypesList().then((data) => data && setExpensesTypeList(data));
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        setUser(authUser);
+    }, []);
+
+    useEffect(() => {
         getExpenses();
-    }, [id]);
+        if (user) {
+            getExpensesListTypes(user.useruid).then((response) => {
+                if (response) {
+                    setExpensesTypeList(response);
+                }
+            });
+            getExpensesListVendors(user.useruid).then((response) => {
+                if (response) {
+                    setExpensesVendorList(response);
+                }
+            });
+        }
+    }, [getExpenses, user]);
 
     const handleExpenseSubmit = () => {
         const expenseData: Partial<Expenses> = {
@@ -66,7 +87,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
             vendor: expenseVendor,
             comment: expenseNotes,
         };
-        setExpensesItem(expenseId, expenseData).then(() => getExpenses());
+        setExpensesItem({ expenseuid: user?.useruid, expenseData }).then(() => getExpenses());
     };
 
     return (
@@ -97,8 +118,10 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     <div className='col-12'>
                         <Dropdown
                             placeholder='Vendor'
+                            optionLabel='userName'
+                            optionValue='contactuid'
                             filter
-                            // options={[expenseVendor]}
+                            options={expensesVendorList}
                             value={expenseVendor}
                             onChange={({ value }) => value && setExpenseVendor(String(value))}
                             className='w-full'

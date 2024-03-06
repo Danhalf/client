@@ -1,5 +1,17 @@
 import { Expenses, ExpensesSetResponse, ExpensesTotal } from "common/models/expenses";
 import { authorizedUserApiInstance } from "http/index";
+import { ListData } from "./inventory-service";
+import { BaseResponse, Status } from "common/models/base-response";
+import { Contact } from "common/models/contact";
+
+interface ExpensesListTypes extends BaseResponse {
+    contact_types: ListData[];
+}
+
+interface ExpensesData {
+    expenseuid?: string | null;
+    expenseData: Partial<Expenses>;
+}
 
 export const getExpensesList = async (inventoryuid: string) => {
     try {
@@ -27,10 +39,34 @@ export const getExpensesTotal = async (inventoryuid: string) => {
     }
 };
 
-export const setExpensesItem = async (expenseuid: number, expenseData: Partial<Expenses>) => {
+export const getExpensesListTypes = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<ExpensesListTypes>(
+            `contacts/${useruid}/listtypes`
+        );
+        if (request.status === 200 && request.data.status === Status.OK) {
+            return request.data.contact_types;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getExpensesListVendors = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<Contact[]>(`contacts/${useruid}/list`);
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const setExpensesItem = async ({ expenseuid, expenseData }: ExpensesData) => {
     try {
         const request = await authorizedUserApiInstance.post<ExpensesSetResponse>(
-            `inventory/${expenseuid}/expense`,
+            `inventory/${expenseuid || 0}/expense`,
             expenseData
         );
         if (request.status === 200) {
