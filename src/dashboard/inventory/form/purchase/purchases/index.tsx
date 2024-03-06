@@ -29,9 +29,11 @@ export const PurchasePurchases = observer((): ReactElement => {
             purPurchaseCity,
             purPurchaseDate,
             purPurchasePhone,
+            purPurchaseEmail,
             purPurchaseZipCode,
             purPurchasedFrom,
             purSoldByLot,
+            purPurchaseCheckMemo,
         },
         changeInventoryExtData,
     } = store;
@@ -53,7 +55,13 @@ export const PurchasePurchases = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='purchase-purchases__text-input w-full'
-                        //TODO: missed data
+                        value={purPurchaseEmail}
+                        onChange={({ target: { value } }) => {
+                            changeInventoryExtData({
+                                key: "purPurchaseEmail",
+                                value,
+                            });
+                        }}
                     />
                     <label className='float-label'>E-mail</label>
                 </span>
@@ -258,7 +266,13 @@ export const PurchasePurchases = observer((): ReactElement => {
                 <InputTextarea
                     className='purchase-purchases__text-area'
                     placeholder='Notes'
-                    //TODO: missed purchase notes data
+                    value={purPurchaseCheckMemo}
+                    onChange={({ target: { value } }) => {
+                        changeInventoryExtData({
+                            key: "purPurchaseCheckMemo",
+                            value,
+                        });
+                    }}
                 />
             </div>
         </div>

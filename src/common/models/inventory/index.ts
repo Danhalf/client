@@ -105,6 +105,7 @@ export interface InventoryExtData {
     purPurchaseCity: string;
     purPurchaseDate: number;
     purPurchasePhone: string;
+    purPurchaseEmail: string;
     purPurchaseZipCode: string;
     purPurchasedFrom: string;
     purSoldByLot: number;
