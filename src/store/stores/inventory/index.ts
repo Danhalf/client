@@ -268,6 +268,8 @@ export class InventoryStore {
                     csEarlyRemoval: this.inventoryExtData?.csEarlyRemoval * 100,
                     csListingFee: this.inventoryExtData?.csListingFee * 100,
                     csOwnerAskingPrice: this.inventoryExtData?.csOwnerAskingPrice * 100,
+                    purPurchaseBuyerComm: this.inventoryExtData?.purPurchaseBuyerComm * 100,
+                    purPurchaseAmount: this.inventoryExtData?.purPurchaseAmount * 100,
                 },
                 options_info: this.inventoryOptions,
                 Audit: this.inventoryAudit,
