@@ -56,7 +56,7 @@ export const ImagesMedia = observer((): ReactElement => {
             id && getInventory(id).then(() => fetchImages());
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchImages, checked, id]);
+    }, [images, checked, id]);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
         store.uploadFileImages = e.files;
