@@ -138,6 +138,7 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    justify-content: space-between;
     gap: 25px 15px;
     padding-top: 50px;
     color: var(--admss-app-light-grey);
@@ -210,6 +211,16 @@
     color: var(--admss-app-primary-main-green);
 }
 
+.image-info__icon .icon {
+    font-size: 14px;
+}
+
+.image-info__text {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 .image-info__text--bold {
     font-weight: 600;
 }
@@ -220,8 +231,14 @@
     right: 15px;
     cursor: pointer;
     border: none;
+    color: var(--admss-app-medium-grey);
     background-color: transparent;
 }
+.media-images__close i {
+    font-size: 14px;
+    font-weight: 600;
+}
+
 .media-images__close:hover {
     color: var(--admss-app-light-grey);
 }

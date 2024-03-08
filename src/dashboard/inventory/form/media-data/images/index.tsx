@@ -17,6 +17,7 @@ import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { MediaLimitations } from "common/models/inventory";
+import { useParams } from "react-router-dom";
 
 import { OrderList, OrderListProps } from "primereact/orderlist";
 import { ImageItem } from "store/stores/inventory";
@@ -31,8 +32,16 @@ const limitations: MediaLimitations = {
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { saveInventoryImages, uploadFileImages, images, isLoading, removeImage, fetchImages } =
-        store;
+    const { id } = useParams();
+    const {
+        getInventory,
+        saveInventoryImages,
+        uploadFileImages,
+        images,
+        isLoading,
+        removeImage,
+        fetchImages,
+    } = store;
     const [checked, setChecked] = useState<boolean>(true);
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
@@ -44,10 +53,10 @@ export const ImagesMedia = observer((): ReactElement => {
             setImagesChecked(new Array(images.length).fill(checked));
             setDraggableImages(images.map((image, index) => ({ ...image, index })));
         } else {
-            fetchImages();
+            id && getInventory(id).then(() => fetchImages());
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fetchImages, images, checked]);
+    }, [fetchImages, checked, id]);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
         store.uploadFileImages = e.files;

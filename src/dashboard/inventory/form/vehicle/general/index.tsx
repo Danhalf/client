@@ -1,10 +1,11 @@
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
-import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import { ChangeEvent, ReactElement, useCallback, useEffect, useState } from "react";
 import {
     ListData,
     MakesListData,
+    getAutoMakeModelList,
     getInventoryAutomakesList,
     getInventoryExteriorColorsList,
     getInventoryInteriorColorsList,
@@ -12,15 +13,18 @@ import {
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { inventoryDecodeVIN } from "http/services/vin-decoder.service";
+import { Checkbox } from "primereact/checkbox";
+import { Audit } from "common/models/inventory";
 
 //TODO: add validation
 const VIN_VALID_LENGTH = 17;
 
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { inventory, changeInventory } = store;
+    const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
+    const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
 
@@ -41,6 +45,21 @@ export const VehicleGeneral = observer((): ReactElement => {
             list && setInteriorList(list);
         });
     }, []);
+
+    const handleSelectMake = useCallback(() => {
+        const makeSting = inventory.Make.toLowerCase().replaceAll(" ", "");
+        getAutoMakeModelList(makeSting).then((list) => {
+            if (list && Object.keys(list).length) {
+                setAutomakesModelList(list);
+            } else {
+                setAutomakesModelList([]);
+            }
+        });
+    }, [inventory.Make]);
+
+    useEffect(() => {
+        if (inventory.Make) handleSelectMake();
+    }, [handleSelectMake, inventory.Make]);
 
     const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
         if (option) {
@@ -90,6 +109,13 @@ export const VehicleGeneral = observer((): ReactElement => {
         }
     };
 
+    const renderedAuditKeys: (keyof Audit)[] = [
+        "DataNeedsUpdate",
+        "NeedsCleaning",
+        "ReadyForSale",
+        "JustArrived",
+    ];
+
     return (
         <div className='grid vehicle-general row-gap-2'>
             <div className='col-6'>
@@ -122,8 +148,8 @@ export const VehicleGeneral = observer((): ReactElement => {
                     value={inventory?.Make}
                     filter
                     required
-                    onChange={({ value }) => changeInventory({ key: "Make", value })}
                     options={[...automakesList, { name: inventory.Make }]}
+                    onChange={({ target: { value } }) => changeInventory({ key: "Make", value })}
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
                     placeholder='Make (required)'
@@ -138,7 +164,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     value={inventory?.Model}
                     filter
                     //TODO: add options
-                    options={[{ name: inventory?.Model }]}
+                    options={automakesModelList}
                     onChange={({ value }) => changeInventory({ key: "Model", value })}
                     placeholder='Model (required)'
                     className='w-full vehicle-general__dropdown'
@@ -198,6 +224,36 @@ export const VehicleGeneral = observer((): ReactElement => {
                     className='w-full vehicle-general__dropdown'
                 />
             </div>
+
+            <div className='flex col-12'>
+                <h3 className='vehicle-general__title m-0 pr-3'>Audit</h3>
+                <hr className='vehicle-general__line flex-1' />
+            </div>
+
+            {Object.entries(inventoryAudit).map(([key, value]) => {
+                const typedKey = key as keyof Audit;
+
+                if (!renderedAuditKeys.includes(typedKey)) return null;
+
+                const inputLabel = typedKey.replace(/(?!^)([A-Z]|\d+)/g, " $1");
+
+                return (
+                    <div
+                        className='col-3 vehicle-options__checkbox flex align-items-center'
+                        key={key}
+                    >
+                        <Checkbox
+                            inputId={`audit-${key}`}
+                            name={`audit-${key}`}
+                            checked={!!value}
+                            onChange={() => changeInventoryAudit(typedKey)}
+                        />
+                        <label htmlFor={`audit-${key}`} className='ml-2'>
+                            {inputLabel}
+                        </label>
+                    </div>
+                );
+            })}
         </div>
     );
 });

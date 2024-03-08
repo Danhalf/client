@@ -1,7 +1,7 @@
-import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
-import { InputNumber, InputNumberChangeEvent, InputNumberProps } from "primereact/inputnumber";
+import { InputNumber, InputNumberProps } from "primereact/inputnumber";
 import { Checkbox, CheckboxProps } from "primereact/checkbox";
 import { InputText, InputTextProps } from "primereact/inputtext";
 import { Calendar, CalendarProps } from "primereact/calendar";
@@ -56,7 +56,6 @@ export const CurrencyInput = ({
     labelPosition = "left",
     ...props
 }: CurrencyInputProps): ReactElement => {
-    const [inputValue, setInputValue] = useState<number | null>(value || 0);
     return (
         <div
             key={name}
@@ -67,13 +66,7 @@ export const CurrencyInput = ({
             </label>
             <div className='currency-item__input flex justify-content-center'>
                 <div className='currency-item__icon input-icon input-icon-left'>$</div>
-                <InputNumber
-                    {...props}
-                    minFractionDigits={2}
-                    locale='en-US'
-                    value={inputValue}
-                    onChange={(e: InputNumberChangeEvent) => setInputValue(e.value)}
-                />
+                <InputNumber minFractionDigits={2} locale='en-US' value={value} {...props} />
             </div>
         </div>
     );
@@ -81,12 +74,10 @@ export const CurrencyInput = ({
 
 export const PercentInput = ({
     name,
-    value,
     title,
     labelPosition = "left",
     ...props
 }: PercentInputProps): ReactElement => {
-    const [inputValue, setInputValue] = useState<number | null>(value || 0);
     return (
         <div
             key={name}
@@ -99,14 +90,7 @@ export const PercentInput = ({
                 {title}
             </label>
             <div className='percent-item__input flex justify-content-center'>
-                <InputNumber
-                    {...props}
-                    inputId={name}
-                    minFractionDigits={2}
-                    name={name}
-                    value={inputValue}
-                    onChange={(e: InputNumberChangeEvent) => setInputValue(e.value)}
-                />
+                <InputNumber inputId={name} minFractionDigits={2} name={name} {...props} />
                 <div className='percent-item__icon input-icon input-icon-right'>%</div>
             </div>
         </div>
@@ -135,12 +119,10 @@ export const BorderedCheckbox = ({
 
 export const SearchInput = ({
     name,
-    value,
     height = "50px",
     title,
     ...props
 }: InputTextProps): ReactElement => {
-    const [inputValue, setInputValue] = useState<string>(value || "");
     return (
         <div
             key={name}
@@ -150,11 +132,7 @@ export const SearchInput = ({
             className='flex align-items-center search-input'
         >
             <span className='p-float-label search-input__wrapper'>
-                <InputText
-                    {...props}
-                    value={inputValue}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
-                />
+                <InputText {...props} />
                 <label className='float-label search-input__label'>{title}</label>
             </span>
             <div className='search-input__icon input-icon input-icon-right'>
