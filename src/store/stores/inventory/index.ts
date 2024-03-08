@@ -25,7 +25,7 @@ import {
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
 
-interface ImageItem {
+export interface ImageItem {
     src: string;
     itemuid: string;
 }

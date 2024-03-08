@@ -18,6 +18,9 @@ import { Checkbox } from "primereact/checkbox";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { MediaLimitations } from "common/models/inventory";
 
+import { OrderList, OrderListProps } from "primereact/orderlist";
+import { ImageItem } from "store/stores/inventory";
+
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
     minResolution: "512x512",
@@ -34,10 +37,12 @@ export const ImagesMedia = observer((): ReactElement => {
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
+    const [draggableImages, setDraggableImages] = useState<ImageItem[]>([]);
 
     useEffect(() => {
         if (images.length) {
             setImagesChecked(new Array(images.length).fill(checked));
+            setDraggableImages(images.map((image, index) => ({ ...image, index })));
         } else {
             fetchImages();
         }
@@ -193,6 +198,57 @@ export const ImagesMedia = observer((): ReactElement => {
         icon: "none",
     };
 
+    const OrderListTemplate = (value: OrderListProps): any => {
+        const { itemuid, src, index } = value as ImageItem & { index: number };
+        return (
+            <div key={itemuid} className='media-images__item'>
+                {checked && (
+                    <Checkbox
+                        checked={imagesChecked[index]}
+                        onChange={() => handleCheckedChange(index)}
+                        className='media-uploaded__checkbox'
+                    />
+                )}
+                <Image
+                    src={src}
+                    alt='inventory-item'
+                    width='65'
+                    height='65'
+                    pt={{
+                        image: {
+                            className: "media-images__image",
+                        },
+                    }}
+                />
+                <div className='media-images__info image-info'>
+                    <div className='image-info__item'>
+                        <span className='image-info__icon'>
+                            <i className='icon adms-category' />
+                        </span>
+                        <span className='image-info__text--bold'>Exterior</span>
+                    </div>
+                    <div className='image-info__item'>
+                        <span className='image-info__icon'>
+                            <span className='image-info__icon'>
+                                <i className='icon adms-comment' />
+                            </span>
+                        </span>
+                        <span className='image-info__text'>Renewed colour and new tires</span>
+                    </div>
+                    <div className='image-info__item'>
+                        <span className='image-info__icon'>
+                            <i className='icon adms-calendar' />
+                        </span>
+                        <span className='image-info__text'>10/11/2023 08:51:39</span>
+                    </div>
+                </div>
+                <button className='media-images__close' onClick={() => handleDeleteImage(itemuid)}>
+                    <i className='pi pi-times' />
+                </button>
+            </div>
+        );
+    };
+
     return (
         <div className='media grid'>
             <FileUpload
@@ -242,62 +298,15 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length ? (
-                    images.map(({ itemuid, src }, index: number) => {
-                        return (
-                            <div key={itemuid} className='media-images__item'>
-                                {checked && (
-                                    <Checkbox
-                                        checked={imagesChecked[index]}
-                                        onChange={() => handleCheckedChange(index)}
-                                        className='media-uploaded__checkbox'
-                                    />
-                                )}
-                                <Image
-                                    src={src}
-                                    alt='inventory-item'
-                                    width='75'
-                                    height='75'
-                                    pt={{
-                                        image: {
-                                            className: "media-images__image",
-                                        },
-                                    }}
-                                />
-                                <div className='media-images__info image-info'>
-                                    <div className='image-info__item'>
-                                        <span className='image-info__icon'>
-                                            <i className='pi pi-th-large' />
-                                        </span>
-                                        <span className='image-info__text--bold'>Exterior</span>
-                                    </div>
-                                    <div className='image-info__item'>
-                                        <span className='image-info__icon'>
-                                            <span className='image-info__icon'>
-                                                <i className='pi pi-comment' />
-                                            </span>
-                                        </span>
-                                        <span className='image-info__text'>
-                                            Renewed colour and new tires
-                                        </span>
-                                    </div>
-                                    <div className='image-info__item'>
-                                        <span className='image-info__icon'>
-                                            <i className='pi pi-calendar' />
-                                        </span>
-                                        <span className='image-info__text'>
-                                            10/11/2023 08:51:39
-                                        </span>
-                                    </div>
-                                </div>
-                                <button
-                                    className='media-images__close'
-                                    onClick={() => handleDeleteImage(itemuid)}
-                                >
-                                    <i className='pi pi-times' />
-                                </button>
-                            </div>
-                        );
-                    })
+                    <OrderList
+                        dataKey='id'
+                        value={draggableImages}
+                        onChange={(e) => setDraggableImages(e.value)}
+                        itemTemplate={OrderListTemplate}
+                        className='w-full flex flex-wrap'
+                        header={null}
+                        dragdrop
+                    />
                 ) : (
                     <div className='w-full text-center'>No images added yet.</div>
                 )}
