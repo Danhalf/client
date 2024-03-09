@@ -13,18 +13,20 @@ import {
 import { getAccountPayment } from "http/services/accounts.service";
 import {
     getInventoryInfo,
-    getInventoryMediaItemList,
     setInventory,
-    createMediaItemRecord,
-    uploadInventoryMedia,
-    pairMediaWithInventoryItem,
-    getInventoryMediaItem,
-    deleteMediaImage,
     getInventoryWebInfo,
     getInventoryWebInfoHistory,
     getInventoryPrintForms,
     setInventoryExportWeb,
 } from "http/services/inventory-service";
+import {
+    getInventoryMediaItemList,
+    createMediaItemRecord,
+    uploadInventoryMedia,
+    pairMediaWithInventoryItem,
+    getInventoryMediaItem,
+    deleteMediaImage,
+} from "http/services/media.service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
 
