@@ -9,6 +9,7 @@ import {
     InventoryExportWebHistory,
     InventoryPrintForm,
     Audit,
+    InventoryMediaInfo,
 } from "common/models/inventory";
 import { getAccountPayment } from "http/services/accounts.service";
 import {
@@ -26,6 +27,7 @@ import {
     pairMediaWithInventoryItem,
     getInventoryMediaItem,
     deleteMediaImage,
+    getInventoryMediaInfo,
 } from "http/services/media.service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
@@ -33,6 +35,7 @@ import { RootStore } from "store";
 interface ImageItem {
     src: string;
     itemuid: string;
+    info?: InventoryMediaInfo;
 }
 
 export class InventoryStore {
@@ -343,9 +346,14 @@ export class InventoryStore {
             await Promise.all(
                 this._inventoryImagesID.map(async ({ mediauid, itemuid }) => {
                     if (mediauid && itemuid) {
-                        const response = await getInventoryMediaItem(mediauid);
-                        if (response) {
-                            result.push({ itemuid, src: response });
+                        const responseSrc = await getInventoryMediaItem(mediauid);
+                        const responseData = await getInventoryMediaInfo(mediauid as string);
+                        if (responseSrc) {
+                            result.push({
+                                itemuid,
+                                src: responseSrc,
+                                info: responseData || ({} as InventoryMediaInfo),
+                            });
                         }
                     }
                 })

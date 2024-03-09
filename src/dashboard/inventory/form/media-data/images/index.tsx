@@ -251,7 +251,7 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length ? (
-                    images.map(({ itemuid, src }, index: number) => {
+                    images.map(({ itemuid, src, info }, index: number) => {
                         return (
                             <div key={itemuid} className='media-images__item'>
                                 {checked && (
@@ -277,7 +277,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                         <span className='image-info__icon'>
                                             <i className='icon adms-category' />
                                         </span>
-                                        <span className='image-info__text--bold'>Exterior</span>
+                                        <span className='image-info__text--bold'>{info?.size}</span>
                                     </div>
                                     <div className='image-info__item'>
                                         <span className='image-info__icon'>
@@ -285,17 +285,13 @@ export const ImagesMedia = observer((): ReactElement => {
                                                 <i className='icon adms-comment' />
                                             </span>
                                         </span>
-                                        <span className='image-info__text'>
-                                            Renewed colour and new tires
-                                        </span>
+                                        <span className='image-info__text'>{info?.itemUID}</span>
                                     </div>
                                     <div className='image-info__item'>
                                         <span className='image-info__icon'>
                                             <i className='icon adms-calendar' />
                                         </span>
-                                        <span className='image-info__text'>
-                                            10/11/2023 08:51:39
-                                        </span>
+                                        <span className='image-info__text'>{info?.accessed}</span>
                                     </div>
                                 </div>
                                 <button

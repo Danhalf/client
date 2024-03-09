@@ -3,6 +3,7 @@ import {
     InventoryMedia,
     CreateMediaItemRecordResponse,
     InventorySetResponse,
+    InventoryMediaInfo,
 } from "common/models/inventory";
 import { authorizedUserApiInstance } from "http/index";
 
@@ -39,6 +40,19 @@ export const getInventoryMediaItem = async (mediaID: string): Promise<string | u
     } catch (error) {
         // TODO: add error handler
         return undefined;
+    }
+};
+
+export const getInventoryMediaInfo = async (mediauid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryMediaInfo>(
+            `media/${mediauid}/data`
+        );
+        if (request) {
+            return request.data;
+        } else throw new Error();
+    } catch (error) {
+        // TODO: add error handler
     }
 };
 

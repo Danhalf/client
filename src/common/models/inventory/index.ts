@@ -277,6 +277,22 @@ export interface InventoryMediaItemID {
     inventoryuid: string;
 }
 
+export interface InventoryMediaInfo {
+    accessed: string;
+    created: string;
+    duration: number;
+    filepath: string;
+    height: number;
+    index: number;
+    itemUID: string;
+    mediaType: number;
+    size: number;
+    status: string;
+    updated: string;
+    userUID: string;
+    width: number;
+}
+
 export interface InventoryMedia extends InventoryMediaItemID {
     contenttype: number;
     created: string;
