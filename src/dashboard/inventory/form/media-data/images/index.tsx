@@ -1,5 +1,5 @@
 import "./index.css";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
     FileUpload,
@@ -10,7 +10,7 @@ import {
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
-import { Dropdown } from "primereact/dropdown";
+import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
@@ -18,6 +18,7 @@ import { Checkbox } from "primereact/checkbox";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { MediaLimitations } from "common/models/inventory";
 import { useParams } from "react-router-dom";
+import { ContentType } from "common/models/enums";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -26,6 +27,13 @@ const limitations: MediaLimitations = {
     maxSize: 8,
     maxUpload: 16,
 };
+
+const CATEGORIES = [
+    { name: "Interior", id: ContentType.ctInterior },
+    { name: "Exterior", id: ContentType.ctExterior },
+    { name: "Document", id: ContentType.ctDocument },
+    { name: "General", id: ContentType.ctGeneral },
+];
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -54,8 +62,31 @@ export const ImagesMedia = observer((): ReactElement => {
     }, [fetchImages, checked, id]);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
-        store.uploadFileImages = e.files;
+        store.uploadFileImages = {
+            ...store.uploadFileImages,
+            file: e.files,
+        };
         setTotalCount(e.files.length);
+    };
+
+    const handleCategorySelect = (e: DropdownChangeEvent) => {
+        store.uploadFileImages = {
+            ...store.uploadFileImages,
+            data: {
+                ...store.uploadFileImages.data,
+                contenttype: e.target.value,
+            },
+        };
+    };
+
+    const handleCommentaryChange = (e: ChangeEvent<HTMLInputElement>) => {
+        store.uploadFileImages = {
+            ...store.uploadFileImages,
+            data: {
+                ...store.uploadFileImages.data,
+                notes: e.target.value,
+            },
+        };
     };
 
     const onTemplateUpload = (e: FileUploadUploadEvent) => {
@@ -63,9 +94,12 @@ export const ImagesMedia = observer((): ReactElement => {
     };
 
     const onTemplateRemove = (file: File, callback: Function) => {
-        const newFiles = uploadFileImages.filter((item) => item.name !== file.name);
+        const newFiles = {
+            file: uploadFileImages.file.filter((item) => item.name !== file.name),
+            data: uploadFileImages.data,
+        };
         store.uploadFileImages = newFiles;
-        setTotalCount(newFiles.length);
+        setTotalCount(newFiles.file.length);
         callback();
     };
 
@@ -219,8 +253,21 @@ export const ImagesMedia = observer((): ReactElement => {
                 className='col-12'
             />
             <div className='col-12 mt-4 media-input'>
-                <Dropdown className='media-input__dropdown' placeholder='Category' />
-                <InputText className='media-input__text' placeholder='Comment' />
+                <Dropdown
+                    className='media-input__dropdown'
+                    placeholder='Category'
+                    optionLabel={"name"}
+                    optionValue={"id"}
+                    options={CATEGORIES}
+                    value={uploadFileImages?.data?.contenttype || 0}
+                    onChange={handleCategorySelect}
+                />
+                <InputText
+                    className='media-input__text'
+                    placeholder='Comment'
+                    value={uploadFileImages?.data?.notes || ""}
+                    onChange={handleCommentaryChange}
+                />
                 <Button
                     severity={totalCount ? "success" : "secondary"}
                     disabled={!totalCount || isLoading}

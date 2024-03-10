@@ -4,6 +4,7 @@ import {
     CreateMediaItemRecordResponse,
     InventorySetResponse,
     InventoryMediaInfo,
+    InventoryMediaPostData,
 } from "common/models/inventory";
 import { authorizedUserApiInstance } from "http/index";
 
@@ -46,7 +47,7 @@ export const getInventoryMediaItem = async (mediaID: string): Promise<string | u
 export const getInventoryMediaInfo = async (mediauid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<InventoryMediaInfo>(
-            `media/${mediauid}/data`
+            `inventory/${mediauid}/mediaitem`
         );
         if (request) {
             return request.data;
@@ -87,12 +88,17 @@ export const uploadInventoryMedia = async (inventoryUid: string, inventoryData: 
     }
 };
 
-export const pairMediaWithInventoryItem = async (inventoryUid: string, mediaitemuid: string) => {
+export const setMediaItemData = async (
+    inventoryUid: string,
+    { mediaitemuid, contenttype, notes }: Partial<InventoryMediaPostData>
+) => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
             `inventory/${inventoryUid}/media`,
             {
                 mediaitemuid,
+                contenttype,
+                notes,
             }
         );
 

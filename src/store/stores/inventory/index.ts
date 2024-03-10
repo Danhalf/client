@@ -10,6 +10,7 @@ import {
     InventoryPrintForm,
     Audit,
     InventoryMediaInfo,
+    InventoryMediaPostData,
 } from "common/models/inventory";
 import { getAccountPayment } from "http/services/accounts.service";
 import {
@@ -24,7 +25,7 @@ import {
     getInventoryMediaItemList,
     createMediaItemRecord,
     uploadInventoryMedia,
-    pairMediaWithInventoryItem,
+    setMediaItemData,
     getInventoryMediaItem,
     deleteMediaImage,
     getInventoryMediaInfo,
@@ -36,6 +37,11 @@ interface ImageItem {
     src: string;
     itemuid: string;
     info?: InventoryMediaInfo;
+}
+
+interface UploadImageItem {
+    file: File[];
+    data: Partial<InventoryMediaPostData>;
 }
 
 export class InventoryStore {
@@ -52,7 +58,7 @@ export class InventoryStore {
     private _exportWebHistory: InventoryExportWebHistory[] = [];
 
     private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
-    private _uploadFileImages: File[] = [];
+    private _uploadFileImages: UploadImageItem = {} as UploadImageItem;
     private _images: ImageItem[] = [];
 
     private _inventoryVideoID: string[] = [];
@@ -299,7 +305,7 @@ export class InventoryStore {
         try {
             this._isLoading = true;
             this._images = [];
-            const uploadPromises = this._uploadFileImages.map(async (file) => {
+            const uploadPromises = this._uploadFileImages.file.map(async (file) => {
                 const formData = new FormData();
                 formData.append("file", file);
 
@@ -311,10 +317,11 @@ export class InventoryStore {
                             formData
                         );
                         if (uploadMediaResponse?.status === Status.OK) {
-                            await pairMediaWithInventoryItem(
-                                this._inventoryID,
-                                uploadMediaResponse.itemuid
-                            );
+                            await setMediaItemData(this._inventoryID, {
+                                mediaitemuid: uploadMediaResponse.itemuid,
+                                contenttype: this._uploadFileImages.data.contenttype,
+                                notes: this._uploadFileImages.data.notes,
+                            });
                         }
                     }
                 } catch (error) {
@@ -323,7 +330,7 @@ export class InventoryStore {
             });
 
             await Promise.all(uploadPromises);
-            this._uploadFileImages = [];
+            this._uploadFileImages = {} as UploadImageItem;
             this.fetchImages();
 
             return Status.OK;
@@ -400,7 +407,7 @@ export class InventoryStore {
         }
     });
 
-    public set uploadFileImages(files: File[]) {
+    public set uploadFileImages(files: UploadImageItem) {
         this._uploadFileImages = files;
     }
 

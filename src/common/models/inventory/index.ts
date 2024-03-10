@@ -1,4 +1,5 @@
 import { BaseResponse, Status } from "../base-response";
+import { ContentType } from "../enums";
 
 export interface InventoryExtData {
     bgAsIs: number;
@@ -293,8 +294,18 @@ export interface InventoryMediaInfo {
     width: number;
 }
 
-export interface InventoryMedia extends InventoryMediaItemID {
+export interface InventoryMediaPostData {
+    useruid: string;
+    itemuid: string;
+    mediaitemuid: string;
+    notes: string;
+    type: number;
     contenttype: number;
+    order: number;
+}
+
+export interface InventoryMedia extends InventoryMediaItemID {
+    contenttype: ContentType;
     created: string;
     index: number;
     notes: string;
