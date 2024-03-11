@@ -61,7 +61,12 @@ export const ContactForm = () => {
 
     return (
         <Suspense>
-            <div className='grid'>
+            <div className='grid relative'>
+                <Button
+                    icon='pi pi-times'
+                    className='p-button close-button'
+                    onClick={() => navigate("/dashboard/contacts")}
+                />
                 <div className='col-12'>
                     <div className='card contact'>
                         <div className='card-header'>
@@ -75,8 +80,8 @@ export const ContactForm = () => {
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
                                         onTabChange={(e) => setAccordionActiveIndex(e.index)}
-                                        className='contact__accordion'
                                         multiple
+                                        className='contact__accordion'
                                     >
                                         {contactSections.map((section) => (
                                             <AccordionTab

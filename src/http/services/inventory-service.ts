@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import { AxiosResponse } from "axios";
-import { BaseResponse } from "common/models/base-response";
+import { BaseResponse, Status } from "common/models/base-response";
 import {
     Inventory,
     TotalInventoryList,
@@ -12,6 +12,8 @@ import {
     CreateMediaItemRecordResponse,
     InventoryWebInfo,
     InventoryExportWebHistory,
+    InventoryPrintForm,
+    InventoryLocations,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -39,7 +41,9 @@ export const getInventoryInfo = async (uid: string) => {
     }
 };
 
-export const fetchInventoryList = async <T>(endpoint: EndpointType): Promise<T | undefined> => {
+export const fetchInventoryList = async <T>(
+    endpoint: EndpointType | string
+): Promise<T | undefined> => {
     try {
         const response: AxiosResponse<T> = await authorizedUserApiInstance.get(
             `inventory/list/constants/${endpoint}`
@@ -55,6 +59,11 @@ export type ListData = {
     id?: number;
     name: string;
 };
+
+export interface LocationsListData {
+    locations: InventoryLocations[];
+    status: Status;
+}
 
 export type MakesListData = ListData & { logo: string };
 export type OptionsListData = ListData & { name: InventoryOptionsInfo };
@@ -87,6 +96,8 @@ export const getInventoryStatusList = async (): Promise<ListData[] | undefined> 
     await fetchInventoryList<ListData[]>("status");
 export const getInventoryGroupList = async (): Promise<ListData[] | undefined> =>
     await fetchInventoryList<ListData[]>("group");
+export const getAutoMakeModelList = async (make: string): Promise<ListData[] | undefined> =>
+    await fetchInventoryList<ListData[]>(make);
 
 export const getInventoryDeleteReasonsList = async (
     useruid: string
@@ -252,6 +263,66 @@ export const getInventoryWebInfoHistory = async (inventoryuid: string) => {
         );
         if (request.status === 200) {
             return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const setInventoryExportWeb = async (
+    inventoryUid: string,
+    inventoryData: Partial<InventoryWebInfo>
+): Promise<InventorySetResponse | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<InventorySetResponse>(
+            `inventory/${inventoryUid || 0}/webadd`,
+            inventoryData
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getInventoryPrintForms = async (inventoryuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryPrintForm[]>(
+            `print/${inventoryuid}/listforms`
+        );
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getInventoryPrintFormTemplate = async (inventoryuid: string, templateuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any>(
+            `print/${inventoryuid}/${templateuid}/form`,
+            {
+                responseType: "blob",
+            }
+        );
+        if (request.status === 200) {
+            return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getInventoryLocations = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<LocationsListData>(
+            `user/${useruid}/locations`
+        );
+        if (request.status === 200 && request.data.status === Status.OK) {
+            return request.data.locations;
         }
     } catch (error) {
         // TODO: add error handler

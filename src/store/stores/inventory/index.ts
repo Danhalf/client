@@ -1,3 +1,4 @@
+import { AccountPayment } from "common/models/accounts";
 import { Status } from "common/models/base-response";
 import {
     Inventory,
@@ -6,7 +7,10 @@ import {
     InventoryMediaItemID,
     InventoryWebInfo,
     InventoryExportWebHistory,
+    InventoryPrintForm,
+    Audit,
 } from "common/models/inventory";
+import { getAccountPayment } from "http/services/accounts.service";
 import {
     getInventoryInfo,
     getInventoryMediaItemList,
@@ -18,6 +22,8 @@ import {
     deleteMediaImage,
     getInventoryWebInfo,
     getInventoryWebInfoHistory,
+    getInventoryPrintForms,
+    setInventoryExportWeb,
 } from "http/services/inventory-service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
@@ -33,8 +39,12 @@ export class InventoryStore {
     private _inventoryID: string = "";
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
-    private _inventoryExportWeb: InventoryWebInfo = {} as InventoryWebInfo;
-    private _inventoryExportWebHistory: InventoryExportWebHistory[] = [];
+    private _inventoryPayments: AccountPayment = {} as AccountPayment;
+    private _inventoryAudit: Audit = {} as Audit;
+
+    private _exportWebActive: boolean = false;
+    private _exportWeb: InventoryWebInfo = {} as InventoryWebInfo;
+    private _exportWebHistory: InventoryExportWebHistory[] = [];
 
     private _inventoryImagesID: Partial<InventoryMediaItemID>[] = [];
     private _uploadFileImages: File[] = [];
@@ -43,6 +53,9 @@ export class InventoryStore {
     private _inventoryVideoID: string[] = [];
     private _inventoryAudioID: string[] = [];
     private _inventoryDocumentsID: string[] = [];
+
+    private _printList: InventoryPrintForm[] = [];
+
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -56,23 +69,41 @@ export class InventoryStore {
     public get inventoryOptions() {
         return this._inventoryOptions;
     }
+    public get inventoryAudit() {
+        return this._inventoryAudit;
+    }
     public get inventoryExtData() {
         return this._inventoryExtData;
     }
+    public get inventoryPayments() {
+        return this._inventoryPayments;
+    }
     public get inventoryExportWeb() {
-        return this._inventoryExportWeb;
+        return this._exportWeb;
+    }
+    public get exportWebActive() {
+        return this._exportWebActive;
     }
     public get uploadFileImages() {
         return this._uploadFileImages;
     }
     public get inventoryExportWebHistory() {
-        return this._inventoryExportWebHistory;
+        return this._exportWebHistory;
     }
     public get images() {
         return this._images;
     }
+
+    public get printList() {
+        return this._printList;
+    }
+
     public get isLoading() {
         return this._isLoading;
+    }
+
+    public set exportWebActive(state: boolean) {
+        this._exportWebActive = state;
     }
 
     public set isLoading(state: boolean) {
@@ -84,11 +115,13 @@ export class InventoryStore {
         try {
             const response = await getInventoryInfo(itemuid);
             if (response) {
-                const { extdata, options_info, ...inventory } = response;
+                const { extdata, options_info, Audit, ...inventory } = response;
                 this._inventoryID = response.itemuid;
                 this._inventory = inventory || ({} as Inventory);
                 this._inventoryOptions = options_info || [];
+
                 this._inventoryExtData = extdata || ({} as InventoryExtData);
+                this._inventoryAudit = Audit || ({} as Audit);
             }
         } catch (error) {
         } finally {
@@ -136,7 +169,20 @@ export class InventoryStore {
         try {
             const response = await getInventoryWebInfo(id);
             if (response) {
-                this._inventoryExportWeb = response;
+                this._exportWeb = response;
+            }
+        } catch (error) {
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public getInventoryPayments = async (id = this._inventoryID): Promise<void> => {
+        this._isLoading = true;
+        try {
+            const response = await getAccountPayment(id);
+            if (response) {
+                this._inventoryPayments = response;
             }
         } catch (error) {
         } finally {
@@ -149,7 +195,7 @@ export class InventoryStore {
         try {
             const response = await getInventoryWebInfoHistory(id);
             if (response) {
-                this._inventoryExportWebHistory = response;
+                this._exportWebHistory = response;
             }
         } catch (error) {
         } finally {
@@ -159,7 +205,7 @@ export class InventoryStore {
 
     public changeInventory = action(
         ({ key, value }: { key: keyof Inventory; value: string | number }) => {
-            if (this._inventory && key !== "extdata" && key !== "options_info") {
+            if (this._inventory && key !== "extdata" && key !== "options_info" && key !== "Audit") {
                 (this._inventory as Record<typeof key, string | number>)[key] = value;
             }
         }
@@ -189,13 +235,58 @@ export class InventoryStore {
         }
     });
 
+    public changeInventoryAudit = action((key: keyof Audit) => {
+        const inventoryStore = this.rootStore.inventoryStore;
+        if (inventoryStore) {
+            const { inventoryAudit } = inventoryStore;
+            const newValue = !!inventoryAudit[key] ? 0 : 1;
+            (inventoryAudit as Record<typeof key, string | number>)[key] = newValue;
+        }
+    });
+
+    public changeExportWeb = action(
+        ({ key, value }: { key: keyof InventoryWebInfo; value: string | number }) => {
+            const inventoryStore = this.rootStore.inventoryStore;
+            if (inventoryStore) {
+                const { inventoryExportWeb } = inventoryStore;
+                (inventoryExportWeb as Record<typeof key, string | number>)[key] = value;
+            }
+        }
+    );
+
     public saveInventory = action(async (): Promise<string | undefined> => {
         try {
-            const response = await setInventory(this._inventoryID, this._inventory);
-            if (response?.status === Status.OK) return response.itemuid;
+            this._isLoading = true;
+            const inventoryData: Inventory = {
+                ...this.inventory,
+                extdata: {
+                    ...this.inventoryExtData,
+                    fpReduxAmt: this.inventoryExtData?.fpReduxAmt * 100,
+                    fpRemainBal: this.inventoryExtData?.fpRemainBal * 100,
+                    csFee: this.inventoryExtData?.csFee * 100,
+                    csReserveAmt: this.inventoryExtData?.csReserveAmt * 100,
+                    csEarlyRemoval: this.inventoryExtData?.csEarlyRemoval * 100,
+                    csListingFee: this.inventoryExtData?.csListingFee * 100,
+                    csOwnerAskingPrice: this.inventoryExtData?.csOwnerAskingPrice * 100,
+                    purPurchaseBuyerComm: this.inventoryExtData?.purPurchaseBuyerComm * 100,
+                    purPurchaseAmount: this.inventoryExtData?.purPurchaseAmount * 100,
+                },
+                options_info: this.inventoryOptions,
+                Audit: this.inventoryAudit,
+            };
+            const inventoryResponse = await setInventory(this._inventoryID, inventoryData);
+            if (!this.exportWebActive) {
+                return inventoryResponse?.status === Status.OK ? this._inventoryID : undefined;
+            }
+            const webResponse = await setInventoryExportWeb(this._inventoryID, this._exportWeb);
+            await Promise.all([inventoryResponse, webResponse]).then((response) =>
+                response.every((item) => item?.status === Status.OK) ? this._inventoryID : undefined
+            );
         } catch (error) {
-            // TODO: add error handler
+            // TODO: add error handlers
             return undefined;
+        } finally {
+            this._isLoading = false;
         }
     });
 
@@ -260,7 +351,21 @@ export class InventoryStore {
 
             this._images = result;
         } catch (error) {
-            // Handle or log the error
+            // TODO: add error handler
+        } finally {
+            this._isLoading = false;
+        }
+    });
+
+    public getPrintList = action(async (inventoryuid = this._inventoryID) => {
+        try {
+            this._isLoading = true;
+            const response = await getInventoryPrintForms(inventoryuid);
+            if (response) {
+                this._printList = response;
+            }
+        } catch (error) {
+            // TODO: add error handler
         } finally {
             this._isLoading = false;
         }
@@ -269,7 +374,6 @@ export class InventoryStore {
     public removeImage = action(async (imageuid: string): Promise<Status | undefined> => {
         try {
             this._isLoading = true;
-
             try {
                 await deleteMediaImage(imageuid);
                 await this.fetchImages();
@@ -295,7 +399,8 @@ export class InventoryStore {
         this._inventoryOptions = [];
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
-        this._inventoryExportWeb = {} as InventoryWebInfo;
-        this._inventoryExportWebHistory = [] as InventoryExportWebHistory[];
+        this._exportWeb = {} as InventoryWebInfo;
+        this._exportWebHistory = [] as InventoryExportWebHistory[];
+        this._printList = [] as InventoryPrintForm[];
     };
 }

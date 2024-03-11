@@ -28,8 +28,11 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                 <BorderedCheckbox
                     name='Floorplanned'
                     checked={!!fpIsFloorplanned}
-                    onChange={({ target: { value } }) =>
-                        changeInventoryExtData({ key: "fpIsFloorplanned", value: !!value ? 0 : 1 })
+                    onChange={() =>
+                        changeInventoryExtData({
+                            key: "fpIsFloorplanned",
+                            value: !!fpIsFloorplanned ? 0 : 1,
+                        })
                     }
                 />
             </div>
@@ -37,21 +40,25 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                 <SearchInput
                     name='Floor'
                     title='Floorplan Company'
-                    //TODO: Add search input API here
+                    //TODO:missed search company API
                     value={fpFloorplanCompany}
+                    onChange={({ target: { value } }) => {
+                        changeInventoryExtData({
+                            key: "fpFloorplanCompany",
+                            value,
+                        });
+                    }}
                 />
             </div>
             <div className='col-3'>
                 <DateInput
                     name='Reduction Date'
-                    value={new Date(fpReductionDate)}
+                    date={fpReductionDate}
                     onChange={({ value }) => {
-                        if (value instanceof Date) {
-                            changeInventoryExtData({
-                                key: "fpReductionDate",
-                                value: value.getTime(),
-                            });
-                        }
+                        changeInventoryExtData({
+                            key: "fpReductionDate",
+                            value: Number(value),
+                        });
                     }}
                 />
             </div>
@@ -73,14 +80,12 @@ export const PurchaseFloorplan = observer((): ReactElement => {
             <div className='col-3'>
                 <DateInput
                     name='Pay Off By'
-                    value={new Date(fpPayoffBy)}
+                    date={fpPayoffBy}
                     onChange={({ value }) => {
-                        if (value instanceof Date) {
-                            changeInventoryExtData({
-                                key: "fpPayoffBy",
-                                value: value.getTime(),
-                            });
-                        }
+                        changeInventoryExtData({
+                            key: "fpPayoffBy",
+                            value: Number(value),
+                        });
                     }}
                 />
             </div>
