@@ -1,6 +1,6 @@
 import { Status } from "common/models/base-response";
 import { Contact, ExtData } from "common/models/contact";
-import { getContactInfo } from "http/services/contacts-service";
+import { getContactInfo, setContact } from "http/services/contacts-service";
 import { action, makeAutoObservable, observable } from "mobx";
 import { RootStore } from "store";
 
@@ -69,12 +69,33 @@ export class ContactStore {
         }
     };
 
-    public changeContact = action((key: keyof Omit<Contact, "extdata">, value: string | number) => {
-        this._contact[key] = value as never;
-    });
+    public changeContact = action(
+        (key: keyof Omit<Contact, "extdata">, value: string | number | string[]) => {
+            this._contact[key] = value as never;
+        }
+    );
 
     public changeContactExtData = action((key: keyof ExtData, value: string | number) => {
-        this._contact.extdata[key] = value as never;
+        this._contactExtData[key] = value as never;
+    });
+
+    public saveContact = action(async (): Promise<string | undefined> => {
+        try {
+            this._isLoading = true;
+            const contactData: Contact = {
+                ...this.contact,
+                extdata: this.contactExtData,
+            };
+            const inventoryResponse = await setContact(this._contactID, contactData);
+            await Promise.all([inventoryResponse]).then((response) =>
+                response.every((item) => item?.status === Status.OK) ? this._contactID : undefined
+            );
+        } catch (error) {
+            // TODO: add error handlers
+            return undefined;
+        } finally {
+            this._isLoading = false;
+        }
     });
 
     public setImagesDL = async (): Promise<any> => {
