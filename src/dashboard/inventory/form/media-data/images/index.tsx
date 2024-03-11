@@ -44,6 +44,7 @@ export const ImagesMedia = observer((): ReactElement => {
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
+    const fileUploadCheckbox = useRef<Checkbox>(null);
 
     useEffect(() => {
         if (images.length) {
@@ -266,15 +267,17 @@ export const ImagesMedia = observer((): ReactElement => {
                             })),
                         }}
                         cols={{ lg: 3, md: 3, sm: 3, xs: 2, xxs: 1 }}
+                        draggableCancel='.media-uploaded__checkbox, .media-images__close'
                         width={960}
                         rowHeight={20}
                     >
                         {images.map(({ itemuid, src }, index: number) => {
                             return (
-                                <div key={itemuid} className='media-images__item absolute'>
+                                <div key={itemuid} className='media-images__item'>
                                     {checked && (
                                         <Checkbox
                                             checked={imagesChecked[index]}
+                                            ref={fileUploadCheckbox}
                                             onChange={() => handleCheckedChange(index)}
                                             className='media-uploaded__checkbox'
                                         />
