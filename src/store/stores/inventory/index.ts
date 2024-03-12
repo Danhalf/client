@@ -28,6 +28,7 @@ import {
     setMediaItemData,
     getInventoryMediaItem,
     deleteMediaImage,
+    setMediaItemMeta,
 } from "http/services/media.service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
@@ -35,7 +36,9 @@ import { RootStore } from "store";
 export interface ImageItem {
     src: string;
     itemuid: string;
-    info?: Partial<InventoryMedia>;
+    info?: Partial<InventoryMedia> & {
+        order?: number;
+    };
 }
 
 interface UploadImageItem {
@@ -294,9 +297,17 @@ export class InventoryStore {
                 return inventoryResponse?.status === Status.OK ? this._inventoryID : undefined;
             }
             const webResponse = await setInventoryExportWeb(this._inventoryID, this._exportWeb);
+
             await Promise.all([inventoryResponse, webResponse]).then((response) =>
                 response.every((item) => item?.status === Status.OK) ? this._inventoryID : undefined
             );
+
+            // this._images.forEach(async (image) => {
+            //     await setMediaItemData(this._inventoryID, {
+            //         mediaitemuid: image.itemuid,
+            //         order: image.info?.order,
+            //     });
+            // });
         } catch (error) {
             // TODO: add error handlers
             return undefined;
@@ -344,6 +355,14 @@ export class InventoryStore {
         } finally {
             this._isLoading = false;
         }
+    });
+
+    public changeInventoryMediaOrder = action((list: { itemuid: string; order: number }[]) => {
+        list.forEach(async ({ itemuid, order }) => {
+            await setMediaItemMeta(itemuid, {
+                order,
+            });
+        });
     });
 
     public fetchImages = action(async () => {

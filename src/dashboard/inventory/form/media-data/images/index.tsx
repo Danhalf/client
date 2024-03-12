@@ -47,6 +47,7 @@ export const ImagesMedia = observer((): ReactElement => {
         isLoading,
         removeImage,
         fetchImages,
+        changeInventoryMediaOrder,
     } = store;
     const [checked, setChecked] = useState<boolean>(true);
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
@@ -231,6 +232,16 @@ export const ImagesMedia = observer((): ReactElement => {
         );
     };
 
+    const handleChangeOrder = (list: any) => {
+        const orderedList: any = [];
+        if (list) {
+            list.forEach((item: any) => {
+                orderedList.push({ itemuid: item.i, order: item.y + 1 * item.x + 1 });
+            });
+        }
+        changeInventoryMediaOrder(orderedList);
+    };
+
     const chooseOptions = {
         className: "media__button",
         label: "Choose from files",
@@ -303,6 +314,7 @@ export const ImagesMedia = observer((): ReactElement => {
                         isDraggable={true}
                         isDroppable={true}
                         className='layout w-full relative'
+                        onDragStop={handleChangeOrder}
                         layouts={{
                             lg: images.map(({ itemuid }, index: number) => ({
                                 i: itemuid,

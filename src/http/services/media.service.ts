@@ -90,7 +90,7 @@ export const uploadInventoryMedia = async (inventoryUid: string, inventoryData: 
 
 export const setMediaItemData = async (
     inventoryUid: string,
-    { mediaitemuid, type, notes }: Partial<InventoryMediaPostData>
+    { mediaitemuid, type, notes, order }: Partial<InventoryMediaPostData>
 ) => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
@@ -99,6 +99,27 @@ export const setMediaItemData = async (
                 mediaitemuid,
                 // type,
                 notes,
+                order,
+            }
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const setMediaItemMeta = async (
+    mediaitemuid: string,
+    { order }: Partial<InventoryMediaPostData>
+) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `media/${mediaitemuid}/meta`,
+            {
+                order,
             }
         );
 
