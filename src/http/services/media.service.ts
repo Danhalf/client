@@ -90,14 +90,14 @@ export const uploadInventoryMedia = async (inventoryUid: string, inventoryData: 
 
 export const setMediaItemData = async (
     inventoryUid: string,
-    { mediaitemuid, contenttype, notes }: Partial<InventoryMediaPostData>
+    { mediaitemuid, type, notes }: Partial<InventoryMediaPostData>
 ) => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
             `inventory/${inventoryUid}/media`,
             {
                 mediaitemuid,
-                contenttype,
+                // type,
                 notes,
             }
         );

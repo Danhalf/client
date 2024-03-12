@@ -9,8 +9,8 @@ import {
     InventoryExportWebHistory,
     InventoryPrintForm,
     Audit,
-    InventoryMediaInfo,
     InventoryMediaPostData,
+    InventoryMedia,
 } from "common/models/inventory";
 import { getAccountPayment } from "http/services/accounts.service";
 import {
@@ -28,7 +28,6 @@ import {
     setMediaItemData,
     getInventoryMediaItem,
     deleteMediaImage,
-    getInventoryMediaInfo,
 } from "http/services/media.service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
@@ -36,7 +35,7 @@ import { RootStore } from "store";
 export interface ImageItem {
     src: string;
     itemuid: string;
-    info?: InventoryMediaInfo;
+    info?: Partial<InventoryMedia>;
 }
 
 interface UploadImageItem {
@@ -145,11 +144,16 @@ export class InventoryStore {
         try {
             const response = await getInventoryMediaItemList(this._inventoryID);
             if (response && response.length > 0) {
-                response.forEach(({ contenttype, mediauid, itemuid }) => {
+                response.forEach(({ contenttype, mediauid, itemuid, ...info }) => {
                     if (mediauid) {
                         switch (contenttype) {
                             case 0:
                                 this._inventoryImagesID.push({ itemuid, mediauid });
+                                this._images.push({
+                                    src: "",
+                                    itemuid,
+                                    info,
+                                });
                                 break;
                             case 1:
                                 this._inventoryVideoID.push(mediauid);
@@ -319,7 +323,7 @@ export class InventoryStore {
                         if (uploadMediaResponse?.status === Status.OK) {
                             await setMediaItemData(this._inventoryID, {
                                 mediaitemuid: uploadMediaResponse.itemuid,
-                                contenttype: this._uploadFileImages.data.contenttype,
+                                type: this._uploadFileImages.data.type,
                                 notes: this._uploadFileImages.data.notes,
                             });
                         }
@@ -348,19 +352,18 @@ export class InventoryStore {
             this._inventoryImagesID = [];
             await this.getInventoryMedia();
 
-            const result: ImageItem[] = [];
+            const result: ImageItem[] = [...this._images];
 
             await Promise.all(
-                this._inventoryImagesID.map(async ({ mediauid, itemuid }) => {
+                this._inventoryImagesID.map(async ({ mediauid, itemuid }, index: number) => {
                     if (mediauid && itemuid) {
                         const responseSrc = await getInventoryMediaItem(mediauid);
-                        const responseData = await getInventoryMediaInfo(mediauid as string);
                         if (responseSrc) {
-                            result.push({
+                            result[index] = {
+                                info: result[index].info,
                                 itemuid,
                                 src: responseSrc,
-                                info: responseData || ({} as InventoryMediaInfo),
-                            });
+                            };
                         }
                     }
                 })

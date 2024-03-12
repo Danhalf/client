@@ -52,7 +52,6 @@ export const ImagesMedia = observer((): ReactElement => {
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
-    const fileUploadCheckbox = useRef<Checkbox>(null);
 
     useEffect(() => {
         if (images.length) {
@@ -76,7 +75,7 @@ export const ImagesMedia = observer((): ReactElement => {
             ...store.uploadFileImages,
             data: {
                 ...store.uploadFileImages.data,
-                contenttype: e.target.value,
+                type: e.target.value,
             },
         };
     };
@@ -261,7 +260,7 @@ export const ImagesMedia = observer((): ReactElement => {
                     optionLabel={"name"}
                     optionValue={"id"}
                     options={CATEGORIES}
-                    value={uploadFileImages?.data?.contenttype || 0}
+                    value={uploadFileImages?.data?.type || 0}
                     onChange={handleCategorySelect}
                 />
                 <InputText
@@ -318,13 +317,12 @@ export const ImagesMedia = observer((): ReactElement => {
                         width={960}
                         rowHeight={20}
                     >
-                        {images.map(({ itemuid, src }, index: number) => {
+                        {images.map(({ itemuid, src, info }, index: number) => {
                             return (
                                 <div key={itemuid} className='media-images__item'>
                                     {checked && (
                                         <Checkbox
                                             checked={imagesChecked[index]}
-                                            ref={fileUploadCheckbox}
                                             onChange={() => handleCheckedChange(index)}
                                             className='media-uploaded__checkbox'
                                         />
@@ -345,7 +343,13 @@ export const ImagesMedia = observer((): ReactElement => {
                                             <span className='image-info__icon'>
                                                 <i className='icon adms-category' />
                                             </span>
-                                            <span className='image-info__text--bold'>Exterior</span>
+                                            <span className='image-info__text--bold'>
+                                                {
+                                                    CATEGORIES.find(
+                                                        (category) => category.id === info?.type
+                                                    )?.name
+                                                }
+                                            </span>
                                         </div>
                                         <div className='image-info__item'>
                                             <span className='image-info__icon'>
@@ -353,16 +357,14 @@ export const ImagesMedia = observer((): ReactElement => {
                                                     <i className='icon adms-comment' />
                                                 </span>
                                             </span>
-                                            <span className='image-info__text'>
-                                                Renewed colour and new tires
-                                            </span>
+                                            <span className='image-info__text'>{info?.notes}</span>
                                         </div>
                                         <div className='image-info__item'>
                                             <span className='image-info__icon'>
                                                 <i className='icon adms-calendar' />
                                             </span>
                                             <span className='image-info__text'>
-                                                10/11/2023 08:51:39
+                                                {info?.created}
                                             </span>
                                         </div>
                                     </div>
