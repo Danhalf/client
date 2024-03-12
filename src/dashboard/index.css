@@ -18,8 +18,8 @@
 }
 
 .card-content__wrapper {
-    height: 46vh;
-    max-height: 704px;
+    height: 48vh;
+    max-height: 744px;
     overflow-y: scroll;
     overflow-x: hidden;
 }

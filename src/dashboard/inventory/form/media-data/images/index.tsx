@@ -18,7 +18,7 @@ import { Checkbox } from "primereact/checkbox";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { MediaLimitations } from "common/models/inventory";
 import { useParams } from "react-router-dom";
-import { Responsive as ResponsiveGridLayout } from "react-grid-layout";
+import { Responsive, WidthProvider } from "react-grid-layout";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -27,6 +27,8 @@ const limitations: MediaLimitations = {
     maxSize: 8,
     maxUpload: 16,
 };
+
+const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -253,7 +255,7 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length ? (
-                    <ResponsiveGridLayout
+                    <ResponsiveReactGridLayout
                         isDraggable={true}
                         isDroppable={true}
                         className='layout w-full relative'
@@ -268,7 +270,6 @@ export const ImagesMedia = observer((): ReactElement => {
                         }}
                         cols={{ lg: 3, md: 3, sm: 3, xs: 2, xxs: 1 }}
                         draggableCancel='.media-uploaded__checkbox, .media-images__close'
-                        width={960}
                         rowHeight={20}
                     >
                         {images.map(({ itemuid, src }, index: number) => {
@@ -328,7 +329,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                 </div>
                             );
                         })}
-                    </ResponsiveGridLayout>
+                    </ResponsiveReactGridLayout>
                 ) : (
                     <div className='w-full text-center'>No images added yet.</div>
                 )}
