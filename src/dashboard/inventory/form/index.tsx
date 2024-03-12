@@ -159,7 +159,7 @@ export const InventoryForm = observer(() => {
                             </div>
                         </div>
                         <div className='card-content inventory__card'>
-                            <div className='grid flex-nowrap'>
+                            <div className='grid flex-nowrap inventory__card-content'>
                                 <div className='p-0 card-content__wrapper'>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}

@@ -25,7 +25,7 @@
 }
 
 .card-content__wrapper::-webkit-scrollbar {
-    width: 2px;
+    width: 4px;
 }
 
 .card-content__title {
