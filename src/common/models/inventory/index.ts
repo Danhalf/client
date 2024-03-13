@@ -55,7 +55,7 @@ export interface InventoryExtData {
     fpReductionDate: number;
     fpReduxAmt: number;
     fpRemainBal: number;
-    inspDate: string;
+    inspDate: number;
     inspEmissions: number;
     inspNumber: string;
     inspSafety: number;
@@ -105,6 +105,7 @@ export interface InventoryExtData {
     purPurchaseCity: string;
     purPurchaseDate: number;
     purPurchasePhone: string;
+    purPurchaseEmail: string;
     purPurchaseZipCode: string;
     purPurchasedFrom: string;
     purSoldByLot: number;
@@ -112,11 +113,15 @@ export interface InventoryExtData {
     titleHolderName: string;
     titleHolderPayoff: string;
     titleHolderPhone: string;
+    titleHolderZIP: string;
+    titleHolderState: string;
     titleIsTradeIn: number;
     titleNumber: string;
     titlePrevAddress: string;
     titlePrevName: string;
     titlePrevPhone: string;
+    titlePrevZIP: string;
+    titlePrevState: string;
     titleReceived: number;
     titleReceivedDate: number;
     titleState: string;
@@ -195,13 +200,30 @@ export type InventoryOptionsInfo =
     | "Android Auto"
     | "Apple Car Play";
 
+export interface Audit {
+    NeedsInspection: number;
+    NeedsOilChange: number;
+    Floorplanned: number;
+    KeysMissing: number;
+    TitleMissing: number;
+    NotPaid: number;
+    DataNeedsUpdate: number;
+    NeedsCleaning: number;
+    ReadyForSale: number;
+    Sold: number;
+    JustArrived: number;
+}
+
 export interface Inventory {
+    Age: number;
     BodyStyle: string;
     Category: string;
     Cylinders: string;
+    DealerCertified: number;
     DriveLine: string;
     Engine: string;
     ExteriorColor: string;
+    FactoryCertified: number;
     GroupClass: number;
     GroupClassName: string;
     InteriorColor: string;
@@ -209,6 +231,7 @@ export interface Inventory {
     Model: string;
     Notes: string;
     Options: number;
+    Price: number;
     Status: string;
     StockNo: string;
     Transmission: string;
@@ -217,16 +240,15 @@ export interface Inventory {
     VINimageUID: string;
     Year: string;
     created: string;
-    extdata?: InventoryExtData;
     itemuid: string;
-    mileage: number;
+    mileage: string;
     name: string;
+    options_codes?: unknown;
     options_info?: InventoryOptionsInfo[];
-    FactoryCertified: number;
-    DealerCertified: number;
-    status: string;
     updated: string;
     useruid: string;
+    extdata?: InventoryExtData;
+    Audit?: Audit;
 }
 
 export interface TotalInventoryList extends BaseResponse {
@@ -298,4 +320,23 @@ export interface InventoryPrintForm {
     state: string;
     type: string;
     version: string;
+}
+
+export interface InventoryLocations {
+    created: string;
+    index: number;
+    locEmail1: string;
+    locEmail2: string;
+    locManager1: string;
+    locManager2: string;
+    locName: string;
+    locPhone1: string;
+    locPhone2: string;
+    locState: string;
+    locStreetAddress: string;
+    locWeb: string;
+    locZIP: string;
+    locationuid: string;
+    updated: string;
+    useruid: string;
 }

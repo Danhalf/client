@@ -14,18 +14,18 @@
     margin-bottom: 30px;
     display: flex;
     align-items: center;
-    gap: 150px;
+    gap: 4.6rem;
 }
 
 .card-content__wrapper {
-    height: 40vh;
-    max-height: 704px;
+    height: 48vh;
+    max-height: 744px;
     overflow-y: scroll;
     overflow-x: hidden;
 }
 
 .card-content__wrapper::-webkit-scrollbar {
-    width: 2px;
+    width: 4px;
 }
 
 .card-content__title {
@@ -139,6 +139,16 @@
 
 .p-datatable.p-datatable-gridlines .p-paginator-bottom {
     border: none;
+}
+
+.p-float-label input.p-filled ~ label,
+.p-inputtext:enabled:focus + .float-label,
+.p-float-label .p-inputwrapper-filled ~ label {
+    top: 0;
+    left: 4px;
+    color: var(--admss-app-medium-grey);
+    margin-top: -16px;
+    font-size: 12px;
 }
 
 @media screen and (min-width: 992px) {

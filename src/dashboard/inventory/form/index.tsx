@@ -45,7 +45,7 @@ export const InventoryForm = observer(() => {
 
     const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
-    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number>(0);
+    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [reason, setReason] = useState<string>("");
     const [comment, setComment] = useState<string>("");
@@ -91,7 +91,11 @@ export const InventoryForm = observer(() => {
     useEffect(() => {
         ACCORDION_STEPS.forEach((step, index) => {
             if (step - 1 < stepActiveIndex) {
-                return setAccordionActiveIndex(index);
+                return setAccordionActiveIndex((prev) => {
+                    const updatedArray = Array.isArray(prev) ? [...prev] : [0];
+                    updatedArray[index] = index;
+                    return updatedArray;
+                });
             }
         });
         if (
@@ -138,7 +142,7 @@ export const InventoryForm = observer(() => {
                 />
                 <div className='col-12'>
                     <div className='card inventory'>
-                        <div className='card-header'>
+                        <div className='card-header flex'>
                             <h2 className='card-header__title uppercase m-0'>
                                 {id ? "Edit" : "Create new"} inventory
                             </h2>
@@ -155,14 +159,13 @@ export const InventoryForm = observer(() => {
                             </div>
                         </div>
                         <div className='card-content inventory__card'>
-                            <div className='grid flex-nowrap'>
+                            <div className='grid flex-nowrap inventory__card-content'>
                                 <div className='p-0 card-content__wrapper'>
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
-                                        onTabChange={(e) =>
-                                            setAccordionActiveIndex(Number(e.index))
-                                        }
+                                        onTabChange={(e) => setAccordionActiveIndex(e.index)}
                                         className='inventory__accordion'
+                                        multiple
                                     >
                                         {inventorySections.map((section) => (
                                             <AccordionTab
