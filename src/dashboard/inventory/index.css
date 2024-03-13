@@ -187,3 +187,7 @@
     color: var(--admss-app-primary);
     background-color: var(--admss-app-light-blue);
 }
+
+.inventory-filter .p-multiselect-item.p-disabled {
+    font-weight: 900;
+}
