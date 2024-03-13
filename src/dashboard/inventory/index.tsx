@@ -54,7 +54,7 @@ const createStringifySearchQuery = (obj: Record<string, string>): string => {
         .map(([key, value], index) => {
             if (value.includes("-")) {
                 const [wordFrom, wordTo] = value.split("-");
-                return `${wordFrom}.${wordTo}.${key}`;
+                return `${index > 0 ? "+" : ""}${wordFrom}.${wordTo}.${key}`;
             }
             return `${index > 0 ? "+" : ""}${value}.${key}`;
         })
@@ -79,7 +79,7 @@ const filterOptions: FilterOptions[] = [
     { label: "0 to 30 days", column: "Age", value: "0-30" },
     { label: "31 to 60 days", column: "Age", value: "31-60" },
     { label: "61 to 90 days", column: "Age", value: "61-90" },
-    { label: "90+ days", column: "Age", value: "90+" },
+    { label: "90+ days", column: "Age", value: "over90" },
     { label: "Body", value: "body", bold: true, disabled: true },
     { label: "Trucks", column: "BodyStyle", value: "trucks" },
     { label: "SUVs", column: "BodyStyle", value: "suv" },
@@ -131,7 +131,10 @@ export default function Inventories(): ReactElement {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
     const [selectedFilter, setSelectedFilter] = useState<FilterOptions[]>([]);
-    const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[]>([]);
+    const [selectedFilterOptions, setSelectedFilterOptions] = useState<Record<
+        keyof Inventory,
+        string
+    > | null>(null);
 
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(columns);
 
@@ -268,28 +271,20 @@ export default function Inventories(): ReactElement {
         },
     ];
 
-    const hanldeFilterSelect = (key: keyof Inventory, value: string) => {
-        handleSetAdvancedSearch(key, value);
-    };
-
     useEffect(() => {
-        selectedFilterOptions.length &&
-            selectedFilterOptions.forEach((option) => {
-                const { column, value } = option;
-                hanldeFilterSelect(column as keyof Inventory, value);
-                const params: QueryParams = {
-                    ...(lazyState.sortOrder === 1 && { type: "asc" }),
-                    ...(lazyState.sortOrder === -1 && { type: "desc" }),
-                    ...(value && {
-                        qry: createStringifySearchQuery({
-                            column: value,
-                        }),
-                    }),
-                    skip: lazyState.first,
-                    top: lazyState.rows,
-                };
-                handleGetInventoryList(params);
-            });
+        if (selectedFilterOptions) {
+            const qry = createStringifySearchQuery(selectedFilterOptions);
+            const params: QueryParams = {
+                ...(lazyState.sortOrder === 1 && { type: "asc" }),
+                ...(lazyState.sortOrder === -1 && { type: "desc" }),
+                ...{
+                    qry,
+                },
+                skip: lazyState.first,
+                top: lazyState.rows,
+            };
+            handleGetInventoryList(params);
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedFilterOptions]);
 
@@ -302,7 +297,13 @@ export default function Inventories(): ReactElement {
                     options={filterOptions}
                     value={selectedFilter}
                     onChange={(evt: MultiSelectChangeEvent) => {
-                        setSelectedFilterOptions((prev) => [...prev, evt.selectedOption]);
+                        setSelectedFilterOptions((prev: any) => {
+                            return {
+                                ...prev,
+                                [evt.selectedOption.column as keyof Inventory]:
+                                    evt.selectedOption.value,
+                            };
+                        });
                         return setSelectedFilter(evt.value);
                     }}
                     placeholder='Filter'
