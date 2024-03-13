@@ -70,7 +70,6 @@ interface FilterOptions {
 }
 
 const filterOptions: FilterOptions[] = [
-    { label: "Select All", value: "", bold: true },
     { label: "Status", value: "status", bold: true, disabled: true },
     { label: "All", value: "all", column: "Status" },
     { label: "Current (not sold)", column: "Status", value: "current" },
@@ -307,12 +306,16 @@ export default function Inventories(): ReactElement {
                         return setSelectedFilter(evt.value);
                     }}
                     placeholder='Filter'
-                    className='w-full pb-0 h-full flex align-items-center'
+                    className='w-full pb-0 h-full flex align-items-center inventory-filter'
                     display='chip'
-                    filter
+                    // showSelectAll={false}
+                    selectedItemsLabel='Clear Filter'
                     pt={{
+                        header: {
+                            className: "inventory-filter__header",
+                        },
                         wrapper: {
-                            className: "inventory-filter",
+                            className: "inventory-filter__wrapper",
                         },
                     }}
                 />
@@ -323,8 +326,14 @@ export default function Inventories(): ReactElement {
                     options={columns}
                     optionLabel='header'
                     onChange={onColumnToggle}
-                    className='w-full pb-0 h-full flex align-items-center'
+                    showSelectAll={false}
+                    className='w-full pb-0 h-full flex align-items-center column-pocker'
                     display='chip'
+                    pt={{
+                        header: {
+                            className: "column-picker__header",
+                        },
+                    }}
                 />
             </div>
             <div className='col-2'>
