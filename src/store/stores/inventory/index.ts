@@ -412,6 +412,7 @@ export class InventoryStore {
             this._isLoading = true;
             try {
                 await deleteMediaImage(imageuid);
+                this._images = [];
                 await this.fetchImages();
             } catch (error) {
                 // TODO: add error handler
@@ -435,6 +436,7 @@ export class InventoryStore {
         this._inventoryOptions = [];
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
+        this._images = [];
         this._exportWeb = {} as InventoryWebInfo;
         this._exportWebHistory = [] as InventoryExportWebHistory[];
         this._printList = [] as InventoryPrintForm[];
