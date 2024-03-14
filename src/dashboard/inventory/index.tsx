@@ -52,10 +52,6 @@ const createStringifySearchQuery = (obj: Record<string, string>): string => {
 
     return Object.entries(filteredObj)
         .map(([key, value], index) => {
-            if (value.includes("-")) {
-                const [wordFrom, wordTo] = value.split("-");
-                return `${index > 0 ? "+" : ""}${wordFrom}.${wordTo}.${key}`;
-            }
             return `${index > 0 ? "+" : ""}${value}.${key}`;
         })
         .join("");
@@ -130,10 +126,9 @@ export default function Inventories(): ReactElement {
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
     const [selectedFilter, setSelectedFilter] = useState<FilterOptions[]>([]);
-    const [selectedFilterOptions, setSelectedFilterOptions] = useState<Record<
-        keyof Inventory,
-        string
-    > | null>(null);
+    const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
+        null
+    );
 
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(columns);
 
@@ -272,7 +267,15 @@ export default function Inventories(): ReactElement {
 
     useEffect(() => {
         if (selectedFilterOptions) {
-            const qry = createStringifySearchQuery(selectedFilterOptions);
+            let qry: string = "";
+            selectedFilterOptions.forEach((option, index) => {
+                const { column, value } = option;
+                if (value.includes("-")) {
+                    const [wordFrom, wordTo] = value.split("-");
+                    return (qry += `${index > 0 ? "+" : ""}${wordFrom}.${wordTo}.${column}`);
+                }
+                qry += `${index > 0 ? "+" : ""}${value}.${column}`;
+            });
             const params: QueryParams = {
                 ...(lazyState.sortOrder === 1 && { type: "asc" }),
                 ...(lazyState.sortOrder === -1 && { type: "desc" }),
@@ -295,15 +298,12 @@ export default function Inventories(): ReactElement {
                     optionLabel='label'
                     options={filterOptions}
                     value={selectedFilter}
-                    onChange={(evt: MultiSelectChangeEvent) => {
-                        setSelectedFilterOptions((prev: any) => {
-                            return {
-                                ...prev,
-                                [evt.selectedOption.column as keyof Inventory]:
-                                    evt.selectedOption.value,
-                            };
-                        });
-                        return setSelectedFilter(evt.value);
+                    onChange={({ value }: MultiSelectChangeEvent) => {
+                        const selectedOptions = filterOptions.filter((option) =>
+                            value.includes(option.value)
+                        );
+                        setSelectedFilterOptions(selectedOptions);
+                        setSelectedFilter(value);
                     }}
                     placeholder='Filter'
                     className='w-full pb-0 h-full flex align-items-center inventory-filter'
