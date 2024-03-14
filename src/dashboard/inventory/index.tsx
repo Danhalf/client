@@ -308,7 +308,6 @@ export default function Inventories(): ReactElement {
                     placeholder='Filter'
                     className='w-full pb-0 h-full flex align-items-center inventory-filter'
                     display='chip'
-                    // showSelectAll={false}
                     selectedItemsLabel='Clear Filter'
                     pt={{
                         header: {
@@ -327,7 +326,7 @@ export default function Inventories(): ReactElement {
                     optionLabel='header'
                     onChange={onColumnToggle}
                     showSelectAll={false}
-                    className='w-full pb-0 h-full flex align-items-center column-pocker'
+                    className='w-full pb-0 h-full flex align-items-center column-picker'
                     display='chip'
                     pt={{
                         header: {

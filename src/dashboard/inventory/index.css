@@ -192,6 +192,10 @@
     font-weight: 900;
 }
 
+.inventory-filter__wrapper .p-multiselect-item.p-disabled .p-checkbox {
+    display: none;
+}
+
 .column-picker__header.p-multiselect-header {
     display: none;
 }
