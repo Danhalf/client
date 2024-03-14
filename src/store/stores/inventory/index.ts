@@ -328,7 +328,7 @@ export class InventoryStore {
                         if (uploadMediaResponse?.status === Status.OK) {
                             await setMediaItemData(this._inventoryID, {
                                 mediaitemuid: uploadMediaResponse.itemuid,
-                                contenttype: this._uploadFileImages.data.type,
+                                contenttype: this._uploadFileImages.data.contenttype,
                                 notes: this._uploadFileImages.data.notes,
                             });
                         }

@@ -78,7 +78,7 @@ export const ImagesMedia = observer((): ReactElement => {
             ...store.uploadFileImages,
             data: {
                 ...store.uploadFileImages.data,
-                type: e.target.value,
+                contenttype: e.target.value,
             },
         };
     };
@@ -273,7 +273,7 @@ export const ImagesMedia = observer((): ReactElement => {
                     optionLabel={"name"}
                     optionValue={"id"}
                     options={CATEGORIES}
-                    value={uploadFileImages?.data?.type || 0}
+                    value={uploadFileImages?.data?.contenttype || 0}
                     onChange={handleCategorySelect}
                 />
                 <InputText
