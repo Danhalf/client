@@ -359,7 +359,8 @@ export const ImagesMedia = observer((): ReactElement => {
                                             <span className='image-info__text--bold'>
                                                 {
                                                     CATEGORIES.find(
-                                                        (category) => category.id === info?.type
+                                                        (category) =>
+                                                            category.id === info?.contenttype
                                                     )?.name
                                                 }
                                             </span>

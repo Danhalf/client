@@ -1,5 +1,6 @@
 import { AccountPayment } from "common/models/accounts";
 import { Status } from "common/models/base-response";
+import { MediaType } from "common/models/enums";
 import {
     Inventory,
     InventoryOptionsInfo,
@@ -147,10 +148,10 @@ export class InventoryStore {
         try {
             const response = await getInventoryMediaItemList(this._inventoryID);
             if (response && response.length > 0) {
-                response.forEach(({ contenttype, mediauid, itemuid, ...info }) => {
+                response.forEach(({ type, mediauid, itemuid, ...info }) => {
                     if (mediauid) {
-                        switch (contenttype) {
-                            case 0:
+                        switch (type) {
+                            case MediaType.mtPhoto:
                                 this._inventoryImagesID.push({ itemuid, mediauid });
                                 this._images.push({
                                     src: "",
@@ -158,13 +159,13 @@ export class InventoryStore {
                                     info,
                                 });
                                 break;
-                            case 1:
+                            case MediaType.mtVideo:
                                 this._inventoryVideoID.push(mediauid);
                                 break;
-                            case 2:
+                            case MediaType.mtAudio:
                                 this._inventoryAudioID.push(mediauid);
                                 break;
-                            case 3:
+                            case MediaType.mtDocument:
                                 this._inventoryDocumentsID.push(mediauid);
                                 break;
                             default:
@@ -327,7 +328,7 @@ export class InventoryStore {
                         if (uploadMediaResponse?.status === Status.OK) {
                             await setMediaItemData(this._inventoryID, {
                                 mediaitemuid: uploadMediaResponse.itemuid,
-                                type: this._uploadFileImages.data.type,
+                                contenttype: this._uploadFileImages.data.type,
                                 notes: this._uploadFileImages.data.notes,
                             });
                         }
