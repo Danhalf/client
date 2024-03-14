@@ -353,9 +353,8 @@ export class InventoryStore {
 
     public changeInventoryMediaOrder = action((list: { itemuid: string; order: number }[]) => {
         list.forEach(async ({ itemuid, order }) => {
-            const currentImage = this._images.find((image) => image.itemuid === itemuid);
             await setMediaItemData(this._inventoryID, {
-                mediaitemuid: currentImage?.mediauid,
+                itemuid,
                 order,
             });
         });
