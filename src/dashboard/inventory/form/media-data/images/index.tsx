@@ -16,9 +16,9 @@ import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
-import { MediaLimitations } from "common/models/inventory";
+import { InventoryMediaPostData, MediaLimitations } from "common/models/inventory";
 import { useParams } from "react-router-dom";
-import { Responsive, WidthProvider } from "react-grid-layout";
+import { Layout, Responsive, WidthProvider } from "react-grid-layout";
 import { ContentType } from "common/models/enums";
 
 const limitations: MediaLimitations = {
@@ -234,10 +234,10 @@ export const ImagesMedia = observer((): ReactElement => {
         );
     };
 
-    const handleChangeOrder = (list: any) => {
-        const orderedList: any = [];
+    const handleChangeOrder = (list: Layout[]) => {
+        const orderedList: Pick<InventoryMediaPostData, "itemuid" | "order">[] = [];
         if (list) {
-            list.forEach((item: any) => {
+            list.forEach((item: Layout) => {
                 orderedList.push({ itemuid: item.i, order: item.y + 1 * item.x + 1 });
             });
         }
@@ -316,7 +316,7 @@ export const ImagesMedia = observer((): ReactElement => {
                         isDraggable={true}
                         isDroppable={true}
                         className='layout w-full relative'
-                        onDragStop={handleChangeOrder}
+                        onDragStop={(item) => handleChangeOrder(item)}
                         layouts={{
                             lg: images.map(({ itemuid }, index: number) => ({
                                 i: itemuid,

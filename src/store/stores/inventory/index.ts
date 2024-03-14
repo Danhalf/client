@@ -351,14 +351,21 @@ export class InventoryStore {
         }
     });
 
-    public changeInventoryMediaOrder = action((list: { itemuid: string; order: number }[]) => {
-        list.forEach(async ({ itemuid, order }) => {
-            await setMediaItemData(this._inventoryID, {
-                itemuid,
-                order,
+    public changeInventoryMediaOrder = action(
+        (list: Pick<InventoryMediaPostData, "itemuid" | "order">[]) => {
+            list.forEach(async ({ itemuid, order }) => {
+                const currentMedia = this._images.find((image) => image.itemuid === itemuid);
+                if (currentMedia?.mediauid && currentMedia?.info) {
+                    await setMediaItemData(this._inventoryID, {
+                        mediaitemuid: currentMedia?.mediauid,
+                        ...currentMedia.info,
+                        itemuid,
+                        order,
+                    });
+                }
             });
-        });
-    });
+        }
+    );
 
     public fetchImages = action(async () => {
         try {
