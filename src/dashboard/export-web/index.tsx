@@ -316,7 +316,7 @@ export const ExportToWeb = () => {
                                             );
                                         }}
                                     />
-                                    {columns.map(({ field, header }) => (
+                                    {activeColumns.map(({ field, header }) => (
                                         <Column
                                             field={field}
                                             header={header}
