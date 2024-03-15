@@ -316,7 +316,7 @@ export default function Inventories(): ReactElement {
                         wrapper: {
                             className: "inventory-filter__wrapper",
                             style: {
-                                maxHeight: "440px",
+                                maxHeight: "500px",
                             },
                         },
                     }}
