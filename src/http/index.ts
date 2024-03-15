@@ -26,10 +26,6 @@ const handleErrorResponse = (error: any, navigate: any) => {
         localStorage.removeItem("useruid");
         navigate("/");
         return Promise.reject(error.response);
-    } else if (error.response && error.response.status === 500) {
-        return Promise.reject(error.response);
-    } else {
-        return Promise.reject(error);
     }
 };
 
