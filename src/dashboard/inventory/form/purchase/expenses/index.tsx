@@ -22,6 +22,7 @@ import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { Contact } from "common/models/contact";
+import { Checkbox } from "primereact/checkbox";
 
 export const PurchaseExpenses = observer((): ReactElement => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -184,13 +185,31 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
+                        pt={{
+                            wrapper: {
+                                className: "overflow-x-hidden",
+                            },
+                        }}
                     >
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            body={() => {
+                                return (
+                                    <div className='flex gap-3 align-items-center'>
+                                        <i className='icon adms-edit-item cursor-pointer export-web__icon' />
+                                        <i className='pi pi-angle-down' />
+                                    </div>
+                                );
+                            }}
+                        />
                         {renderColumnsData.map(({ field, header }) => (
                             <Column
                                 field={field}
                                 header={header}
                                 key={field}
                                 headerClassName='cursor-move'
+                                className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                pt={{}}
                             />
                         ))}
                         <Column style={{ flex: "0 0 4rem" }} body={deleteTemplate}></Column>
