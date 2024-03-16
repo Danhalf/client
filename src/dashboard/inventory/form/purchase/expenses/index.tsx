@@ -91,6 +91,20 @@ export const PurchaseExpenses = observer((): ReactElement => {
         setExpensesItem({ expenseuid: "0", expenseData }).then(() => getExpenses());
     };
 
+    const deleteTemplate = ({ itemuid }: Expenses) => {
+        return (
+            <Button
+                type='button'
+                icon='icon adms-trash-can'
+                className='purchase-expenses__delete-button p-button-text'
+                onClick={() => {
+                    // eslint-disable-next-line no-console
+                    console.log(itemuid);
+                }}
+            />
+        );
+    };
+
     return (
         <>
             <div className='grid purchase-expenses'>
@@ -179,6 +193,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 headerClassName='cursor-move'
                             />
                         ))}
+                        <Column style={{ flex: "0 0 4rem" }} body={deleteTemplate}></Column>
                     </DataTable>
                 </div>
                 <div className='col-12 total-sum'>
