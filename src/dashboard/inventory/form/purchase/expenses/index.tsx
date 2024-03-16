@@ -11,6 +11,7 @@ import { ListData } from "http/services/inventory-service";
 import { useParams } from "react-router-dom";
 import { Expenses } from "common/models/expenses";
 import {
+    deleteExpensesItem,
     getExpensesList,
     getExpensesListTypes,
     getExpensesListVendors,
@@ -98,8 +99,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                 icon='icon adms-trash-can'
                 className='purchase-expenses__delete-button p-button-text'
                 onClick={() => {
-                    // eslint-disable-next-line no-console
-                    console.log(itemuid);
+                    deleteExpensesItem(itemuid).then(() => getExpenses());
                 }}
             />
         );
