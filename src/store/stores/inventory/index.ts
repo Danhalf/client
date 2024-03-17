@@ -110,6 +110,18 @@ export class InventoryStore {
     public get images() {
         return this._images;
     }
+    public get uploadFileVideos() {
+        return this._uploadFileVideos;
+    }
+    public get videos() {
+        return this._videos;
+    }
+    public get uploadFileAudios() {
+        return this._uploadFileAudios;
+    }
+    public get audios() {
+        return this._audios;
+    }
 
     public get inventoryExportWebHistory() {
         return this._exportWebHistory;
@@ -342,7 +354,7 @@ export class InventoryStore {
                         formData.append("file", file);
 
                         try {
-                            const createMediaResponse = await createMediaItemRecord();
+                            const createMediaResponse = await createMediaItemRecord(mediaType);
                             if (createMediaResponse?.status === Status.OK) {
                                 const uploadMediaResponse = await uploadInventoryMedia(
                                     createMediaResponse.itemUID,
@@ -351,8 +363,10 @@ export class InventoryStore {
                                 if (uploadMediaResponse?.status === Status.OK) {
                                     await setMediaItemData(this._inventoryID, {
                                         mediaitemuid: uploadMediaResponse.itemuid,
-                                        contenttype: this._uploadFileImages.data.contenttype,
-                                        notes: this._uploadFileImages.data.notes,
+                                        contenttype: (currentMt.get(mediaType) as UploadMediaItem)
+                                            .data.contenttype,
+                                        notes: (currentMt.get(mediaType) as UploadMediaItem).data
+                                            .notes,
                                     });
                                 }
                             }
@@ -391,6 +405,18 @@ export class InventoryStore {
             this._videos = [];
             await this.saveInventoryMedia(MediaType.mtVideo);
             this._uploadFileVideos = {} as UploadMediaItem;
+            this.fetchImages();
+            return Status.OK;
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
+        }
+    });
+    public saveInventoryAudios = action(async (): Promise<Status | undefined> => {
+        try {
+            this._audios = [];
+            await this.saveInventoryMedia(MediaType.mtAudio);
+            this._uploadFileAudios = {} as UploadMediaItem;
             this.fetchImages();
             return Status.OK;
         } catch (error) {
@@ -526,6 +552,10 @@ export class InventoryStore {
         this._inventoryExtData = {} as InventoryExtData;
         this._inventoryImagesID = [];
         this._images = [];
+        this._inventoryVideoID = [];
+        this._videos = [];
+        this._inventoryAudioID = [];
+        this._audios = [];
         this._exportWeb = {} as InventoryWebInfo;
         this._exportWebHistory = [] as InventoryExportWebHistory[];
         this._printList = [] as InventoryPrintForm[];
