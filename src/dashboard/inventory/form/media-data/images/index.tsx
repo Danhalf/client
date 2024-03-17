@@ -47,7 +47,7 @@ export const ImagesMedia = observer((): ReactElement => {
         uploadFileImages,
         images,
         isLoading,
-        removeImage,
+        removeMedia,
         fetchImages,
         changeInventoryMediaOrder,
     } = store;
@@ -134,7 +134,7 @@ export const ImagesMedia = observer((): ReactElement => {
     };
 
     const handleDeleteImage = (mediauid: string) => {
-        removeImage(mediauid);
+        removeMedia(mediauid);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
