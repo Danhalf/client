@@ -155,7 +155,6 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                 style={{ width: "75vw" }}
                 maximizable
                 modal
-                contentStyle={{ height: "70vh" }}
                 onHide={() => setDialogVisible(false)}
             >
                 <ContactsDataTable onRowClick={handleOnRowClick} />

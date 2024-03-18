@@ -162,6 +162,8 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                         showGridlines
                         value={contacts}
                         lazy
+                        scrollable
+                        scrollHeight='70vh'
                         paginator
                         first={lazyState.first}
                         rows={lazyState.rows}
