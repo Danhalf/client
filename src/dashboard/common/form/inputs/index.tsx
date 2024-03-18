@@ -1,12 +1,10 @@
-import { FormEventHandler, LegacyRef, ReactElement, Ref, useEffect, useRef, useState } from "react";
+import { LegacyRef, ReactElement, useEffect, useRef, useState } from "react";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
 import { Checkbox, CheckboxProps } from "primereact/checkbox";
 import { Calendar, CalendarProps } from "primereact/calendar";
-import { Dropdown, DropdownChangeEvent, DropdownProps } from "primereact/dropdown";
-import { getContacts } from "http/services/contacts-service";
-import { InputTextProps } from "primereact/inputtext";
+import { Dropdown, DropdownProps } from "primereact/dropdown";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -119,17 +117,23 @@ export const BorderedCheckbox = ({
     );
 };
 
+interface SearchInputProps extends DropdownProps {
+    onInputChange?: (value: string) => void;
+    onIconClick?: () => void;
+}
+
 export const SearchInput = ({
     height = "50px",
     title,
     onInputChange,
+    onIconClick,
     ...props
-}: DropdownProps & { onInputChange?: (value: string) => void }): ReactElement => {
+}: SearchInputProps): ReactElement => {
     const dropdownRef: LegacyRef<any> = useRef(null);
 
     const handleOnInputChange = ({ target }: any) => {
-        const { value } = target as any;
-        if (onInputChange && value && value.length > 1) {
+        const { value } = target as DropdownProps;
+        if (onInputChange && value) {
             dropdownRef.current.show();
             onInputChange(value);
         } else {
@@ -161,7 +165,7 @@ export const SearchInput = ({
                 />
                 <label className='float-label search-input__label'>{title}</label>
             </span>
-            <div className='search-input__icon input-icon input-icon-right'>
+            <div className='search-input__icon input-icon input-icon-right' onClick={onIconClick}>
                 <i className='icon adms-table' />
             </div>
         </div>

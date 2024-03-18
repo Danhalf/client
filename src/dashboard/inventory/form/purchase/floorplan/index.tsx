@@ -7,11 +7,12 @@ import {
     DateInput,
     SearchInput,
 } from "dashboard/common/form/inputs";
+import { ContactsDataTable } from "dashboard/contacts";
 import { AuthUser } from "http/services/auth.service";
 import { getContacts } from "http/services/contacts-service";
 import { observer } from "mobx-react-lite";
-import { InputTextProps } from "primereact/inputtext";
-import { FormEvent, ReactElement, useEffect, useState } from "react";
+import { Dialog } from "primereact/dialog";
+import { ReactElement, useEffect, useState } from "react";
 import { getKeyValue } from "services/local-storage.service";
 import { useStore } from "store/hooks";
 
@@ -20,6 +21,7 @@ const FIELD: keyof ContactUser = "companyName";
 export const PurchaseFloorplan = observer((): ReactElement => {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [options, setOptions] = useState<ContactUser[]>([]);
+    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const store = useStore().inventoryStore;
     const {
         inventoryExtData: {
@@ -52,6 +54,14 @@ export const PurchaseFloorplan = observer((): ReactElement => {
             });
     };
 
+    const handleOnRowClick = (companyName: string) => {
+        changeInventoryExtData({
+            key: "fpFloorplanCompany",
+            value: companyName,
+        });
+        setDialogVisible(false);
+    };
+
     return (
         <div className='grid purchase-floorplan row-gap-2'>
             <div className='col-3'>
@@ -80,6 +90,9 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                             key: "fpFloorplanCompany",
                             value,
                         });
+                    }}
+                    onIconClick={() => {
+                        setDialogVisible(true);
                     }}
                 />
             </div>
@@ -136,6 +149,17 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                     }
                 />
             </div>
+            <Dialog
+                header={<div className='uppercase'>Inventory</div>}
+                visible={dialogVisible}
+                style={{ width: "75vw" }}
+                maximizable
+                modal
+                contentStyle={{ height: "70vh" }}
+                onHide={() => setDialogVisible(false)}
+            >
+                <ContactsDataTable onRowClick={handleOnRowClick} />
+            </Dialog>
         </div>
     );
 });
