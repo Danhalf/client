@@ -3,8 +3,8 @@ import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereac
 import "./index.css";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
 import { Checkbox, CheckboxProps } from "primereact/checkbox";
-import { InputText, InputTextProps } from "primereact/inputtext";
 import { Calendar, CalendarProps } from "primereact/calendar";
+import { Dropdown, DropdownProps } from "primereact/dropdown";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -117,26 +117,34 @@ export const BorderedCheckbox = ({
     );
 };
 
-export const SearchInput = ({
-    name,
-    height = "50px",
-    title,
-    ...props
-}: InputTextProps): ReactElement => {
+export const SearchInput = ({ height = "50px", title, ...props }: DropdownProps): ReactElement => {
     return (
         <div
-            key={name}
+            key={props.name}
             style={{
                 height,
             }}
             className='flex align-items-center search-input'
         >
             <span className='p-float-label search-input__wrapper'>
-                <InputText {...props} />
+                <Dropdown
+                    value={"dd"}
+                    onChange={() => {}}
+                    options={[{ name: "dd" }]}
+                    optionLabel='name'
+                    editable
+                    placeholder='Select a City'
+                    {...props}
+                    pt={{
+                        trigger: {
+                            className: "hidden",
+                        },
+                    }}
+                />
                 <label className='float-label search-input__label'>{title}</label>
             </span>
             <div className='search-input__icon input-icon input-icon-right'>
-                <i className='adms-search' />
+                <i className='icon adms-table' />
             </div>
         </div>
     );
