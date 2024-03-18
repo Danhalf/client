@@ -1,14 +1,25 @@
+import { LS_APP_USER } from "common/constants/localStorage";
+import { ContactUser } from "common/models/contact";
+import { QueryParams } from "common/models/query-params";
 import {
     BorderedCheckbox,
     CurrencyInput,
     DateInput,
     SearchInput,
 } from "dashboard/common/form/inputs";
+import { AuthUser } from "http/services/auth.service";
+import { getContacts } from "http/services/contacts-service";
 import { observer } from "mobx-react-lite";
-import { ReactElement } from "react";
+import { InputTextProps } from "primereact/inputtext";
+import { FormEvent, ReactElement, useEffect, useState } from "react";
+import { getKeyValue } from "services/local-storage.service";
 import { useStore } from "store/hooks";
 
+const FIELD: keyof ContactUser = "companyName";
+
 export const PurchaseFloorplan = observer((): ReactElement => {
+    const [user, setUser] = useState<AuthUser | null>(null);
+    const [options, setOptions] = useState<ContactUser[]>([]);
     const store = useStore().inventoryStore;
     const {
         inventoryExtData: {
@@ -21,6 +32,25 @@ export const PurchaseFloorplan = observer((): ReactElement => {
         },
         changeInventoryExtData,
     } = store;
+
+    useEffect(() => {
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        setUser(authUser);
+    }, []);
+
+    const handleCompanyInputChange = (searchValue: string): void => {
+        const params: QueryParams = {
+            qry: `${searchValue}.${FIELD}`,
+        };
+        user &&
+            getContacts(user.useruid, params).then((response) => {
+                if (response?.length) {
+                    setOptions(response);
+                } else {
+                    setOptions([]);
+                }
+            });
+    };
 
     return (
         <div className='grid purchase-floorplan row-gap-2'>
@@ -40,7 +70,10 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                 <SearchInput
                     name='Floor'
                     title='Floorplan Company'
-                    //TODO:missed search company API
+                    optionValue={FIELD}
+                    optionLabel={FIELD}
+                    options={options}
+                    onInputChange={handleCompanyInputChange}
                     value={fpFloorplanCompany}
                     onChange={({ target: { value } }) => {
                         changeInventoryExtData({

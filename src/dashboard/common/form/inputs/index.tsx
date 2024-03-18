@@ -1,10 +1,12 @@
-import { ReactElement, useEffect, useState } from "react";
+import { FormEventHandler, LegacyRef, ReactElement, Ref, useEffect, useRef, useState } from "react";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
 import { Checkbox, CheckboxProps } from "primereact/checkbox";
 import { Calendar, CalendarProps } from "primereact/calendar";
-import { Dropdown, DropdownProps } from "primereact/dropdown";
+import { Dropdown, DropdownChangeEvent, DropdownProps } from "primereact/dropdown";
+import { getContacts } from "http/services/contacts-service";
+import { InputTextProps } from "primereact/inputtext";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -117,7 +119,24 @@ export const BorderedCheckbox = ({
     );
 };
 
-export const SearchInput = ({ height = "50px", title, ...props }: DropdownProps): ReactElement => {
+export const SearchInput = ({
+    height = "50px",
+    title,
+    onInputChange,
+    ...props
+}: DropdownProps & { onInputChange?: (value: string) => void }): ReactElement => {
+    const dropdownRef: LegacyRef<any> = useRef(null);
+
+    const handleOnInputChange = ({ target }: any) => {
+        const { value } = target as any;
+        if (onInputChange && value && value.length > 1) {
+            dropdownRef.current.show();
+            onInputChange(value);
+        } else {
+            dropdownRef.current.hide();
+        }
+    };
+
     return (
         <div
             key={props.name}
@@ -128,12 +147,11 @@ export const SearchInput = ({ height = "50px", title, ...props }: DropdownProps)
         >
             <span className='p-float-label search-input__wrapper'>
                 <Dropdown
-                    value={"dd"}
-                    onChange={() => {}}
-                    options={[{ name: "dd" }]}
+                    ref={dropdownRef}
+                    onInput={handleOnInputChange}
                     optionLabel='name'
                     editable
-                    placeholder='Select a City'
+                    placeholder={title}
                     {...props}
                     pt={{
                         trigger: {
