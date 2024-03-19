@@ -1,27 +1,10 @@
-import { LS_APP_USER } from "common/constants/localStorage";
-import { ContactUser } from "common/models/contact";
-import { QueryParams } from "common/models/query-params";
-import {
-    BorderedCheckbox,
-    CurrencyInput,
-    DateInput,
-    SearchInput,
-} from "dashboard/common/form/inputs";
-import { ContactsDataTable } from "dashboard/contacts";
-import { AuthUser } from "http/services/auth.service";
-import { getContacts } from "http/services/contacts-service";
+import { BorderedCheckbox, CurrencyInput, DateInput } from "dashboard/common/form/inputs";
+import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { observer } from "mobx-react-lite";
-import { Dialog } from "primereact/dialog";
-import { ReactElement, useEffect, useState } from "react";
-import { getKeyValue } from "services/local-storage.service";
+import { ReactElement } from "react";
 import { useStore } from "store/hooks";
 
-const FIELD: keyof ContactUser = "companyName";
-
 export const PurchaseFloorplan = observer((): ReactElement => {
-    const [user, setUser] = useState<AuthUser | null>(null);
-    const [options, setOptions] = useState<ContactUser[]>([]);
-    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const store = useStore().inventoryStore;
     const {
         inventoryExtData: {
@@ -34,33 +17,6 @@ export const PurchaseFloorplan = observer((): ReactElement => {
         },
         changeInventoryExtData,
     } = store;
-
-    useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        setUser(authUser);
-    }, []);
-
-    const handleCompanyInputChange = (searchValue: string): void => {
-        const params: QueryParams = {
-            qry: `${searchValue}.${FIELD}`,
-        };
-        user &&
-            getContacts(user.useruid, params).then((response) => {
-                if (response?.length) {
-                    setOptions(response);
-                } else {
-                    setOptions([]);
-                }
-            });
-    };
-
-    const handleOnRowClick = (companyName: string) => {
-        changeInventoryExtData({
-            key: "fpFloorplanCompany",
-            value: companyName,
-        });
-        setDialogVisible(false);
-    };
 
     return (
         <div className='grid purchase-floorplan row-gap-2'>
@@ -77,23 +33,18 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                 />
             </div>
             <div className='col-6'>
-                <SearchInput
-                    name='Floor'
-                    title='Floorplan Company'
-                    optionValue={FIELD}
-                    optionLabel={FIELD}
-                    options={options}
-                    onInputChange={handleCompanyInputChange}
+                <CompanySearch
+                    name='Floorplan Company'
                     value={fpFloorplanCompany}
-                    onChange={({ target: { value } }) => {
+                    onChange={({ value }) =>
+                        changeInventoryExtData({ key: "fpFloorplanCompany", value })
+                    }
+                    onRowClick={(companyName) =>
                         changeInventoryExtData({
                             key: "fpFloorplanCompany",
-                            value,
-                        });
-                    }}
-                    onIconClick={() => {
-                        setDialogVisible(true);
-                    }}
+                            value: companyName,
+                        })
+                    }
                 />
             </div>
             <div className='col-3'>
@@ -149,16 +100,6 @@ export const PurchaseFloorplan = observer((): ReactElement => {
                     }
                 />
             </div>
-            <Dialog
-                header={<div className='uppercase'>Inventory</div>}
-                visible={dialogVisible}
-                style={{ width: "75vw" }}
-                maximizable
-                modal
-                onHide={() => setDialogVisible(false)}
-            >
-                <ContactsDataTable onRowClick={handleOnRowClick} />
-            </Dialog>
         </div>
     );
 });
