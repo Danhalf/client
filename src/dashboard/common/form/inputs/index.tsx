@@ -165,9 +165,12 @@ export const SearchInput = ({
                 />
                 <label className='float-label search-input__label'>{title}</label>
             </span>
-            <div className='search-input__icon input-icon input-icon-right' onClick={onIconClick}>
+            <button
+                className='search-input__icon input-icon input-icon-right'
+                onClick={onIconClick}
+            >
                 <i className='icon adms-table' />
-            </div>
+            </button>
         </div>
     );
 };

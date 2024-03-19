@@ -2,13 +2,24 @@ import { CurrencyInput, DateInput, SearchInput } from "dashboard/common/form/inp
 import { Checkbox } from "primereact/checkbox";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { InputNumber } from "primereact/inputnumber";
-
+import { ContactUser } from "common/models/contact";
+import { AuthUser } from "http/services/auth.service";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { QueryParams } from "common/models/query-params";
+import { getContacts } from "http/services/contacts-service";
+import { getKeyValue } from "services/local-storage.service";
+import { ContactsDataTable } from "dashboard/contacts";
+import { Dialog } from "primereact/dialog";
+const FIELD: keyof ContactUser = "companyName";
 export const PurchaseConsign = observer((): ReactElement => {
+    const [user, setUser] = useState<AuthUser | null>(null);
+    const [options, setOptions] = useState<ContactUser[]>([]);
+    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const store = useStore().inventoryStore;
     const {
         inventoryExtData: {
@@ -29,6 +40,33 @@ export const PurchaseConsign = observer((): ReactElement => {
         },
         changeInventoryExtData,
     } = store;
+
+    useEffect(() => {
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        setUser(authUser);
+    }, []);
+
+    const handleCompanyInputChange = (searchValue: string): void => {
+        const params: QueryParams = {
+            qry: `${searchValue}.${FIELD}`,
+        };
+        user &&
+            getContacts(user.useruid, params).then((response) => {
+                if (response?.length) {
+                    setOptions(response);
+                } else {
+                    setOptions([]);
+                }
+            });
+    };
+
+    const handleOnRowClick = (companyName: string) => {
+        changeInventoryExtData({
+            key: "csName",
+            value: companyName,
+        });
+        setDialogVisible(false);
+    };
     return (
         <div className='grid purchase-consign row-gap-2'>
             <div className='col-3 flex align-items-center'>
@@ -52,7 +90,12 @@ export const PurchaseConsign = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <SearchInput
-                    name='Floor'
+                    name='Consignor'
+                    title='Consignor'
+                    optionValue={FIELD}
+                    optionLabel={FIELD}
+                    options={options}
+                    onInputChange={handleCompanyInputChange}
                     value={csName}
                     onChange={({ target: { value } }) => {
                         changeInventoryExtData({
@@ -60,7 +103,9 @@ export const PurchaseConsign = observer((): ReactElement => {
                             value,
                         });
                     }}
-                    title='Consignor'
+                    onIconClick={() => {
+                        setDialogVisible(true);
+                    }}
                 />
             </div>
             <div className='col-3'>
@@ -242,6 +287,16 @@ export const PurchaseConsign = observer((): ReactElement => {
                     }}
                 />
             </div>
+            <Dialog
+                header={<div className='uppercase'>Inventory</div>}
+                visible={dialogVisible}
+                style={{ width: "75vw" }}
+                maximizable
+                modal
+                onHide={() => setDialogVisible(false)}
+            >
+                <ContactsDataTable onRowClick={handleOnRowClick} />
+            </Dialog>
         </div>
     );
 });
