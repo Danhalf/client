@@ -19,7 +19,7 @@ import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
-import { ContentType } from "common/models/enums";
+import { CATEGORIES } from "common/constants/media-categories";
 
 const limitations: MediaLimitations = {
     formats: ["MP4", "MKV", "MOV"],
@@ -31,13 +31,6 @@ const limitations: MediaLimitations = {
     maxSize: 32,
     maxUpload: 4,
 };
-
-const CATEGORIES = [
-    { name: "Interior", id: ContentType.ctInterior },
-    { name: "Exterior", id: ContentType.ctExterior },
-    { name: "Document", id: ContentType.ctDocument },
-    { name: "General", id: ContentType.ctGeneral },
-];
 
 export const VideoMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;

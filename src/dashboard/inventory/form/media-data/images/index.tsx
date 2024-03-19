@@ -19,7 +19,7 @@ import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { InventoryMediaPostData, MediaLimitations } from "common/models/inventory";
 import { useParams } from "react-router-dom";
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
-import { ContentType } from "common/models/enums";
+import { CATEGORIES } from "common/constants/media-categories";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -28,13 +28,6 @@ const limitations: MediaLimitations = {
     maxSize: 8,
     maxUpload: 16,
 };
-
-const CATEGORIES = [
-    { name: "Interior", id: ContentType.ctInterior },
-    { name: "Exterior", id: ContentType.ctExterior },
-    { name: "Document", id: ContentType.ctDocument },
-    { name: "General", id: ContentType.ctGeneral },
-];
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 

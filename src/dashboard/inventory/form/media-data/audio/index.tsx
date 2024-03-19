@@ -18,7 +18,7 @@ import { MediaLimitations } from "common/models/inventory";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { Checkbox } from "primereact/checkbox";
-import { ContentType } from "common/models/enums";
+import { CATEGORIES } from "common/constants/media-categories";
 
 const limitations: MediaLimitations = {
     formats: ["WAV", "MP3", "MP4"],
@@ -27,13 +27,6 @@ const limitations: MediaLimitations = {
     maxSize: 8,
     maxUpload: 8,
 };
-
-const CATEGORIES = [
-    { name: "Interior", id: ContentType.ctInterior },
-    { name: "Exterior", id: ContentType.ctExterior },
-    { name: "Document", id: ContentType.ctDocument },
-    { name: "General", id: ContentType.ctGeneral },
-];
 
 export const AudioMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
