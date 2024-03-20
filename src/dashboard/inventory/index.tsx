@@ -491,6 +491,8 @@ export default function Inventories(): ReactElement {
                                     value={inventories}
                                     lazy
                                     paginator
+                                    scrollable
+                                    scrollHeight='70vh'
                                     first={lazyState.first}
                                     rows={lazyState.rows}
                                     rowsPerPageOptions={ROWS_PER_PAGE}
@@ -506,11 +508,6 @@ export default function Inventories(): ReactElement {
                                     onRowClick={({ data: { itemuid } }: DataTableRowClickEvent) =>
                                         navigate(itemuid)
                                     }
-                                    pt={{
-                                        wrapper: {
-                                            className: "overflow-x-hidden w-full",
-                                        },
-                                    }}
                                 >
                                     {activeColumns.map(({ field, header }) => (
                                         <Column
