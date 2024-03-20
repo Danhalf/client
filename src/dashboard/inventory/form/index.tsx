@@ -24,17 +24,6 @@ import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { PrintForms } from "./print-forms";
 
-export const inventorySections = [
-    InventoryVehicleData,
-    InventoryPurchaseData,
-    InventoryMediaData,
-    InventoryExportWebData,
-].map((sectionData) => new InventorySection(sectionData));
-
-const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
-const ITEMS_MENU_COUNT = inventorySections.reduce((acc, current) => acc + current.getLength(), -1);
-const PRINT_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
-const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 2;
 const STEP = "step";
 
 export const InventoryForm = observer(() => {
@@ -62,6 +51,15 @@ export const InventoryForm = observer(() => {
     } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
+    const [inventorySections, setInventorySections] = useState<InventorySection[]>([]);
+
+    const ACCORDION_STEPS = inventorySections.map((item) => item.startIndex);
+    const ITEMS_MENU_COUNT = inventorySections.reduce(
+        (acc, current) => acc + current.getLength(),
+        -1
+    );
+    const PRINT_ACTIVE_INDEX = ITEMS_MENU_COUNT + 1;
+    const DELETE_ACTIVE_INDEX = ITEMS_MENU_COUNT + 2;
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -91,11 +89,20 @@ export const InventoryForm = observer(() => {
     };
 
     useEffect(() => {
+        const sections = [
+            InventoryVehicleData,
+            InventoryPurchaseData,
+            InventoryMediaData,
+            InventoryExportWebData,
+        ];
         if (id) {
             getInventory(id);
         } else {
+            sections.splice(2, 1);
             clearInventory();
         }
+        const inventorySections = sections.map((sectionData) => new InventorySection(sectionData));
+        setInventorySections(inventorySections);
         return () => {
             clearInventory();
         };
