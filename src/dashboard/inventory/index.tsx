@@ -248,12 +248,14 @@ export default function Inventories(): ReactElement {
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
-        authUser && changeSettings({ page: event });
+        // eslint-disable-next-line no-console
+        console.log(event);
+        changeSettings({ table: event });
     };
 
     const sortData = (event: DataTableSortEvent) => {
         setLazyState(event);
-        authUser && changeSettings({ sort: event });
+        changeSettings({ table: event });
     };
 
     useEffect(() => {
@@ -273,6 +275,17 @@ export default function Inventories(): ReactElement {
                     const settings = JSON.parse(response.profile);
                     setServerSettings(settings);
                     settings?.activeColumns && setActiveColumns(settings.activeColumns);
+                    settings?.table &&
+                        setLazyState({
+                            first: settings.table.first || initialDataTableQueries.first,
+                            rows: settings.table.rows || initialDataTableQueries.rows,
+                            page: settings.table.page || initialDataTableQueries.page,
+                            column: settings.table.column || initialDataTableQueries.column,
+                            sortField:
+                                settings.table.sortField || initialDataTableQueries.sortField,
+                            sortOrder:
+                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                        });
                 }
             });
         }
@@ -509,6 +522,7 @@ export default function Inventories(): ReactElement {
 
     return (
         <div className='grid'>
+            {serverSettings && <pre>{JSON.stringify(serverSettings, null, 2)}</pre>}
             <div className='col-12'>
                 <div className='card'>
                     <div className='card-header'>

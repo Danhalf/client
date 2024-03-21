@@ -34,6 +34,7 @@ export const setUserSettings = async (uid: string, settings: any) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(`user/${uid}/profile`, {
             profile: JSON.stringify(settings),
+            // profile: "",
         });
         return request.data;
     } catch (error) {
