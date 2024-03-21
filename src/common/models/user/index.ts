@@ -26,7 +26,6 @@ interface TableState extends DataTableState {
 
 export interface InventoryUserSettings {
     activeColumns?: ActiveColumn[];
-    columnOrder?: string[];
     columnWidth?: ColumnWidth;
     selectedFilterOptions?: SelectedFilterOption[];
     table?: TableState;
