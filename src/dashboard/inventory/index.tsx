@@ -264,6 +264,8 @@ export default function Inventories(): ReactElement {
             });
             getUserSettings(authUser.useruid).then((response) => {
                 if (response) {
+                    // eslint-disable-next-line no-console
+                    console.log(JSON.parse(response.profile));
                 }
             });
         }
