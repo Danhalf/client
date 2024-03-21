@@ -104,6 +104,22 @@ export default function Inventories(): ReactElement {
     }, []);
 
     useEffect(() => {
+        const isAdvancedSearchEmpty = isObjectEmpty(advancedSearch);
+
+        const params: QueryParams = {
+            ...(lazyState.sortOrder === 1 && { type: "asc" }),
+            ...(lazyState.sortOrder === -1 && { type: "desc" }),
+            ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(advancedSearch) }),
+            ...(globalSearch && { qry: globalSearch }),
+            ...(lazyState.sortField && { column: lazyState.sortField }),
+            skip: lazyState.first,
+            top: lazyState.rows,
+        };
+        handleGetInventoryList(params);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lazyState, globalSearch, authUser]);
+
+    useEffect(() => {
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
@@ -162,22 +178,6 @@ export default function Inventories(): ReactElement {
             });
         }
     };
-
-    useEffect(() => {
-        const isAdvancedSearchEmpty = isObjectEmpty(advancedSearch);
-
-        const params: QueryParams = {
-            ...(lazyState.sortOrder === 1 && { type: "asc" }),
-            ...(lazyState.sortOrder === -1 && { type: "desc" }),
-            ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(advancedSearch) }),
-            ...(globalSearch && { qry: globalSearch }),
-            ...(lazyState.sortField && { column: lazyState.sortField }),
-            skip: lazyState.first,
-            top: lazyState.rows,
-        };
-        handleGetInventoryList(params);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lazyState, authUser, globalSearch]);
 
     const handleSetAdvancedSearch = (key: keyof Inventory, value: string) => {
         setAdvancedSearch((prevSearch) => {
@@ -362,7 +362,6 @@ export default function Inventories(): ReactElement {
 
     return (
         <div className='grid'>
-            {serverSettings && <pre>{JSON.stringify(serverSettings, null, 2)}</pre>}
             <div className='col-12'>
                 <div className='card'>
                     <div className='card-header'>
@@ -398,8 +397,24 @@ export default function Inventories(): ReactElement {
                                             const orderArray = event.columns?.map(
                                                 (column: any) => column.props.field
                                             );
+
+                                            const newActiveColumns = orderArray
+                                                .map((field: string) => {
+                                                    return (
+                                                        activeColumns.find(
+                                                            (column) => column.field === field
+                                                        ) || null
+                                                    );
+                                                })
+                                                .filter(
+                                                    (column): column is TableColumnsList =>
+                                                        column !== null
+                                                );
+
+                                            setActiveColumns(newActiveColumns);
+
                                             changeSettings({
-                                                columnOrder: orderArray,
+                                                activeColumns: newActiveColumns,
                                             });
                                         }
                                     }}
@@ -432,6 +447,7 @@ export default function Inventories(): ReactElement {
                                                 header={header}
                                                 key={field}
                                                 sortable
+                                                reorderable
                                                 headerClassName='cursor-move'
                                                 pt={{
                                                     root: {
@@ -465,6 +481,7 @@ export default function Inventories(): ReactElement {
                     fields={searchFields}
                 />
             </div>
+            {serverSettings && <pre>{JSON.stringify(serverSettings, null, 2)}</pre>}
         </div>
     );
 }
