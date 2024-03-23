@@ -16,17 +16,9 @@ interface SelectedFilterOption {
     value: string;
 }
 
-interface TableState extends DataTableState {
-    first: number;
-    rows: number;
-    sortField: string;
-    page: number;
-    pageCount: number;
-}
-
 export interface InventoryUserSettings {
     activeColumns?: ActiveColumn[];
     columnWidth?: ColumnWidth;
     selectedFilterOptions?: SelectedFilterOption[];
-    table?: TableState;
+    table?: DataTableState;
 }
