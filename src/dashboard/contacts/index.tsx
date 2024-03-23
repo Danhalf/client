@@ -157,11 +157,10 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                             options={categories}
                             optionLabel='name'
                             editable
-                            className='m-r-20px'
                             placeholder='Select Category'
                         />
                         <Button
-                            className='contact-top-controls__button m-r-20px'
+                            className='contact-top-controls__button'
                             icon='pi pi-plus-circle'
                             severity='success'
                             type='button'
@@ -170,8 +169,14 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                         <Button
                             severity='success'
                             type='button'
-                            icon='pi pi-print'
+                            icon='icon adms-print'
                             onClick={() => printTableData(true)}
+                        />
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='icon adms-blank'
+                            onClick={() => printTableData()}
                         />
                     </div>
                 </div>
