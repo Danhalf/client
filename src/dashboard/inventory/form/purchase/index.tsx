@@ -1,4 +1,4 @@
-import { Inventory } from "dashboard/inventory/common/step-navigation";
+import { Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 
 const PurchaseFloorplan = lazy(() =>
