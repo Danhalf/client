@@ -25,10 +25,24 @@ import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactUser } from "common/models/contact";
+import { getReportById, makeReports } from "http/services/reports.service";
 
 interface ContactsDataTableProps {
     onRowClick?: (companyName: string) => void;
 }
+
+interface TableColumnProps extends ColumnProps {
+    field: keyof ContactUser;
+}
+
+const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+    { field: "userName", header: "Name" },
+    { field: "phone1", header: "Work Phone" },
+    { field: "phone2", header: "Home Phone" },
+    { field: "streetAddress", header: "Address" },
+    { field: "email1", header: "Email" },
+    { field: "created", header: "Created" },
+];
 
 export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
     const [categories, setCategories] = useState<ContactType[]>([]);
@@ -41,10 +55,43 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
 
     const navigate = useNavigate();
 
-    const printTableData = () => {
-        const contactsDoc = new jsPDF();
-        autoTable(contactsDoc, { html: ".p-datatable-table" });
-        contactsDoc.output("dataurlnewwindow");
+    const printTableData = async (print: boolean = false) => {
+        const columns: string[] = renderColumnsData.map((column) => column.field);
+        const date = new Date();
+        const name = `contacts_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        const params: QueryParams = {
+            ...(selectedCategory?.id && { param: selectedCategory.id }),
+            ...(globalSearch && { qry: globalSearch }),
+        };
+        if (authUser) {
+            const data = await getContacts(authUser.useruid, params);
+            const JSONreport = {
+                name,
+                data,
+                columns,
+                format: "",
+            };
+            await makeReports(authUser.useruid, JSONreport).then((response) => {
+                setTimeout(() => {
+                    getReportById(response.taskuid).then((response) => {
+                        const url = new Blob([response], { type: "application/pdf" });
+                        let link = document.createElement("a");
+                        link.href = window.URL.createObjectURL(url);
+                        link.download = "Report.pdf";
+                        link.click();
+
+                        if (print) {
+                            window.open(
+                                link.href,
+                                "_blank",
+                                "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                            );
+                        }
+                    });
+                }, 5000);
+            });
+        }
     };
 
     const pageChanged = (event: DataTablePageEvent) => {
@@ -90,18 +137,6 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
             });
         }
     }, [selectedCategory, lazyState, authUser, globalSearch]);
-    interface TableColumnProps extends ColumnProps {
-        field: keyof ContactUser;
-    }
-
-    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
-        { field: "userName", header: "Name" },
-        { field: "phone1", header: "Work Phone" },
-        { field: "phone2", header: "Home Phone" },
-        { field: "streetAddress", header: "Address" },
-        { field: "email1", header: "Email" },
-        { field: "created", header: "Created" },
-    ];
 
     const handleOnRowClick = ({ data: { contactuid, companyName } }: DataTableRowClickEvent) => {
         if (onRowClick) {
@@ -136,7 +171,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                             severity='success'
                             type='button'
                             icon='pi pi-print'
-                            onClick={printTableData}
+                            onClick={() => printTableData(true)}
                         />
                     </div>
                 </div>
