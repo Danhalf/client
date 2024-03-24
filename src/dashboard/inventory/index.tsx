@@ -153,17 +153,23 @@ export default function Inventories(): ReactElement {
         const columns: string[] = activeColumns.map((column) => column.field);
         const date = new Date();
         const name = `inventories_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+        let qry: string = "";
 
-        // createStringifySearchQuery(advancedSearch);
+        if (globalSearch) {
+            qry += globalSearch;
+        } else {
+            qry += createStringifySearchQuery(advancedSearch);
+        }
+
+        if (selectedFilterOptions) {
+            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
+            qry += createStringifyFilterQuery(selectedFilterOptions);
+        }
+
         const params: QueryParams = {
-            // ...(selectedCategory?.id && { param: selectedCategory.id }),
-            ...(globalSearch && {
-                qry: globalSearch,
-            }),
-            ...(advancedSearch && {
-                qry: createStringifySearchQuery(advancedSearch),
-            }),
+            qry,
         };
+
         if (authUser) {
             const data = await getInventoryList(authUser.useruid, params);
             const JSONreport = {
@@ -173,25 +179,25 @@ export default function Inventories(): ReactElement {
                 columns,
                 format: "",
             };
-            // await makeReports(authUser.useruid, JSONreport).then((response) => {
-            //     setTimeout(() => {
-            //         getReportById(response.taskuid).then((response) => {
-            //             const url = new Blob([response], { type: "application/pdf" });
-            //             let link = document.createElement("a");
-            //             link.href = window.URL.createObjectURL(url);
-            //             link.download = "Report.pdf";
-            //             link.click();
+            await makeReports(authUser.useruid, JSONreport).then((response) => {
+                setTimeout(() => {
+                    getReportById(response.taskuid).then((response) => {
+                        const url = new Blob([response], { type: "application/pdf" });
+                        let link = document.createElement("a");
+                        link.href = window.URL.createObjectURL(url);
+                        link.download = "Report.pdf";
+                        link.click();
 
-            //             if (print) {
-            //                 window.open(
-            //                     link.href,
-            //                     "_blank",
-            //                     "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-            //                 );
-            //             }
-            //         });
-            //     }, 5000);
-            // });
+                        if (print) {
+                            window.open(
+                                link.href,
+                                "_blank",
+                                "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                            );
+                        }
+                    });
+                }, 5000);
+            });
         }
     };
 
@@ -204,6 +210,7 @@ export default function Inventories(): ReactElement {
     };
 
     const onColumnToggle = ({ value, selectedOption }: MultiSelectChangeEvent) => {
+        setActiveColumns([]);
         const column: TableColumnsList = selectedOption;
         column.checked = !column.checked;
         const newColumns = value.filter((item: TableColumnsList) => item.checked);
