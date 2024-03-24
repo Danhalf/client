@@ -11,8 +11,6 @@ import {
     DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { getKeyValue } from "services/local-storage.service";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
@@ -68,6 +66,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
             const data = await getContacts(authUser.useruid, params);
             const JSONreport = {
                 name,
+                type: "table",
                 data,
                 columns,
                 format: "",
