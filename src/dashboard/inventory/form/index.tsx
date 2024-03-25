@@ -5,7 +5,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InventoryVehicleData } from "./vehicle";
 import { Button } from "primereact/button";
-import { InventoryItem, InventorySection } from "../common";
+import { Inventory, InventoryItem, InventorySection } from "../common";
 import { InventoryPurchaseData } from "./purchase";
 import { InventoryMediaData } from "./media-data";
 import { useNavigate, useParams } from "react-router-dom";
@@ -85,27 +85,24 @@ export const InventoryForm = observer(() => {
     };
 
     useEffect(() => {
-        if (id) {
-            const inventorySections = [
-                InventoryVehicleData,
-                InventoryPurchaseData,
-                InventoryMediaData,
-                InventoryExportWebData,
-            ].map((sectionData) => new InventorySection(sectionData));
-            setInventorySections(inventorySections);
-            setAccordionSteps(inventorySections.map((item) => item.startIndex));
-            const itemsMenuCount = inventorySections.reduce(
-                (acc, current) => acc + current.getLength(),
-                -1
-            );
-            setItemsMenuCount(itemsMenuCount);
-            setPrintActiveIndex(itemsMenuCount + 1);
-            setDeleteActiveIndex(itemsMenuCount + 2);
-            getInventory(id);
-        } else {
-            clearInventory();
-        }
+        const inventorySections: Pick<Inventory, "label" | "items">[] = [
+            InventoryVehicleData,
+            InventoryPurchaseData,
+            InventoryExportWebData,
+        ];
+        id && inventorySections.splice(2, 0, InventoryMediaData);
+        const sections = inventorySections.map((sectionData) => new InventorySection(sectionData));
+        setInventorySections(sections);
+        setAccordionSteps(sections.map((item) => item.startIndex));
+        const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
+        setItemsMenuCount(itemsMenuCount);
+        setPrintActiveIndex(itemsMenuCount + 1);
+        setDeleteActiveIndex(itemsMenuCount + 2);
+
+        id && getInventory(id);
+
         return () => {
+            sections.forEach((section) => section.clearCount());
             clearInventory();
         };
     }, [id, store]);
