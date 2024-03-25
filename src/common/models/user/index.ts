@@ -5,7 +5,7 @@ interface ColumnWidth {
     [key: string]: number;
 }
 
-interface TableState extends DataTableState {
+export interface TableState extends DataTableState {
     page: number;
     column: string;
 }

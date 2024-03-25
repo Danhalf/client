@@ -7,6 +7,7 @@ import {
     DataTablePageEvent,
     DataTableRowClickEvent,
     DataTableSortEvent,
+    DataTableState,
 } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
@@ -25,7 +26,7 @@ import { ROWS_PER_PAGE } from "common/settings";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
-import { InventoryUserSettings, ServerUserSettings } from "common/models/user";
+import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -83,14 +84,12 @@ export default function Inventories(): ReactElement {
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
-        // eslint-disable-next-line no-console
-        console.log(event);
-        changeSettings({ table: event });
+        changeSettings({ table: event as TableState });
     };
 
     const sortData = (event: DataTableSortEvent) => {
         setLazyState(event);
-        changeSettings({ table: event });
+        changeSettings({ table: event as TableState });
     };
 
     useEffect(() => {
@@ -147,9 +146,9 @@ export default function Inventories(): ReactElement {
         }
     }, [authUser]);
 
-    const changeSettings = (settings: any) => {
+    const changeSettings = (settings: Partial<InventoryUserSettings>) => {
         if (authUser) {
-            const newSettings = { ...serverSettings, ...settings };
+            const newSettings = { ...serverSettings, inventory: settings };
             setServerSettings(newSettings);
             setUserSettings(authUser.useruid, newSettings);
         }
