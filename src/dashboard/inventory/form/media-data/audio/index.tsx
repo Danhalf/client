@@ -42,14 +42,14 @@ export const AudioMedia = observer((): ReactElement => {
         clearInventory,
     } = store;
     const [checked, setChecked] = useState<boolean>(true);
-    const [videoChecked, setVideoChecked] = useState<boolean[]>([]);
+    const [audioChecked, setAudioChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
 
     useEffect(() => {
         id && getInventory(id).then(() => fetchAudios());
         if (audios.length) {
-            setVideoChecked(new Array(audios.length).fill(checked));
+            setAudioChecked(new Array(audios.length).fill(checked));
         }
         return () => {
             clearInventory();
@@ -108,20 +108,20 @@ export const AudioMedia = observer((): ReactElement => {
     };
 
     const handleCheckedChange = (index?: number) => {
-        const updatedVideoChecked = [...videoChecked];
+        const updatedAudioChecked = [...audioChecked];
 
         if (index === undefined && !checked) {
             setChecked(true);
-            const allChecked = updatedVideoChecked.map(() => true);
-            setVideoChecked(allChecked);
+            const allChecked = updatedAudioChecked.map(() => true);
+            setAudioChecked(allChecked);
         } else if (index === undefined && checked) {
             setChecked(false);
-            const allUnchecked = updatedVideoChecked.map(() => false);
-            setVideoChecked(allUnchecked);
+            const allUnchecked = updatedAudioChecked.map(() => false);
+            setAudioChecked(allUnchecked);
         } else if (index !== undefined) {
-            const updatedCheckboxState = [...updatedVideoChecked];
+            const updatedCheckboxState = [...updatedAudioChecked];
             updatedCheckboxState[index] = !updatedCheckboxState[index];
-            setVideoChecked(updatedCheckboxState);
+            setAudioChecked(updatedCheckboxState);
         }
     };
 
@@ -140,7 +140,7 @@ export const AudioMedia = observer((): ReactElement => {
                         role='presentation'
                         width={29}
                         height={29}
-                        className='presentation__video'
+                        className='presentation__audio'
                     />
                     <span className='presentation__label flex flex-column text-left ml-3'>
                         {file.name}
@@ -283,7 +283,7 @@ export const AudioMedia = observer((): ReactElement => {
                             <div key={itemuid} className='media-images__item'>
                                 {checked && (
                                     <Checkbox
-                                        checked={videoChecked[index]}
+                                        checked={audioChecked[index]}
                                         onChange={() => handleCheckedChange(index)}
                                         className='media-uploaded__checkbox'
                                     />
