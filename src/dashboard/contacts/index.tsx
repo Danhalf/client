@@ -25,12 +25,25 @@ import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactUser } from "common/models/contact";
-import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
+import { ContactsUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+
+interface TableColumnProps extends ColumnProps {
+    field: keyof ContactUser;
+}
 
 interface ContactsDataTableProps {
     onRowClick?: (companyName: string) => void;
 }
+
+const renderColumnsData: TableColumnProps[] = [
+    { field: "userName", header: "Name" },
+    { field: "phone1", header: "Work Phone" },
+    { field: "phone2", header: "Home Phone" },
+    { field: "streetAddress", header: "Address" },
+    { field: "email1", header: "Email" },
+    { field: "created", header: "Created" },
+];
 
 export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
     const [categories, setCategories] = useState<ContactType[]>([]);
@@ -40,7 +53,8 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
-    const [serverSettings, setServerSettings] = useState<InventoryUserSettings>();
+    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
+    const [activeColumns, setActiveColumns] = useState<TableColumnProps[]>(renderColumnsData);
     const navigate = useNavigate();
 
     const printTableData = () => {
@@ -94,16 +108,16 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
             });
         }
     }, [selectedCategory, lazyState, authUser, globalSearch]);
-    interface TableColumnProps extends ColumnProps {
-        field: keyof ContactUser;
-    }
 
     useEffect(() => {
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
-                    const { contacts: settings }: ServerUserSettings = JSON.parse(response.profile);
-                    setServerSettings(settings);
+                    const allSettings: ServerUserSettings = JSON.parse(response.profile);
+                    setServerSettings(allSettings);
+                    const { contacts: settings } = allSettings;
+                    settings?.activeColumns &&
+                        setActiveColumns(settings.activeColumns as TableColumnProps[]);
                     settings?.table &&
                         setLazyState({
                             first: settings.table.first || initialDataTableQueries.first,
@@ -115,30 +129,21 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                             sortOrder:
                                 settings.table.sortOrder || initialDataTableQueries.sortOrder,
                         });
-                    // if (settings?.selectedFilterOptions) {
-                    //     setSelectedFilterOptions(settings.selectedFilterOptions);
-                    // }
                 }
             });
         }
     }, [authUser]);
 
-    const changeSettings = (settings: Partial<InventoryUserSettings>) => {
+    const changeSettings = (settings: Partial<ContactsUserSettings>) => {
         if (authUser) {
-            const newSettings = { ...serverSettings, contacts: settings };
+            const newSettings = {
+                ...serverSettings,
+                contacts: { ...serverSettings?.contacts, ...settings },
+            } as ServerUserSettings;
             setServerSettings(newSettings);
             setUserSettings(authUser.useruid, newSettings);
         }
     };
-
-    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
-        { field: "userName", header: "Name" },
-        { field: "phone1", header: "Work Phone" },
-        { field: "phone2", header: "Home Phone" },
-        { field: "streetAddress", header: "Address" },
-        { field: "email1", header: "Email" },
-        { field: "created", header: "Created" },
-    ];
 
     const handleOnRowClick = ({ data: { contactuid, companyName } }: DataTableRowClickEvent) => {
         if (onRowClick) {
@@ -150,21 +155,17 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
 
     return (
         <div className='card-content'>
-            <div>
-                <button
-                    onClick={() =>
-                        authUser && setUserSettings(authUser?.useruid, {} as ServerUserSettings)
-                    }
-                >
-                    clear
-                </button>
-            </div>
             <div className='grid datatable-controls'>
                 <div className='col-6'>
                     <div className='contact-top-controls'>
                         <Dropdown
                             value={selectedCategory}
-                            onChange={(e) => setSelectedCategory(e.value)}
+                            onChange={(e) => {
+                                changeSettings({
+                                    selectedCategoriesOptions: e.value,
+                                });
+                                setSelectedCategory(e.value);
+                            }}
                             options={categories}
                             optionLabel='name'
                             editable
@@ -223,6 +224,31 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                         reorderableColumns
                         rowClassName={() => "hover:text-primary cursor-pointer"}
                         onRowClick={handleOnRowClick}
+                        onColReorder={(event) => {
+                            if (authUser && Array.isArray(event.columns)) {
+                                const orderArray = event.columns?.map(
+                                    (column: any) => column.props.field
+                                );
+
+                                const newActiveColumns = orderArray
+                                    .map((field: string) => {
+                                        return (
+                                            activeColumns.find(
+                                                (column) => column.field === field
+                                            ) || null
+                                        );
+                                    })
+                                    .filter(
+                                        (column): column is TableColumnProps => column !== null
+                                    ) as TableColumnProps[];
+
+                                setActiveColumns(newActiveColumns);
+
+                                changeSettings({
+                                    activeColumns: newActiveColumns,
+                                });
+                            }
+                        }}
                         onColumnResizeEnd={(event) => {
                             if (authUser && event) {
                                 const newColumnWidth = {
@@ -230,7 +256,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                                 };
                                 changeSettings({
                                     columnWidth: {
-                                        ...serverSettings?.columnWidth,
+                                        ...serverSettings?.contacts?.columnWidth,
                                         ...newColumnWidth,
                                     },
                                 });
@@ -244,7 +270,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                             },
                         }}
                     >
-                        {renderColumnsData.map(({ field, header }) => (
+                        {activeColumns.map(({ field, header }) => (
                             <Column
                                 field={field}
                                 header={header}
@@ -254,7 +280,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                                 pt={{
                                     root: {
                                         style: {
-                                            width: serverSettings?.columnWidth?.[field],
+                                            width: serverSettings?.contacts?.columnWidth?.[field],
                                             overflow: "hidden",
                                             textOverflow: "ellipsis",
                                         },

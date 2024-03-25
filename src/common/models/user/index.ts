@@ -1,5 +1,6 @@
 import { FilterOptions, TableColumnsList } from "dashboard/inventory/common/data-table";
 import { DataTableState } from "primereact/datatable";
+import { ContactType } from "../contact";
 
 interface ColumnWidth {
     [key: string]: number;
@@ -11,7 +12,7 @@ export interface TableState extends DataTableState {
 }
 
 interface UserSettings {
-    activeColumns?: TableColumnsList[];
+    activeColumns?: TableColumnsList[] | any[];
     columnWidth?: ColumnWidth;
     table?: TableState;
 }
@@ -21,7 +22,7 @@ export interface InventoryUserSettings extends UserSettings {
 }
 
 export interface ContactsUserSettings extends UserSettings {
-    selectedCategoriesOptions?: FilterOptions[];
+    selectedCategoriesOptions?: ContactType[];
 }
 
 export interface ServerUserSettings {

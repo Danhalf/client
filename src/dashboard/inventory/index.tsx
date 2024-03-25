@@ -160,7 +160,6 @@ export default function Inventories(): ReactElement {
         column.checked = !column.checked;
         const newColumns = value.filter((item: TableColumnsList) => item.checked);
         setActiveColumns(newColumns);
-
         changeSettings({ activeColumns: newColumns });
     };
 
