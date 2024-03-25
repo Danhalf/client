@@ -7,7 +7,6 @@ import {
     DataTablePageEvent,
     DataTableRowClickEvent,
     DataTableSortEvent,
-    DataTableState,
 } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
@@ -68,7 +67,7 @@ export default function Inventories(): ReactElement {
     const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
         null
     );
-    const [serverSettings, setServerSettings] = useState<InventoryUserSettings>();
+    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(
         columns.filter((column) => column.checked)
@@ -122,10 +121,9 @@ export default function Inventories(): ReactElement {
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
-                    const { inventory: settings }: ServerUserSettings = JSON.parse(
-                        response.profile
-                    );
-                    setServerSettings(settings);
+                    const allSettings: ServerUserSettings = JSON.parse(response.profile);
+                    setServerSettings(allSettings);
+                    const { inventory: settings } = allSettings;
                     settings?.activeColumns && setActiveColumns(settings.activeColumns);
                     settings?.table &&
                         setLazyState({
@@ -148,7 +146,10 @@ export default function Inventories(): ReactElement {
 
     const changeSettings = (settings: Partial<InventoryUserSettings>) => {
         if (authUser) {
-            const newSettings = { ...serverSettings, inventory: settings };
+            const newSettings = {
+                ...serverSettings,
+                inventory: { ...serverSettings?.inventory, ...settings },
+            } as ServerUserSettings;
             setServerSettings(newSettings);
             setUserSettings(authUser.useruid, newSettings);
         }
@@ -427,7 +428,7 @@ export default function Inventories(): ReactElement {
                                             };
                                             changeSettings({
                                                 columnWidth: {
-                                                    ...serverSettings?.columnWidth,
+                                                    ...serverSettings?.inventory?.columnWidth,
                                                     ...newColumnWidth,
                                                 },
                                             });
@@ -453,9 +454,8 @@ export default function Inventories(): ReactElement {
                                                 pt={{
                                                     root: {
                                                         style: {
-                                                            width: serverSettings?.columnWidth?.[
-                                                                field
-                                                            ],
+                                                            width: serverSettings?.inventory
+                                                                ?.columnWidth?.[field],
                                                             overflow: "hidden",
                                                             textOverflow: "ellipsis",
                                                         },

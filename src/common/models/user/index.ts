@@ -10,13 +10,21 @@ export interface TableState extends DataTableState {
     column: string;
 }
 
-export interface InventoryUserSettings {
+interface UserSettings {
     activeColumns?: TableColumnsList[];
     columnWidth?: ColumnWidth;
-    selectedFilterOptions?: FilterOptions[];
     table?: TableState;
+}
+
+export interface InventoryUserSettings extends UserSettings {
+    selectedFilterOptions?: FilterOptions[];
+}
+
+export interface ContactsUserSettings extends UserSettings {
+    selectedCategoriesOptions?: FilterOptions[];
 }
 
 export interface ServerUserSettings {
     inventory: InventoryUserSettings;
+    contacts: ContactsUserSettings;
 }

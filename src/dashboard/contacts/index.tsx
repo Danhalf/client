@@ -25,6 +25,8 @@ import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactUser } from "common/models/contact";
+import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
+import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 
 interface ContactsDataTableProps {
     onRowClick?: (companyName: string) => void;
@@ -38,7 +40,7 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
-
+    const [serverSettings, setServerSettings] = useState<InventoryUserSettings>();
     const navigate = useNavigate();
 
     const printTableData = () => {
@@ -49,10 +51,12 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
+        changeSettings({ table: event as TableState });
     };
 
     const sortData = (event: DataTableSortEvent) => {
         setLazyState(event);
+        changeSettings({ table: event as TableState });
     };
 
     useEffect(() => {
@@ -94,6 +98,39 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
         field: keyof ContactUser;
     }
 
+    useEffect(() => {
+        if (authUser) {
+            getUserSettings(authUser.useruid).then((response) => {
+                if (response?.profile.length) {
+                    const { contacts: settings }: ServerUserSettings = JSON.parse(response.profile);
+                    setServerSettings(settings);
+                    settings?.table &&
+                        setLazyState({
+                            first: settings.table.first || initialDataTableQueries.first,
+                            rows: settings.table.rows || initialDataTableQueries.rows,
+                            page: settings.table.page || initialDataTableQueries.page,
+                            column: settings.table.column || initialDataTableQueries.column,
+                            sortField:
+                                settings.table.sortField || initialDataTableQueries.sortField,
+                            sortOrder:
+                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                        });
+                    // if (settings?.selectedFilterOptions) {
+                    //     setSelectedFilterOptions(settings.selectedFilterOptions);
+                    // }
+                }
+            });
+        }
+    }, [authUser]);
+
+    const changeSettings = (settings: Partial<InventoryUserSettings>) => {
+        if (authUser) {
+            const newSettings = { ...serverSettings, contacts: settings };
+            setServerSettings(newSettings);
+            setUserSettings(authUser.useruid, newSettings);
+        }
+    };
+
     const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
         { field: "userName", header: "Name" },
         { field: "phone1", header: "Work Phone" },
@@ -113,6 +150,15 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
 
     return (
         <div className='card-content'>
+            <div>
+                <button
+                    onClick={() =>
+                        authUser && setUserSettings(authUser?.useruid, {} as ServerUserSettings)
+                    }
+                >
+                    clear
+                </button>
+            </div>
             <div className='grid datatable-controls'>
                 <div className='col-6'>
                     <div className='contact-top-controls'>
@@ -177,6 +223,26 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                         reorderableColumns
                         rowClassName={() => "hover:text-primary cursor-pointer"}
                         onRowClick={handleOnRowClick}
+                        onColumnResizeEnd={(event) => {
+                            if (authUser && event) {
+                                const newColumnWidth = {
+                                    [event.column.props.field as string]: event.element.offsetWidth,
+                                };
+                                changeSettings({
+                                    columnWidth: {
+                                        ...serverSettings?.columnWidth,
+                                        ...newColumnWidth,
+                                    },
+                                });
+                            }
+                        }}
+                        pt={{
+                            table: {
+                                style: {
+                                    tableLayout: "fixed",
+                                },
+                            },
+                        }}
                     >
                         {renderColumnsData.map(({ field, header }) => (
                             <Column
@@ -185,6 +251,15 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
                                 key={field}
                                 sortable
                                 headerClassName='cursor-move'
+                                pt={{
+                                    root: {
+                                        style: {
+                                            width: serverSettings?.columnWidth?.[field],
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                        },
+                                    },
+                                }}
                             />
                         ))}
                     </DataTable>
