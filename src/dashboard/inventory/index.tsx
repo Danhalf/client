@@ -25,7 +25,7 @@ import { ROWS_PER_PAGE } from "common/settings";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
-import { InventoryUserSettings } from "common/models/user";
+import { InventoryUserSettings, ServerUserSettings } from "common/models/user";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -123,7 +123,9 @@ export default function Inventories(): ReactElement {
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
-                    const settings = JSON.parse(response.profile);
+                    const { inventory: settings }: ServerUserSettings = JSON.parse(
+                        response.profile
+                    );
                     setServerSettings(settings);
                     settings?.activeColumns && setActiveColumns(settings.activeColumns);
                     settings?.table &&

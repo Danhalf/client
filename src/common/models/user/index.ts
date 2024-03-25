@@ -1,32 +1,22 @@
+import { FilterOptions, TableColumnsList } from "dashboard/inventory/common/data-table";
 import { DataTableState } from "primereact/datatable";
-
-interface ActiveColumn {
-    field: string;
-    header: string;
-    checked: boolean;
-}
 
 interface ColumnWidth {
     [key: string]: number;
 }
 
-interface SelectedFilterOption {
-    label: string;
-    column: string;
-    value: string;
-}
-
 interface TableState extends DataTableState {
-    first: number;
-    rows: number;
-    sortField: string;
     page: number;
-    pageCount: number;
+    column: string;
 }
 
 export interface InventoryUserSettings {
-    activeColumns?: ActiveColumn[];
+    activeColumns?: TableColumnsList[];
     columnWidth?: ColumnWidth;
-    selectedFilterOptions?: SelectedFilterOption[];
+    selectedFilterOptions?: FilterOptions[];
     table?: TableState;
+}
+
+export interface ServerUserSettings {
+    inventory: InventoryUserSettings;
 }
