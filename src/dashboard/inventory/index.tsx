@@ -67,7 +67,6 @@ export default function Inventories(): ReactElement {
         null
     );
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
-
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(
         columns.filter((column) => column.checked)
     );

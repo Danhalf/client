@@ -17,8 +17,8 @@ import "./index.css";
 import { setInventory } from "http/services/inventory-service";
 import { Inventory } from "common/models/inventory";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
-import { getUserSettings } from "http/services/auth-user.service";
-import { ServerUserSettings } from "common/models/user";
+import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Inventory | MissedInventoryColumn;
@@ -145,17 +145,21 @@ export const ExportToWeb = () => {
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
-    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(columns);
+    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(
+        columns.filter((column) => column.checked)
+    );
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
     const navigate = useNavigate();
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
+        changeSettings({ table: event as TableState });
     };
 
     const sortData = (event: DataTableSortEvent) => {
         setLazyState(event);
+        changeSettings({ table: event as TableState });
     };
 
     useEffect(() => {
@@ -188,6 +192,17 @@ export const ExportToWeb = () => {
         }
     }, [lazyState, authUser, globalSearch]);
 
+    const changeSettings = (settings: Partial<ExportWebUserSettings>) => {
+        if (authUser) {
+            const newSettings = {
+                ...serverSettings,
+                exportWeb: { ...serverSettings?.exportWeb, ...settings },
+            } as ServerUserSettings;
+            setServerSettings(newSettings);
+            setUserSettings(authUser.useruid, newSettings);
+        }
+    };
+
     useEffect(() => {
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
@@ -215,7 +230,9 @@ export const ExportToWeb = () => {
     const onColumnToggle = ({ value, selectedOption }: MultiSelectChangeEvent) => {
         const column: TableColumnsList = selectedOption;
         column.checked = !column.checked;
-        setActiveColumns(value.filter((item: TableColumnsList) => item.checked));
+        const newColumns = value.filter((item: TableColumnsList) => item.checked);
+        setActiveColumns(newColumns);
+        changeSettings({ activeColumns: newColumns });
     };
 
     const handleEditedValueSet = (
@@ -322,10 +339,58 @@ export const ExportToWeb = () => {
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
                                     className='overflow-x-hidden'
+                                    onColReorder={(event) => {
+                                        if (authUser && Array.isArray(event.columns)) {
+                                            const orderArray = event.columns?.map(
+                                                (column: any) => column.props.field
+                                            );
+
+                                            const newActiveColumns = orderArray
+                                                .map((field: string) => {
+                                                    return (
+                                                        activeColumns.find(
+                                                            (column) => column.field === field
+                                                        ) || null
+                                                    );
+                                                })
+                                                .filter(
+                                                    (column): column is TableColumnsList =>
+                                                        column !== null
+                                                );
+
+                                            setActiveColumns(newActiveColumns);
+
+                                            changeSettings({
+                                                activeColumns: newActiveColumns,
+                                            });
+                                        }
+                                    }}
+                                    onColumnResizeEnd={(event) => {
+                                        if (authUser && event) {
+                                            const newColumnWidth = {
+                                                [event.column.props.field as string]:
+                                                    event.element.offsetWidth,
+                                            };
+                                            changeSettings({
+                                                columnWidth: {
+                                                    ...serverSettings?.exportWeb?.columnWidth,
+                                                    ...newColumnWidth,
+                                                },
+                                            });
+                                        }
+                                    }}
+                                    pt={{
+                                        table: {
+                                            style: {
+                                                tableLayout: "fixed",
+                                            },
+                                        },
+                                    }}
                                 >
                                     <Column
                                         bodyStyle={{ textAlign: "center" }}
                                         header={<Checkbox checked={false} />}
+                                        reorderable={false}
                                         body={(options) => {
                                             return (
                                                 <div className='flex gap-3'>
@@ -362,6 +427,16 @@ export const ExportToWeb = () => {
                                                 }
                                             }}
                                             headerClassName='cursor-move'
+                                            pt={{
+                                                root: {
+                                                    style: {
+                                                        width: serverSettings?.exportWeb
+                                                            ?.columnWidth?.[field],
+                                                        overflow: "hidden",
+                                                        textOverflow: "ellipsis",
+                                                    },
+                                                },
+                                            }}
                                         />
                                     ))}
                                 </DataTable>
