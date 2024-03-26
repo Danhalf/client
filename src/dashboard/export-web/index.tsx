@@ -17,6 +17,8 @@ import "./index.css";
 import { setInventory } from "http/services/inventory-service";
 import { Inventory } from "common/models/inventory";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import { getUserSettings } from "http/services/auth-user.service";
+import { ServerUserSettings } from "common/models/user";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Inventory | MissedInventoryColumn;
@@ -144,6 +146,7 @@ export const ExportToWeb = () => {
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(columns);
+    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
     const navigate = useNavigate();
 
@@ -184,6 +187,30 @@ export const ExportToWeb = () => {
             });
         }
     }, [lazyState, authUser, globalSearch]);
+
+    useEffect(() => {
+        if (authUser) {
+            getUserSettings(authUser.useruid).then((response) => {
+                if (response?.profile.length) {
+                    const allSettings: ServerUserSettings = JSON.parse(response.profile);
+                    setServerSettings(allSettings);
+                    const { exportWeb: settings } = allSettings;
+                    settings?.activeColumns && setActiveColumns(settings.activeColumns);
+                    settings?.table &&
+                        setLazyState({
+                            first: settings.table.first || initialDataTableQueries.first,
+                            rows: settings.table.rows || initialDataTableQueries.rows,
+                            page: settings.table.page || initialDataTableQueries.page,
+                            column: settings.table.column || initialDataTableQueries.column,
+                            sortField:
+                                settings.table.sortField || initialDataTableQueries.sortField,
+                            sortOrder:
+                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                        });
+                }
+            });
+        }
+    }, [authUser]);
 
     const onColumnToggle = ({ value, selectedOption }: MultiSelectChangeEvent) => {
         const column: TableColumnsList = selectedOption;
