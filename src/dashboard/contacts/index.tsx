@@ -25,6 +25,7 @@ import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactUser } from "common/models/contact";
 import { ContactsUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { getReportById, makeReports } from "http/services/reports.service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ContactUser;
@@ -37,15 +38,6 @@ interface ContactsDataTableProps {
 interface TableColumnProps extends ColumnProps {
     field: keyof ContactUser;
 }
-
-const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
-    { field: "userName", header: "Name" },
-    { field: "phone1", header: "Work Phone" },
-    { field: "phone2", header: "Home Phone" },
-    { field: "streetAddress", header: "Address" },
-    { field: "email1", header: "Email" },
-    { field: "created", header: "Created" },
-];
 
 const renderColumnsData: TableColumnProps[] = [
     { field: "userName", header: "Name" },

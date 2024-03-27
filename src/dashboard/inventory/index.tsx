@@ -23,6 +23,7 @@ import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/searc
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
 import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
+import { getReportById, makeReports } from "http/services/reports.service";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
