@@ -434,13 +434,6 @@ export default function Inventories(): ReactElement {
                                             });
                                         }
                                     }}
-                                    pt={{
-                                        table: {
-                                            style: {
-                                                tableLayout: "fixed",
-                                            },
-                                        },
-                                    }}
                                 >
                                     {activeColumns.map(({ field, header }) => {
                                         return (

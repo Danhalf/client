@@ -338,7 +338,6 @@ export const ExportToWeb = () => {
                                     resizableColumns
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
-                                    className='overflow-x-hidden'
                                     onColReorder={(event) => {
                                         if (authUser && Array.isArray(event.columns)) {
                                             const orderArray = event.columns?.map(
@@ -378,13 +377,6 @@ export const ExportToWeb = () => {
                                                 },
                                             });
                                         }
-                                    }}
-                                    pt={{
-                                        table: {
-                                            style: {
-                                                tableLayout: "fixed",
-                                            },
-                                        },
                                     }}
                                 >
                                     <Column
