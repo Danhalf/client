@@ -32,7 +32,7 @@ export default function Deals() {
     const printTableData = async (print: boolean = false) => {
         const columns: string[] = renderColumnsData.map((column) => column.field) as string[];
         const date = new Date();
-        const name = `contacts_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+        const name = `deals_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
         const params: QueryParams = {
             ...(globalSearch && { qry: globalSearch }),
