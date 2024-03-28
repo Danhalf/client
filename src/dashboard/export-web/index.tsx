@@ -232,17 +232,9 @@ export const ExportToWeb = () => {
         const columns: string[] = activeColumns.map((column) => column.field);
         const date = new Date();
         const name = `export-web_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
-        let qry: string = "";
-
-        if (globalSearch) {
-            qry += globalSearch;
-        }
-
-        const params: QueryParams = {};
-
-        if (qry) {
-            params.qry = qry;
-        }
+        const params: QueryParams = {
+            ...(globalSearch && { qry: globalSearch }),
+        };
 
         if (authUser) {
             const data = await getExportToWebList(authUser.useruid, params);
@@ -353,7 +345,7 @@ export const ExportToWeb = () => {
                                     }}
                                 />
                             </div>
-                            <div className='col-3'>
+                            <div className='col-4'>
                                 <div className='contact-top-controls'>
                                     <Button
                                         className='contact-top-controls__button px-6 uppercase'
@@ -377,7 +369,7 @@ export const ExportToWeb = () => {
                                 </div>
                             </div>
 
-                            <div className='col-7 text-right'>
+                            <div className='col-6 text-right'>
                                 <span className='p-input-icon-right'>
                                     <i className='pi pi-search' />
                                     <InputText
@@ -469,11 +461,11 @@ export const ExportToWeb = () => {
                                             );
                                         }}
                                     />
-                                    {activeColumns.map(({ field, header }) => (
+                                    {activeColumns.map(({ field, header }, index) => (
                                         <Column
                                             field={field}
                                             header={header}
-                                            key={field}
+                                            key={`${field + index}`}
                                             sortable
                                             editor={(data: ColumnEditorOptions) => {
                                                 const { field } = data;

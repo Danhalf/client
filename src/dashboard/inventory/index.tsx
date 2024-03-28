@@ -380,7 +380,7 @@ export default function Inventories(): ReactElement {
             <div className='col-2'>
                 <div className='inventory-top-controls'>
                     <Button
-                        className='inventory-top-controls__button m-r-20px new-inventory-button'
+                        className='inventory-top-controls__button new-inventory-button'
                         icon='icon adms-add-item'
                         severity='success'
                         type='button'
@@ -498,12 +498,12 @@ export default function Inventories(): ReactElement {
                                         }
                                     }}
                                 >
-                                    {activeColumns.map(({ field, header }) => {
+                                    {activeColumns.map(({ field, header }, index) => {
                                         return (
                                             <Column
                                                 field={field}
                                                 header={header}
-                                                key={field}
+                                                key={`${field + index}`}
                                                 sortable
                                                 reorderable
                                                 headerClassName='cursor-move'

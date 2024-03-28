@@ -34,7 +34,8 @@ export const getUserSettings = async (uid: string) => {
 export const setUserSettings = async (uid: string, settings: Partial<ServerUserSettings>) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponse>(`user/${uid}/profile`, {
-            profile: JSON.stringify(settings),
+            // profile: JSON.stringify(settings),
+            profile: "",
         });
         return request.data;
     } catch (error) {
