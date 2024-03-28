@@ -219,6 +219,8 @@
     font-weight: 700;
     line-height: 1;
     flex-direction: column;
+    height: 50px;
+    width: 50px;
 }
 
 .new-inventory-button .icon {
