@@ -201,6 +201,12 @@
     display: none;
 }
 
+.p-error {
+    position: absolute;
+    bottom: -10px;
+    left: 10px;
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
