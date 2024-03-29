@@ -292,8 +292,10 @@ export default function Inventories(): ReactElement {
         <div className='dropdown-header flex pb-1'>
             <label className='cursor-pointer dropdown-header__label'>
                 <Checkbox
-                    checked={false}
-                    onChange={() => {}}
+                    checked={columns.length === activeColumns.length}
+                    onChange={() => {
+                        setActiveColumns(columns);
+                    }}
                     className='dropdown-header__checkbox mr-2'
                 />
                 Select All
@@ -487,11 +489,30 @@ export default function Inventories(): ReactElement {
                                         navigate(itemuid)
                                     }
                                     onColReorder={(event: any) => {
-                                        const reorderedColumns = event.columns.map(
-                                            ({ props: { field } }: any) => field
-                                        );
+                                        if (authUser && Array.isArray(event.columns)) {
+                                            const orderArray = event.columns?.map(
+                                                (column: any) => column.props.field
+                                            );
 
-                                        changeSettings({ activeColumns: reorderedColumns });
+                                            const newActiveColumns = orderArray
+                                                .map((field: string) => {
+                                                    return (
+                                                        activeColumns.find(
+                                                            (column) => column.field === field
+                                                        ) || null
+                                                    );
+                                                })
+                                                .filter(
+                                                    (column: any): column is TableColumnsList =>
+                                                        column !== null
+                                                );
+
+                                            setActiveColumns(newActiveColumns);
+
+                                            changeSettings({
+                                                activeColumns: newActiveColumns,
+                                            });
+                                        }
                                     }}
                                     onColumnResizeEnd={(event) => {
                                         if (authUser && event) {
