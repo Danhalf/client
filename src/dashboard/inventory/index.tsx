@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState, useRef, LegacyRef } from "react";
 import { AuthUser } from "http/services/auth.service";
 import {
     DataTable,
@@ -67,6 +67,7 @@ const createStringifyFilterQuery = (filterArray: FilterOptions[]): string => {
 
 export default function Inventories(): ReactElement {
     const [inventories, setInventories] = useState<Inventory[]>([]);
+    const dropdownHeaderRef: LegacyRef<MultiSelect> = useRef(null);
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
@@ -103,6 +104,8 @@ export default function Inventories(): ReactElement {
                 response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
             });
         }
+        // eslint-disable-next-line no-console
+        console.log(dropdownHeaderRef.current?.props.pt?.header);
     }, []);
 
     useEffect(() => {
@@ -360,6 +363,7 @@ export default function Inventories(): ReactElement {
                     options={columns}
                     value={activeColumns}
                     optionLabel='header'
+                    ref={dropdownHeaderRef}
                     onChange={onColumnToggle}
                     showSelectAll={false}
                     className='w-full pb-0 h-full flex align-items-center column-picker'
