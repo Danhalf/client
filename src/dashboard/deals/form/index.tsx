@@ -10,6 +10,7 @@ import { ProgressBar } from "primereact/progressbar";
 
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
+import { GeneralInfoData } from "./general-info";
 
 const STEP = "step";
 
@@ -23,7 +24,7 @@ export const DealsForm = observer(() => {
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const stepsRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
-    const [dealSections, setDealSections] = useState<DealsSection[]>([]);
+    const [dealsSections, setDealsSections] = useState<DealsSection[]>([]);
     const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
 
@@ -41,13 +42,13 @@ export const DealsForm = observer(() => {
 
     const getUrl = (activeIndex: number) => {
         const currentPath = id ? id : "create";
-        return `/dashboard/deal/${currentPath}?step=${activeIndex + 1}`;
+        return `/dashboard/deals/${currentPath}?step=${activeIndex + 1}`;
     };
 
     useEffect(() => {
-        const dealSections: Pick<Deals, "label" | "items">[] = [];
-        const sections = dealSections.map((sectionData) => new DealsSection(sectionData));
-        setDealSections(sections);
+        const dealsSections: Pick<Deals, "label" | "items">[] = [GeneralInfoData];
+        const sections = dealsSections.map((sectionData) => new DealsSection(sectionData));
+        setDealsSections(sections);
         setAccordionSteps(sections.map((item) => item.startIndex));
         const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
         setItemsMenuCount(itemsMenuCount);
@@ -75,7 +76,7 @@ export const DealsForm = observer(() => {
                 <Button
                     icon='pi pi-times'
                     className='p-button close-button'
-                    onClick={() => navigate("/dashboard/deal")}
+                    onClick={() => navigate("/dashboard/deals")}
                 />
                 <div className='col-12'>
                     <div className='card deal'>
@@ -93,7 +94,7 @@ export const DealsForm = observer(() => {
                                         className='deal__accordion'
                                         multiple
                                     >
-                                        {dealSections.map((section) => (
+                                        {dealsSections.map((section) => (
                                             <AccordionTab
                                                 key={section.sectionId}
                                                 header={section.label}
@@ -136,7 +137,7 @@ export const DealsForm = observer(() => {
                                 </div>
                                 <div className='w-full flex flex-column p-0 card-content__wrapper'>
                                     <div className='flex flex-grow-1'>
-                                        {dealSections.map((section) =>
+                                        {dealsSections.map((section) =>
                                             section.items.map((item: DealsItem) => (
                                                 <div
                                                     key={item.itemIndex}
@@ -198,11 +199,9 @@ export const DealsForm = observer(() => {
                                 >
                                     Next
                                 </Button>
-                                (
                                 <Button onClick={() => {}} className='uppercase px-6 deal__button'>
                                     Save
                                 </Button>
-                                )
                             </div>
                         </div>
                     </div>
