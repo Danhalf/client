@@ -53,8 +53,14 @@ const router: RemixRouter = createBrowserRouter([
                         ],
                     },
                     {
+                        // path: "deals",
+                        // element: <Deals />,
                         path: "deals",
-                        element: <Deals />,
+                        children: [
+                            { path: "", element: <Contacts /> },
+                            { path: "create", element: <ContactForm /> },
+                            { path: ":id", element: <ContactForm /> },
+                        ],
                     },
                     {
                         path: "accounts",
