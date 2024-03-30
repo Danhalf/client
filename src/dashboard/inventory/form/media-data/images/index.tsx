@@ -20,7 +20,6 @@ import { InventoryMediaPostData, MediaLimitations } from "common/models/inventor
 import { useParams } from "react-router-dom";
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
 import { CATEGORIES } from "common/constants/media-categories";
-import { Dialog } from "primereact/dialog";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -50,8 +49,6 @@ export const ImagesMedia = observer((): ReactElement => {
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
-    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
-    const [currentImage, setCurrentImage] = useState<string>("");
 
     useEffect(() => {
         id && getInventory(id).then(() => fetchImages());
@@ -243,12 +240,6 @@ export const ImagesMedia = observer((): ReactElement => {
         changeInventoryMediaOrder(orderedList);
     };
 
-    // const handleImageClick = (src: string) => {
-    //     return (
-
-    //     );
-    // };
-
     const chooseOptions = {
         className: "media__button",
         label: "Choose from files",
@@ -350,14 +341,17 @@ export const ImagesMedia = observer((): ReactElement => {
                                         alt='inventory-item'
                                         width='75'
                                         height='75'
+                                        preview
                                         className='cursor-pointer'
-                                        onClick={() => {
-                                            setCurrentImage(src);
-                                            setDialogVisible(true);
-                                        }}
                                         pt={{
                                             image: {
                                                 className: "media-images__image",
+                                            },
+                                            previewContainer: {
+                                                className: "media-images__preview-container",
+                                            },
+                                            preview: {
+                                                className: "media-images__preview",
                                             },
                                         }}
                                     />
@@ -406,21 +400,6 @@ export const ImagesMedia = observer((): ReactElement => {
                     <div className='w-full text-center'>No images added yet.</div>
                 )}
             </div>
-            <Dialog
-                className='media-dialog'
-                visible={dialogVisible}
-                onHide={() => setDialogVisible(false)}
-            >
-                <Image
-                    className='media-dialog__image-wrapper'
-                    src={currentImage}
-                    pt={{
-                        image: {
-                            className: "media-dialog__image",
-                        },
-                    }}
-                />
-            </Dialog>
         </div>
     );
 });

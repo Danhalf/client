@@ -282,39 +282,25 @@
     min-width: 330px;
 }
 
-.media-dialog {
-    width: 70vw;
-    height: 70vh;
+.p-image-mask.p-component-overlay {
+    background-color: rgba(0, 0, 0, 0.25) !important;
 }
 
-.media-dialog .p-dialog-header {
-    height: 0;
-    padding: 0;
+.media-images__preview {
+    border-radius: 12px;
 }
 
-.media-dialog.p-dialog .p-dialog-header .p-dialog-header-close {
+.p-image-toolbar {
+    display: flex;
+    flex-direction: column-reverse;
 }
 
-.media-dialog.p-dialog .p-dialog-header .p-dialog-header-close-icon {
-    color: var(--admss-app-white-blue);
+.p-image-toolbar .p-image-action:last-child {
+    margin-bottom: 31vh;
 }
 
-.media-dialog .p-dialog-content {
-    border-radius: 22px;
-    padding: 0;
-}
-
-.media-dialog__image-wrapper {
-    display: block;
-    overflow: hidden;
-}
-
-.media-dialog__image-wrapper,
-.media-dialog__image {
-    width: 100%;
-    height: 100%;
-}
-
-.media-dialog__image {
-    object-fit: cover;
+.p-image-preview-container:hover > .p-image-preview-indicator {
+    height: 75px;
+    width: 75px;
+    background-color: rgba(0, 0, 0, 0.15);
 }
