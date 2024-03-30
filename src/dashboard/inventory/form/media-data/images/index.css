@@ -281,3 +281,33 @@
 .image-choose .info-panel__panel {
     min-width: 330px;
 }
+
+.media-dialog {
+    width: 70vw;
+    height: 70vh;
+}
+
+.media-dialog .p-dialog-header {
+    height: 0;
+    padding: 0;
+}
+
+.media-dialog .p-dialog-content {
+    border-radius: 22px;
+    padding: 0;
+}
+
+.media-dialog__image-wrapper {
+    display: block;
+    overflow: hidden;
+}
+
+.media-dialog__image-wrapper,
+.media-dialog__image {
+    width: 100%;
+    height: 100%;
+}
+
+.media-dialog__image {
+    object-fit: cover;
+}
