@@ -409,7 +409,6 @@ export const ImagesMedia = observer((): ReactElement => {
             <Dialog
                 className='media-dialog'
                 visible={dialogVisible}
-                header={<></>}
                 onHide={() => setDialogVisible(false)}
             >
                 <Image

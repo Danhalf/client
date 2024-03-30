@@ -292,6 +292,13 @@
     padding: 0;
 }
 
+.media-dialog.p-dialog .p-dialog-header .p-dialog-header-close {
+}
+
+.media-dialog.p-dialog .p-dialog-header .p-dialog-header-close-icon {
+    color: var(--admss-app-white-blue);
+}
+
 .media-dialog .p-dialog-content {
     border-radius: 22px;
     padding: 0;
