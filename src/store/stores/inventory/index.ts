@@ -203,7 +203,11 @@ export class InventoryStore {
                                 this._inventoryAudioID.push({ itemuid, mediauid });
                                 break;
                             case MediaType.mtDocument:
-                                this._inventoryDocumentsID.push(mediauid);
+                                this.documents.push({
+                                    src: "",
+                                    itemuid,
+                                    info,
+                                });
                                 break;
                             default:
                                 break;
@@ -569,6 +573,10 @@ export class InventoryStore {
 
     public set uploadFileAudios(files: UploadMediaItem) {
         this._uploadFileAudios = files;
+    }
+
+    public set uploadFileDocuments(files: UploadMediaItem) {
+        this._uploadFileDocuments = files;
     }
 
     public clearInventory = () => {
