@@ -151,8 +151,7 @@ export const VehicleGeneral = observer((): ReactElement => {
             } else {
                 changeInventory({ key: "Model", value: data.Model });
             }
-
-            if (!data.Year) {
+            if (!data.Year || Number(data.Year) < MIN_YEAR) {
                 errors.Year = "Data is required.";
             } else {
                 changeInventory({ key: "Year", value: String(data.Year) });
@@ -170,17 +169,23 @@ export const VehicleGeneral = observer((): ReactElement => {
         onSubmit: () => {},
     });
 
-    const isFormFieldInvalid = (name: keyof Inventory) => {
-        return !!formik.values[name] || formik.errors[name];
-    };
+    const isFormFieldInvalid = useCallback(
+        (name: keyof Inventory) => {
+            return !!formik.values[name];
+        },
+        [formik.values]
+    );
 
-    const getFormErrorMessage = (name: keyof Inventory) => {
-        return isFormFieldInvalid(name) ? (
-            <small className='p-error'>&nbsp;</small>
-        ) : (
-            <small className='p-error'>{formik.errors[name]}</small>
-        );
-    };
+    const getFormErrorMessage = useCallback(
+        (name: keyof Inventory) => {
+            return isFormFieldInvalid(name) ? (
+                <small className='p-error'>&nbsp;</small>
+            ) : (
+                <small className='p-error'>{formik.errors[name]}</small>
+            );
+        },
+        [formik.errors, isFormFieldInvalid]
+    );
 
     return (
         <div className='grid vehicle-general row-gap-2'>
@@ -251,17 +256,16 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputNumber
                         className={`vehicle-general__text-input w-full ${
-                            !isFormFieldInvalid("Year") && "p-invalid"
+                            formik.errors.Year && "p-invalid"
                         }`}
                         required
-                        min={MIN_YEAR}
                         value={year || MIN_YEAR}
                         useGrouping={false}
                         onChange={({ value }) => formik.setFieldValue("Year", value)}
                     />
                     <label className='float-label'>Year (required)</label>
                 </span>
-                {getFormErrorMessage("Year")}
+                <small className='p-error'>{formik.errors.Year ? "Data is required." : ""}</small>
             </div>
 
             <div className='col-3 relative'>
