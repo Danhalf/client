@@ -41,10 +41,10 @@ export const AudioMedia = observer((): ReactElement => {
         fetchAudios,
         clearInventory,
     } = store;
-    const [checked, setChecked] = useState<boolean>(true);
-    const [audioChecked, setAudioChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
+    const [checked, setChecked] = useState<boolean>(true);
+    const [audioChecked, setAudioChecked] = useState<boolean[]>([]);
 
     useEffect(() => {
         id && getInventory(id).then(() => fetchAudios());

@@ -359,6 +359,7 @@ export class InventoryStore {
                     [MediaType.mtPhoto, this._uploadFileImages],
                     [MediaType.mtVideo, this._uploadFileVideos],
                     [MediaType.mtAudio, this._uploadFileAudios],
+                    [MediaType.mtDocument, this._uploadFileDocuments],
                 ]);
                 const uploadPromises = (currentMt.get(mediaType) || { file: [] }).file.map(
                     async (file) => {
@@ -436,6 +437,7 @@ export class InventoryStore {
             return undefined;
         }
     });
+
     public saveInventoryDocuments = action(async (): Promise<Status | undefined> => {
         try {
             this._documents = [];
@@ -448,6 +450,7 @@ export class InventoryStore {
             return undefined;
         }
     });
+
     public changeInventoryMediaOrder = action(
         (list: Pick<InventoryMediaPostData, "itemuid" | "order">[]) => {
             list.forEach(async ({ itemuid, order }) => {
@@ -589,6 +592,8 @@ export class InventoryStore {
         this._videos = [];
         this._inventoryAudioID = [];
         this._audios = [];
+        this._inventoryDocumentsID = [];
+        this._documents = [];
         this._exportWeb = {} as InventoryWebInfo;
         this._exportWebHistory = [] as InventoryExportWebHistory[];
         this._printList = [] as InventoryPrintForm[];
