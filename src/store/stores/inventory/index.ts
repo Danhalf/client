@@ -72,7 +72,9 @@ export class InventoryStore {
     private _uploadFileAudios: UploadMediaItem = {} as UploadMediaItem;
     private _audios: MediaItem[] = [];
 
-    private _inventoryDocumentsID: string[] = [];
+    private _inventoryDocumentsID: Partial<InventoryMediaItemID>[] = [];
+    private _uploadFileDocuments: UploadMediaItem = {} as UploadMediaItem;
+    private _documents: MediaItem[] = [];
 
     private _printList: InventoryPrintForm[] = [];
 
@@ -121,6 +123,12 @@ export class InventoryStore {
     }
     public get audios() {
         return this._audios;
+    }
+    public get uploadFileDocuments() {
+        return this._uploadFileDocuments;
+    }
+    public get documents() {
+        return this._documents;
     }
 
     public get inventoryExportWebHistory() {
@@ -405,7 +413,7 @@ export class InventoryStore {
             this._videos = [];
             await this.saveInventoryMedia(MediaType.mtVideo);
             this._uploadFileVideos = {} as UploadMediaItem;
-            this.fetchImages();
+            this.fetchVideos();
             return Status.OK;
         } catch (error) {
             // TODO: add error handler
@@ -417,14 +425,25 @@ export class InventoryStore {
             this._audios = [];
             await this.saveInventoryMedia(MediaType.mtAudio);
             this._uploadFileAudios = {} as UploadMediaItem;
-            this.fetchImages();
+            this.fetchAudios();
             return Status.OK;
         } catch (error) {
             // TODO: add error handler
             return undefined;
         }
     });
-
+    public saveInventoryDocuments = action(async (): Promise<Status | undefined> => {
+        try {
+            this._documents = [];
+            await this.saveInventoryMedia(MediaType.mtDocument);
+            this._uploadFileDocuments = {} as UploadMediaItem;
+            this.fetchDocuments();
+            return Status.OK;
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
+        }
+    });
     public changeInventoryMediaOrder = action(
         (list: Pick<InventoryMediaPostData, "itemuid" | "order">[]) => {
             list.forEach(async ({ itemuid, order }) => {
@@ -498,6 +517,12 @@ export class InventoryStore {
         this._audios = [];
         this._inventoryAudioID = [];
         await this.fetchMedia(MediaType.mtAudio, this._audios, this._inventoryAudioID);
+    });
+
+    public fetchDocuments = action(async () => {
+        this._documents = [];
+        this._inventoryDocumentsID = [];
+        await this.fetchMedia(MediaType.mtDocument, this._documents, this._inventoryDocumentsID);
     });
 
     public getPrintList = action(async (inventoryuid = this._inventoryID) => {
