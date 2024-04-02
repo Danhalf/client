@@ -23,14 +23,6 @@ import { InputNumber } from "primereact/inputnumber";
 const VIN_VALID_LENGTH = 17;
 const MIN_YEAR = 1970;
 
-const validateYear = (value: string) => {
-    const year = parseInt(value, 10);
-    if (isNaN(year) || year < MIN_YEAR) {
-        return `Year must be at least ${MIN_YEAR}`;
-    }
-    return undefined;
-};
-
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
@@ -163,10 +155,6 @@ export const VehicleGeneral = observer((): ReactElement => {
             if (!data.Year) {
                 errors.Year = "Data is required.";
             } else {
-                const yearError = validateYear(data.Year);
-                if (yearError) {
-                    errors.Year = yearError;
-                }
                 changeInventory({ key: "Year", value: String(data.Year) });
             }
 
@@ -266,8 +254,8 @@ export const VehicleGeneral = observer((): ReactElement => {
                             !isFormFieldInvalid("Year") && "p-invalid"
                         }`}
                         required
-                        min={0}
-                        value={year || 0}
+                        min={MIN_YEAR}
+                        value={year || MIN_YEAR}
                         useGrouping={false}
                         onChange={({ value }) => formik.setFieldValue("Year", value)}
                     />
