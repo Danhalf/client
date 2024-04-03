@@ -62,6 +62,8 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
 
     const printTableData = async (print: boolean = false) => {
         const columns: string[] = renderColumnsData.map((column) => column.field);
+        const date = new Date();
+        const name = `accounts_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
         const params: QueryParams = {
             ...(selectedCategory?.id && { param: selectedCategory.id }),
@@ -70,7 +72,8 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
         if (authUser) {
             const data = await getContacts(authUser.useruid, params);
             const JSONreport = {
-                itemUID: authUser.useruid,
+                name,
+                itemUID: "0",
                 data,
                 columns,
                 format: "",

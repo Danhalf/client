@@ -163,6 +163,8 @@ export default function Inventories(): ReactElement {
     const printTableData = async (print: boolean = false) => {
         const columns: string[] = activeColumns.map((column) => column.field);
         let qry: string = "";
+        const date = new Date();
+        const name = `inventory_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
         if (globalSearch) {
             qry += globalSearch;
@@ -182,6 +184,8 @@ export default function Inventories(): ReactElement {
         if (authUser) {
             const data = await getInventoryList(authUser.useruid, params);
             const JSONreport = {
+                name,
+                itemUID: "0",
                 data,
                 columns,
                 format: "",
