@@ -253,6 +253,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             formik.touched.Year && formik.errors.Year && "p-invalid"
                         }`}
                         required
+                        min={0}
                         value={year || MIN_YEAR}
                         useGrouping={false}
                         onChange={({ value }) => formik.setFieldValue("Year", value)}
