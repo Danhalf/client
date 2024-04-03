@@ -40,8 +40,6 @@ export default function Deals() {
 
     const printTableData = async (print: boolean = false) => {
         const columns: string[] = renderColumnsData.map((column) => column.field) as string[];
-        const date = new Date();
-        const name = `deals_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
         const params: QueryParams = {
             ...(globalSearch && { qry: globalSearch }),
@@ -49,8 +47,7 @@ export default function Deals() {
         if (authUser) {
             const data = await getContacts(authUser.useruid, params);
             const JSONreport = {
-                name,
-                type: "table",
+                itemUID: authUser.useruid,
                 data,
                 columns,
                 format: "",

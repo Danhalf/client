@@ -264,8 +264,6 @@ export const ExportToWeb = () => {
 
     const printTableData = async (print: boolean = false) => {
         const columns: string[] = activeColumns.map((column) => column.field);
-        const date = new Date();
-        const name = `export-web_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
         const params: QueryParams = {
             ...(globalSearch && { qry: globalSearch }),
         };
@@ -273,8 +271,7 @@ export const ExportToWeb = () => {
         if (authUser) {
             const data = await getExportToWebList(authUser.useruid, params);
             const JSONreport = {
-                name,
-                type: "table",
+                itemUID: authUser.useruid,
                 data,
                 columns,
                 format: "",
