@@ -152,7 +152,10 @@ export const VehicleGeneral = observer((): ReactElement => {
                 changeInventory({ key: "Model", value: data.Model });
             }
             if (!data.Year || Number(data.Year) < MIN_YEAR) {
-                errors.Year = "Data is required.";
+                errors.Year =
+                    Number(data.Year) < MIN_YEAR
+                        ? `Must be greater than ${MIN_YEAR}`
+                        : "Data is required.";
             } else {
                 changeInventory({ key: "Year", value: String(data.Year) });
             }
@@ -165,35 +168,17 @@ export const VehicleGeneral = observer((): ReactElement => {
 
             return errors;
         },
-        validateOnChange: true,
         onSubmit: () => {},
     });
-
-    const isFormFieldInvalid = useCallback(
-        (name: keyof Inventory) => {
-            return !!formik.values[name];
-        },
-        [formik.values]
-    );
-
-    const getFormErrorMessage = useCallback(
-        (name: keyof Inventory) => {
-            return isFormFieldInvalid(name) ? (
-                <small className='p-error'>&nbsp;</small>
-            ) : (
-                <small className='p-error'>{formik.errors[name]}</small>
-            );
-        },
-        [formik.errors, isFormFieldInvalid]
-    );
 
     return (
         <div className='grid vehicle-general row-gap-2'>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InputText
+                        {...formik.getFieldProps("VIN")}
                         className={`vehicle-general__text-input w-full ${
-                            !isFormFieldInvalid("VIN") && "p-invalid"
+                            formik.touched.VIN && formik.errors.VIN && "p-invalid"
                         }`}
                         value={formik.values.VIN}
                         onChange={({ target: { value } }) => {
@@ -202,7 +187,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     />
                     <label className='float-label'>VIN (required)</label>
                 </span>
-                {getFormErrorMessage("VIN")}
+                <small className='p-error'>{(formik.touched.VIN && formik.errors.VIN) || ""}</small>
             </div>
 
             <div className='col-6'>
@@ -219,6 +204,7 @@ export const VehicleGeneral = observer((): ReactElement => {
             </div>
             <div className='col-6 relative'>
                 <Dropdown
+                    {...formik.getFieldProps("Make")}
                     optionLabel='name'
                     optionValue='name'
                     value={formik.values.Make}
@@ -230,14 +216,17 @@ export const VehicleGeneral = observer((): ReactElement => {
                     itemTemplate={autoMakesOptionTemplate}
                     placeholder='Make (required)'
                     className={`vehicle-general__dropdown w-full ${
-                        !isFormFieldInvalid("Make") && "p-invalid"
+                        formik.touched.Make && formik.errors.Make && "p-invalid"
                     }`}
                 />
-                {getFormErrorMessage("Make")}
+                <small className='p-error'>
+                    {(formik.touched.Make && formik.errors.Make) || ""}
+                </small>
             </div>
 
             <div className='col-6 relative'>
                 <Dropdown
+                    {...formik.getFieldProps("Model")}
                     optionLabel='name'
                     optionValue='name'
                     value={formik.values.Model}
@@ -247,16 +236,19 @@ export const VehicleGeneral = observer((): ReactElement => {
                     onChange={({ value }) => formik.setFieldValue("Model", value)}
                     placeholder='Model (required)'
                     className={`vehicle-general__dropdown w-full ${
-                        !isFormFieldInvalid("Model") && "p-invalid"
+                        formik.touched.Model && formik.errors.Model && "p-invalid"
                     }`}
                 />
-                {getFormErrorMessage("Model")}
+                <small className='p-error'>
+                    {(formik.touched.Model && formik.errors.Model) || ""}
+                </small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputNumber
+                        {...formik.getFieldProps("Year")}
                         className={`vehicle-general__text-input w-full ${
-                            formik.errors.Year && "p-invalid"
+                            formik.touched.Year && formik.errors.Year && "p-invalid"
                         }`}
                         required
                         value={year || MIN_YEAR}
@@ -265,14 +257,17 @@ export const VehicleGeneral = observer((): ReactElement => {
                     />
                     <label className='float-label'>Year (required)</label>
                 </span>
-                <small className='p-error'>{formik.errors.Year ? "Data is required." : ""}</small>
+                <small className='p-error'>
+                    {(formik.touched.Year && formik.errors.Year) || ""}
+                </small>
             </div>
 
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputNumber
+                        {...formik.getFieldProps("mileage")}
                         className={`vehicle-general__text-input w-full ${
-                            !isFormFieldInvalid("mileage") && "p-invalid"
+                            formik.touched.mileage && formik.errors.mileage && "p-invalid"
                         }`}
                         required
                         value={mileage}
@@ -289,7 +284,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                     <label className='float-label'>Mileage (required)</label>
                 </span>
 
-                {getFormErrorMessage("mileage")}
+                <small className='p-error'>
+                    {(formik.touched.mileage && formik.errors.mileage) || ""}
+                </small>
             </div>
             <div className='col-3'>
                 <Dropdown
