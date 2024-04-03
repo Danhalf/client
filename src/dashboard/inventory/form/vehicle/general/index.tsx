@@ -24,6 +24,7 @@ import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 //TODO: add validation
 const VIN_VALID_LENGTH = 17;
 const MIN_YEAR = 1970;
+const MAX_YEAR = new Date().getFullYear();
 
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -153,11 +154,17 @@ export const VehicleGeneral = observer((): ReactElement => {
             } else {
                 changeInventory({ key: "Model", value: data.Model });
             }
-            if (!data.Year || Number(data.Year) < MIN_YEAR) {
-                errors.Year =
-                    Number(data.Year) < MIN_YEAR
-                        ? `Must be greater than ${MIN_YEAR}`
-                        : "Data is required.";
+            if (!data.Year || Number(data.Year) < MIN_YEAR || Number(data.Year) > MAX_YEAR) {
+                switch (true) {
+                    case Number(data.Year) < MIN_YEAR:
+                        errors.Year = `Must be greater than ${MIN_YEAR}`;
+                        break;
+                    case Number(data.Year) > MAX_YEAR:
+                        errors.Year = `Must be less than ${MAX_YEAR}`;
+                        break;
+                    default:
+                        errors.Year = "Data is required.";
+                }
             } else {
                 changeInventory({ key: "Year", value: String(data.Year) });
             }
