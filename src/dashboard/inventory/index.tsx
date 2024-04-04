@@ -190,6 +190,7 @@ export default function Inventories(): ReactElement {
                 columns,
                 format: "",
             };
+            //@ts-ignore
             await makeReports(authUser.useruid, JSONreport).then((response) => {
                 setTimeout(() => {
                     getReportById(response.taskuid).then((response) => {

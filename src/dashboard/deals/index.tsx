@@ -20,6 +20,7 @@ import { getContacts } from "http/services/contacts-service";
 import { getReportById, makeReports } from "http/services/reports.service";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
+import { ReportsColumn } from "common/models/reports";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountuid", header: "Account" },
@@ -39,19 +40,34 @@ export default function Deals() {
     const navigate = useNavigate();
 
     const printTableData = async (print: boolean = false) => {
-        const columns: string[] = renderColumnsData.map((column) => column.field) as string[];
+        const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
         const date = new Date();
         const name = `deals_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
-
         const params: QueryParams = {
             ...(globalSearch && { qry: globalSearch }),
         };
+
         if (authUser) {
-            const data = await getContacts(authUser.useruid, params);
+            const data = await getContacts(authUser.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    return response.map((item) => {
+                        const filteredItem: Record<string, any> = {};
+                        columns.forEach((column) => {
+                            if (item.hasOwnProperty(column.data)) {
+                                filteredItem[column.data] = item[column.data as keyof typeof item];
+                            }
+                        });
+                        return filteredItem;
+                    });
+                }
+            });
             const JSONreport = {
                 name,
                 itemUID: "0",
-                data,
+                data: data as Record<string, string>[],
                 columns,
                 format: "",
             };

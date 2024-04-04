@@ -53,6 +53,7 @@ export default function Accounts() {
                 columns,
                 format: "",
             };
+            //@ts-ignore
             await makeReports(authUser.useruid, JSONreport).then((response) => {
                 setTimeout(() => {
                     getReportById(response.taskuid).then((response) => {
