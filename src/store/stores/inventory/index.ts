@@ -380,6 +380,7 @@ export class InventoryStore {
                                             .data.contenttype,
                                         notes: (currentMt.get(mediaType) as UploadMediaItem).data
                                             .notes,
+                                        type: mediaType,
                                     });
                                 }
                             }
