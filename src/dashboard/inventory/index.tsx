@@ -25,6 +25,7 @@ import { FilterOptions, TableColumnsList, columns, filterOptions } from "./commo
 import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getReportById, makeReports } from "http/services/reports.service";
 import { Checkbox } from "primereact/checkbox";
+import { ReportsColumn } from "common/models/reports";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -161,7 +162,10 @@ export default function Inventories(): ReactElement {
     }, [authUser]);
 
     const printTableData = async (print: boolean = false) => {
-        const columns: string[] = activeColumns.map((column) => column.field);
+        const columns: ReportsColumn[] = activeColumns.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
         let qry: string = "";
         const date = new Date();
         const name = `inventory_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
@@ -182,15 +186,26 @@ export default function Inventories(): ReactElement {
         };
 
         if (authUser) {
-            const data = await getInventoryList(authUser.useruid, params);
+            const data = await getInventoryList(authUser.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    return response.map((item) => {
+                        const filteredItem: Record<string, any> = {};
+                        columns.forEach((column) => {
+                            if (item.hasOwnProperty(column.data)) {
+                                filteredItem[column.data] = item[column.data as keyof typeof item];
+                            }
+                        });
+                        return filteredItem;
+                    });
+                }
+            });
             const JSONreport = {
                 name,
                 itemUID: "0",
-                data,
+                data: data as Record<string, string>[],
                 columns,
                 format: "",
             };
-            //@ts-ignore
             await makeReports(authUser.useruid, JSONreport).then((response) => {
                 setTimeout(() => {
                     getReportById(response.taskuid).then((response) => {

@@ -76,7 +76,7 @@ export default function Deals() {
                         const url = new Blob([response], { type: "application/pdf" });
                         let link = document.createElement("a");
                         link.href = window.URL.createObjectURL(url);
-                        link.download = `${name}.pdf`;
+                        link.download = `Report-${name}.pdf`;
                         link.click();
 
                         if (print) {
