@@ -111,20 +111,34 @@ export default function Inventories(): ReactElement {
     }, [activeColumns]);
 
     useEffect(() => {
-        const isAdvancedSearchEmpty = isObjectEmpty(advancedSearch);
+        if (selectedFilterOptions) {
+            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
+        }
+        let qry: string = "";
+
+        if (globalSearch) {
+            qry += globalSearch;
+        } else {
+            qry += createStringifySearchQuery(advancedSearch);
+        }
+
+        if (selectedFilterOptions) {
+            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
+            qry += createStringifyFilterQuery(selectedFilterOptions);
+        }
 
         const params: QueryParams = {
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
-            ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(advancedSearch) }),
-            ...(globalSearch && { qry: globalSearch }),
             ...(lazyState.sortField && { column: lazyState.sortField }),
+            qry,
             skip: lazyState.first,
             top: lazyState.rows,
         };
+
         handleGetInventoryList(params);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lazyState, globalSearch, authUser]);
+    }, [lazyState, globalSearch, authUser, selectedFilterOptions]);
 
     useEffect(() => {
         if (authUser) {
@@ -346,24 +360,6 @@ export default function Inventories(): ReactElement {
         },
     ];
 
-    useEffect(() => {
-        if (selectedFilterOptions) {
-            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
-            const qry = createStringifyFilterQuery(selectedFilterOptions);
-            const params: QueryParams = {
-                ...(lazyState.sortOrder === 1 && { type: "asc" }),
-                ...(lazyState.sortOrder === -1 && { type: "desc" }),
-                ...{
-                    qry,
-                },
-                skip: lazyState.first,
-                top: lazyState.rows,
-            };
-            handleGetInventoryList(params);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedFilterOptions]);
-
     const header = (
         <div className='grid datatable-controls'>
             <div className='col-2'>
@@ -440,12 +436,14 @@ export default function Inventories(): ReactElement {
                         severity='success'
                         type='button'
                         icon='pi pi-print'
+                        tooltip='Print inventory form'
                         onClick={() => printTableData(true)}
                     />
                     <Button
                         severity='success'
                         type='button'
                         icon='icon adms-blank'
+                        tooltip='Download inventory form'
                         onClick={() => printTableData()}
                     />
                 </div>

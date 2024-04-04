@@ -144,18 +144,21 @@ export default function Accounts() {
                                         icon='pi pi-plus-circle'
                                         severity='success'
                                         type='button'
+                                        tooltip='Add new account'
                                         onClick={() => navigate("create")}
                                     />
                                     <Button
                                         severity='success'
                                         type='button'
                                         icon='icon adms-print'
+                                        tooltip='Print accounts form'
                                         onClick={() => printTableData(true)}
                                     />
                                     <Button
                                         severity='success'
                                         type='button'
                                         icon='icon adms-blank'
+                                        tooltip='Download accounts form'
                                         onClick={() => printTableData()}
                                     />
                                 </div>
