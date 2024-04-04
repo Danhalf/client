@@ -16,7 +16,6 @@ import { getDealsList } from "http/services/deals.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
 import { Inventory } from "common/models/inventory";
-import { getContacts } from "http/services/contacts-service";
 import { getReportById, makeReports } from "http/services/reports.service";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
@@ -51,7 +50,7 @@ export default function Deals() {
         };
 
         if (authUser) {
-            const data = await getContacts(authUser.useruid, params).then((response) => {
+            const data = await getDealsList(authUser.useruid, params).then((response) => {
                 if (Array.isArray(response)) {
                     return response.map((item) => {
                         const filteredItem: Record<string, any> = {};
@@ -77,7 +76,7 @@ export default function Deals() {
                         const url = new Blob([response], { type: "application/pdf" });
                         let link = document.createElement("a");
                         link.href = window.URL.createObjectURL(url);
-                        link.download = "Report.pdf";
+                        link.download = `${name}.pdf`;
                         link.click();
 
                         if (print) {
