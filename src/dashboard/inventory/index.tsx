@@ -180,43 +180,23 @@ export default function Inventories(): ReactElement {
             name: column.header as string,
             data: column.field as string,
         }));
-        let qry: string = "";
         const date = new Date();
         const name = `inventory_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
-        if (globalSearch) {
-            qry += globalSearch;
-        } else {
-            qry += createStringifySearchQuery(advancedSearch);
-        }
-
-        if (selectedFilterOptions) {
-            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
-            qry += createStringifyFilterQuery(selectedFilterOptions);
-        }
-
-        const params: QueryParams = {
-            qry,
-        };
-
         if (authUser) {
-            const data = await getInventoryList(authUser.useruid, params).then((response) => {
-                if (Array.isArray(response)) {
-                    return response.map((item) => {
-                        const filteredItem: Record<string, any> = {};
-                        columns.forEach((column) => {
-                            if (item.hasOwnProperty(column.data)) {
-                                filteredItem[column.data] = item[column.data as keyof typeof item];
-                            }
-                        });
-                        return filteredItem;
-                    });
-                }
+            const data = inventories.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        filteredItem[column.data] = item[column.data as keyof typeof item];
+                    }
+                });
+                return filteredItem;
             });
             const JSONreport = {
                 name,
                 itemUID: "0",
-                data: data as Record<string, string>[],
+                data: data as any,
                 columns,
                 format: "",
             };

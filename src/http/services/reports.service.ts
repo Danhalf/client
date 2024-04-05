@@ -15,7 +15,10 @@ export const getReportsList = async (uid: string, queryParams: QueryParams) => {
 
 export const makeReports = async (uid: string | undefined, body?: ReportsPostData) => {
     try {
-        const request = await authorizedUserApiInstance.post<any>(`reports/${uid}/report`, body);
+        const request = await authorizedUserApiInstance.post<any>(
+            `reports/${uid}/shortreport`,
+            body
+        );
         return request.data;
     } catch (error) {
         // TODO: add error handler
