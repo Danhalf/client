@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
@@ -15,6 +16,7 @@ import {
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
+import { DLSide } from "store/stores/contact";
 
 const SexList = [
     {
@@ -24,6 +26,11 @@ const SexList = [
         name: "F",
     },
 ];
+
+enum DLSides {
+    front = "front",
+    back = "back",
+}
 
 export const ContactsIdentificationInfo = observer((): ReactElement => {
     const [sex, setSex] = useState<string>("");
@@ -36,19 +43,24 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const onTemplateSelect = (e: FileUploadSelectEvent) => {};
-
-    const onTemplateUpload = (e: FileUploadUploadEvent) => {};
+    const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide) => {
+        if (side === DLSides.front) {
+            store.frontSideDL = e.files[0];
+        }
+        if (side === DLSides.back) {
+            store.backSideDL = e.files[0];
+        }
+    };
 
     // eslint-disable-next-line no-unused-vars
-    const onTemplateRemove = (file: File, callback: Function) => {
+    const onTemplateRemove = (file: File, callback: Function, side: DLSide) => {
         removeImagesDL().then((res) => {
-            handleUploadFiles();
+            setImagesDL();
         });
         callback();
     };
 
-    const handleUploadFiles = () => {
+    const handleUploadFile = (side: DLSide) => {
         setImagesDL().then((res) => {
             if (res) {
                 fileUploadRef.current?.clear();
@@ -56,13 +68,13 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         });
     };
 
-    const handleDeleteImage = () => {
+    const handleDeleteImage = (side: DLSide) => {
         removeImagesDL().then((res) => {
-            handleUploadFiles();
+            setImagesDL();
         });
     };
 
-    const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
+    const itemTemplateFront = (inFile: object, props: ItemTemplateOptions) => {
         const file = inFile as File;
         return (
             <div className='flex align-items-center presentation'>
@@ -82,14 +94,41 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <Button
                     type='button'
                     icon='pi pi-times'
-                    onClick={handleDeleteImage}
+                    onClick={() => handleDeleteImage(DLSides.front)}
                     className='p-button presentation__remove-button'
                 />
             </div>
         );
     };
 
-    const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
+    const itemTemplateBack = (inFile: object, props: ItemTemplateOptions) => {
+        const file = inFile as File;
+        return (
+            <div className='flex align-items-center presentation'>
+                <div className='flex align-items-center'>
+                    <img
+                        alt={file.name}
+                        src={URL.createObjectURL(file)}
+                        role='presentation'
+                        width={29}
+                        height={29}
+                        className='presentation__image'
+                    />
+                    <span className='presentation__label flex flex-column text-left ml-3'>
+                        {file.name}
+                    </span>
+                </div>
+                <Button
+                    type='button'
+                    icon='pi pi-times'
+                    onClick={() => handleDeleteImage(DLSides.back)}
+                    className='p-button presentation__remove-button'
+                />
+            </div>
+        );
+    };
+
+    const chooseTemplateFront = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
         return (
             <div className='col-6 ml-auto flex justify-content-center flex-wrap mb-3'>
                 {chooseButton}
@@ -97,7 +136,33 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         );
     };
 
-    const emptyTemplate = () => {
+    const chooseTemplateBack = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
+        return (
+            <div className='col-6 ml-auto flex justify-content-center flex-wrap mb-3'>
+                {chooseButton}
+            </div>
+        );
+    };
+
+    const emptyTemplateFront = () => {
+        return (
+            <div className='grid col-6 ml-auto'>
+                <div className='flex align-items-center flex-column col-12'>
+                    <i className='pi pi-cloud-upload dl__upload-icon' />
+                    <span className='text-center dl__upload-icon-label'>
+                        Drag and Drop Images Here
+                    </span>
+                </div>
+                <div className='col-12 flex justify-content-center align-items-center dl__upload-splitter'>
+                    <hr className='dl__line mr-4 flex-1' />
+                    <span>or</span>
+                    <hr className='dl__line ml-4 flex-1' />
+                </div>
+            </div>
+        );
+    };
+
+    const emptyTemplateBack = () => {
         return (
             <div className='grid col-6 ml-auto'>
                 <div className='flex align-items-center flex-column col-12'>
@@ -187,11 +252,10 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <FileUpload
                     ref={fileUploadRef}
                     accept='image/*'
-                    headerTemplate={chooseTemplate}
-                    onUpload={onTemplateUpload}
-                    itemTemplate={itemTemplate}
-                    emptyTemplate={emptyTemplate}
-                    onSelect={onTemplateSelect}
+                    headerTemplate={chooseTemplateFront}
+                    itemTemplate={itemTemplateFront}
+                    emptyTemplate={emptyTemplateFront}
+                    onSelect={(event) => onTemplateSelect(event, DLSides.front)}
                     progressBarTemplate={<></>}
                     className='col-12'
                 />
@@ -201,9 +265,10 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <FileUpload
                     ref={fileUploadRef}
                     accept='image/*'
-                    headerTemplate={chooseTemplate}
-                    itemTemplate={itemTemplate}
-                    emptyTemplate={emptyTemplate}
+                    headerTemplate={chooseTemplateBack}
+                    itemTemplate={itemTemplateBack}
+                    emptyTemplate={emptyTemplateBack}
+                    onSelect={(event) => onTemplateSelect(event, DLSides.back)}
                     progressBarTemplate={<></>}
                     className='col-12'
                 />
