@@ -44,7 +44,9 @@ export default function Deals() {
             data: column.field as string,
         }));
         const date = new Date();
-        const name = `deals_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+        const name = `deals_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
         if (authUser) {
             const data = deals.map((item) => {

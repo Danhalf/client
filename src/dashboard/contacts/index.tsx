@@ -67,7 +67,9 @@ export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
             data: column.field as string,
         }));
         const date = new Date();
-        const name = `contacts_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+        const name = `contacts_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
         if (authUser) {
             const data = contacts.map((item) => {

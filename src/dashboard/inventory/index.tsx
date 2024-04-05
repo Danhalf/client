@@ -181,7 +181,9 @@ export default function Inventories(): ReactElement {
             data: column.field as string,
         }));
         const date = new Date();
-        const name = `inventory_${date.getMonth()}-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+        const name = `inventory_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
 
         if (authUser) {
             const data = inventories.map((item) => {
