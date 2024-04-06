@@ -35,8 +35,9 @@ enum DLSides {
 export const ContactsIdentificationInfo = observer((): ReactElement => {
     const [sex, setSex] = useState<string>("");
     const store = useStore().contactStore;
-    const { contact, setImagesDL, getImagesDL, removeImagesDL } = store;
-    const fileUploadRef = useRef<FileUpload>(null);
+    const { contact, frontSideDL, backSideDL, getImagesDL, removeImagesDL } = store;
+    const fileUploadFrontRef = useRef<FileUpload>(null);
+    const fileUploadBackRef = useRef<FileUpload>(null);
 
     useEffect(() => {
         getImagesDL();
@@ -52,117 +53,52 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         }
     };
 
-    // eslint-disable-next-line no-unused-vars
-    const onTemplateRemove = (file: File, callback: Function, side: DLSide) => {
-        removeImagesDL().then((res) => {
-            setImagesDL();
-        });
-        callback();
-    };
-
-    const handleUploadFile = (side: DLSide) => {
-        setImagesDL().then((res) => {
-            if (res) {
-                fileUploadRef.current?.clear();
-            }
-        });
-    };
-
     const handleDeleteImage = (side: DLSide) => {
-        removeImagesDL().then((res) => {
-            setImagesDL();
-        });
+        if (side === DLSides.front) {
+            fileUploadFrontRef.current?.clear();
+            store.frontSideDL = {} as File;
+        }
+        if (side === DLSides.back) {
+            fileUploadBackRef.current?.clear();
+            store.backSideDL = {} as File;
+        }
+        removeImagesDL();
     };
 
-    const itemTemplateFront = (inFile: object, props: ItemTemplateOptions) => {
+    const itemTemplate = (inFile: object, side: DLSide) => {
         const file = inFile as File;
         return (
-            <div className='flex align-items-center presentation'>
-                <div className='flex align-items-center'>
-                    <img
-                        alt={file.name}
-                        src={URL.createObjectURL(file)}
-                        role='presentation'
-                        width={29}
-                        height={29}
-                        className='presentation__image'
-                    />
-                    <span className='presentation__label flex flex-column text-left ml-3'>
-                        {file.name}
-                    </span>
-                </div>
+            <div className='flex align-items-center dl-presentation'>
+                <img
+                    alt={file.name}
+                    src={URL.createObjectURL(file)}
+                    role='presentation'
+                    className='dl-presentation__image'
+                />
                 <Button
                     type='button'
                     icon='pi pi-times'
-                    onClick={() => handleDeleteImage(DLSides.front)}
-                    className='p-button presentation__remove-button'
+                    onClick={() => handleDeleteImage(side)}
+                    className='p-button dl-presentation__remove-button'
                 />
             </div>
         );
     };
 
-    const itemTemplateBack = (inFile: object, props: ItemTemplateOptions) => {
-        const file = inFile as File;
+    const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions, side: DLSide) => {
+        const { size } = side === DLSides.front ? frontSideDL : backSideDL;
         return (
-            <div className='flex align-items-center presentation'>
-                <div className='flex align-items-center'>
-                    <img
-                        alt={file.name}
-                        src={URL.createObjectURL(file)}
-                        role='presentation'
-                        width={29}
-                        height={29}
-                        className='presentation__image'
-                    />
-                    <span className='presentation__label flex flex-column text-left ml-3'>
-                        {file.name}
-                    </span>
-                </div>
-                <Button
-                    type='button'
-                    icon='pi pi-times'
-                    onClick={() => handleDeleteImage(DLSides.back)}
-                    className='p-button presentation__remove-button'
-                />
-            </div>
-        );
-    };
-
-    const chooseTemplateFront = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
-        return (
-            <div className='col-6 ml-auto flex justify-content-center flex-wrap mb-3'>
+            <div
+                className={`col-6 ml-auto flex justify-content-center flex-wrap mb-3 dl-header ${
+                    size ? "dl-header__active" : ""
+                }`}
+            >
                 {chooseButton}
             </div>
         );
     };
 
-    const chooseTemplateBack = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
-        return (
-            <div className='col-6 ml-auto flex justify-content-center flex-wrap mb-3'>
-                {chooseButton}
-            </div>
-        );
-    };
-
-    const emptyTemplateFront = () => {
-        return (
-            <div className='grid col-6 ml-auto'>
-                <div className='flex align-items-center flex-column col-12'>
-                    <i className='pi pi-cloud-upload dl__upload-icon' />
-                    <span className='text-center dl__upload-icon-label'>
-                        Drag and Drop Images Here
-                    </span>
-                </div>
-                <div className='col-12 flex justify-content-center align-items-center dl__upload-splitter'>
-                    <hr className='dl__line mr-4 flex-1' />
-                    <span>or</span>
-                    <hr className='dl__line ml-4 flex-1' />
-                </div>
-            </div>
-        );
-    };
-
-    const emptyTemplateBack = () => {
+    const emptyTemplate = () => {
         return (
             <div className='grid col-6 ml-auto'>
                 <div className='flex align-items-center flex-column col-12'>
@@ -247,30 +183,36 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 <hr className='identification__line flex-1' />
             </div>
 
-            <div className='col-6 identification-dl'>
+            <div
+                className={`col-6 identification-dl ${
+                    frontSideDL.size ? "identification-dl__active" : ""
+                }`}
+            >
                 <div className='identification-dl__title'>Frontside</div>
                 <FileUpload
-                    ref={fileUploadRef}
+                    ref={fileUploadFrontRef}
                     accept='image/*'
-                    headerTemplate={chooseTemplateFront}
-                    itemTemplate={itemTemplateFront}
-                    emptyTemplate={emptyTemplateFront}
+                    headerTemplate={(props) => chooseTemplate(props, DLSides.front)}
+                    itemTemplate={(file) => itemTemplate(file, DLSides.front)}
+                    emptyTemplate={emptyTemplate}
                     onSelect={(event) => onTemplateSelect(event, DLSides.front)}
                     progressBarTemplate={<></>}
-                    className='col-12'
                 />
             </div>
-            <div className='col-6 identification-dl'>
+            <div
+                className={`col-6 identification-dl ${
+                    backSideDL.size ? "identification-dl__active" : ""
+                }`}
+            >
                 <div className='identification-dl__title'>Backside</div>
                 <FileUpload
-                    ref={fileUploadRef}
+                    ref={fileUploadBackRef}
                     accept='image/*'
-                    headerTemplate={chooseTemplateBack}
-                    itemTemplate={itemTemplateBack}
-                    emptyTemplate={emptyTemplateBack}
+                    headerTemplate={(props) => chooseTemplate(props, DLSides.back)}
+                    itemTemplate={(file) => itemTemplate(file, DLSides.back)}
+                    emptyTemplate={emptyTemplate}
                     onSelect={(event) => onTemplateSelect(event, DLSides.back)}
                     progressBarTemplate={<></>}
-                    className='col-12'
                 />
             </div>
         </div>
