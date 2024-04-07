@@ -17,6 +17,7 @@ import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
 import { DLSide } from "store/stores/contact";
+import { useParams } from "react-router-dom";
 
 const SexList = [
     {
@@ -34,6 +35,7 @@ enum DLSides {
 
 export const ContactsIdentificationInfo = observer((): ReactElement => {
     const [sex, setSex] = useState<string>("");
+    const { id } = useParams();
     const store = useStore().contactStore;
     const { contact, frontSideDL, backSideDL, getImagesDL, removeImagesDL } = store;
     const fileUploadFrontRef = useRef<FileUpload>(null);
