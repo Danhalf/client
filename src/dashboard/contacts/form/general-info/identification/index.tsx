@@ -10,8 +10,6 @@ import {
     FileUpload,
     FileUploadHeaderTemplateOptions,
     FileUploadSelectEvent,
-    FileUploadUploadEvent,
-    ItemTemplateOptions,
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
@@ -180,43 +178,47 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     className='identification-info__date-input w-full'
                 />
             </div>
-            <div className='flex col-12'>
-                <h3 className='identification__title m-0 pr-3'>Driver license's photos</h3>
-                <hr className='identification__line flex-1' />
-            </div>
+            {id && (
+                <>
+                    <div className='flex col-12'>
+                        <h3 className='identification__title m-0 pr-3'>Driver license's photos</h3>
+                        <hr className='identification__line flex-1' />
+                    </div>
 
-            <div
-                className={`col-6 identification-dl ${
-                    frontSideDL.size ? "identification-dl__active" : ""
-                }`}
-            >
-                <div className='identification-dl__title'>Frontside</div>
-                <FileUpload
-                    ref={fileUploadFrontRef}
-                    accept='image/*'
-                    headerTemplate={(props) => chooseTemplate(props, DLSides.front)}
-                    itemTemplate={(file) => itemTemplate(file, DLSides.front)}
-                    emptyTemplate={emptyTemplate}
-                    onSelect={(event) => onTemplateSelect(event, DLSides.front)}
-                    progressBarTemplate={<></>}
-                />
-            </div>
-            <div
-                className={`col-6 identification-dl ${
-                    backSideDL.size ? "identification-dl__active" : ""
-                }`}
-            >
-                <div className='identification-dl__title'>Backside</div>
-                <FileUpload
-                    ref={fileUploadBackRef}
-                    accept='image/*'
-                    headerTemplate={(props) => chooseTemplate(props, DLSides.back)}
-                    itemTemplate={(file) => itemTemplate(file, DLSides.back)}
-                    emptyTemplate={emptyTemplate}
-                    onSelect={(event) => onTemplateSelect(event, DLSides.back)}
-                    progressBarTemplate={<></>}
-                />
-            </div>
+                    <div
+                        className={`col-6 identification-dl ${
+                            frontSideDL.size ? "identification-dl__active" : ""
+                        }`}
+                    >
+                        <div className='identification-dl__title'>Frontside</div>
+                        <FileUpload
+                            ref={fileUploadFrontRef}
+                            accept='image/*'
+                            headerTemplate={(props) => chooseTemplate(props, DLSides.front)}
+                            itemTemplate={(file) => itemTemplate(file, DLSides.front)}
+                            emptyTemplate={emptyTemplate}
+                            onSelect={(event) => onTemplateSelect(event, DLSides.front)}
+                            progressBarTemplate={<></>}
+                        />
+                    </div>
+                    <div
+                        className={`col-6 identification-dl ${
+                            backSideDL.size ? "identification-dl__active" : ""
+                        }`}
+                    >
+                        <div className='identification-dl__title'>Backside</div>
+                        <FileUpload
+                            ref={fileUploadBackRef}
+                            accept='image/*'
+                            headerTemplate={(props) => chooseTemplate(props, DLSides.back)}
+                            itemTemplate={(file) => itemTemplate(file, DLSides.back)}
+                            emptyTemplate={emptyTemplate}
+                            onSelect={(event) => onTemplateSelect(event, DLSides.back)}
+                            progressBarTemplate={<></>}
+                        />
+                    </div>
+                </>
+            )}
         </div>
     );
 });

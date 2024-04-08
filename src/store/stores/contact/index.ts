@@ -12,6 +12,8 @@ export class ContactStore {
     private _contact: Contact = {} as Contact;
     private _contactID: string = "";
     protected _isLoading = false;
+    private _frontSiteDLSrc: string = "";
+    private _backSiteDLSrc: string = "";
     private _frontSiteDL: File = {} as File;
     private _backSiteDL: File = {} as File;
 
@@ -55,14 +57,12 @@ export class ContactStore {
         }
     };
 
-    public getImagesDL = async (): Promise<any> => {
-        this._isLoading = true;
-        try {
-            return Status.OK;
-        } catch (error) {
-            return Status.ERROR;
-        } finally {
-            this._isLoading = false;
+    public getImagesDL = (): void => {
+        if (this._contact.dluidfront) {
+            this._frontSiteDLSrc = this._contact.dluidfront;
+        }
+        if (this._contact.dluidback) {
+            this._backSiteDLSrc = this._contact.dluidback;
         }
     };
 
