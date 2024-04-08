@@ -68,20 +68,26 @@ export class ContactStore {
 
     public setImagesDL = async (): Promise<any> => {
         this._isLoading = true;
-        const formData = new FormData();
-        [this._frontSiteDL, this._backSiteDL].forEach((file) => formData.append("file", file));
-
         try {
-            const createMediaResponse = await createMediaItemRecord();
-            if (createMediaResponse?.status === Status.OK) {
-                const uploadMediaResponse = await uploadInventoryMedia(this._contactID, formData);
-                if (uploadMediaResponse?.status === Status.OK) {
-                    await setContactDL(this._contactID, {
-                        dluidfront: uploadMediaResponse.itemuid,
-                        dluidback: uploadMediaResponse.itemuid,
-                    });
+            [this._frontSiteDL, this._backSiteDL].forEach(async (file, index) => {
+                if (file.size) {
+                    const formData = new FormData();
+                    formData.append("file", file);
+
+                    const createMediaResponse = await createMediaItemRecord();
+                    if (createMediaResponse?.status === Status.OK) {
+                        const uploadMediaResponse = await uploadInventoryMedia(
+                            this._contactID,
+                            formData
+                        );
+                        if (uploadMediaResponse?.status === Status.OK) {
+                            await setContactDL(this._contactID, {
+                                [!!index ? "dluidfront" : "dluidback"]: uploadMediaResponse.itemuid,
+                            });
+                        }
+                    }
                 }
-            }
+            });
         } catch (error) {
             // TODO: add error handler
         }
