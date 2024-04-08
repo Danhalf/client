@@ -32,7 +32,7 @@ export const ContactForm = () => {
         const contactSections: any[] = [GeneralInfoData, ContactInfoData];
         if (id) {
             getContact(id);
-            contactSections.splice(1, 0, ContactMediaData);
+            contactSections.splice(2, 0, ContactMediaData);
         } else {
             clearContact();
         }
@@ -43,6 +43,7 @@ export const ContactForm = () => {
         setItemsMenuCount(itemsMenuCount);
         return () => {
             clearContact();
+            sections.forEach((section) => section.clearCount());
         };
     }, [id, store]);
 
