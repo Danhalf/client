@@ -74,7 +74,7 @@ export class ContactStore {
                     const formData = new FormData();
                     formData.append("file", file);
 
-                    const createMediaResponse = await createMediaItemRecord();
+                    const createMediaResponse = await createMediaItemRecord(1);
                     if (createMediaResponse?.status === Status.OK) {
                         const uploadMediaResponse = await uploadInventoryMedia(
                             this._contactID,
