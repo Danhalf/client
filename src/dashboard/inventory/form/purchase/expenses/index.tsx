@@ -11,6 +11,7 @@ import { ListData } from "http/services/inventory-service";
 import { useParams } from "react-router-dom";
 import { Expenses } from "common/models/expenses";
 import {
+    deleteExpensesItem,
     getExpensesList,
     getExpensesListTypes,
     getExpensesListVendors,
@@ -21,6 +22,7 @@ import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { Contact } from "common/models/contact";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 export const PurchaseExpenses = observer((): ReactElement => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -36,6 +38,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const [expenseVendor, setExpenseVendor] = useState<string>("");
     const [expenseNotes, setExpenseNotes] = useState<string>("");
     const [expenseTotal, setExpenseTotal] = useState<string>("$ 0.00");
+    const [currentExpenseUid, setCurrentExpenseUid] = useState<string>("");
+    const [confirmActive, setConfirmActive] = useState<boolean>(false);
 
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "operationdate", header: "Date" },
@@ -89,6 +93,24 @@ export const PurchaseExpenses = observer((): ReactElement => {
             comment: expenseNotes,
         };
         setExpensesItem({ expenseuid: "0", expenseData }).then(() => getExpenses());
+    };
+
+    const handleDeleteExpenses = () => {
+        currentExpenseUid && deleteExpensesItem(currentExpenseUid).then(() => getExpenses());
+    };
+
+    const deleteTemplate = ({ itemuid }: Expenses) => {
+        return (
+            <Button
+                type='button'
+                icon='icon adms-trash-can'
+                className='purchase-expenses__delete-button p-button-text'
+                onClick={() => {
+                    setCurrentExpenseUid(itemuid);
+                    setConfirmActive(true);
+                }}
+            />
+        );
     };
 
     return (
@@ -170,15 +192,34 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
+                        pt={{
+                            wrapper: {
+                                className: "overflow-x-hidden",
+                            },
+                        }}
                     >
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            body={() => {
+                                return (
+                                    <div className='flex gap-3 align-items-center'>
+                                        <i className='icon adms-edit-item cursor-pointer export-web__icon' />
+                                        <i className='pi pi-angle-down' />
+                                    </div>
+                                );
+                            }}
+                        />
                         {renderColumnsData.map(({ field, header }) => (
                             <Column
                                 field={field}
                                 header={header}
                                 key={field}
                                 headerClassName='cursor-move'
+                                className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                pt={{}}
                             />
                         ))}
+                        <Column style={{ flex: "0 0 4rem" }} body={deleteTemplate}></Column>
                     </DataTable>
                 </div>
                 <div className='col-12 total-sum'>
@@ -186,6 +227,17 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     <span className='total-sum__value'> {expenseTotal}</span>
                 </div>
             </div>
+            <ConfirmModal
+                visible={confirmActive}
+                bodyMessage='Do you really want to delete this expense? 
+                This process cannot be undone.'
+                confirmAction={handleDeleteExpenses}
+                draggable={false}
+                rejectLabel='Cancel'
+                acceptLabel='Delete'
+                className='expenses-confirm-dialog'
+                onHide={() => setConfirmActive(false)}
+            />
         </>
     );
 });

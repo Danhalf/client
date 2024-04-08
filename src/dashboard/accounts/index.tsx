@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
+
+import {
+    DataTable,
+    DataTablePageEvent,
+    DataTableRowClickEvent,
+    DataTableSortEvent,
+} from "primereact/datatable";
 import { getKeyValue } from "services/local-storage.service";
 import { getAccountsList } from "http/services/accounts.service";
 import { Button } from "primereact/button";
@@ -12,6 +16,17 @@ import { Column, ColumnProps } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
+import { makeShortReports } from "http/services/reports.service";
+import "./index.css";
+import { useNavigate } from "react-router-dom";
+import { ReportsColumn } from "common/models/reports";
+
+const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
+    { field: "accountnumber", header: "Account" },
+    { field: "accounttype", header: "Type" },
+    { field: "accountstatus", header: "Name" },
+    { field: "created", header: "Date" },
+];
 
 export default function Accounts() {
     const [accounts, setAccounts] = useState<any[]>([]);
@@ -19,11 +34,51 @@ export default function Accounts() {
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+    const navigate = useNavigate();
 
-    const printTableData = () => {
-        const contactsDoc = new jsPDF();
-        autoTable(contactsDoc, { html: ".p-datatable-table" });
-        contactsDoc.output("dataurlnewwindow");
+    const printTableData = async (print: boolean = false) => {
+        const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
+        const date = new Date();
+        const name = `accounts_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        if (authUser) {
+            const data = accounts.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        filteredItem[column.data] = item[column.data as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
+            const JSONreport = {
+                name,
+                itemUID: "0",
+                data,
+                columns,
+                format: "",
+            };
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                link.download = `Report-${name}.pdf`;
+                link.click();
+
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            });
+        }
     };
 
     const pageChanged = (event: DataTablePageEvent) => {
@@ -64,13 +119,6 @@ export default function Accounts() {
         }
     }, [lazyState, authUser, globalSearch]);
 
-    const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-        { field: "accountnumber", header: "Account" },
-        { field: "accounttype", header: "Type" },
-        { field: "accountstatus", header: "Name" },
-        { field: "created", header: "Date" },
-    ];
-
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -83,16 +131,26 @@ export default function Accounts() {
                             <div className='col-6'>
                                 <div className='contact-top-controls'>
                                     <Button
-                                        className='contact-top-controls__button m-r-20px'
+                                        className='contact-top-controls__button'
                                         icon='pi pi-plus-circle'
                                         severity='success'
                                         type='button'
+                                        tooltip='Add new account'
+                                        onClick={() => navigate("create")}
                                     />
                                     <Button
                                         severity='success'
                                         type='button'
-                                        icon='pi pi-print'
-                                        onClick={printTableData}
+                                        icon='icon adms-print'
+                                        tooltip='Print accounts form'
+                                        onClick={() => printTableData(true)}
+                                    />
+                                    <Button
+                                        severity='success'
+                                        type='button'
+                                        icon='icon adms-blank'
+                                        tooltip='Download accounts form'
+                                        onClick={() => printTableData()}
                                     />
                                 </div>
                             </div>
@@ -129,6 +187,12 @@ export default function Accounts() {
                                     resizableColumns
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
+                                    rowClassName={() => "hover:text-primary cursor-pointer"}
+                                    onRowClick={({
+                                        data: { accountuid },
+                                    }: DataTableRowClickEvent) => {
+                                        navigate(accountuid);
+                                    }}
                                 >
                                     {renderColumnsData.map(({ field, header }) => (
                                         <Column

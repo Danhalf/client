@@ -1,7 +1,7 @@
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
-import { ChangeEvent, ReactElement, useCallback, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import {
     ListData,
     MakesListData,
@@ -10,18 +10,27 @@ import {
     getInventoryExteriorColorsList,
     getInventoryInteriorColorsList,
 } from "http/services/inventory-service";
+
+import { useFormik } from "formik";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { inventoryDecodeVIN } from "http/services/vin-decoder.service";
 import { Checkbox } from "primereact/checkbox";
-import { Audit } from "common/models/inventory";
+import { Audit, Inventory } from "common/models/inventory";
+import { InputNumber } from "primereact/inputnumber";
+
+import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 
 //TODO: add validation
 const VIN_VALID_LENGTH = 17;
+const MIN_YEAR = 1970;
+const MAX_YEAR = new Date().getFullYear();
 
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
+    const year = parseInt(inventory.Year, 10);
+    const mileage = (inventory?.mileage && parseFloat(inventory.mileage.replace(/,/g, "."))) || 0;
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
@@ -67,7 +76,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <div className='flex align-items-center'>
                     <img
                         alt={option.name}
-                        src={option.logo}
+                        src={option?.logo || defaultMakesLogo}
                         className='mr-2 vehicle-general__dropdown-icon'
                     />
                     <div>{option.name}</div>
@@ -83,7 +92,7 @@ export const VehicleGeneral = observer((): ReactElement => {
             <div className='flex align-items-center'>
                 <img
                     alt={option.name}
-                    src={option.logo}
+                    src={option?.logo || defaultMakesLogo}
                     className='mr-2 vehicle-general__dropdown-icon'
                 />
                 <div>{option.name}</div>
@@ -91,7 +100,7 @@ export const VehicleGeneral = observer((): ReactElement => {
         );
     };
 
-    const handleVINchange = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+    const handleVINchange = (value: string) => {
         changeInventory({ key: "VIN", value });
         if (value.length === VIN_VALID_LENGTH) {
             inventoryDecodeVIN(value).then((response) => {
@@ -116,24 +125,85 @@ export const VehicleGeneral = observer((): ReactElement => {
         "JustArrived",
     ];
 
+    const formik = useFormik({
+        initialValues: {
+            VIN: inventory?.VIN || "",
+            Make: inventory.Make,
+            Model: inventory.Model,
+            Year: String(year),
+            mileage: inventory.mileage,
+        } as Partial<Inventory>,
+        enableReinitialize: true,
+        validate: (data) => {
+            let errors: any = {};
+
+            if (!data.VIN) {
+                errors.VIN = "Data is required.";
+            } else {
+                handleVINchange(data.VIN);
+            }
+
+            if (!data.Make) {
+                errors.Make = "Data is required.";
+            } else {
+                changeInventory({ key: "Make", value: data.Make });
+            }
+
+            if (!data.Model) {
+                errors.Model = "Data is required.";
+            } else {
+                changeInventory({ key: "Model", value: data.Model });
+            }
+            if (!data.Year || Number(data.Year) < MIN_YEAR || Number(data.Year) > MAX_YEAR) {
+                switch (true) {
+                    case Number(data.Year) < MIN_YEAR:
+                        errors.Year = `Must be greater than ${MIN_YEAR}`;
+                        break;
+                    case Number(data.Year) > MAX_YEAR:
+                        errors.Year = `Must be less than ${MAX_YEAR}`;
+                        break;
+                    default:
+                        errors.Year = "Data is required.";
+                }
+            } else {
+                changeInventory({ key: "Year", value: String(data.Year) });
+            }
+
+            if (!data.mileage) {
+                errors.mileage = "Data is required.";
+            } else {
+                changeInventory({ key: "mileage", value: String(data.mileage).replace(".", ",") });
+            }
+
+            return errors;
+        },
+        onSubmit: () => {},
+    });
+
     return (
         <div className='grid vehicle-general row-gap-2'>
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InputText
-                        className='vehicle-general__text-input w-full'
-                        value={inventory?.VIN}
-                        onChange={handleVINchange}
+                        {...formik.getFieldProps("VIN")}
+                        className={`vehicle-general__text-input w-full ${
+                            formik.touched.VIN && formik.errors.VIN && "p-invalid"
+                        }`}
+                        value={formik.values.VIN}
+                        onChange={({ target: { value } }) => {
+                            formik.setFieldValue("VIN", value);
+                        }}
                     />
                     <label className='float-label'>VIN (required)</label>
                 </span>
+                <small className='p-error'>{(formik.touched.VIN && formik.errors.VIN) || ""}</small>
             </div>
 
             <div className='col-6'>
                 <span className='p-float-label'>
                     <InputText
                         className='vehicle-general__text-input w-full'
-                        value={inventory?.StockNo}
+                        value={inventory?.StockNo || ""}
                         onChange={({ target: { value } }) =>
                             changeInventory({ key: "StockNo", value })
                         }
@@ -141,61 +211,92 @@ export const VehicleGeneral = observer((): ReactElement => {
                     <label className='float-label'>Stock#</label>
                 </span>
             </div>
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <Dropdown
+                    {...formik.getFieldProps("Make")}
                     optionLabel='name'
                     optionValue='name'
-                    value={inventory?.Make}
+                    value={formik.values.Make}
                     filter
                     required
-                    options={[...automakesList, { name: inventory.Make }]}
-                    onChange={({ target: { value } }) => changeInventory({ key: "Make", value })}
+                    options={automakesList}
+                    onChange={({ value }) => formik.setFieldValue("Make", value)}
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
                     placeholder='Make (required)'
-                    className='w-full vehicle-general__dropdown'
+                    className={`vehicle-general__dropdown w-full ${
+                        formik.touched.Make && formik.errors.Make && "p-invalid"
+                    }`}
                 />
+                <small className='p-error'>
+                    {(formik.touched.Make && formik.errors.Make) || ""}
+                </small>
             </div>
 
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <Dropdown
+                    {...formik.getFieldProps("Model")}
                     optionLabel='name'
                     optionValue='name'
-                    value={inventory?.Model}
-                    filter
-                    //TODO: add options
+                    value={formik.values.Model}
+                    filter={!!automakesModelList.length}
+                    editable={!automakesModelList.length}
                     options={automakesModelList}
-                    onChange={({ value }) => changeInventory({ key: "Model", value })}
+                    onChange={({ value }) => formik.setFieldValue("Model", value)}
                     placeholder='Model (required)'
-                    className='w-full vehicle-general__dropdown'
+                    className={`vehicle-general__dropdown w-full ${
+                        formik.touched.Model && formik.errors.Model && "p-invalid"
+                    }`}
                 />
+                <small className='p-error'>
+                    {(formik.touched.Model && formik.errors.Model) || ""}
+                </small>
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
-                    <InputText
-                        className='vehicle-general__text-input w-full'
+                    <InputNumber
+                        {...formik.getFieldProps("Year")}
+                        className={`vehicle-general__text-input w-full ${
+                            formik.touched.Year && formik.errors.Year && "p-invalid"
+                        }`}
                         required
-                        value={inventory?.Year}
-                        onChange={({ target: { value } }) =>
-                            changeInventory({ key: "Year", value })
-                        }
+                        min={0}
+                        value={year || MIN_YEAR}
+                        useGrouping={false}
+                        onChange={({ value }) => formik.setFieldValue("Year", value)}
                     />
                     <label className='float-label'>Year (required)</label>
                 </span>
+                <small className='p-error'>
+                    {(formik.touched.Year && formik.errors.Year) || ""}
+                </small>
             </div>
 
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
-                    <InputText
-                        className='vehicle-general__text-input w-full'
+                    <InputNumber
+                        {...formik.getFieldProps("mileage")}
+                        className={`vehicle-general__text-input w-full ${
+                            formik.touched.mileage && formik.errors.mileage && "p-invalid"
+                        }`}
                         required
-                        value={inventory?.mileage}
-                        onChange={({ target: { value } }) =>
-                            value && changeInventory({ key: "mileage", value })
+                        value={mileage}
+                        minFractionDigits={2}
+                        min={0}
+                        onChange={({ value }) =>
+                            value &&
+                            changeInventory({
+                                key: "mileage",
+                                value: String(value).replace(".", ","),
+                            })
                         }
                     />
                     <label className='float-label'>Mileage (required)</label>
                 </span>
+
+                <small className='p-error'>
+                    {(formik.touched.mileage && formik.errors.mileage) || ""}
+                </small>
             </div>
             <div className='col-3'>
                 <Dropdown
@@ -205,7 +306,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     filter
                     required
                     onChange={({ value }) => changeInventory({ key: "ExteriorColor", value })}
-                    options={[...colorList, { name: inventory?.ExteriorColor }]}
+                    options={colorList}
                     placeholder='Color'
                     className='w-full vehicle-general__dropdown'
                 />
@@ -219,7 +320,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     filter
                     required
                     onChange={({ value }) => changeInventory({ key: "InteriorColor", value })}
-                    options={[...interiorList, { name: inventory?.InteriorColor }]}
+                    options={interiorList}
                     placeholder='Interior color'
                     className='w-full vehicle-general__dropdown'
                 />

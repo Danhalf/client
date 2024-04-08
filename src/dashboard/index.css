@@ -14,18 +14,18 @@
     margin-bottom: 30px;
     display: flex;
     align-items: center;
-    gap: 150px;
+    gap: 4.6rem;
 }
 
 .card-content__wrapper {
-    height: 40vh;
-    max-height: 704px;
+    height: 48vh;
+    max-height: 744px;
     overflow-y: scroll;
     overflow-x: hidden;
 }
 
 .card-content__wrapper::-webkit-scrollbar {
-    width: 2px;
+    width: 4px;
 }
 
 .card-content__title {
@@ -93,11 +93,8 @@
     padding: 0;
 }
 
-.p-multiselect-panel .p-multiselect-header {
-    display: none;
-}
-
-.p-datatable-header .p-multiselect .p-multiselect-token {
+.p-datatable-header .p-multiselect .p-multiselect-token,
+.card-content .p-multiselect .p-multiselect-token {
     background: var(--admss-app-primary-main-green);
     color: var(--admss-app-white);
 }
@@ -149,6 +146,65 @@
     color: var(--admss-app-medium-grey);
     margin-top: -16px;
     font-size: 12px;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-thumb {
+    border: 0.2em solid var(--admss-app-light-blue);
+    border-radius: 0.6em;
+    width: 6px;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-button:single-button {
+    background: var(--admss-app-light-blue);
+    display: block;
+    border-style: solid;
+    height: 8px;
+    width: 8px;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-button:single-button:vertical:decrement {
+    border-width: 0 7px 7px 7px;
+    border-color: transparent transparent var(--admss-app-primary) transparent;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-button:single-button:vertical:increment {
+    border-width: 7px 7px 0 7px;
+    border-color: var(--admss-app-primary) transparent transparent transparent;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-button:single-button:horizontal:decrement {
+    border-width: 7px 7px 7px 0;
+    border-color: transparent var(--admss-app-primary) transparent transparent;
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-button:single-button:horizontal:increment {
+    border-width: 7px 0 7px 7px;
+    border-color: transparent transparent transparent var(--admss-app-primary);
+}
+
+.p-datatable-wrapper::-webkit-scrollbar-track {
+    background: var(--admss-app-light-blue);
+}
+
+.p-tooltip .p-tooltip-text {
+    background: var(--admss-app-white);
+    color: var(--admss-app-blue-text);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.p-tooltip .p-tooltip-arrow {
+    display: none;
+}
+
+.p-error {
+    position: absolute;
+    bottom: -10px;
+    left: 10px;
 }
 
 @media screen and (min-width: 992px) {

@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
+import {
+    DataTable,
+    DataTablePageEvent,
+    DataTableRowClickEvent,
+    DataTableSortEvent,
+} from "primereact/datatable";
 import { getKeyValue } from "services/local-storage.service";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
@@ -13,6 +16,18 @@ import { getDealsList } from "http/services/deals.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
 import { Inventory } from "common/models/inventory";
+import { makeShortReports } from "http/services/reports.service";
+import { useNavigate } from "react-router-dom";
+import "./index.css";
+import { ReportsColumn } from "common/models/reports";
+
+const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
+    { field: "accountuid", header: "Account" },
+    { field: "contactinfo", header: "Customer" },
+    { field: "dealtype", header: "Type" },
+    { field: "created", header: "Date" },
+    { field: "inventoryinfo", header: "Info (Vehicle)" },
+];
 
 export default function Deals() {
     const [deals, setDeals] = useState<Inventory[]>([]);
@@ -21,10 +36,51 @@ export default function Deals() {
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
 
-    const printTableData = () => {
-        const contactsDoc = new jsPDF();
-        autoTable(contactsDoc, { html: ".p-datatable-table" });
-        contactsDoc.output("dataurlnewwindow");
+    const navigate = useNavigate();
+
+    const printTableData = async (print: boolean = false) => {
+        const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
+        const date = new Date();
+        const name = `deals_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        if (authUser) {
+            const data = deals.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        filteredItem[column.data] = item[column.data as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
+            const JSONreport = {
+                name,
+                itemUID: "0",
+                data,
+                columns,
+                format: "",
+            };
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                link.download = `Report-${name}.pdf`;
+                link.click();
+
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            });
+        }
     };
 
     const pageChanged = (event: DataTablePageEvent) => {
@@ -65,14 +121,6 @@ export default function Deals() {
         }
     }, [lazyState, authUser, globalSearch]);
 
-    const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-        { field: "accountuid", header: "Account" },
-        { field: "contactinfo", header: "Customer" },
-        { field: "dealtype", header: "Type" },
-        { field: "created", header: "Date" },
-        { field: "inventoryinfo", header: "Info (Vehicle)" },
-    ];
-
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -85,16 +133,26 @@ export default function Deals() {
                             <div className='col-6'>
                                 <div className='contact-top-controls'>
                                     <Button
-                                        className='contact-top-controls__button m-r-20px'
+                                        className='contact-top-controls__button'
                                         icon='pi pi-plus-circle'
                                         severity='success'
                                         type='button'
+                                        tooltip='Add new deal'
+                                        onClick={() => navigate("create")}
                                     />
                                     <Button
                                         severity='success'
                                         type='button'
-                                        icon='pi pi-print'
-                                        onClick={printTableData}
+                                        icon='icon adms-print'
+                                        tooltip='Print deals form'
+                                        onClick={() => printTableData(true)}
+                                    />
+                                    <Button
+                                        severity='success'
+                                        type='button'
+                                        icon='icon adms-blank'
+                                        tooltip='Download deals form'
+                                        onClick={() => printTableData()}
                                     />
                                 </div>
                             </div>
@@ -131,6 +189,12 @@ export default function Deals() {
                                     resizableColumns
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
+                                    rowClassName={() => "hover:text-primary cursor-pointer"}
+                                    onRowClick={({
+                                        data: { contactuid },
+                                    }: DataTableRowClickEvent) => {
+                                        navigate(contactuid);
+                                    }}
                                 >
                                     {renderColumnsData.map(({ field, header }) => (
                                         <Column

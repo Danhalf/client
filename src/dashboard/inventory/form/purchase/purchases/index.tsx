@@ -3,7 +3,6 @@ import {
     CurrencyInput,
     DateInput,
     PercentInput,
-    SearchInput,
 } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
 import { ReactElement } from "react";
@@ -12,6 +11,9 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
+import { CompanySearch } from "dashboard/contacts/common/company-search";
+import { useFormik } from "formik";
+import { InventoryExtData } from "common/models/inventory";
 
 export const PurchasePurchases = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -37,19 +39,57 @@ export const PurchasePurchases = observer((): ReactElement => {
         },
         changeInventoryExtData,
     } = store;
+
+    const formik = useFormik({
+        initialValues: {
+            purPurchasedFrom,
+        } as Partial<InventoryExtData>,
+        enableReinitialize: true,
+        validate: (data) => {
+            let errors: any = {};
+
+            if (!data.purPurchasedFrom) {
+                errors.purPurchasedFrom = "Data is required.";
+            } else {
+                changeInventoryExtData({ key: "purPurchasedFrom", value: data.purPurchasedFrom });
+            }
+
+            return errors;
+        },
+        validateOnChange: true,
+        onSubmit: () => {},
+    });
+
+    const isFormFieldInvalid = (name: keyof InventoryExtData) => {
+        return !!formik.values[name];
+    };
+
+    const getFormErrorMessage = (name: keyof InventoryExtData) => {
+        return isFormFieldInvalid(name) ? (
+            <small className='p-error'>&nbsp;</small>
+        ) : (
+            <small className='p-error'>{formik.errors[name]}</small>
+        );
+    };
+
     return (
         <div className='grid purchase-purchases row-gap-2'>
-            <div className='col-6'>
-                <SearchInput
-                    title='Purchased From (required)'
-                    value={purPurchasedFrom}
-                    onChange={({ target: { value } }) => {
+            <div className='col-6 relative'>
+                <CompanySearch
+                    name='Purchased From (required)'
+                    value={formik.values.purPurchasedFrom}
+                    onChange={({ target: { value } }) =>
+                        formik.setFieldValue("purPurchasedFrom", value)
+                    }
+                    onRowClick={(companyName) =>
                         changeInventoryExtData({
                             key: "purPurchasedFrom",
-                            value,
-                        });
-                    }}
+                            value: companyName,
+                        })
+                    }
+                    className={`${!isFormFieldInvalid("purPurchasedFrom") && "p-invalid"}`}
                 />
+                {getFormErrorMessage("purPurchasedFrom")}
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -131,8 +171,8 @@ export const PurchasePurchases = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-6'>
-                <SearchInput
-                    title='Auction Company'
+                <CompanySearch
+                    name='Auction Company'
                     value={purPurchaseAuctCo}
                     onChange={({ target: { value } }) => {
                         changeInventoryExtData({
@@ -140,11 +180,17 @@ export const PurchasePurchases = observer((): ReactElement => {
                             value,
                         });
                     }}
+                    onRowClick={(companyName) =>
+                        changeInventoryExtData({
+                            key: "purPurchaseAuctCo",
+                            value: companyName,
+                        })
+                    }
                 />
             </div>
             <div className='col-6'>
-                <SearchInput
-                    title='Buyer Name'
+                <CompanySearch
+                    name='Buyer Name'
                     value={purPurchaseBuyerName}
                     onChange={({ target: { value } }) => {
                         changeInventoryExtData({
@@ -152,6 +198,12 @@ export const PurchasePurchases = observer((): ReactElement => {
                             value,
                         });
                     }}
+                    onRowClick={(companyName) =>
+                        changeInventoryExtData({
+                            key: "purPurchaseBuyerName",
+                            value: companyName,
+                        })
+                    }
                 />
             </div>
             <div className='col-3'>

@@ -11,8 +11,6 @@ import {
     DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import { getKeyValue } from "services/local-storage.service";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
@@ -25,8 +23,33 @@ import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactUser } from "common/models/contact";
+import { ContactsUserSettings, ServerUserSettings, TableState } from "common/models/user";
+import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { makeShortReports } from "http/services/reports.service";
+import { ReportsColumn } from "common/models/reports";
 
-export default function Contacts() {
+interface TableColumnProps extends ColumnProps {
+    field: keyof ContactUser;
+}
+
+interface ContactsDataTableProps {
+    onRowClick?: (companyName: string) => void;
+}
+
+interface TableColumnProps extends ColumnProps {
+    field: keyof ContactUser;
+}
+
+const renderColumnsData: TableColumnProps[] = [
+    { field: "userName", header: "Name" },
+    { field: "phone1", header: "Work Phone" },
+    { field: "phone2", header: "Home Phone" },
+    { field: "streetAddress", header: "Address" },
+    { field: "email1", header: "Email" },
+    { field: "created", header: "Created" },
+];
+
+export const ContactsDataTable = ({ onRowClick }: ContactsDataTableProps) => {
     const [categories, setCategories] = useState<ContactType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
     const [authUser, setUser] = useState<AuthUser | null>(null);
@@ -34,21 +57,63 @@ export default function Contacts() {
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
-
+    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
+    const [activeColumns, setActiveColumns] = useState<TableColumnProps[]>(renderColumnsData);
     const navigate = useNavigate();
 
-    const printTableData = () => {
-        const contactsDoc = new jsPDF();
-        autoTable(contactsDoc, { html: ".p-datatable-table" });
-        contactsDoc.output("dataurlnewwindow");
+    const printTableData = async (print: boolean = false) => {
+        const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
+        const date = new Date();
+        const name = `contacts_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        if (authUser) {
+            const data = contacts.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        filteredItem[column.data] = item[column.data as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
+            const JSONreport = {
+                name,
+                itemUID: "0",
+                data,
+                columns,
+                format: "",
+            };
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                link.download = `Report-${name}.pdf`;
+                link.click();
+
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            });
+        }
     };
 
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
+        changeSettings({ table: event as TableState });
     };
 
     const sortData = (event: DataTableSortEvent) => {
         setLazyState(event);
+        changeSettings({ table: event as TableState });
     };
 
     useEffect(() => {
@@ -86,19 +151,202 @@ export default function Contacts() {
             });
         }
     }, [selectedCategory, lazyState, authUser, globalSearch]);
-    interface TableColumnProps extends ColumnProps {
-        field: keyof ContactUser;
-    }
 
-    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
-        { field: "userName", header: "Name" },
-        { field: "phone1", header: "Work Phone" },
-        { field: "phone2", header: "Home Phone" },
-        { field: "streetAddress", header: "Address" },
-        { field: "email1", header: "Email" },
-        { field: "created", header: "Created" },
-    ];
+    useEffect(() => {
+        if (authUser) {
+            getUserSettings(authUser.useruid).then((response) => {
+                if (response?.profile.length) {
+                    const allSettings: ServerUserSettings = JSON.parse(response.profile);
+                    setServerSettings(allSettings);
+                    const { contacts: settings } = allSettings;
+                    settings?.activeColumns &&
+                        setActiveColumns(settings.activeColumns as TableColumnProps[]);
+                    settings?.table &&
+                        setLazyState({
+                            first: settings.table.first || initialDataTableQueries.first,
+                            rows: settings.table.rows || initialDataTableQueries.rows,
+                            page: settings.table.page || initialDataTableQueries.page,
+                            column: settings.table.column || initialDataTableQueries.column,
+                            sortField:
+                                settings.table.sortField || initialDataTableQueries.sortField,
+                            sortOrder:
+                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                        });
+                }
+            });
+        }
+    }, [authUser]);
 
+    const changeSettings = (settings: Partial<ContactsUserSettings>) => {
+        if (authUser) {
+            const newSettings = {
+                ...serverSettings,
+                contacts: { ...serverSettings?.contacts, ...settings },
+            } as ServerUserSettings;
+            setServerSettings(newSettings);
+            setUserSettings(authUser.useruid, newSettings);
+        }
+    };
+
+    const handleOnRowClick = ({ data: { contactuid, companyName } }: DataTableRowClickEvent) => {
+        if (onRowClick) {
+            onRowClick(companyName);
+        } else {
+            navigate(contactuid);
+        }
+    };
+
+    return (
+        <div className='card-content'>
+            <div className='grid datatable-controls'>
+                <div className='col-6'>
+                    <div className='contact-top-controls'>
+                        <Dropdown
+                            value={selectedCategory}
+                            onChange={(e) => {
+                                changeSettings({
+                                    selectedCategoriesOptions: e.value,
+                                });
+                                setSelectedCategory(e.value);
+                            }}
+                            options={categories}
+                            optionLabel='name'
+                            editable
+                            placeholder='Select Category'
+                            pt={{
+                                wrapper: {
+                                    style: {
+                                        maxHeight: "500px",
+                                    },
+                                },
+                            }}
+                        />
+                        <Button
+                            className='contact-top-controls__button'
+                            icon='pi pi-plus-circle'
+                            severity='success'
+                            type='button'
+                            tooltip='Add new contact'
+                            onClick={() => navigate("create")}
+                        />
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='icon adms-print'
+                            tooltip='Print contacts form'
+                            onClick={() => printTableData(true)}
+                        />
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='icon adms-blank'
+                            tooltip='Download contacts form'
+                            onClick={() => printTableData()}
+                        />
+                    </div>
+                </div>
+                <div className='col-6 text-right'>
+                    <Button
+                        className='contact-top-controls__button m-r-20px'
+                        label='Advanced search'
+                        severity='success'
+                        type='button'
+                    />
+                    <span className='p-input-icon-right'>
+                        <i className='pi pi-search' />
+                        <InputText
+                            value={globalSearch}
+                            onChange={(e) => setGlobalSearch(e.target.value)}
+                        />
+                    </span>
+                </div>
+            </div>
+            <div className='grid'>
+                <div className='col-12'>
+                    <DataTable
+                        showGridlines
+                        value={contacts}
+                        lazy
+                        scrollable
+                        scrollHeight='70vh'
+                        paginator
+                        first={lazyState.first}
+                        rows={lazyState.rows}
+                        rowsPerPageOptions={ROWS_PER_PAGE}
+                        totalRecords={totalRecords}
+                        onPage={pageChanged}
+                        onSort={sortData}
+                        sortOrder={lazyState.sortOrder}
+                        sortField={lazyState.sortField}
+                        resizableColumns
+                        reorderableColumns
+                        rowClassName={() => "hover:text-primary cursor-pointer"}
+                        onRowClick={handleOnRowClick}
+                        onColReorder={(event) => {
+                            if (authUser && Array.isArray(event.columns)) {
+                                const orderArray = event.columns?.map(
+                                    (column: any) => column.props.field
+                                );
+
+                                const newActiveColumns = orderArray
+                                    .map((field: string) => {
+                                        return (
+                                            activeColumns.find(
+                                                (column) => column.field === field
+                                            ) || null
+                                        );
+                                    })
+                                    .filter(
+                                        (column): column is TableColumnProps => column !== null
+                                    ) as TableColumnProps[];
+
+                                setActiveColumns(newActiveColumns);
+
+                                changeSettings({
+                                    activeColumns: newActiveColumns,
+                                });
+                            }
+                        }}
+                        onColumnResizeEnd={(event) => {
+                            if (authUser && event) {
+                                const newColumnWidth = {
+                                    [event.column.props.field as string]: event.element.offsetWidth,
+                                };
+                                changeSettings({
+                                    columnWidth: {
+                                        ...serverSettings?.contacts?.columnWidth,
+                                        ...newColumnWidth,
+                                    },
+                                });
+                            }
+                        }}
+                    >
+                        {activeColumns.map(({ field, header }) => (
+                            <Column
+                                field={field}
+                                header={header}
+                                key={field}
+                                sortable
+                                headerClassName='cursor-move'
+                                pt={{
+                                    root: {
+                                        style: {
+                                            width: serverSettings?.contacts?.columnWidth?.[field],
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                        },
+                                    },
+                                }}
+                            />
+                        ))}
+                    </DataTable>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default function Contacts() {
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -106,85 +354,7 @@ export default function Contacts() {
                     <div className='card-header'>
                         <h2 className='card-header__title uppercase m-0'>Contacts</h2>
                     </div>
-                    <div className='card-content'>
-                        <div className='grid datatable-controls'>
-                            <div className='col-6'>
-                                <div className='contact-top-controls'>
-                                    <Dropdown
-                                        value={selectedCategory}
-                                        onChange={(e) => setSelectedCategory(e.value)}
-                                        options={categories}
-                                        optionLabel='name'
-                                        editable
-                                        className='m-r-20px'
-                                        placeholder='Select Category'
-                                    />
-                                    <Button
-                                        className='contact-top-controls__button m-r-20px'
-                                        icon='pi pi-plus-circle'
-                                        severity='success'
-                                        type='button'
-                                        onClick={() => navigate("create")}
-                                    />
-                                    <Button
-                                        severity='success'
-                                        type='button'
-                                        icon='pi pi-print'
-                                        onClick={printTableData}
-                                    />
-                                </div>
-                            </div>
-                            <div className='col-6 text-right'>
-                                <Button
-                                    className='contact-top-controls__button m-r-20px'
-                                    label='Advanced search'
-                                    severity='success'
-                                    type='button'
-                                />
-                                <span className='p-input-icon-right'>
-                                    <i className='pi pi-search' />
-                                    <InputText
-                                        value={globalSearch}
-                                        onChange={(e) => setGlobalSearch(e.target.value)}
-                                    />
-                                </span>
-                            </div>
-                        </div>
-                        <div className='grid'>
-                            <div className='col-12'>
-                                <DataTable
-                                    showGridlines
-                                    value={contacts}
-                                    lazy
-                                    paginator
-                                    first={lazyState.first}
-                                    rows={lazyState.rows}
-                                    rowsPerPageOptions={ROWS_PER_PAGE}
-                                    totalRecords={totalRecords}
-                                    onPage={pageChanged}
-                                    onSort={sortData}
-                                    sortOrder={lazyState.sortOrder}
-                                    sortField={lazyState.sortField}
-                                    resizableColumns
-                                    reorderableColumns
-                                    rowClassName={() => "hover:text-primary cursor-pointer"}
-                                    onRowClick={({
-                                        data: { contactuid },
-                                    }: DataTableRowClickEvent) => navigate(contactuid)}
-                                >
-                                    {renderColumnsData.map(({ field, header }) => (
-                                        <Column
-                                            field={field}
-                                            header={header}
-                                            key={field}
-                                            sortable
-                                            headerClassName='cursor-move'
-                                        />
-                                    ))}
-                                </DataTable>
-                            </div>
-                        </div>
-                    </div>
+                    <ContactsDataTable />
                 </div>
             </div>
         </div>

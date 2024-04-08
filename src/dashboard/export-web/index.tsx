@@ -15,6 +15,131 @@ import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { setInventory } from "http/services/inventory-service";
+import { Inventory } from "common/models/inventory";
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
+import { makeShortReports } from "http/services/reports.service";
+import { ReportsColumn } from "common/models/reports";
+
+interface TableColumnProps extends ColumnProps {
+    field: keyof Inventory | MissedInventoryColumn;
+}
+
+type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & { checked: boolean };
+
+type MissedInventoryColumn =
+    | "Location"
+    | "IsFloorplanned"
+    | "FloorplanCompany"
+    | "PurchasedFrom"
+    | "PurchaseAuctCo"
+    | "PurchaseBuyerName"
+    | "PurchaseDate"
+    | "PurchaseAmount"
+    | "LotNo"
+    | "SoldByLot"
+    | "KeysMissing"
+    | "KeysDuplicate"
+    | "KeysHasRemote"
+    | "KeyNumber"
+    | "Consignor"
+    | "Consign"
+    | "IsTradeIn"
+    | "TitleStatus"
+    | "TitleState"
+    | "TitleNumber"
+    | "TitleReceived"
+    | "TitleReceivedDate"
+    | "Paid"
+    | "SalesTaxPaid"
+    | "ODOMInExcess"
+    | "ODOMNotActual"
+    | "DAM_Salvage"
+    | "DAM_Salvage_State"
+    | "DAM_Flood"
+    | "DAM_25"
+    | "DAM_25_Parts"
+    | "DAM_Theft"
+    | "DAM_Theft_Parts"
+    | "DAM_Reconstructed"
+    | "Autocheck_Checked"
+    | "CHK_Oil"
+    | "CHK_Inspected"
+    | "INSP_Number"
+    | "INSP_Date"
+    | "INSP_Emissions"
+    | "INSP_Sticker_Exp"
+    | "In Stock Date"
+    | "City MPG"
+    | "Hwy MPG";
+
+const columns: TableColumnsList[] = [
+    { field: "VIN", header: "VIN", checked: true },
+    { field: "StockNo", header: "Stock#", checked: true },
+    { field: "Category", header: "Category", checked: false },
+    { field: "Year", header: "Year", checked: true },
+    { field: "Make", header: "Make", checked: true },
+    { field: "Model", header: "Model", checked: true },
+    { field: "mileage", header: "Mileage", checked: true },
+    { field: "Price", header: "Price", checked: true },
+    { field: "ExteriorColor", header: "Color", checked: false },
+    { field: "InteriorColor", header: "Interior Color", checked: false },
+    { field: "BodyStyle", header: "Body", checked: false },
+    { field: "Transmission", header: "Transmission", checked: false },
+    { field: "TypeOfFuel", header: "Fuel Type", checked: false },
+    { field: "DriveLine", header: "Drive Line", checked: false },
+    { field: "Cylinders", header: "Number of Cylinders", checked: false },
+    { field: "Engine", header: "Engine Descriptions", checked: false },
+    { field: "Status", header: "Status", checked: false },
+    { field: "GroupClass", header: "Group Class", checked: false },
+    { field: "Location", header: "Location", checked: false },
+    { field: "IsFloorplanned", header: "Floorplan Status", checked: false },
+    { field: "FloorplanCompany", header: "Floorplan Company", checked: false },
+    { field: "PurchasedFrom", header: "Purchased From", checked: false },
+    { field: "PurchaseAuctCo", header: "Purchase Auction Company", checked: false },
+    { field: "PurchaseBuyerName", header: "Purchase Buyer Name", checked: false },
+    { field: "PurchaseDate", header: "Purchase Date", checked: false },
+    { field: "PurchaseAmount", header: "Purchase Amount", checked: false },
+    { field: "LotNo", header: "Lot Number", checked: false },
+    { field: "SoldByLot", header: "Sold By Lot", checked: false },
+    { field: "KeysMissing", header: "Keys Missing", checked: false },
+    { field: "KeysDuplicate", header: "Duplicate Keys", checked: false },
+    { field: "KeysHasRemote", header: "Keys with Remote", checked: false },
+    { field: "KeyNumber", header: "Key Number", checked: false },
+    { field: "Consignor", header: "Consignor", checked: false },
+    { field: "Consign", header: "Consign Date", checked: false },
+    { field: "IsTradeIn", header: "Trade-In Status", checked: false },
+    { field: "TitleStatus", header: "Title Status", checked: false },
+    { field: "TitleState", header: "Title State", checked: false },
+    { field: "TitleNumber", header: "Title Number", checked: false },
+    { field: "TitleReceived", header: "Title Received", checked: false },
+    { field: "TitleReceivedDate", header: "Title Received Date", checked: false },
+    { field: "Paid", header: "Paid", checked: false },
+    { field: "SalesTaxPaid", header: "Sales Tax Paid", checked: false },
+    { field: "ODOMInExcess", header: "Odometer in Excess", checked: false },
+    { field: "ODOMNotActual", header: "Odometer Not Actual", checked: false },
+    { field: "DAM_Salvage", header: "Salvage Status", checked: false },
+    { field: "DAM_Salvage_State", header: "Salvage State", checked: false },
+    { field: "DAM_Flood", header: "Flood Status", checked: false },
+    { field: "DAM_25", header: "Damage Percentage", checked: false },
+    { field: "DAM_25_Parts", header: "Damaged Parts", checked: false },
+    { field: "DAM_Theft", header: "Theft Status", checked: false },
+    { field: "DAM_Theft_Parts", header: "Theft Parts", checked: false },
+    { field: "DAM_Reconstructed", header: "Reconstruction Status", checked: false },
+    { field: "Autocheck_Checked", header: "Autocheck Status", checked: false },
+    { field: "CHK_Oil", header: "Oil Check", checked: false },
+    { field: "CHK_Inspected", header: "State Inspection", checked: false },
+    { field: "FactoryCertified", header: "Factory Certified", checked: false },
+    { field: "DealerCertified", header: "Dealer Certified", checked: false },
+    { field: "INSP_Number", header: "Inspection Number", checked: false },
+    { field: "INSP_Date", header: "Inspection Date", checked: false },
+    { field: "INSP_Emissions", header: "Emissions Check", checked: false },
+    { field: "INSP_Sticker_Exp", header: "Sticker Expiration Date", checked: false },
+    { field: "In Stock Date", header: "In Stock Date", checked: false },
+    { field: "City MPG", header: "City MPG", checked: false },
+    { field: "Hwy MPG", header: "Highway MPG", checked: false },
+];
 
 export const ExportToWeb = () => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
@@ -22,15 +147,24 @@ export const ExportToWeb = () => {
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
+    const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
     const navigate = useNavigate();
 
+    useEffect(() => {
+        changeSettings({ activeColumns: activeColumns.map(({ field }) => field) });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeColumns]);
+
     const pageChanged = (event: DataTablePageEvent) => {
         setLazyState(event);
+        changeSettings({ table: event as TableState });
     };
 
     const sortData = (event: DataTableSortEvent) => {
         setLazyState(event);
+        changeSettings({ table: event as TableState });
     };
 
     useEffect(() => {
@@ -63,9 +197,120 @@ export const ExportToWeb = () => {
         }
     }, [lazyState, authUser, globalSearch]);
 
-    interface TableColumnProps extends ColumnProps {
-        field: keyof ExportWebList | "media";
-    }
+    const changeSettings = (settings: Partial<ExportWebUserSettings>) => {
+        if (authUser) {
+            const newSettings = {
+                ...serverSettings,
+                exportWeb: { ...serverSettings?.exportWeb, ...settings },
+            } as ServerUserSettings;
+            setServerSettings(newSettings);
+            setUserSettings(authUser.useruid, newSettings);
+        }
+    };
+
+    useEffect(() => {
+        if (authUser) {
+            getUserSettings(authUser.useruid).then((response) => {
+                if (response?.profile.length) {
+                    const allSettings: ServerUserSettings = JSON.parse(response.profile);
+                    setServerSettings(allSettings);
+                    const { exportWeb: settings } = allSettings;
+                    if (settings?.activeColumns?.length) {
+                        const uniqueColumns = Array.from(new Set(settings?.activeColumns));
+                        const serverColumns = columns.filter((column) =>
+                            uniqueColumns.find((col) => col === column.field)
+                        );
+                        setActiveColumns(serverColumns);
+                    } else {
+                        setActiveColumns(columns.filter(({ checked }) => checked));
+                    }
+                    settings?.table &&
+                        setLazyState({
+                            first: settings.table.first || initialDataTableQueries.first,
+                            rows: settings.table.rows || initialDataTableQueries.rows,
+                            page: settings.table.page || initialDataTableQueries.page,
+                            column: settings.table.column || initialDataTableQueries.column,
+                            sortField:
+                                settings.table.sortField || initialDataTableQueries.sortField,
+                            sortOrder:
+                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                        });
+                }
+            });
+        }
+    }, [authUser]);
+
+    const dropdownHeaderPanel = (
+        <div className='dropdown-header flex pb-1'>
+            <label className='cursor-pointer dropdown-header__label'>
+                <Checkbox
+                    checked={columns.length === activeColumns.length}
+                    onChange={() => {
+                        setActiveColumns(columns);
+                    }}
+                    className='dropdown-header__checkbox mr-2'
+                />
+                Select All
+            </label>
+            <button
+                className='p-multiselect-close p-link'
+                onClick={() => {
+                    return setActiveColumns(columns.filter(({ checked }) => checked));
+                }}
+            >
+                <i className='pi pi-times' />
+            </button>
+        </div>
+    );
+
+    const printTableData = async (print: boolean = false) => {
+        const columns: ReportsColumn[] = activeColumns.map((column) => ({
+            name: column.header as string,
+            data: column.field,
+        }));
+        const date = new Date();
+        const name = `export-web_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        if (authUser) {
+            const data = exportsToWeb.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        filteredItem[column.data] = item[column.data as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
+            const JSONreport = {
+                name,
+                itemUID: "0",
+                data,
+                columns,
+                format: "",
+            };
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                link.download = `Report-${name}.pdf`;
+                link.click();
+
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            });
+        }
+    };
+
+    const onColumnToggle = ({ value }: MultiSelectChangeEvent) => {
+        return setActiveColumns(value);
+    };
 
     const handleEditedValueSet = (
         key: "Enter" | unknown,
@@ -100,19 +345,6 @@ export const ExportToWeb = () => {
         );
     };
 
-    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
-        { field: "Make", header: "Make" },
-        { field: "Model", header: "Model" },
-        { field: "Year", header: "Year" },
-        { field: "StockNo", header: "StockNo" },
-        { field: "media", header: "Media" },
-        { field: "Status", header: "Status" },
-        { field: "ExteriorColor", header: "Color" },
-        { field: "mileage", header: "Mileage" },
-        { field: "lastexportdate", header: "Last Export Date" },
-        { field: "Price", header: "Price" },
-    ];
-
     const allowedEditableFields: Partial<keyof ExportWebList>[] = [
         "ExteriorColor",
         "mileage",
@@ -128,17 +360,55 @@ export const ExportToWeb = () => {
                     </div>
                     <div className='card-content'>
                         <div className='grid datatable-controls'>
-                            <div className='col-6'>
+                            <div className='col-2'>
+                                <MultiSelect
+                                    options={columns}
+                                    value={activeColumns}
+                                    optionLabel='header'
+                                    panelHeaderTemplate={dropdownHeaderPanel}
+                                    onChange={onColumnToggle}
+                                    showSelectAll={false}
+                                    className='w-full pb-0 h-full flex align-items-center column-picker'
+                                    display='chip'
+                                    pt={{
+                                        header: {
+                                            className: "column-picker__header",
+                                        },
+                                        wrapper: {
+                                            className: "column-picker__wrapper",
+                                            style: {
+                                                maxHeight: "500px",
+                                            },
+                                        },
+                                    }}
+                                />
+                            </div>
+                            <div className='col-4'>
                                 <div className='contact-top-controls'>
                                     <Button
-                                        className='contact-top-controls__button m-r-20px px-6 uppercase'
+                                        className='contact-top-controls__button px-6 uppercase'
                                         severity='success'
                                         type='button'
                                     >
                                         Export
                                     </Button>
+                                    <Button
+                                        severity='success'
+                                        type='button'
+                                        icon='pi pi-print'
+                                        tooltip='Print export to web form'
+                                        onClick={() => printTableData(true)}
+                                    />
+                                    <Button
+                                        severity='success'
+                                        type='button'
+                                        icon='icon adms-blank'
+                                        tooltip='Download export to web form'
+                                        onClick={() => printTableData()}
+                                    />
                                 </div>
                             </div>
+
                             <div className='col-6 text-right'>
                                 <span className='p-input-icon-right'>
                                     <i className='pi pi-search' />
@@ -157,6 +427,8 @@ export const ExportToWeb = () => {
                                     value={exportsToWeb}
                                     lazy
                                     paginator
+                                    scrollable
+                                    scrollHeight='70vh'
                                     first={lazyState.first}
                                     rows={lazyState.rows}
                                     rowsPerPageOptions={ROWS_PER_PAGE}
@@ -167,11 +439,51 @@ export const ExportToWeb = () => {
                                     resizableColumns
                                     sortOrder={lazyState.sortOrder}
                                     sortField={lazyState.sortField}
-                                    className='overflow-x-hidden'
+                                    onColReorder={(event) => {
+                                        if (authUser && Array.isArray(event.columns)) {
+                                            const orderArray = event.columns?.map(
+                                                (column: any) => column.props.field
+                                            );
+
+                                            const newActiveColumns = orderArray
+                                                .map((field: string) => {
+                                                    return (
+                                                        activeColumns.find(
+                                                            (column) => column.field === field
+                                                        ) || null
+                                                    );
+                                                })
+                                                .filter(
+                                                    (column): column is TableColumnsList =>
+                                                        column !== null
+                                                );
+
+                                            setActiveColumns(newActiveColumns);
+
+                                            changeSettings({
+                                                activeColumns: newActiveColumns,
+                                            });
+                                        }
+                                    }}
+                                    onColumnResizeEnd={(event) => {
+                                        if (authUser && event) {
+                                            const newColumnWidth = {
+                                                [event.column.props.field as string]:
+                                                    event.element.offsetWidth,
+                                            };
+                                            changeSettings({
+                                                columnWidth: {
+                                                    ...serverSettings?.exportWeb?.columnWidth,
+                                                    ...newColumnWidth,
+                                                },
+                                            });
+                                        }
+                                    }}
                                 >
                                     <Column
                                         bodyStyle={{ textAlign: "center" }}
                                         header={<Checkbox checked={false} />}
+                                        reorderable={false}
                                         body={(options) => {
                                             return (
                                                 <div className='flex gap-3'>
@@ -189,7 +501,7 @@ export const ExportToWeb = () => {
                                             );
                                         }}
                                     />
-                                    {renderColumnsData.map(({ field, header }) => (
+                                    {activeColumns.map(({ field, header }) => (
                                         <Column
                                             field={field}
                                             header={header}
@@ -208,6 +520,16 @@ export const ExportToWeb = () => {
                                                 }
                                             }}
                                             headerClassName='cursor-move'
+                                            pt={{
+                                                root: {
+                                                    style: {
+                                                        width: serverSettings?.exportWeb
+                                                            ?.columnWidth?.[field],
+                                                        overflow: "hidden",
+                                                        textOverflow: "ellipsis",
+                                                    },
+                                                },
+                                            }}
                                         />
                                     ))}
                                 </DataTable>

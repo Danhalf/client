@@ -138,7 +138,6 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    justify-content: space-between;
     gap: 25px 15px;
     padding-top: 50px;
     color: var(--admss-app-light-grey);
@@ -150,7 +149,6 @@
 
 .media-images__item {
     display: flex;
-    width: 32%;
     box-shadow: 1px 1px 5px 0px rgba(41, 93, 194, 0.5);
     padding: 15px;
     align-items: center;
@@ -282,4 +280,27 @@
 
 .image-choose .info-panel__panel {
     min-width: 330px;
+}
+
+.p-image-mask.p-component-overlay {
+    background-color: rgba(0, 0, 0, 0.25) !important;
+}
+
+.media-images__preview {
+    border-radius: 12px;
+}
+
+.p-image-toolbar {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.p-image-toolbar .p-image-action:last-child {
+    margin-bottom: 31vh;
+}
+
+.p-image-preview-container:hover > .p-image-preview-indicator {
+    height: 75px;
+    width: 75px;
+    background-color: rgba(0, 0, 0, 0.15);
 }

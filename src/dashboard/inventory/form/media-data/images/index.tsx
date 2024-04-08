@@ -1,5 +1,5 @@
 import "./index.css";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import {
     FileUpload,
@@ -10,15 +10,16 @@ import {
 } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
-import { Dropdown } from "primereact/dropdown";
+import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
 import { Checkbox } from "primereact/checkbox";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
-import { MediaLimitations } from "common/models/inventory";
+import { InventoryMediaPostData, MediaLimitations } from "common/models/inventory";
 import { useParams } from "react-router-dom";
-import { Responsive as ResponsiveGridLayout } from "react-grid-layout";
+import { Layout, Responsive, WidthProvider } from "react-grid-layout";
+import { CATEGORIES } from "common/constants/media-categories";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -27,6 +28,8 @@ const limitations: MediaLimitations = {
     maxSize: 8,
     maxUpload: 16,
 };
+
+const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -37,27 +40,53 @@ export const ImagesMedia = observer((): ReactElement => {
         uploadFileImages,
         images,
         isLoading,
-        removeImage,
+        removeMedia,
         fetchImages,
+        changeInventoryMediaOrder,
+        clearInventory,
     } = store;
     const [checked, setChecked] = useState<boolean>(true);
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
-    const fileUploadCheckbox = useRef<Checkbox>(null);
 
     useEffect(() => {
+        id && getInventory(id).then(() => fetchImages());
         if (images.length) {
             setImagesChecked(new Array(images.length).fill(checked));
-        } else {
-            id && getInventory(id).then(() => fetchImages().then());
         }
+        return () => {
+            clearInventory();
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchImages, checked, id]);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
-        store.uploadFileImages = e.files;
+        store.uploadFileImages = {
+            ...store.uploadFileImages,
+            file: e.files,
+        };
         setTotalCount(e.files.length);
+    };
+
+    const handleCategorySelect = (e: DropdownChangeEvent) => {
+        store.uploadFileImages = {
+            ...store.uploadFileImages,
+            data: {
+                ...store.uploadFileImages.data,
+                contenttype: e.target.value,
+            },
+        };
+    };
+
+    const handleCommentaryChange = (e: ChangeEvent<HTMLInputElement>) => {
+        store.uploadFileImages = {
+            ...store.uploadFileImages,
+            data: {
+                ...store.uploadFileImages.data,
+                notes: e.target.value,
+            },
+        };
     };
 
     const onTemplateUpload = (e: FileUploadUploadEvent) => {
@@ -65,9 +94,12 @@ export const ImagesMedia = observer((): ReactElement => {
     };
 
     const onTemplateRemove = (file: File, callback: Function) => {
-        const newFiles = uploadFileImages.filter((item) => item.name !== file.name);
+        const newFiles = {
+            file: uploadFileImages.file.filter((item) => item.name !== file.name),
+            data: uploadFileImages.data,
+        };
         store.uploadFileImages = newFiles;
-        setTotalCount(newFiles.length);
+        setTotalCount(newFiles.file.length);
         callback();
     };
 
@@ -98,7 +130,7 @@ export const ImagesMedia = observer((): ReactElement => {
     };
 
     const handleDeleteImage = (mediauid: string) => {
-        removeImage(mediauid);
+        removeMedia(mediauid);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -198,6 +230,16 @@ export const ImagesMedia = observer((): ReactElement => {
         );
     };
 
+    const handleChangeOrder = (list: Layout[]) => {
+        const orderedList: Pick<InventoryMediaPostData, "itemuid" | "order">[] = [];
+        if (list) {
+            list.forEach((item: Layout) => {
+                orderedList.push({ itemuid: item.i, order: item.y + 1 * item.x + 1 });
+            });
+        }
+        changeInventoryMediaOrder(orderedList);
+    };
+
     const chooseOptions = {
         className: "media__button",
         label: "Choose from files",
@@ -221,8 +263,21 @@ export const ImagesMedia = observer((): ReactElement => {
                 className='col-12'
             />
             <div className='col-12 mt-4 media-input'>
-                <Dropdown className='media-input__dropdown' placeholder='Category' />
-                <InputText className='media-input__text' placeholder='Comment' />
+                <Dropdown
+                    className='media-input__dropdown'
+                    placeholder='Category'
+                    optionLabel={"name"}
+                    optionValue={"id"}
+                    options={CATEGORIES}
+                    value={uploadFileImages?.data?.contenttype || 0}
+                    onChange={handleCategorySelect}
+                />
+                <InputText
+                    className='media-input__text'
+                    placeholder='Comment'
+                    value={uploadFileImages?.data?.notes || ""}
+                    onChange={handleCommentaryChange}
+                />
                 <Button
                     severity={totalCount ? "success" : "secondary"}
                     disabled={!totalCount || isLoading}
@@ -253,10 +308,11 @@ export const ImagesMedia = observer((): ReactElement => {
             </div>
             <div className='media-images'>
                 {images.length ? (
-                    <ResponsiveGridLayout
+                    <ResponsiveReactGridLayout
                         isDraggable={true}
                         isDroppable={true}
                         className='layout w-full relative'
+                        onDragStop={(item) => handleChangeOrder(item)}
                         layouts={{
                             lg: images.map(({ itemuid }, index: number) => ({
                                 i: itemuid,
@@ -267,17 +323,15 @@ export const ImagesMedia = observer((): ReactElement => {
                             })),
                         }}
                         cols={{ lg: 3, md: 3, sm: 3, xs: 2, xxs: 1 }}
-                        draggableCancel='.media-uploaded__checkbox, .media-images__close'
-                        width={960}
+                        draggableCancel='.media-uploaded__checkbox, .media-images__close, .p-image'
                         rowHeight={20}
                     >
-                        {images.map(({ itemuid, src }, index: number) => {
+                        {images.map(({ itemuid, src, info }, index: number) => {
                             return (
                                 <div key={itemuid} className='media-images__item'>
                                     {checked && (
                                         <Checkbox
                                             checked={imagesChecked[index]}
-                                            ref={fileUploadCheckbox}
                                             onChange={() => handleCheckedChange(index)}
                                             className='media-uploaded__checkbox'
                                         />
@@ -287,9 +341,17 @@ export const ImagesMedia = observer((): ReactElement => {
                                         alt='inventory-item'
                                         width='75'
                                         height='75'
+                                        preview
+                                        className='cursor-pointer'
                                         pt={{
                                             image: {
                                                 className: "media-images__image",
+                                            },
+                                            previewContainer: {
+                                                className: "media-images__preview-container",
+                                            },
+                                            preview: {
+                                                className: "media-images__preview",
                                             },
                                         }}
                                     />
@@ -298,7 +360,14 @@ export const ImagesMedia = observer((): ReactElement => {
                                             <span className='image-info__icon'>
                                                 <i className='icon adms-category' />
                                             </span>
-                                            <span className='image-info__text--bold'>Exterior</span>
+                                            <span className='image-info__text--bold'>
+                                                {
+                                                    CATEGORIES.find(
+                                                        (category) =>
+                                                            category.id === info?.contenttype
+                                                    )?.name
+                                                }
+                                            </span>
                                         </div>
                                         <div className='image-info__item'>
                                             <span className='image-info__icon'>
@@ -306,16 +375,14 @@ export const ImagesMedia = observer((): ReactElement => {
                                                     <i className='icon adms-comment' />
                                                 </span>
                                             </span>
-                                            <span className='image-info__text'>
-                                                Renewed colour and new tires
-                                            </span>
+                                            <span className='image-info__text'>{info?.notes}</span>
                                         </div>
                                         <div className='image-info__item'>
                                             <span className='image-info__icon'>
                                                 <i className='icon adms-calendar' />
                                             </span>
                                             <span className='image-info__text'>
-                                                10/11/2023 08:51:39
+                                                {info?.created}
                                             </span>
                                         </div>
                                     </div>
@@ -328,7 +395,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                 </div>
                             );
                         })}
-                    </ResponsiveGridLayout>
+                    </ResponsiveReactGridLayout>
                 ) : (
                     <div className='w-full text-center'>No images added yet.</div>
                 )}
