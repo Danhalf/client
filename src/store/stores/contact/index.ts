@@ -1,5 +1,6 @@
 import { Status } from "common/models/base-response";
 import { Contact } from "common/models/contact";
+import { MediaType } from "common/models/enums";
 import { getContactInfo, setContactDL } from "http/services/contacts-service";
 import { createMediaItemRecord, uploadInventoryMedia } from "http/services/media.service";
 import { makeAutoObservable } from "mobx";
@@ -74,7 +75,7 @@ export class ContactStore {
                     const formData = new FormData();
                     formData.append("file", file);
 
-                    const createMediaResponse = await createMediaItemRecord(1);
+                    const createMediaResponse = await createMediaItemRecord(MediaType.mtPhoto);
                     if (createMediaResponse?.status === Status.OK) {
                         const uploadMediaResponse = await uploadInventoryMedia(
                             this._contactID,

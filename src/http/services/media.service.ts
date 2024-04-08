@@ -58,11 +58,11 @@ export const getInventoryMediaInfo = async (mediauid: string) => {
     }
 };
 
-export const createMediaItemRecord = async (mediatype?: MediaType) => {
+export const createMediaItemRecord = async (mediaType?: MediaType) => {
     try {
         const response = await authorizedUserApiInstance.post<CreateMediaItemRecordResponse>(
             "media/0/meta",
-            { mediatype }
+            { mediaType }
         );
 
         if (response.status === 200) {
