@@ -27,8 +27,8 @@ const SexList = [
 ];
 
 enum DLSides {
-    front = "front",
-    back = "back",
+    FRONT = "front",
+    BACK = "back",
 }
 
 export const ContactsIdentificationInfo = observer((): ReactElement => {
@@ -45,20 +45,20 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
     }, []);
 
     const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide) => {
-        if (side === DLSides.front) {
+        if (side === DLSides.FRONT) {
             store.frontSideDL = e.files[0];
         }
-        if (side === DLSides.back) {
+        if (side === DLSides.BACK) {
             store.backSideDL = e.files[0];
         }
     };
 
     const handleDeleteImage = (side: DLSide) => {
-        if (side === DLSides.front) {
+        if (side === DLSides.FRONT) {
             fileUploadFrontRef.current?.clear();
             store.frontSideDL = {} as File;
         }
-        if (side === DLSides.back) {
+        if (side === DLSides.BACK) {
             fileUploadBackRef.current?.clear();
             store.backSideDL = {} as File;
         }
@@ -86,7 +86,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
     };
 
     const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions, side: DLSide) => {
-        const { size } = side === DLSides.front ? frontSideDL : backSideDL;
+        const { size } = side === DLSides.FRONT ? frontSideDL : backSideDL;
         return (
             <div
                 className={`col-6 ml-auto flex justify-content-center flex-wrap mb-3 dl-header ${
@@ -194,10 +194,10 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         <FileUpload
                             ref={fileUploadFrontRef}
                             accept='image/*'
-                            headerTemplate={(props) => chooseTemplate(props, DLSides.front)}
-                            itemTemplate={(file) => itemTemplate(file, DLSides.front)}
+                            headerTemplate={(props) => chooseTemplate(props, DLSides.FRONT)}
+                            itemTemplate={(file) => itemTemplate(file, DLSides.FRONT)}
                             emptyTemplate={emptyTemplate}
-                            onSelect={(event) => onTemplateSelect(event, DLSides.front)}
+                            onSelect={(event) => onTemplateSelect(event, DLSides.FRONT)}
                             progressBarTemplate={<></>}
                         />
                     </div>
@@ -210,10 +210,10 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         <FileUpload
                             ref={fileUploadBackRef}
                             accept='image/*'
-                            headerTemplate={(props) => chooseTemplate(props, DLSides.back)}
-                            itemTemplate={(file) => itemTemplate(file, DLSides.back)}
+                            headerTemplate={(props) => chooseTemplate(props, DLSides.BACK)}
+                            itemTemplate={(file) => itemTemplate(file, DLSides.BACK)}
                             emptyTemplate={emptyTemplate}
-                            onSelect={(event) => onTemplateSelect(event, DLSides.back)}
+                            onSelect={(event) => onTemplateSelect(event, DLSides.BACK)}
                             progressBarTemplate={<></>}
                         />
                     </div>
