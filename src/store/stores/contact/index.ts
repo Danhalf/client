@@ -78,12 +78,12 @@ export class ContactStore {
                     const createMediaResponse = await createMediaItemRecord(MediaType.mtPhoto);
                     if (createMediaResponse?.status === Status.OK) {
                         const uploadMediaResponse = await uploadInventoryMedia(
-                            this._contactID,
+                            createMediaResponse.itemUID,
                             formData
                         );
                         if (uploadMediaResponse?.status === Status.OK) {
                             await setContactDL(this._contactID, {
-                                [!!index ? "dluidfront" : "dluidback"]: uploadMediaResponse.itemuid,
+                                [!index ? "dluidfront" : "dluidback"]: uploadMediaResponse.itemuid,
                             });
                         }
                     }
@@ -91,11 +91,6 @@ export class ContactStore {
             });
         } catch (error) {
             // TODO: add error handler
-        }
-        try {
-            return Status.OK;
-        } catch (error) {
-            return Status.ERROR;
         } finally {
             this._isLoading = false;
         }
