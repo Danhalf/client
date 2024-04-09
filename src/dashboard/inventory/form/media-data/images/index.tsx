@@ -130,7 +130,7 @@ export const ImagesMedia = observer((): ReactElement => {
     };
 
     const handleDeleteImage = (mediauid: string) => {
-        removeMedia(mediauid);
+        removeMedia(mediauid, fetchImages);
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
