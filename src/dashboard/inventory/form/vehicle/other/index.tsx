@@ -91,13 +91,16 @@ export const VehicleOther = observer((): ReactElement => {
             </div>
 
             <div className='col-12'>
-                <label className='w-full float-label'>Notes</label>
-                <InputTextarea
-                    placeholder='Notes'
-                    value={inventory?.Notes}
-                    onChange={({ target: { value } }) => changeInventory({ key: "Notes", value })}
-                    className='w-full vehicle-other__text-area'
-                />
+                <span className='p-float-label'>
+                    <InputTextarea
+                        value={inventory?.Notes}
+                        onChange={({ target: { value } }) =>
+                            changeInventory({ key: "Notes", value })
+                        }
+                        className='w-full vehicle-other__text-area'
+                    />
+                    <label className='float-label'>Notes</label>
+                </span>
             </div>
         </div>
     );

@@ -84,7 +84,6 @@ export const VehicleDisclosures = observer((): ReactElement => {
                             changeInventoryExtData({ key: "damSalvageState", value })
                         }
                         options={STATES_LIST}
-                        placeholder='State'
                         className='w-full vehicle-disclosures__dropdown'
                     />
                     <label className='float-label'>State</label>
@@ -150,7 +149,6 @@ export const VehicleDisclosures = observer((): ReactElement => {
             <div className='col-6'>
                 <span className='p-float-label'>
                     <InputTextarea
-                        placeholder='Parts Damaged'
                         className='w-full vehicle-disclosures__text-area'
                         value={dam25Parts}
                         onChange={({ target: { value } }) =>
@@ -163,7 +161,6 @@ export const VehicleDisclosures = observer((): ReactElement => {
             <div className='col-6'>
                 <span className='p-float-label'>
                     <InputTextarea
-                        placeholder='Theft Parts Damaged '
                         className='w-full vehicle-disclosures__text-area'
                         value={damTheftParts}
                         onChange={({ target: { value } }) =>
