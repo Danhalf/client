@@ -14,7 +14,10 @@
     margin-bottom: 30px;
     display: flex;
     align-items: center;
-    gap: 4.6rem;
+}
+
+.card-header__title {
+    width: 312px;
 }
 
 .card-content__wrapper {
