@@ -80,8 +80,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         filter
                         value={inventory?.Transmission}
                         onChange={({ value }) => changeInventory({ key: "Transmission", value })}
-                        options={[...transmissionList, { name: inventory?.Transmission }]}
-                        placeholder='Transmission'
+                        options={transmissionList}
                         className='w-full vehicle-description__dropdown'
                     />
                     <label className='float-label'>Transmission</label>
@@ -94,10 +93,9 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='name'
                         filter
-                        options={[...fuelList, { name: inventory?.TypeOfFuel }]}
+                        options={fuelList}
                         value={formik.values.TypeOfFuel}
                         onChange={({ value }) => formik.setFieldValue("TypeOfFuel", value)}
-                        placeholder='Type of Fuel (required)'
                         className={`vehicle-description__dropdown w-full ${
                             !isFormFieldInvalid("TypeOfFuel") && "p-invalid"
                         }`}
@@ -114,8 +112,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         filter
                         value={inventory?.DriveLine}
                         onChange={({ value }) => changeInventory({ key: "DriveLine", value })}
-                        options={[...driveLineList, { name: inventory?.DriveLine }]}
-                        placeholder='Drive Line'
+                        options={driveLineList}
                         className='w-full vehicle-description__dropdown'
                     />
                     <label className='float-label'>Drive Line</label>
@@ -130,8 +127,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         filter
                         value={inventory?.Cylinders}
                         onChange={({ value }) => changeInventory({ key: "Cylinders", value })}
-                        options={[...cylindersList, { name: inventory?.Cylinders }]}
-                        placeholder='Cylinders'
+                        options={cylindersList}
                         className='w-full vehicle-description__dropdown'
                     />
                     <label className='float-label'>Cylinders</label>
@@ -146,9 +142,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         value={inventory?.Engine}
                         filter
                         onChange={({ value }) => changeInventory({ key: "Engine", value })}
-                        //TODO: Remove name value from dropdown list
-                        options={[...engineList, { name: inventory?.Engine }]}
-                        placeholder='Engine description'
+                        options={engineList}
                         className='w-full vehicle-description__dropdown'
                     />
                     <label className='float-label'>Engine description</label>
