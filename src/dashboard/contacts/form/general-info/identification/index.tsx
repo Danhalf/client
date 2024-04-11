@@ -74,16 +74,12 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         removeImagesDL();
     };
 
-    const itemTemplate = (inFile: object, side: DLSide) => {
-        const file = inFile as File;
+    const itemTemplate = (image: File | string, side: DLSide) => {
+        const alt = typeof image === "string" ? "driven license" : image?.name;
+        const src = typeof image === "string" ? image : URL.createObjectURL(image);
         return (
-            <div className='flex align-items-center dl-presentation'>
-                <img
-                    alt={file.name}
-                    src={URL.createObjectURL(file)}
-                    role='presentation'
-                    className='dl-presentation__image'
-                />
+            <div className='flex align-items-center dl-presentation relative'>
+                <img alt={alt} src={src} role='presentation' className='dl-presentation__image' />
                 <Button
                     type='button'
                     icon='pi pi-times'
@@ -201,20 +197,13 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     >
                         <div className='identification-dl__title'>Frontside</div>
                         {frontSideDLurl ? (
-                            <Image
-                                className='dl-image w-full'
-                                alt='front-side-dl'
-                                src={frontSideDLurl}
-                                pt={{
-                                    image: { className: "w-full" },
-                                }}
-                            />
+                            itemTemplate(frontSideDLurl, DLSides.FRONT)
                         ) : (
                             <FileUpload
                                 ref={fileUploadFrontRef}
                                 accept='image/*'
                                 headerTemplate={(props) => chooseTemplate(props, DLSides.FRONT)}
-                                itemTemplate={(file) => itemTemplate(file, DLSides.FRONT)}
+                                itemTemplate={(file) => itemTemplate(file as File, DLSides.FRONT)}
                                 emptyTemplate={emptyTemplate}
                                 onSelect={(event) => onTemplateSelect(event, DLSides.FRONT)}
                                 progressBarTemplate={<></>}
@@ -231,7 +220,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                             ref={fileUploadBackRef}
                             accept='image/*'
                             headerTemplate={(props) => chooseTemplate(props, DLSides.BACK)}
-                            itemTemplate={(file) => itemTemplate(file, DLSides.BACK)}
+                            itemTemplate={(file) => itemTemplate(file as File, DLSides.BACK)}
                             emptyTemplate={emptyTemplate}
                             onSelect={(event) => onTemplateSelect(event, DLSides.BACK)}
                             progressBarTemplate={<></>}

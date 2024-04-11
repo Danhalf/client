@@ -100,3 +100,17 @@ export const setContactDL = async (
         // TODO: add error handler
     }
 };
+
+export const deleteContactDL = async (contactuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `contacts/${contactuid}/deletedlicense`
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
