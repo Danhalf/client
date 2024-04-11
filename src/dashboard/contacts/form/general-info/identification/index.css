@@ -94,7 +94,8 @@
     border: none;
 }
 
-.identification-dl .p-fileupload-content .dl-presentation {
+.identification-dl .p-fileupload-content .dl-presentation,
+.identification-dl .dl-image {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -112,4 +113,8 @@
     position: absolute;
     top: 0;
     right: 0;
+}
+
+.dl-image {
+    /* width: 100%; */
 }

@@ -89,6 +89,7 @@ export const setContactDL = async (
             {
                 dluidfront,
                 dluidback,
+                contactuid,
             }
         );
 

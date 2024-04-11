@@ -1,3 +1,4 @@
+import { getInventoryMediaItem } from "./../../../http/services/media.service";
 import { Status } from "common/models/base-response";
 import { Contact } from "common/models/contact";
 import { MediaType } from "common/models/enums";
@@ -13,8 +14,8 @@ export class ContactStore {
     private _contact: Contact = {} as Contact;
     private _contactID: string = "";
     protected _isLoading = false;
-    private _frontSiteDLSrc: string = "";
-    private _backSiteDLSrc: string = "";
+    private _frontSiteDLurl: string = "";
+    private _backSiteDLurl: string = "";
     private _frontSiteDL: File = {} as File;
     private _backSiteDL: File = {} as File;
 
@@ -33,6 +34,14 @@ export class ContactStore {
 
     public get backSideDL() {
         return this._backSiteDL;
+    }
+
+    public get frontSideDLurl() {
+        return this._frontSiteDLurl;
+    }
+
+    public get backSideDLurl() {
+        return this._backSiteDLurl;
     }
 
     public get isLoading() {
@@ -60,10 +69,18 @@ export class ContactStore {
 
     public getImagesDL = (): void => {
         if (this._contact.dluidfront) {
-            this._frontSiteDLSrc = this._contact.dluidfront;
+            getInventoryMediaItem(this._contact.dluidfront).then((res) => {
+                if (res) {
+                    this._frontSiteDLurl = res;
+                }
+            });
         }
         if (this._contact.dluidback) {
-            this._backSiteDLSrc = this._contact.dluidback;
+            getInventoryMediaItem(this._contact.dluidback).then((res) => {
+                if (res) {
+                    this._backSiteDLurl = res;
+                }
+            });
         }
     };
 

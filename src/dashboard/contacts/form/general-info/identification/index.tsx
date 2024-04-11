@@ -16,6 +16,7 @@ import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
 import { DLSide } from "store/stores/contact";
 import { useParams } from "react-router-dom";
+import { Image } from "primereact/image";
 
 const SexList = [
     {
@@ -35,14 +36,22 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
     const [sex, setSex] = useState<string>("");
     const { id } = useParams();
     const store = useStore().contactStore;
-    const { contact, frontSideDL, backSideDL, getImagesDL, removeImagesDL } = store;
+    const {
+        contact,
+        frontSideDL,
+        backSideDL,
+        getImagesDL,
+        removeImagesDL,
+        frontSideDLurl,
+        backSideDLurl,
+    } = store;
     const fileUploadFrontRef = useRef<FileUpload>(null);
     const fileUploadBackRef = useRef<FileUpload>(null);
 
     useEffect(() => {
         getImagesDL();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [contact]);
 
     const onTemplateSelect = (e: FileUploadSelectEvent, side: DLSide) => {
         if (side === DLSides.FRONT) {
@@ -191,15 +200,26 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         }`}
                     >
                         <div className='identification-dl__title'>Frontside</div>
-                        <FileUpload
-                            ref={fileUploadFrontRef}
-                            accept='image/*'
-                            headerTemplate={(props) => chooseTemplate(props, DLSides.FRONT)}
-                            itemTemplate={(file) => itemTemplate(file, DLSides.FRONT)}
-                            emptyTemplate={emptyTemplate}
-                            onSelect={(event) => onTemplateSelect(event, DLSides.FRONT)}
-                            progressBarTemplate={<></>}
-                        />
+                        {frontSideDLurl ? (
+                            <Image
+                                className='dl-image w-full'
+                                alt='front-side-dl'
+                                src={frontSideDLurl}
+                                pt={{
+                                    image: { className: "w-full" },
+                                }}
+                            />
+                        ) : (
+                            <FileUpload
+                                ref={fileUploadFrontRef}
+                                accept='image/*'
+                                headerTemplate={(props) => chooseTemplate(props, DLSides.FRONT)}
+                                itemTemplate={(file) => itemTemplate(file, DLSides.FRONT)}
+                                emptyTemplate={emptyTemplate}
+                                onSelect={(event) => onTemplateSelect(event, DLSides.FRONT)}
+                                progressBarTemplate={<></>}
+                            />
+                        )}
                     </div>
                     <div
                         className={`col-6 identification-dl ${
