@@ -62,7 +62,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         }
     };
 
-    const handleDeleteImage = (side: DLSide) => {
+    const handleDeleteImage = (side: DLSide, isString: boolean = false) => {
         if (side === DLSides.FRONT) {
             fileUploadFrontRef.current?.clear();
             store.frontSideDL = {} as File;
@@ -71,19 +71,20 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
             fileUploadBackRef.current?.clear();
             store.backSideDL = {} as File;
         }
-        removeImagesDL();
+        isString && removeImagesDL();
     };
 
     const itemTemplate = (image: File | string, side: DLSide) => {
-        const alt = typeof image === "string" ? "driven license" : image?.name;
-        const src = typeof image === "string" ? image : URL.createObjectURL(image);
+        const isString = typeof image === "string";
+        const alt = isString ? "driven license" : image?.name;
+        const src = isString ? image : URL.createObjectURL(image);
         return (
             <div className='flex align-items-center dl-presentation relative'>
                 <img alt={alt} src={src} role='presentation' className='dl-presentation__image' />
                 <Button
                     type='button'
                     icon='pi pi-times'
-                    onClick={() => handleDeleteImage(side)}
+                    onClick={() => handleDeleteImage(side, isString)}
                     className='p-button dl-presentation__remove-button'
                 />
             </div>

@@ -2,7 +2,7 @@ import { getInventoryMediaItem } from "./../../../http/services/media.service";
 import { Status } from "common/models/base-response";
 import { Contact } from "common/models/contact";
 import { MediaType } from "common/models/enums";
-import { getContactInfo, setContactDL } from "http/services/contacts-service";
+import { deleteContactDL, getContactInfo, setContactDL } from "http/services/contacts-service";
 import { createMediaItemRecord, uploadInventoryMedia } from "http/services/media.service";
 import { makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -58,7 +58,9 @@ export class ContactStore {
             const response = await getContactInfo(itemuid);
             if (response) {
                 const contact = response;
+
                 this._contactID = response.contactuid;
+
                 this._contact = contact || ({} as Contact);
             }
         } catch (error) {
@@ -124,6 +126,9 @@ export class ContactStore {
     public removeImagesDL = async (): Promise<any> => {
         this._isLoading = true;
         try {
+            await deleteContactDL(this._contactID);
+            this._frontSiteDLurl = "";
+            this._backSiteDLurl = "";
             return Status.OK;
         } catch (error) {
             return Status.ERROR;
