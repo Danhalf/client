@@ -11,6 +11,7 @@ import { ProgressBar } from "primereact/progressbar";
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { DealGeneralInfo } from "./general-info";
+import { DealRetail } from "./retail";
 
 const STEP = "step";
 
@@ -46,7 +47,7 @@ export const DealsForm = observer(() => {
     };
 
     useEffect(() => {
-        const dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo];
+        const dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo, DealRetail];
         const sections = dealsSections.map((sectionData) => new DealsSection(sectionData));
         setDealsSections(sections);
         setAccordionSteps(sections.map((item) => item.startIndex));

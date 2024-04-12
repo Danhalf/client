@@ -1,21 +1,25 @@
 import { Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 
-const DealsSale = lazy(() =>
-    import("./liens").then((module) => ({ default: module.DealGeneralSale }))
+const DealRetailLiens = lazy(() =>
+    import("./liens").then((module) => ({ default: module.DealRetailLiens }))
 );
-const DealsOdometer = lazy(() =>
-    import("./trade-first").then((module) => ({ default: module.DealGeneralOdometer }))
+const DealRetailTradeFirst = lazy(() =>
+    import("./trade-first").then((module) => ({ default: module.DealRetailTradeFirst }))
 );
-const DealsSeller = lazy(() =>
-    import("./tag").then((module) => ({ default: module.DealGeneralSeller }))
+const DealRetailTradeSecond = lazy(() =>
+    import("./trade-second").then((module) => ({ default: module.DealRetailTradeSecond }))
+);
+const DealRetailTag = lazy(() =>
+    import("./tag").then((module) => ({ default: module.DealRetailTag }))
 );
 
-export const DealGeneralInfo: Pick<Inventory, "label" | "items"> = {
+export const DealRetail: Pick<Inventory, "label" | "items"> = {
     label: "General information",
     items: [
-        { itemLabel: "Sale", component: <DealsSale /> },
-        { itemLabel: "Odometer", component: <DealsOdometer /> },
-        { itemLabel: "Seller", component: <DealsSeller /> },
+        { itemLabel: "Liens", component: <DealRetailLiens /> },
+        { itemLabel: "Trade 1", component: <DealRetailTradeFirst /> },
+        { itemLabel: "Trade 2", component: <DealRetailTradeSecond /> },
+        { itemLabel: "Tag", component: <DealRetailTag /> },
     ],
 };
