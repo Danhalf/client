@@ -2,13 +2,13 @@ import { Inventory } from "dashboard/inventory/common";
 import { lazy } from "react";
 
 const DealsSale = lazy(() =>
-    import("./sale").then((module) => ({ default: module.DealGeneralSale }))
+    import("./liens").then((module) => ({ default: module.DealGeneralSale }))
 );
 const DealsOdometer = lazy(() =>
-    import("./odometer").then((module) => ({ default: module.DealGeneralOdometer }))
+    import("./trade-first").then((module) => ({ default: module.DealGeneralOdometer }))
 );
 const DealsSeller = lazy(() =>
-    import("./seller").then((module) => ({ default: module.DealGeneralSeller }))
+    import("./tag").then((module) => ({ default: module.DealGeneralSeller }))
 );
 
 export const DealGeneralInfo: Pick<Inventory, "label" | "items"> = {
