@@ -19,6 +19,12 @@ export interface Deal {
     extdata: DealExtData;
 }
 
+export interface DealType {
+    index: number;
+    id: number;
+    name: string;
+}
+
 export interface DealExtData {
     itemUID: string;
     created: number;

@@ -1,11 +1,27 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { Dropdown } from "primereact/dropdown";
 import { DateInput } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
+import { useStore } from "store/hooks";
+import { getDealTypes } from "http/services/deals.service";
+import { DealType } from "common/models/deals";
 
 export const DealGeneralSale = observer((): ReactElement => {
+    const store = useStore().dealStore;
+    const {
+        deal: { dealtype, saletype },
+    } = store;
+
+    const [dealTypesList, setDealTypesList] = useState<DealType[]>([]);
+
+    useEffect(() => {
+        getDealTypes().then((res) => {
+            if (res) setDealTypesList(res);
+        });
+    }, []);
+
     return (
         <div className='grid deal-general-sale row-gap-2'>
             <div className='col-6'>
@@ -36,9 +52,11 @@ export const DealGeneralSale = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='name'
-                        optionValue='name'
+                        optionValue='id'
                         filter
                         required
+                        options={dealTypesList}
+                        value={dealtype}
                         className='w-full deal-sale__dropdown'
                     />
                     <label className='float-label'>Type of Deal (required)</label>

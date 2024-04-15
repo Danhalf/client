@@ -1,7 +1,7 @@
 import { authorizedUserApiInstance } from "http/index";
 import { QueryParams } from "common/models/query-params";
 import { BaseResponse, Status } from "common/models/base-response";
-import { Deal } from "common/models/deals";
+import { Deal, DealType } from "common/models/deals";
 
 export interface TotalDealsList extends BaseResponse {
     total: number;
@@ -27,6 +27,18 @@ export const getDealInfo = async (uid: string) => {
         if (request.data.status === Status.OK) {
             return request.data;
         }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+interface TypeResponse extends BaseResponse {
+    deal_types: DealType[];
+}
+
+export const getDealTypes = async () => {
+    try {
+        const request = await authorizedUserApiInstance.get<TypeResponse>("deals/listdealtypes");
+        return request.data.deal_types;
     } catch (error) {
         // TODO: add error handler
     }
