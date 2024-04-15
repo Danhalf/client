@@ -10,6 +10,7 @@ type LabelPosition = "left" | "right" | "top";
 
 interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
+    width?: string;
 }
 
 interface CurrencyInputProps extends InputNumberProps {
@@ -20,7 +21,7 @@ interface PercentInputProps extends InputNumberProps {
     labelPosition?: LabelPosition;
 }
 
-export const DashboardRadio = ({ radioArray }: DashboardRadioProps): ReactElement => {
+export const DashboardRadio = ({ radioArray, width }: DashboardRadioProps): ReactElement => {
     const [radioValue, setRadioValue] = useState<string | number>("" || 0);
 
     return (
@@ -35,6 +36,7 @@ export const DashboardRadio = ({ radioArray }: DashboardRadioProps): ReactElemen
                             inputId={name}
                             name={name}
                             value={value}
+                            style={{ width }}
                             onChange={(e: RadioButtonChangeEvent) => setRadioValue(e.value)}
                             checked={radioValue === value}
                         />
