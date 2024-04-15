@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import "./index.css";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
-import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { InputTextarea } from "primereact/inputtextarea";
