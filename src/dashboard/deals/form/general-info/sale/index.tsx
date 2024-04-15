@@ -5,20 +5,24 @@ import { Dropdown } from "primereact/dropdown";
 import { DateInput } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
-import { getDealTypes } from "http/services/deals.service";
-import { DealType } from "common/models/deals";
+import { getDealTypes, getSaleTypes } from "http/services/deals.service";
+import { DealType, SaleType } from "common/models/deals";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
-        deal: { dealtype, saletype },
+        deal: { dealtype, saletype, inventoryuinfo, name },
     } = store;
 
     const [dealTypesList, setDealTypesList] = useState<DealType[]>([]);
+    const [saleTypesList, setSaleTypesList] = useState<SaleType[]>([]);
 
     useEffect(() => {
         getDealTypes().then((res) => {
             if (res) setDealTypesList(res);
+        });
+        getSaleTypes().then((res) => {
+            if (res) setSaleTypesList(res);
         });
     }, []);
 
@@ -30,6 +34,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='name'
                         filter
+                        value={name}
                         required
                         className='w-full deal-sale__dropdown'
                     />
@@ -42,6 +47,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='name'
                         filter
+                        value={inventoryuinfo}
                         required
                         className='w-full deal-sale__dropdown'
                     />
@@ -78,9 +84,11 @@ export const DealGeneralSale = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='name'
-                        optionValue='name'
+                        optionValue='id'
                         filter
                         required
+                        options={saleTypesList}
+                        value={saletype}
                         className='w-full deal-sale__dropdown'
                     />
                     <label className='float-label'>Sale type (required)</label>
