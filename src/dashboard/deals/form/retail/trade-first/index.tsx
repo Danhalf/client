@@ -74,7 +74,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     <img
                         alt={option.name}
                         src={option?.logo || defaultMakesLogo}
-                        className='mr-2 deal-trade__dropdown-icon'
+                        className='mr-2 vehicle__dropdown-icon'
                     />
                     <div>{option.name}</div>
                 </div>
@@ -90,7 +90,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 <img
                     alt={option.name}
                     src={option?.logo || defaultMakesLogo}
-                    className='mr-2 deal-trade__dropdown-icon'
+                    className='mr-2 vehicle__dropdown-icon'
                 />
                 <div>{option.name}</div>
             </div>
@@ -278,14 +278,14 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         //TODO: add options
-                        // optionLabel='name'
-                        // optionValue='name'
+                        optionLabel='name'
+                        optionValue='name'
                         value={Trade1_BodyStyle}
                         onChange={({ target: { value } }) => {
                             changeDealExtData({ key: "Trade1_BodyStyle", value });
                         }}
                         editable
-                        options={[Trade1_BodyStyle]}
+                        options={[{ name: Trade1_BodyStyle }]}
                         filter
                         className='w-full deal-trade__dropdown'
                     />
@@ -318,20 +318,45 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             </div>
 
             <div className='col-3 deal-trade__checkbox flex align-items-center'>
-                <Checkbox inputId={`trade`} name={`trade`} checked={false} />
-                <label htmlFor={`trade`} className='ml-2'>
+                <Checkbox
+                    inputId='Trade1_OdomInExcess'
+                    name='Trade1_OdomInExcess'
+                    checked={!!Trade1_OdomInExcess}
+                    onChange={() =>
+                        changeDealExtData({
+                            key: "Trade1_OdomInExcess",
+                            value: Number(!Trade1_OdomInExcess),
+                        })
+                    }
+                />
+                <label htmlFor='Trade1_OdomInExcess' className='ml-2'>
                     Disclosure IN EXCESS
                 </label>
             </div>
             <div className='col-3 deal-trade__checkbox flex align-items-center'>
-                <Checkbox inputId={`trade`} name={`trade`} checked={false} />
-                <label htmlFor={`trade`} className='ml-2'>
+                <Checkbox
+                    inputId='Trade1_OdomNotActual'
+                    name='Trade1_OdomNotActual'
+                    checked={!!Trade1_OdomNotActual}
+                    onChange={() =>
+                        changeDealExtData({
+                            key: "Trade1_OdomNotActual",
+                            value: Number(!Trade1_OdomNotActual),
+                        })
+                    }
+                />
+                <label htmlFor='Trade1_OdomNotActual' className='ml-2'>
                     Disclosure NOT ACTUAL
                 </label>
             </div>
             <div className='col-3 deal-trade__checkbox flex align-items-center'>
-                <Checkbox inputId={`trade`} name={`trade`} checked={false} />
-                <label htmlFor={`trade`} className='ml-2'>
+                {/* TODO: Add checkbox for adding to inventory */}
+                <Checkbox
+                    inputId='Trade1_AddToInventory'
+                    name='Trade1_AddToInventory'
+                    checked={false}
+                />
+                <label htmlFor='Trade1_AddToInventory' className='ml-2'>
                     Add to inventory
                 </label>
             </div>
@@ -339,39 +364,106 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Allowance' />
+                <CurrencyInput
+                    value={Number(Trade1_Allowance)}
+                    onChange={({ value }) => {
+                        changeDealExtData({ key: "Trade1_Allowance", value: value || 0 });
+                    }}
+                    labelPosition='top'
+                    title='Allowance'
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Payoff Amount' />
+                <CurrencyInput
+                    value={Number(Trade1_Lien_Payoff)}
+                    onChange={({ value }) => {
+                        changeDealExtData({ key: "Trade1_Lien_Payoff", value: value || 0 });
+                    }}
+                    labelPosition='top'
+                    title='Payoff Amount'
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Payoff Amount' />
+                <CurrencyInput
+                    value={Number(Trade1_Lien_Payoff)}
+                    onChange={({ value }) => {
+                        changeDealExtData({ key: "Trade1_Lien_Payoff", value: value || 0 });
+                    }}
+                    labelPosition='top'
+                    title='Payoff Amount'
+                />
             </div>
             {/* TODO: Add calendar checkbox */}
             <div className='col-3'>
-                <DateInput name='PO Good Thru' />
+                <DateInput
+                    date={Trade1_Lien_Payoff_Good_Through}
+                    onChange={({ value }) =>
+                        value &&
+                        changeDealExtData({
+                            key: "Trade1_Lien_Payoff_Good_Through",
+                            value: Number(value),
+                        })
+                    }
+                    name='PO Good Thru'
+                />
             </div>
 
             <hr className='form-line' />
 
             <div className='col-6'>
-                <CompanySearch name='Lienholder Name' />
+                <CompanySearch
+                    name='Lienholder Name'
+                    value={Trade1_Lien_Name}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Trade1_Lien_Name", value })
+                    }
+                    onRowClick={(value) =>
+                        changeDealExtData({
+                            key: "Trade1_Lien_Name",
+                            value,
+                        })
+                    }
+                />
             </div>
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <InputText className='deal-trade__text-input w-full' />
+                    <InputText
+                        className='deal-trade__text-input w-full'
+                        value={Trade1_Lien_Address}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade1_Lien_Address", value });
+                        }}
+                    />
                     <label className='float-label'>Mailing address</label>
                 </span>
             </div>
 
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='deal-trade__text-input w-full' />
+                    <InputText
+                        className='deal-trade__text-input w-full'
+                        value={Trade1_Lien_Phone}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade1_Lien_Phone", value });
+                        }}
+                    />
                     <label className='float-label'>Phone Number</label>
                 </span>
             </div>
             <div className='col-6'>
-                <CompanySearch name='Contact' />
+                <CompanySearch
+                    value={Trade1_Lien_Contact}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Trade1_Lien_Contact", value })
+                    }
+                    onRowClick={(value) =>
+                        changeDealExtData({
+                            key: "Trade1_Lien_Contact",
+                            value,
+                        })
+                    }
+                    name='Contact'
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -379,6 +471,13 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                         optionLabel='name'
                         optionValue='name'
                         filter
+                        //TODO: add options
+                        value={Trade1_Title_To}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade1_Title_To", value });
+                        }}
+                        editable
+                        options={[{ name: Trade1_Title_To }]}
                         className='w-full deal-trade__dropdown'
                     />
                     <label className='float-label'>Vehicle is Titled to</label>
