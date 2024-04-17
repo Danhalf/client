@@ -34,6 +34,9 @@ export const DealsForm = observer(() => {
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
 
     useEffect(() => {
+        accordionSteps.forEach((step, index) => {
+            stepActiveIndex >= step && setAccordionActiveIndex([index]);
+        });
         if (stepsRef.current) {
             const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
             if (activeStep) {
