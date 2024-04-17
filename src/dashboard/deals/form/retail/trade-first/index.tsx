@@ -15,12 +15,38 @@ import { InputNumber } from "primereact/inputnumber";
 import { Checkbox } from "primereact/checkbox";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
+import { useStore } from "store/hooks";
 
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
+const mileage = 0;
 
 export const DealRetailTradeFirst = observer((): ReactElement => {
-    const mileage = 0;
+    const store = useStore().dealStore;
+    const {
+        dealExtData: {
+            Trade1_VIN,
+            Trade1_Make,
+            Trade1_Model,
+            Trade1_Year,
+            Trade1_Mileage,
+            Trade1_Color,
+            Trade1_BodyStyle,
+            Trade1_Title_Num,
+            Trade1_StockNum,
+            Trade1_OdomInExcess,
+            Trade1_OdomNotActual,
+            Trade1_Allowance,
+            Trade1_Lien_Payoff,
+            Trade1_Lien_Payoff_Good_Through,
+            Trade1_Lien_Name,
+            Trade1_Lien_Address,
+            Trade1_Lien_Phone,
+            Trade1_Lien_Contact,
+            Trade1_Title_To,
+        },
+        changeDealExtData,
+    } = store;
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList] = useState<ListData[]>([]);
@@ -73,11 +99,11 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
 
     const formik = useFormik({
         initialValues: {
-            VIN: "",
-            Make: "",
-            Model: "",
-            Year: String(""),
-            mileage: "",
+            VIN: Trade1_VIN || "",
+            Make: Trade1_Make || "",
+            Model: Trade1_Model || "",
+            Year: Trade1_Year || "",
+            mileage: Trade1_Mileage || "",
         },
         enableReinitialize: true,
         validate: (data) => {
@@ -86,16 +112,19 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             if (!data.VIN) {
                 errors.VIN = "Data is required.";
             } else {
+                changeDealExtData({ key: "Trade1_VIN", value: data.VIN });
             }
 
             if (!data.Make) {
                 errors.Make = "Data is required.";
             } else {
+                changeDealExtData({ key: "Trade1_Make", value: data.Make });
             }
 
             if (!data.Model) {
                 errors.Model = "Data is required.";
             } else {
+                changeDealExtData({ key: "Trade1_Model", value: data.Model });
             }
             if (!data.Year || Number(data.Year) < MIN_YEAR || Number(data.Year) > MAX_YEAR) {
                 switch (true) {
@@ -109,11 +138,13 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                         errors.Year = "Data is required.";
                 }
             } else {
+                changeDealExtData({ key: "Trade1_Year", value: data.Year });
             }
 
             if (!data.mileage) {
                 errors.mileage = "Data is required.";
             } else {
+                changeDealExtData({ key: "Trade1_Mileage", value: data.mileage });
             }
 
             return errors;
@@ -217,7 +248,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                         value={mileage}
                         minFractionDigits={2}
                         min={0}
-                        onChange={({ value }) => {}}
+                        onChange={({ value }) => formik.setFieldValue("mileage", value)}
                     />
                     <label className='float-label'>Mileage (required)</label>
                 </span>
@@ -231,8 +262,12 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     <Dropdown
                         optionLabel='name'
                         optionValue='name'
+                        value={Trade1_Color}
                         filter
                         options={colorList}
+                        onChange={({ target: { value } }) =>
+                            changeDealExtData({ key: "Trade1_Color", value })
+                        }
                         className='w-full deal-trade__dropdown'
                     />
                     <label className='float-label'>Color</label>
@@ -242,8 +277,15 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             <div className='col-3'>
                 <span className='p-float-label'>
                     <Dropdown
-                        optionLabel='name'
-                        optionValue='name'
+                        //TODO: add options
+                        // optionLabel='name'
+                        // optionValue='name'
+                        value={Trade1_BodyStyle}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade1_BodyStyle", value });
+                        }}
+                        editable
+                        options={[Trade1_BodyStyle]}
                         filter
                         className='w-full deal-trade__dropdown'
                     />
@@ -252,13 +294,25 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='deal-trade__text-input w-full' />
+                    <InputText
+                        value={Trade1_Title_Num}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade1_Title_Num", value });
+                        }}
+                        className='deal-trade__text-input w-full'
+                    />
                     <label className='float-label'>Title#</label>
                 </span>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputText className='deal-trade__text-input w-full' />
+                    <InputText
+                        value={Trade1_StockNum}
+                        onChange={({ target: { value } }) => {
+                            changeDealExtData({ key: "Trade1_StockNum", value });
+                        }}
+                        className='deal-trade__text-input w-full'
+                    />
                     <label className='float-label'>Stock#</label>
                 </span>
             </div>
