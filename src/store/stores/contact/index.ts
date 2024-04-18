@@ -1,5 +1,5 @@
 import { Status } from "common/models/base-response";
-import { Contact, ExtData } from "common/models/contact";
+import { Contact, ContactExtData } from "common/models/contact";
 import { getContactInfo, setContact } from "http/services/contacts-service";
 import { action, makeAutoObservable, observable } from "mobx";
 import { RootStore } from "store";
@@ -7,7 +7,7 @@ import { RootStore } from "store";
 export class ContactStore {
     public rootStore: RootStore;
     private _contact: Contact = observable({}) as Contact;
-    private _contactExtData: ExtData = {} as ExtData;
+    private _contactExtData: ContactExtData = {} as ContactExtData;
     private _contactID: string = "";
     protected _isLoading = false;
     private _frontSiteDL: File = {} as File;
@@ -50,7 +50,7 @@ export class ContactStore {
                 const contact = response;
                 this._contactID = response.contactuid;
                 this._contact = contact || ({} as Contact);
-                this._contactExtData = contact.extdata || ({} as ExtData);
+                this._contactExtData = contact.extdata || ({} as ContactExtData);
             }
         } catch (error) {
         } finally {
@@ -75,7 +75,7 @@ export class ContactStore {
         }
     );
 
-    public changeContactExtData = action((key: keyof ExtData, value: string | number) => {
+    public changeContactExtData = action((key: keyof ContactExtData, value: string | number) => {
         this._contactExtData[key] = value as never;
     });
 
@@ -124,6 +124,6 @@ export class ContactStore {
         this._contact = {} as Contact;
         this._backSiteDL = {} as File;
         this._frontSiteDL = {} as File;
-        this._contactExtData = {} as ExtData;
+        this._contactExtData = {} as ContactExtData;
     };
 }

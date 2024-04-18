@@ -38,7 +38,10 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-workplace__text-input w-full'
-                        //TODO: missing Buyer_Emp_Email
+                        value={contactExtData?.Buyer_Emp_Ext}
+                        onChange={({ target: { value } }) => {
+                            changeContactExtData("Buyer_Emp_Ext", value);
+                        }}
                     />
                     <label className='float-label'>E-mail</label>
                 </span>
