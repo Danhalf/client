@@ -145,8 +145,8 @@ export const ContactsDocuments = observer((): ReactElement => {
                 className='col-12'
             />
             <div className='col-12 mt-4 media-input'>
-                <Dropdown className='media-input__dropdown' placeholder='Category' />
-                <InputText className='media-input__text' placeholder='Comment' />
+                <Dropdown className='media-input__dropdown' value={""} placeholder='Category' />
+                <InputText className='media-input__text' value={""} placeholder='Comment' />
                 <Button
                     severity={totalCount ? "success" : "secondary"}
                     disabled={!totalCount}
