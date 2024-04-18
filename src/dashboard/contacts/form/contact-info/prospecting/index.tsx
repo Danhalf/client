@@ -32,7 +32,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                     optionLabel='username'
                     optionValue='useruid'
                     filter
-                    value={contactExtData?.SALESMAN_ID}
+                    value={contactExtData.SALESMAN_ID}
                     options={salespersonsList}
                     onChange={({ target: { value } }) => changeContactExtData("SALESMAN_ID", value)}
                     placeholder='Attending Salesman'
@@ -43,7 +43,7 @@ export const ContactsProspecting = observer((): ReactElement => {
             <div className='col-6'>
                 <DateInput
                     placeholder='Contact till...'
-                    date={contactExtData?.created}
+                    date={contactExtData.created}
                     onChange={() => changeContactExtData("created", "")}
                     disabled
                     className='contacts-prospecting__date-input w-full'
@@ -55,7 +55,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     filter
-                    value={contactExtData?.PROSPECT1_ID}
+                    value={contactExtData.PROSPECT1_ID}
                     onChange={({ target: { value } }) =>
                         changeContactExtData("PROSPECT1_ID", value)
                     }
@@ -74,7 +74,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     filter
-                    value={contactExtData?.PROSPECT2_ID}
+                    value={contactExtData.PROSPECT2_ID}
                     onChange={({ target: { value } }) =>
                         changeContactExtData("PROSPECT2_ID", value)
                     }
@@ -92,7 +92,7 @@ export const ContactsProspecting = observer((): ReactElement => {
             <div className='col-12'>
                 <InputTextarea
                     placeholder='Prospecting Notes'
-                    value={contactExtData?.Notes}
+                    value={contactExtData.Notes}
                     onChange={({ target: { value } }) => changeContactExtData("Notes", value)}
                     className='w-full contacts-prospecting__text-area'
                 />

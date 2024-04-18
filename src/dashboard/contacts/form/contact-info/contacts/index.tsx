@@ -14,7 +14,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact?.email1}
+                        value={contact.email1}
                         onChange={({ target: { value } }) => {
                             changeContact("email1", value);
                         }}
@@ -32,7 +32,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact?.email2}
+                        value={contact.email2}
                         onChange={({ target: { value } }) => {
                             changeContact("email2", value);
                         }}
@@ -51,7 +51,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact?.phone1}
+                        value={contact.phone1}
                         onChange={({ target: { value } }) => {
                             changeContact("phone1", value);
                         }}
@@ -69,7 +69,7 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputText
                         className='contacts-social__text-input w-full'
-                        value={contact?.phone2}
+                        value={contact.phone2}
                         onChange={({ target: { value } }) => {
                             changeContact("phone2", value);
                         }}

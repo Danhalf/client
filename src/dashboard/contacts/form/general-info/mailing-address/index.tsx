@@ -29,7 +29,7 @@ export const ContactsMailingAddressInfo = observer((): ReactElement => {
                     optionValue='id'
                     filter
                     placeholder='State'
-                    value={contact?.state}
+                    value={contact.state}
                     onChange={({ target: { value } }) => store.changeContact("state", value)}
                     options={STATES_LIST}
                     className='w-full mailing-address-info__dropdown'
