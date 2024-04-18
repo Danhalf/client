@@ -328,7 +328,7 @@ export const InventoryForm = observer(() => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex justify-content-end gap-3 mt-5 mr-3'>
+                            <div className='flex justify-content-end gap-3 mt-8 mr-3'>
                                 <Button
                                     onClick={() =>
                                         setStepActiveIndex((prev) => {
@@ -338,6 +338,7 @@ export const InventoryForm = observer(() => {
                                         })
                                     }
                                     disabled={!stepActiveIndex}
+                                    severity={!stepActiveIndex ? "secondary" : "success"}
                                     className='uppercase px-6 inventory__button'
                                     outlined
                                 >
@@ -353,7 +354,8 @@ export const InventoryForm = observer(() => {
                                     }
                                     disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
-                                        stepActiveIndex === deleteActiveIndex
+                                        stepActiveIndex === deleteActiveIndex ||
+                                        stepActiveIndex >= itemsMenuCount
                                             ? "secondary"
                                             : "success"
                                     }
