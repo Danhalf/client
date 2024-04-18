@@ -14,7 +14,6 @@ import { getKeyValue } from "services/local-storage.service";
 export const ContactsProspecting = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contactExtData, changeContactExtData } = store;
-    const [salesperson, setSalesperson] = useState<string>("");
     const [salespersonsList, setSalespersonsList] = useState<unknown[]>([]);
 
     useEffect(() => {
@@ -33,10 +32,9 @@ export const ContactsProspecting = observer((): ReactElement => {
                     optionLabel='username'
                     optionValue='useruid'
                     filter
-                    //TODO: missing init value
-                    value={salesperson}
+                    value={contactExtData?.SALESMAN_ID}
                     options={salespersonsList}
-                    onChange={({ target: { value } }) => setSalesperson(value)}
+                    onChange={({ target: { value } }) => changeContactExtData("SALESMAN_ID", value)}
                     placeholder='Attending Salesman'
                     className='w-full contacts-prospecting__dropdown'
                 />
@@ -45,7 +43,8 @@ export const ContactsProspecting = observer((): ReactElement => {
             <div className='col-6'>
                 <DateInput
                     placeholder='Contact till...'
-                    //TODO: missing value
+                    date={contactExtData?.created}
+                    disabled
                     className='contacts-prospecting__date-input w-full'
                 />
             </div>
@@ -55,7 +54,29 @@ export const ContactsProspecting = observer((): ReactElement => {
                     optionLabel='name'
                     optionValue='name'
                     filter
-                    //TODO: missing value
+                    value={contactExtData?.PROSPECT1_ID}
+                    onChange={({ target: { value } }) =>
+                        changeContactExtData("PROSPECT1_ID", value)
+                    }
+                    placeholder='Choose a Vehicle'
+                    className='w-full contacts-prospecting__dropdown'
+                />
+            </div>
+            <div className='col-6'>
+                <Button className='w-full'>
+                    <i className='pi pi-plus mr-2 text-xs pt-1' />
+                    Add another Vehicle
+                </Button>
+            </div>
+            <div className='col-6'>
+                <Dropdown
+                    optionLabel='name'
+                    optionValue='name'
+                    filter
+                    value={contactExtData?.PROSPECT2_ID}
+                    onChange={({ target: { value } }) =>
+                        changeContactExtData("PROSPECT2_ID", value)
+                    }
                     placeholder='Choose a Vehicle'
                     className='w-full contacts-prospecting__dropdown'
                 />
