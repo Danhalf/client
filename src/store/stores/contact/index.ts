@@ -184,8 +184,6 @@ export class ContactStore {
         this._backSiteDLurl = "";
         this._frontSiteDL = {} as File;
         this._backSiteDL = {} as File;
-        this._backSiteDL = {} as File;
-        this._frontSiteDL = {} as File;
         this._contactExtData = {} as ContactExtData;
     };
 }
