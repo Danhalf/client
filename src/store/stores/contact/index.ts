@@ -107,26 +107,7 @@ export class ContactStore {
         this._contactExtData[key] = value as never;
     });
 
-    public saveContact = action(async (): Promise<string | undefined> => {
-        try {
-            this._isLoading = true;
-            const contactData: Contact = {
-                ...this.contact,
-                extdata: this.contactExtData,
-            };
-            const inventoryResponse = await setContact(this._contactID, contactData);
-            await Promise.all([inventoryResponse]).then((response) =>
-                response.every((item) => item?.status === Status.OK) ? this._contactID : undefined
-            );
-        } catch (error) {
-            // TODO: add error handlers
-            return undefined;
-        } finally {
-            this._isLoading = false;
-        }
-    });
-
-    public setImagesDL = async (): Promise<any> => {
+    private setImagesDL = async (): Promise<any> => {
         this._isLoading = true;
         try {
             [this._frontSiteDL, this._backSiteDL].forEach(async (file, index) => {
@@ -154,6 +135,26 @@ export class ContactStore {
             this._isLoading = false;
         }
     };
+
+    public saveContact = action(async (): Promise<string | undefined> => {
+        try {
+            this._isLoading = true;
+            const contactData: Contact = {
+                ...this.contact,
+                extdata: this.contactExtData,
+            };
+            const contactDataResponse = await setContact(this._contactID, contactData);
+            const imagesResponse = await this.setImagesDL();
+            await Promise.all([contactDataResponse, imagesResponse]).then((response) =>
+                response.every((item) => item?.status === Status.OK) ? this._contactID : undefined
+            );
+        } catch (error) {
+            // TODO: add error handlers
+            return undefined;
+        } finally {
+            this._isLoading = false;
+        }
+    });
 
     public set frontSideDL(file: File) {
         this._frontSiteDL = file;

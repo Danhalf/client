@@ -26,7 +26,7 @@ export const ContactForm = () => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const store = useStore().contactStore;
-    const { getContact, clearContact, setImagesDL, saveContact } = store;
+    const { getContact, clearContact, saveContact } = store;
     const navigate = useNavigate();
     useEffect(() => {
         const contactSections: any[] = [GeneralInfoData, ContactInfoData];
