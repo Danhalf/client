@@ -139,5 +139,10 @@ export class ContactStore {
 
     public clearContact = () => {
         this._contact = {} as Contact;
+        this._contactID = "";
+        this._frontSiteDLurl = "";
+        this._backSiteDLurl = "";
+        this._frontSiteDL = {} as File;
+        this._backSiteDL = {} as File;
     };
 }

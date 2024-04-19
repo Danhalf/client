@@ -217,15 +217,19 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                         }`}
                     >
                         <div className='identification-dl__title'>Backside</div>
-                        <FileUpload
-                            ref={fileUploadBackRef}
-                            accept='image/*'
-                            headerTemplate={(props) => chooseTemplate(props, DLSides.BACK)}
-                            itemTemplate={(file) => itemTemplate(file as File, DLSides.BACK)}
-                            emptyTemplate={emptyTemplate}
-                            onSelect={(event) => onTemplateSelect(event, DLSides.BACK)}
-                            progressBarTemplate={<></>}
-                        />
+                        {backSideDLurl ? (
+                            itemTemplate(backSideDLurl, DLSides.BACK)
+                        ) : (
+                            <FileUpload
+                                ref={fileUploadBackRef}
+                                accept='image/*'
+                                headerTemplate={(props) => chooseTemplate(props, DLSides.BACK)}
+                                itemTemplate={(file) => itemTemplate(file as File, DLSides.BACK)}
+                                emptyTemplate={emptyTemplate}
+                                onSelect={(event) => onTemplateSelect(event, DLSides.BACK)}
+                                progressBarTemplate={<></>}
+                            />
+                        )}
                     </div>
                 </>
             )}
