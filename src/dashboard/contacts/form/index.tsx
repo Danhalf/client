@@ -26,7 +26,7 @@ export const ContactForm = () => {
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const store = useStore().contactStore;
-    const { getContact, clearContact, setImagesDL } = store;
+    const { getContact, clearContact, setImagesDL, saveContact } = store;
     const navigate = useNavigate();
     useEffect(() => {
         const contactSections: any[] = [GeneralInfoData, ContactInfoData];
@@ -193,7 +193,7 @@ export const ContactForm = () => {
                                 >
                                     Next
                                 </Button>
-                                <Button onClick={setImagesDL} className='uppercase px-6'>
+                                <Button onClick={saveContact} className='uppercase px-6'>
                                     Save
                                 </Button>
                             </div>
