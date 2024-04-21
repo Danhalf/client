@@ -352,7 +352,7 @@ export const ExportToWeb = () => {
                                 <Button
                                     severity='success'
                                     type='button'
-                                    icon='pi pi-print'
+                                    icon='icon adms-print'
                                     tooltip='Print export to web form'
                                     onClick={() => printTableData(true)}
                                 />
