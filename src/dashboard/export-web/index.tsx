@@ -20,6 +20,8 @@ import { getUserSettings, setUserSettings } from "http/services/auth-user.servic
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
+import { FilterOptions, TableFilter, filterOptions } from "dashboard/common/filter";
+import { createStringifyFilterQuery, createStringifySearchQuery } from "common/helpers";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ExportWebList;
@@ -46,8 +48,29 @@ export const ExportToWeb = () => {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
+    const [selectedFilter, setSelectedFilter] = useState<Pick<FilterOptions, "value">[]>([]);
+    const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
+        null
+    );
 
     const navigate = useNavigate();
+
+    const handleGetExportWebList = async (params: QueryParams, total?: boolean) => {
+        if (authUser) {
+            if (total) {
+                getExportToWebList(authUser.useruid, { ...params, total: 1 }).then((response) => {
+                    response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
+                });
+            }
+            getExportToWebList(authUser.useruid, params).then((response) => {
+                if (Array.isArray(response)) {
+                    setExportsToWeb(response);
+                } else {
+                    setExportsToWeb([]);
+                }
+            });
+        }
+    };
 
     useEffect(() => {
         changeSettings({ activeColumns: activeColumns.map(({ field }) => field) });
@@ -75,30 +98,38 @@ export const ExportToWeb = () => {
     }, []);
 
     useEffect(() => {
+        if (selectedFilterOptions) {
+            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
+        }
+        let qry: string = "";
+
+        if (globalSearch) {
+            qry += globalSearch;
+        }
+
+        if (selectedFilterOptions) {
+            if (globalSearch.length) qry += "+";
+            qry += createStringifyFilterQuery(selectedFilterOptions);
+        }
+
         const params: QueryParams = {
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
-            ...(globalSearch && { qry: globalSearch }),
             ...(lazyState.sortField && { column: lazyState.sortField }),
+            qry,
             skip: lazyState.first,
             top: lazyState.rows,
         };
-        if (authUser) {
-            getExportToWebList(authUser.useruid, params).then((response) => {
-                if (Array.isArray(response)) {
-                    setExportsToWeb(response);
-                } else {
-                    setExportsToWeb([]);
-                }
-            });
-        }
-    }, [lazyState, authUser, globalSearch]);
+
+        handleGetExportWebList(params);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lazyState, globalSearch, authUser, selectedFilterOptions]);
 
     const changeSettings = (settings: Partial<ExportWebUserSettings>) => {
         if (authUser) {
             const newSettings = {
                 ...serverSettings,
-                exportWeb: { ...serverSettings?.exportWeb, ...settings },
+                inventory: { ...serverSettings?.inventory, ...settings },
             } as ServerUserSettings;
             setServerSettings(newSettings);
             setUserSettings(authUser.useruid, newSettings);
@@ -259,6 +290,31 @@ export const ExportToWeb = () => {
                     </div>
                     <div className='card-content'>
                         <div className='grid datatable-controls'>
+                            <div className='col-2'>
+                                <TableFilter
+                                    filterOptions={filterOptions}
+                                    onFilterChange={(selectedFilter) => {
+                                        setSelectedFilterOptions(
+                                            selectedFilter.filter((option) => !option.disabled)
+                                        );
+                                        setSelectedFilter(selectedFilter);
+                                        changeSettings({
+                                            ...serverSettings,
+                                            selectedFilterOptions: selectedFilter.filter(
+                                                (option) => !option.disabled
+                                            ),
+                                        });
+                                    }}
+                                    onClearFilters={() => {
+                                        setSelectedFilter([]);
+                                        setSelectedFilterOptions([]);
+                                        changeSettings({
+                                            ...serverSettings,
+                                            selectedFilterOptions: [],
+                                        });
+                                    }}
+                                />
+                            </div>
                             <div className='col-2'>
                                 <MultiSelect
                                     options={columns}

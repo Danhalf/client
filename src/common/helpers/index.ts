@@ -1,4 +1,4 @@
-import { FilterOptions } from "dashboard/inventory/common/data-table";
+import { FilterOptions } from "dashboard/common/filter";
 
 export const isObjectEmpty = (obj: Record<string, string>) =>
     Object.values(obj).every((value) => !value.trim().length);
