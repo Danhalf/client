@@ -21,7 +21,7 @@ import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/mo
 import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
 import { FilterOptions, TableFilter, filterOptions } from "dashboard/common/filter";
-import { createStringifyFilterQuery, createStringifySearchQuery } from "common/helpers";
+import { createStringifyFilterQuery } from "common/helpers";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ExportWebList;
@@ -48,7 +48,7 @@ export const ExportToWeb = () => {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
-    const [selectedFilter, setSelectedFilter] = useState<Pick<FilterOptions, "value">[]>([]);
+    const [, setSelectedFilter] = useState<Pick<FilterOptions, "value">[]>([]);
     const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
         null
     );
