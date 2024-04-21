@@ -290,82 +290,80 @@ export const ExportToWeb = () => {
                     </div>
                     <div className='card-content'>
                         <div className='grid datatable-controls'>
-                            <div className='col-2'>
-                                <TableFilter
-                                    filterOptions={filterOptions}
-                                    onFilterChange={(selectedFilter) => {
-                                        setSelectedFilterOptions(
-                                            selectedFilter.filter((option) => !option.disabled)
-                                        );
-                                        setSelectedFilter(selectedFilter);
-                                        changeSettings({
-                                            ...serverSettings,
-                                            selectedFilterOptions: selectedFilter.filter(
-                                                (option) => !option.disabled
-                                            ),
-                                        });
-                                    }}
-                                    onClearFilters={() => {
-                                        setSelectedFilter([]);
-                                        setSelectedFilterOptions([]);
-                                        changeSettings({
-                                            ...serverSettings,
-                                            selectedFilterOptions: [],
-                                        });
-                                    }}
-                                />
-                            </div>
-                            <div className='col-2'>
-                                <MultiSelect
-                                    options={columns}
-                                    value={activeColumns}
-                                    optionLabel='header'
-                                    panelHeaderTemplate={dropdownHeaderPanel}
-                                    onChange={onColumnToggle}
-                                    showSelectAll={false}
-                                    className='w-full pb-0 h-full flex align-items-center column-picker'
-                                    display='chip'
-                                    pt={{
-                                        header: {
-                                            className: "column-picker__header",
-                                        },
-                                        wrapper: {
-                                            className: "column-picker__wrapper",
-                                            style: {
-                                                maxHeight: "500px",
-                                            },
-                                        },
-                                    }}
-                                />
-                            </div>
-                            <div className='col-4'>
-                                <div className='contact-top-controls'>
-                                    <Button
-                                        className='contact-top-controls__button px-6 uppercase'
-                                        severity='success'
-                                        type='button'
-                                    >
-                                        Export
-                                    </Button>
-                                    <Button
-                                        severity='success'
-                                        type='button'
-                                        icon='pi pi-print'
-                                        tooltip='Print export to web form'
-                                        onClick={() => printTableData(true)}
-                                    />
-                                    <Button
-                                        severity='success'
-                                        type='button'
-                                        icon='icon adms-blank'
-                                        tooltip='Download export to web form'
-                                        onClick={() => printTableData()}
+                            <div className='col-12 export-web-controls'>
+                                <Button
+                                    className='export-web-controls__button px-6 uppercase'
+                                    severity='success'
+                                    type='button'
+                                >
+                                    Export now
+                                </Button>
+                                <Button
+                                    className='export-web-controls__button px-6 uppercase'
+                                    severity='success'
+                                    type='button'
+                                >
+                                    SCHEDULE
+                                </Button>
+                                <div className='export-web-controls__input'>
+                                    <TableFilter
+                                        filterOptions={filterOptions}
+                                        onFilterChange={(selectedFilter) => {
+                                            changeSettings({
+                                                ...serverSettings,
+                                                selectedFilterOptions: selectedFilter.filter(
+                                                    (option) => !option.disabled
+                                                ),
+                                            });
+                                        }}
+                                        onClearFilters={() => {
+                                            setSelectedFilter([]);
+                                            setSelectedFilterOptions([]);
+                                            changeSettings({
+                                                ...serverSettings,
+                                                selectedFilterOptions: [],
+                                            });
+                                        }}
                                     />
                                 </div>
-                            </div>
-
-                            <div className='col-6 text-right'>
-                                <span className='p-input-icon-right'>
+                                <div className='export-web-controls__input'>
+                                    <MultiSelect
+                                        options={columns}
+                                        value={activeColumns}
+                                        optionLabel='header'
+                                        panelHeaderTemplate={dropdownHeaderPanel}
+                                        onChange={onColumnToggle}
+                                        showSelectAll={false}
+                                        className='w-full pb-0 h-full flex align-items-center column-picker'
+                                        display='chip'
+                                        pt={{
+                                            header: {
+                                                className: "column-picker__header",
+                                            },
+                                            wrapper: {
+                                                className: "column-picker__wrapper",
+                                                style: {
+                                                    maxHeight: "500px",
+                                                },
+                                            },
+                                        }}
+                                    />
+                                </div>
+                                <Button
+                                    severity='success'
+                                    type='button'
+                                    icon='pi pi-print'
+                                    tooltip='Print export to web form'
+                                    onClick={() => printTableData(true)}
+                                />
+                                <Button
+                                    severity='success'
+                                    type='button'
+                                    icon='icon adms-blank'
+                                    tooltip='Download export to web form'
+                                    onClick={() => printTableData()}
+                                />
+                                <span className='p-input-icon-right ml-auto'>
                                     <i className='pi pi-search' />
                                     <InputText
                                         value={globalSearch}
