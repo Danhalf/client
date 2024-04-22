@@ -1,5 +1,3 @@
-import { DashboardDialog } from "dashboard/common/dialog";
-import { DialogProps } from "primereact/dialog";
 import { TabView, TabPanel } from "primereact/tabview";
 import "./index.css";
 import { SettingsDeals } from "./deals";
@@ -10,18 +8,14 @@ import { SettingsStockTradeIn } from "./stockTradeIn";
 import { SettingsAccount } from "./account";
 import { SettingsContract } from "./contract";
 import { SettingsLease } from "./lease";
+import { ReactElement } from "react";
 
 interface TabItem {
     settingName: string;
-    component: JSX.Element;
+    component: ReactElement;
 }
 
-export const GeneralSettingsDialog = ({ visible, onHide }: DialogProps): JSX.Element => {
-    const handleSendSupportContact = (): void => {
-        onHide();
-        return;
-    };
-
+export const GeneralSettings = (): ReactElement => {
     const tabItems: TabItem[] = [
         {
             settingName: "Deals",
@@ -64,28 +58,17 @@ export const GeneralSettingsDialog = ({ visible, onHide }: DialogProps): JSX.Ele
     ];
 
     return (
-        <>
-            <DashboardDialog
-                className='dialog__general-settings general-settings'
-                footer='Save'
-                header='General settings'
-                visible={visible}
-                onHide={onHide}
-                action={handleSendSupportContact}
-            >
-                <TabView className='general-settings__tabs'>
-                    {tabItems.map(({ settingName, component }) => {
-                        return (
-                            <TabPanel
-                                header={settingName}
-                                children={component}
-                                key={settingName}
-                                className='general-settings__panel'
-                            />
-                        );
-                    })}
-                </TabView>
-            </DashboardDialog>
-        </>
+        <TabView className='general-settings__tabs'>
+            {tabItems.map(({ settingName, component }) => {
+                return (
+                    <TabPanel
+                        header={settingName}
+                        children={component}
+                        key={settingName}
+                        className='general-settings__panel'
+                    />
+                );
+            })}
+        </TabView>
     );
 };
