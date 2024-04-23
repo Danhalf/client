@@ -7,7 +7,7 @@ import {
     SalespersonsList,
     TotalUsers,
 } from "common/models/contact";
-import { Status } from "common/models/base-response";
+import { BaseResponse, Status } from "common/models/base-response";
 
 export const getContactsCategories = async () => {
     try {
@@ -73,6 +73,60 @@ export const getContactsSalesmanList = async (uid: string) => {
         );
         if (request.status === 200) {
             return request.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const setContact = async (
+    contactuid: string,
+    contactData: Partial<Contact>
+): Promise<BaseResponse | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `contacts/${contactuid || 0}/set`,
+            contactData
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const setContactDL = async (
+    contactuid: string,
+    { dluidback, dluidfront }: { dluidfront?: string; dluidback?: string }
+) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `contacts/${contactuid}/dlicense`,
+            {
+                dluidfront,
+                dluidback,
+                contactuid,
+            }
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const deleteContactDL = async (contactuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `contacts/${contactuid}/deletedlicense`
+        );
+
+        if (response.status === 200) {
+            return response.data;
         }
     } catch (error) {
         // TODO: add error handler

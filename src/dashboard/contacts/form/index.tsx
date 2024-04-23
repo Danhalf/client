@@ -12,33 +12,38 @@ import { ContactInfoData } from "./contact-info";
 import { ContactMediaData } from "./media-data";
 import { useStore } from "store/hooks";
 import { useLocation } from "react-router-dom";
-
-export const contactSections = [GeneralInfoData, ContactInfoData, ContactMediaData].map(
-    (sectionData) => new ContactSection(sectionData)
-);
-const ACCORDION_STEPS = contactSections.map((item) => item.startIndex);
-const ITEMS_MENU_COUNT = contactSections.reduce((acc, current) => acc + current.getLength(), -1);
-
 const STEP = "step";
 
 export const ContactForm = () => {
     const { id } = useParams();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
+
+    const [contactSections, setContactSections] = useState<ContactSection[]>([]);
+    const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
+    const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
     const store = useStore().contactStore;
-    const { getContact, clearContact } = store;
+    const { getContact, clearContact, saveContact } = store;
     const navigate = useNavigate();
     useEffect(() => {
+        const contactSections: any[] = [GeneralInfoData, ContactInfoData];
         if (id) {
             getContact(id);
+            contactSections.splice(2, 0, ContactMediaData);
         } else {
             clearContact();
         }
+        const sections = contactSections.map((sectionData) => new ContactSection(sectionData));
+        setContactSections(sections);
+        setAccordionSteps(sections.map((item) => item.startIndex));
+        const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
+        setItemsMenuCount(itemsMenuCount);
         return () => {
             clearContact();
+            sections.forEach((section) => section.clearCount());
         };
     }, [id, store]);
 
@@ -48,7 +53,7 @@ export const ContactForm = () => {
     };
 
     useEffect(() => {
-        ACCORDION_STEPS.forEach((step, index) => {
+        accordionSteps.forEach((step, index) => {
             if (step - 1 < stepActiveIndex) {
                 return setAccordionActiveIndex((prev) => {
                     const updatedArray = Array.isArray(prev) ? [...prev] : [0];
@@ -155,18 +160,19 @@ export const ContactForm = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex justify-content-end gap-3 mt-5 mr-3'>
+                            <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
                                 <Button
-                                    onClick={() =>
+                                    onClick={() => {
+                                        if (!stepActiveIndex) {
+                                            return navigate(`/dashboard/contacts`);
+                                        }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
                                             navigate(getUrl(newStep));
                                             return newStep;
-                                        })
-                                    }
-                                    disabled={!stepActiveIndex}
-                                    severity={!stepActiveIndex ? "secondary" : "success"}
-                                    className='uppercase px-6'
+                                        });
+                                    }}
+                                    className='form-nav__button'
                                     outlined
                                 >
                                     Back
@@ -179,18 +185,16 @@ export const ContactForm = () => {
                                             return newStep;
                                         })
                                     }
-                                    disabled={stepActiveIndex >= ITEMS_MENU_COUNT}
+                                    disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
-                                        stepActiveIndex >= ITEMS_MENU_COUNT
-                                            ? "secondary"
-                                            : "success"
+                                        stepActiveIndex >= itemsMenuCount ? "secondary" : "success"
                                     }
-                                    className='uppercase px-6'
+                                    className='form-nav__button'
                                     outlined
                                 >
                                     Next
                                 </Button>
-                                <Button onClick={() => {}} className='uppercase px-6'>
+                                <Button onClick={saveContact} className='form-nav__button'>
                                     Save
                                 </Button>
                             </div>

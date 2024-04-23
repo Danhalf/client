@@ -47,6 +47,7 @@ export const InventoryForm = observer(() => {
         getInventoryExportWeb,
         getInventoryExportWebHistory,
         inventory,
+        isFormValid,
     } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
@@ -330,15 +331,16 @@ export const InventoryForm = observer(() => {
                             </div>
                             <div className='flex justify-content-end gap-3 mt-8 mr-3'>
                                 <Button
-                                    onClick={() =>
+                                    onClick={() => {
+                                        if (!stepActiveIndex) {
+                                            return navigate(`/dashboard/inventory`);
+                                        }
                                         setStepActiveIndex((prev) => {
                                             const newStep = prev - 1;
                                             navigate(getUrl(newStep));
                                             return newStep;
-                                        })
-                                    }
-                                    disabled={!stepActiveIndex}
-                                    severity={!stepActiveIndex ? "secondary" : "success"}
+                                        });
+                                    }}
                                     className='uppercase px-6 inventory__button'
                                     outlined
                                 >
@@ -375,6 +377,7 @@ export const InventoryForm = observer(() => {
                                     <Button
                                         onClick={handleSave}
                                         className='uppercase px-6 inventory__button'
+                                        disabled={!isFormValid}
                                     >
                                         Save
                                     </Button>
