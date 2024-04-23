@@ -40,6 +40,18 @@ const columns: TableColumnsList[] = [
     { field: "Price", header: "Price", checked: false },
 ];
 
+interface GroupedColumn {
+    label: string;
+    items: TableColumnsList[];
+}
+
+const groupedColumns: GroupedColumn[] = [
+    {
+        label: "General",
+        items: columns,
+    },
+];
+
 export const ExportToWeb = () => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
@@ -281,6 +293,14 @@ export const ExportToWeb = () => {
         "Price",
     ];
 
+    const groupedItemTemplate = (option: any) => {
+        return (
+            <div className='flex align-items-center'>
+                <div>{option.label}</div>
+            </div>
+        );
+    };
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -328,9 +348,11 @@ export const ExportToWeb = () => {
                                 </div>
                                 <div className='export-web-controls__input'>
                                     <MultiSelect
-                                        options={columns}
+                                        options={groupedColumns}
                                         value={activeColumns}
+                                        optionGroupChildren='items'
                                         optionLabel='header'
+                                        optionGroupLabel='label'
                                         panelHeaderTemplate={dropdownHeaderPanel}
                                         onChange={onColumnToggle}
                                         showSelectAll={false}
