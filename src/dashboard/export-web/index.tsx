@@ -504,6 +504,7 @@ export const ExportToWeb = () => {
                                                     return data.value;
                                                 }
                                             }}
+                                            headerTooltip={field}
                                             headerClassName='cursor-move'
                                             pt={{
                                                 root: {
