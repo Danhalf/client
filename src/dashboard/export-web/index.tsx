@@ -40,15 +40,26 @@ const columns: TableColumnsList[] = [
     { field: "Price", header: "Price", checked: false },
 ];
 
+const serviceColumns: Pick<ColumnProps, "header" | "field">[] = [
+    { field: "cars.com", header: "CDC" },
+    { field: "carsforsale.com", header: "CFS" },
+    { field: "Equipmenttraider.com", header: "EQT" },
+    { field: "Commertialtrucktrader.com", header: "CTT" },
+];
+
 interface GroupedColumn {
     label: string;
-    items: TableColumnsList[];
+    items: TableColumnsList[] | Pick<ColumnProps, "header" | "field">[];
 }
 
 const groupedColumns: GroupedColumn[] = [
     {
         label: "General",
         items: columns,
+    },
+    {
+        label: "Services",
+        items: serviceColumns,
     },
 ];
 
@@ -292,14 +303,6 @@ export const ExportToWeb = () => {
         "mileage",
         "Price",
     ];
-
-    const groupedItemTemplate = (option: any) => {
-        return (
-            <div className='flex align-items-center'>
-                <div>{option.label}</div>
-            </div>
-        );
-    };
 
     return (
         <div className='grid'>
