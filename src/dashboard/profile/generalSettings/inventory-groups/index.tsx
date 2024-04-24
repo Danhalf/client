@@ -28,6 +28,11 @@ export const SettingsInventoryGroups = () => {
     return (
         <div className='settings-form'>
             <div className='settings-form__title'>Inventory groups</div>
+            <div className='flex justify-content-end mb-4'>
+                <Button className='settings-form__button' outlined>
+                    New Group
+                </Button>
+            </div>
             <div className='grid settings-inventory'>
                 <div className='col-12'>
                     <DataTable
