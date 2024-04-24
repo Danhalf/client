@@ -1,3 +1,5 @@
+import { Loader } from "dashboard/common/loader";
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import { store } from "store";
 import { StoreContext } from "store/context";
@@ -5,7 +7,9 @@ import { StoreContext } from "store/context";
 export default function App() {
     return (
         <StoreContext.Provider value={store}>
-            <Outlet />
+            <Suspense fallback={<Loader />}>
+                <Outlet />
+            </Suspense>
         </StoreContext.Provider>
     );
 }
