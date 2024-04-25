@@ -1,52 +1,31 @@
 import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
 import "./index.css";
-import { DataTable, DataTableRowEditCompleteEvent } from "primereact/datatable";
+import { DataTable } from "primereact/datatable";
 import { Button } from "primereact/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InputText } from "primereact/inputtext";
+import { AuthUser } from "http/services/auth.service";
+import { getKeyValue } from "services/local-storage.service";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { addUserGroupList, getUserGroupList } from "http/services/auth-user.service";
+import { UserGroup } from "common/models/user";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-    { field: "group", header: "Group" },
-];
-
-interface SettingsInventoryData {
-    id: number;
-    group: string;
-}
-const inventoryData: SettingsInventoryData[] = [
-    { id: 1, group: "Cars" },
-    { id: 2, group: "The Internet" },
-    { id: 3, group: "Local advertisement" },
-    { id: 4, group: "Direct mail" },
+    { field: "description", header: "Group" },
 ];
 
 export const SettingsInventoryGroups = () => {
-    const [inventorySettings, setInventorySettings] =
-        useState<SettingsInventoryData[]>(inventoryData);
-    const [selectedInventory, setSelectedInventory] = useState<SettingsInventoryData[] | null>(
-        null
-    );
+    const [inventorySettings, setInventorySettings] = useState<Partial<UserGroup>[]>([]);
+    const [selectedInventory, setSelectedInventory] = useState<Partial<UserGroup>[] | null>(null);
 
-    const handleEdit = (e: any, o: any) => {
-        // eslint-disable-next-line no-console
-        // console.log(dataTableRef.current.getElement());
-    };
-
-    const handleDelete = (e: any, o: any) => {
-        if (selectedInventory) {
-            // eslint-disable-next-line no-console
-            console.log(e);
+    useEffect(() => {
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        if (authUser) {
+            getUserGroupList(authUser.useruid).then((list) => {
+                list && setInventorySettings(list);
+            });
         }
-    };
-
-    const onRowEditComplete = (e: DataTableRowEditCompleteEvent) => {
-        let editedData = [...inventorySettings];
-        let { newData, index } = e;
-
-        editedData[index] = newData as SettingsInventoryData;
-
-        setInventorySettings(editedData);
-    };
+    }, []);
 
     const textEditor = (options: ColumnEditorOptions) => {
         return (
@@ -59,7 +38,16 @@ export const SettingsInventoryGroups = () => {
                         options.editorCallback!(e.target.value)
                     }
                 />
-                <Button className='p-button row-edit__button' onClick={() => {}}>
+                <Button
+                    className='p-button row-edit__button'
+                    onClick={() => {
+                        const { rowData } = options;
+                        const newData = [...inventorySettings];
+                        newData.find((item) => item.itemuid === rowData.itemuid)!.description =
+                            options.value;
+                        setInventorySettings(newData);
+                    }}
+                >
                     Save
                 </Button>
             </div>
@@ -70,7 +58,17 @@ export const SettingsInventoryGroups = () => {
         <div className='settings-form'>
             <div className='settings-form__title'>Inventory groups</div>
             <div className='flex justify-content-end mb-4'>
-                <Button className='settings-form__button' outlined>
+                <Button
+                    className='settings-form__button'
+                    outlined
+                    onClick={() => {
+                        addUserGroupList(getKeyValue(LS_APP_USER).useruid, "New group").then(() => {
+                            getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
+                                list && setInventorySettings(list);
+                            });
+                        });
+                    }}
+                >
                     New Group
                 </Button>
             </div>
@@ -80,7 +78,6 @@ export const SettingsInventoryGroups = () => {
                         value={inventorySettings}
                         selectionMode={"checkbox"}
                         selection={selectedInventory!}
-                        onRowEditComplete={onRowEditComplete}
                         editMode='row'
                         onSelectionChange={(e) => setSelectedInventory(e.value)}
                     >
@@ -98,7 +95,7 @@ export const SettingsInventoryGroups = () => {
                             headerStyle={{ width: "6rem" }}
                             header={"Actions"}
                             rowEditor
-                            body={(rowData, options, ...rest) => {
+                            body={(rowData, options) => {
                                 return (
                                     <div className='flex gap-3'>
                                         <Button
@@ -116,7 +113,13 @@ export const SettingsInventoryGroups = () => {
                                         <Button
                                             className='p-button p-button-outlined'
                                             severity='secondary'
-                                            onClick={() => {}}
+                                            onClick={() => {
+                                                setInventorySettings(
+                                                    inventorySettings.filter(
+                                                        (item) => item.itemuid !== rowData.itemuid
+                                                    )
+                                                );
+                                            }}
                                         >
                                             Delete
                                         </Button>
