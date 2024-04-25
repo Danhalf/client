@@ -7,7 +7,11 @@ import { InputText } from "primereact/inputtext";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { addUserGroupList, getUserGroupList } from "http/services/auth-user.service";
+import {
+    addUserGroupList,
+    deleteUserGroupList,
+    getUserGroupList,
+} from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
@@ -104,9 +108,11 @@ export const SettingsInventoryGroups = () => {
                                                 options.rowEditor?.editing ? "secondary" : "success"
                                             }
                                             onClick={(event) => {
+                                                if (options.rowEditor?.editing) {
+                                                    return options.rowEditor?.onSaveClick!(event);
+                                                }
                                                 options.rowEditor?.onInitClick!(event);
                                             }}
-                                            disabled={options.rowEditor?.editing}
                                         >
                                             Edit
                                         </Button>
@@ -114,11 +120,13 @@ export const SettingsInventoryGroups = () => {
                                             className='p-button p-button-outlined'
                                             severity='secondary'
                                             onClick={() => {
-                                                setInventorySettings(
-                                                    inventorySettings.filter(
-                                                        (item) => item.itemuid !== rowData.itemuid
-                                                    )
-                                                );
+                                                deleteUserGroupList(rowData.itemuid).then(() => {
+                                                    getUserGroupList(
+                                                        getKeyValue(LS_APP_USER).useruid
+                                                    ).then((list) => {
+                                                        list && setInventorySettings(list);
+                                                    });
+                                                });
                                             }}
                                         >
                                             Delete
