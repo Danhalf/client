@@ -209,7 +209,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                         value={inventory.locationuid}
                         onChange={({ value }) => changeInventory({ key: "locationuid", value })}
                         placeholder='Location name'
-                        className='w-full vehicle-general__dropdown p-inputwrapper-filled'
+                        className={`w-full vehicle-general__dropdown ${
+                            inventory.locationuid === "" && "p-inputwrapper-filled"
+                        }`}
                     />
                     <label className='float-label'>Location name</label>
                 </span>
