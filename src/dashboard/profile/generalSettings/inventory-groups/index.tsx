@@ -58,17 +58,19 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                 checked={inventorySettings.every((item) => item.enabled)}
                                 onChange={() => {
                                     inventorySettings.forEach((item) => {
-                                        addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
-                                            enabled: 1,
-                                            itemuid: item.itemuid,
-                                            description: item.description,
-                                        }).then(() => {
-                                            getUserGroupList(getKeyValue(LS_APP_USER).useruid).then(
-                                                (list) => {
+                                        if (item.enabled === 0) {
+                                            addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+                                                enabled: 1,
+                                                itemuid: item.itemuid,
+                                                description: item.description,
+                                            }).then(() => {
+                                                getUserGroupList(
+                                                    getKeyValue(LS_APP_USER).useruid
+                                                ).then((list) => {
                                                     list && setInventorySettings(list);
-                                                }
-                                            );
-                                        });
+                                                });
+                                            });
+                                        }
                                     });
                                 }}
                             />
