@@ -57,14 +57,19 @@ export const SettingsInventoryGroups = (): ReactElement => {
                             <Checkbox
                                 checked={inventorySettings.every((item) => item.enabled)}
                                 onChange={() => {
-                                    setInventorySettings(
-                                        inventorySettings.map((item) => {
-                                            return {
-                                                ...item,
-                                                enabled: 1,
-                                            };
-                                        })
-                                    );
+                                    inventorySettings.forEach((item) => {
+                                        addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+                                            enabled: 1,
+                                            itemuid: item.itemuid,
+                                            description: item.description,
+                                        }).then(() => {
+                                            getUserGroupList(getKeyValue(LS_APP_USER).useruid).then(
+                                                (list) => {
+                                                    list && setInventorySettings(list);
+                                                }
+                                            );
+                                        });
+                                    });
                                 }}
                             />
                         </div>
@@ -82,6 +87,12 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                                 enabled: !item.enabled ? 1 : 0,
                                                 itemuid: item.itemuid,
                                                 description: item.description,
+                                            }).then(() => {
+                                                getUserGroupList(
+                                                    getKeyValue(LS_APP_USER).useruid
+                                                ).then((list) => {
+                                                    list && setInventorySettings(list);
+                                                });
                                             });
                                         }}
                                     />
