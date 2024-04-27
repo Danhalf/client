@@ -22,6 +22,7 @@ import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
 import { FilterOptions, TableFilter, filterOptions } from "dashboard/common/filter";
 import { createStringifyFilterQuery } from "common/helpers";
+import { InputNumber } from "primereact/inputnumber";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ExportWebList;
@@ -75,8 +76,15 @@ export const ExportToWeb = () => {
     const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
         null
     );
+    const [checkboxStates, setCheckboxStates] = useState(Array(20).fill(false));
 
     const navigate = useNavigate();
+
+    const handleCheckboxChange = (index: number) => {
+        const newCheckboxStates = [...checkboxStates];
+        newCheckboxStates[index] = !newCheckboxStates[index];
+        setCheckboxStates(newCheckboxStates);
+    };
 
     const handleGetExportWebList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
@@ -173,7 +181,12 @@ export const ExportToWeb = () => {
                         );
                         setActiveColumns(serverColumns);
                     } else {
-                        setActiveColumns(columns.filter(({ checked }) => checked));
+                        setActiveColumns([
+                            //@ts-ignore
+                            ...columns.filter(({ checked }) => checked),
+                            //@ts-ignore
+                            serviceColumns[0],
+                        ]);
                     }
                     settings?.table &&
                         setLazyState({
@@ -486,38 +499,78 @@ export const ExportToWeb = () => {
                                             },
                                         }}
                                     />
-                                    {activeColumns.map(({ field, header }) => (
-                                        <Column
-                                            field={field}
-                                            header={header}
-                                            key={field}
-                                            sortable
-                                            editor={(data: ColumnEditorOptions) => {
-                                                const { field } = data;
-                                                if (
-                                                    allowedEditableFields.includes(
-                                                        field as keyof ExportWebList
-                                                    )
-                                                ) {
-                                                    return cellEditor(data);
-                                                } else {
-                                                    return data.value;
-                                                }
-                                            }}
-                                            headerTooltip={field}
-                                            headerClassName='cursor-move'
-                                            pt={{
-                                                root: {
-                                                    style: {
-                                                        width: serverSettings?.exportWeb
-                                                            ?.columnWidth?.[field],
-                                                        overflow: "hidden",
-                                                        textOverflow: "ellipsis",
+                                    {activeColumns.map(({ field, header }) =>
+                                        serviceColumns.some(
+                                            (serviceColumn) => serviceColumn.field === field
+                                        ) ? (
+                                            <Column
+                                                field={field}
+                                                header={() => (
+                                                    <div className='flex gap-3'>
+                                                        <Checkbox
+                                                            checked={checkboxStates.every(
+                                                                (checkbox) => !!checkbox
+                                                            )}
+                                                            onClick={() => {
+                                                                setCheckboxStates(
+                                                                    checkboxStates.map(() => true)
+                                                                );
+                                                            }}
+                                                        />
+                                                        {header?.toString()}
+                                                    </div>
+                                                )}
+                                                headerTooltip={field}
+                                                body={(_, { rowIndex }) => {
+                                                    return (
+                                                        <div className='export-web-service'>
+                                                            <Checkbox
+                                                                checked={checkboxStates[rowIndex]}
+                                                                onClick={() =>
+                                                                    handleCheckboxChange(rowIndex)
+                                                                }
+                                                            />
+                                                            <InputNumber
+                                                                disabled={!checkboxStates[rowIndex]}
+                                                                className='export-web-service__input'
+                                                            />
+                                                        </div>
+                                                    );
+                                                }}
+                                                key={field}
+                                            />
+                                        ) : (
+                                            <Column
+                                                field={field}
+                                                header={header}
+                                                key={field}
+                                                sortable
+                                                editor={(data: ColumnEditorOptions) => {
+                                                    const { field } = data;
+                                                    if (
+                                                        allowedEditableFields.includes(
+                                                            field as keyof ExportWebList
+                                                        )
+                                                    ) {
+                                                        return cellEditor(data);
+                                                    } else {
+                                                        return data.value;
+                                                    }
+                                                }}
+                                                headerClassName='cursor-move'
+                                                pt={{
+                                                    root: {
+                                                        style: {
+                                                            width: serverSettings?.exportWeb
+                                                                ?.columnWidth?.[field],
+                                                            overflow: "hidden",
+                                                            textOverflow: "ellipsis",
+                                                        },
                                                     },
-                                                },
-                                            }}
-                                        />
-                                    ))}
+                                                }}
+                                            />
+                                        )
+                                    )}
                                 </DataTable>
                             </div>
                         </div>

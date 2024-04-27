@@ -22,3 +22,15 @@
     width: 230px;
     height: 100%;
 }
+
+.export-web-service {
+    display: flex;
+    align-items: center;
+    column-gap: 15px;
+    max-width: 129px;
+}
+
+.export-web-service__input .p-inputnumber-input {
+    width: 94px;
+    height: 34px;
+}
