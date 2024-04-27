@@ -32,6 +32,7 @@ import {
     filterParams,
     isObjectEmpty,
 } from "common/helpers";
+import { Loader } from "dashboard/common/loader";
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
@@ -50,6 +51,7 @@ export default function Inventories(): ReactElement {
     );
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const navigate = useNavigate();
 
@@ -64,6 +66,7 @@ export default function Inventories(): ReactElement {
     };
 
     useEffect(() => {
+        setIsLoading(true);
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
@@ -71,14 +74,18 @@ export default function Inventories(): ReactElement {
                 response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
             });
         }
+        setIsLoading(false);
     }, []);
 
     useEffect(() => {
+        setIsLoading(true);
         changeSettings({ activeColumns: activeColumns.map(({ field }) => field) });
+        setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeColumns]);
 
     useEffect(() => {
+        setIsLoading(true);
         if (selectedFilterOptions) {
             setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
         }
@@ -105,10 +112,12 @@ export default function Inventories(): ReactElement {
         };
 
         handleGetInventoryList(params);
+        setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lazyState, globalSearch, authUser, selectedFilterOptions]);
 
     useEffect(() => {
+        setIsLoading(true);
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
@@ -141,9 +150,11 @@ export default function Inventories(): ReactElement {
                 }
             });
         }
+        setIsLoading(false);
     }, [authUser]);
 
     const printTableData = async (print: boolean = false) => {
+        setIsLoading(true);
         const columns: ReportsColumn[] = activeColumns.map((column) => ({
             name: column.header as string,
             data: column.field as string,
@@ -188,9 +199,11 @@ export default function Inventories(): ReactElement {
                 }
             });
         }
+        setIsLoading(false);
     };
 
     const changeSettings = (settings: Partial<InventoryUserSettings>) => {
+        setIsLoading(true);
         if (authUser) {
             const newSettings = {
                 ...serverSettings,
@@ -207,6 +220,7 @@ export default function Inventories(): ReactElement {
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
+            setIsLoading(true);
             if (total) {
                 getInventoryList(authUser.useruid, { ...params, total: 1 }).then((response) => {
                     response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
@@ -218,11 +232,13 @@ export default function Inventories(): ReactElement {
                 } else {
                     setInventories([]);
                 }
+                setIsLoading(false);
             });
         }
     };
 
     const handleSetAdvancedSearch = (key: keyof Inventory, value: string) => {
+        setIsLoading(true);
         setAdvancedSearch((prevSearch) => {
             const newSearch = { ...prevSearch, [key]: value };
 
@@ -232,15 +248,19 @@ export default function Inventories(): ReactElement {
 
             return newSearch;
         });
+        setIsLoading(false);
     };
 
     const handleAdvancedSearch = () => {
+        setIsLoading(true);
         const searchParams = createStringifySearchQuery(advancedSearch);
         handleGetInventoryList({ ...filterParams(lazyState), qry: searchParams }, true);
         setDialogVisible(false);
+        setIsLoading(false);
     };
 
     const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
+        setIsLoading(true);
         setButtonDisabled(true);
         setAdvancedSearch((prev) => {
             const updatedSearch = { ...prev };
@@ -249,6 +269,7 @@ export default function Inventories(): ReactElement {
         });
 
         try {
+            setIsLoading(true);
             const updatedSearch = { ...advancedSearch };
             delete updatedSearch[key];
 
@@ -473,92 +494,98 @@ export default function Inventories(): ReactElement {
                     <div className='card-content'>
                         <div className='grid'>
                             <div className='col-12'>
-                                <DataTable
-                                    showGridlines
-                                    value={inventories}
-                                    lazy
-                                    paginator
-                                    scrollable
-                                    scrollHeight='70vh'
-                                    first={lazyState.first}
-                                    rows={lazyState.rows}
-                                    rowsPerPageOptions={ROWS_PER_PAGE}
-                                    totalRecords={totalRecords}
-                                    onPage={pageChanged}
-                                    onSort={sortData}
-                                    sortOrder={lazyState.sortOrder}
-                                    sortField={lazyState.sortField}
-                                    reorderableColumns
-                                    resizableColumns
-                                    header={header}
-                                    rowClassName={() => "hover:text-primary cursor-pointer"}
-                                    onRowClick={({ data: { itemuid } }: DataTableRowClickEvent) =>
-                                        navigate(itemuid)
-                                    }
-                                    onColReorder={(event: any) => {
-                                        if (authUser && Array.isArray(event.columns)) {
-                                            const orderArray = event.columns?.map(
-                                                (column: any) => column.props.field
-                                            );
-
-                                            const newActiveColumns = orderArray
-                                                .map((field: string) => {
-                                                    return (
-                                                        activeColumns.find(
-                                                            (column) => column.field === field
-                                                        ) || null
-                                                    );
-                                                })
-                                                .filter(
-                                                    (column: any): column is TableColumnsList =>
-                                                        column !== null
+                                {(!activeColumns.length && !inventories.length) || isLoading ? (
+                                    <div className='dashboard-loader__wrapper'>
+                                        <Loader overlay />
+                                    </div>
+                                ) : (
+                                    <DataTable
+                                        showGridlines
+                                        value={inventories}
+                                        lazy
+                                        paginator
+                                        scrollable
+                                        scrollHeight='70vh'
+                                        first={lazyState.first}
+                                        rows={lazyState.rows}
+                                        rowsPerPageOptions={ROWS_PER_PAGE}
+                                        totalRecords={totalRecords}
+                                        onPage={pageChanged}
+                                        onSort={sortData}
+                                        sortOrder={lazyState.sortOrder}
+                                        sortField={lazyState.sortField}
+                                        reorderableColumns
+                                        resizableColumns
+                                        header={header}
+                                        rowClassName={() => "hover:text-primary cursor-pointer"}
+                                        onRowClick={({
+                                            data: { itemuid },
+                                        }: DataTableRowClickEvent) => navigate(itemuid)}
+                                        onColReorder={(event: any) => {
+                                            if (authUser && Array.isArray(event.columns)) {
+                                                const orderArray = event.columns?.map(
+                                                    (column: any) => column.props.field
                                                 );
 
-                                            setActiveColumns(newActiveColumns);
+                                                const newActiveColumns = orderArray
+                                                    .map((field: string) => {
+                                                        return (
+                                                            activeColumns.find(
+                                                                (column) => column.field === field
+                                                            ) || null
+                                                        );
+                                                    })
+                                                    .filter(
+                                                        (column: any): column is TableColumnsList =>
+                                                            column !== null
+                                                    );
 
-                                            changeSettings({
-                                                activeColumns: newActiveColumns,
-                                            });
-                                        }
-                                    }}
-                                    onColumnResizeEnd={(event) => {
-                                        if (authUser && event) {
-                                            const newColumnWidth = {
-                                                [event.column.props.field as string]:
-                                                    event.element.offsetWidth,
-                                            };
-                                            changeSettings({
-                                                columnWidth: {
-                                                    ...serverSettings?.inventory?.columnWidth,
-                                                    ...newColumnWidth,
-                                                },
-                                            });
-                                        }
-                                    }}
-                                >
-                                    {activeColumns.map(({ field, header }) => {
-                                        return (
-                                            <Column
-                                                field={field}
-                                                header={header}
-                                                key={field}
-                                                sortable
-                                                reorderable
-                                                headerClassName='cursor-move'
-                                                pt={{
-                                                    root: {
-                                                        style: {
-                                                            width: serverSettings?.inventory
-                                                                ?.columnWidth?.[field],
-                                                            overflow: "hidden",
-                                                            textOverflow: "ellipsis",
-                                                        },
+                                                setActiveColumns(newActiveColumns);
+
+                                                changeSettings({
+                                                    activeColumns: newActiveColumns,
+                                                });
+                                            }
+                                        }}
+                                        onColumnResizeEnd={(event) => {
+                                            if (authUser && event) {
+                                                const newColumnWidth = {
+                                                    [event.column.props.field as string]:
+                                                        event.element.offsetWidth,
+                                                };
+                                                changeSettings({
+                                                    columnWidth: {
+                                                        ...serverSettings?.inventory?.columnWidth,
+                                                        ...newColumnWidth,
                                                     },
-                                                }}
-                                            />
-                                        );
-                                    })}
-                                </DataTable>
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        {activeColumns.map(({ field, header }) => {
+                                            return (
+                                                <Column
+                                                    field={field}
+                                                    header={header}
+                                                    key={field}
+                                                    sortable
+                                                    reorderable
+                                                    headerClassName='cursor-move'
+                                                    pt={{
+                                                        root: {
+                                                            style: {
+                                                                width: serverSettings?.inventory
+                                                                    ?.columnWidth?.[field],
+                                                                overflow: "hidden",
+                                                                textOverflow: "ellipsis",
+                                                            },
+                                                        },
+                                                    }}
+                                                />
+                                            );
+                                        })}
+                                    </DataTable>
+                                )}
                             </div>
                         </div>
                     </div>
