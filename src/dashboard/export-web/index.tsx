@@ -429,6 +429,7 @@ export const ExportToWeb = () => {
                                     reorderableColumns
                                     resizableColumns
                                     sortOrder={lazyState.sortOrder}
+                                    className='export-web-table'
                                     sortField={lazyState.sortField}
                                     onColReorder={(event) => {
                                         if (authUser && Array.isArray(event.columns)) {
@@ -473,11 +474,26 @@ export const ExportToWeb = () => {
                                 >
                                     <Column
                                         bodyStyle={{ textAlign: "center" }}
-                                        header={<Checkbox checked={false} />}
+                                        header={
+                                            <Checkbox
+                                                checked={checkboxStates.every(
+                                                    (checkbox) => !!checkbox
+                                                )}
+                                                onClick={() => {
+                                                    setCheckboxStates(
+                                                        checkboxStates.map(() => true)
+                                                    );
+                                                }}
+                                            />
+                                        }
                                         reorderable={false}
                                         body={(options, { rowIndex }) => {
                                             return (
-                                                <div className='flex gap-3'>
+                                                <div
+                                                    className={`flex gap-3 ${
+                                                        checkboxStates[rowIndex] && "row--selected"
+                                                    }`}
+                                                >
                                                     <Checkbox
                                                         checked={checkboxStates[rowIndex]}
                                                         onClick={() =>
@@ -532,9 +548,14 @@ export const ExportToWeb = () => {
                                                     </div>
                                                 )}
                                                 headerTooltip={field}
-                                                body={(_, { rowIndex }) => {
+                                                body={({ Price }: ExportWebList, { rowIndex }) => {
                                                     return (
-                                                        <div className='export-web-service'>
+                                                        <div
+                                                            className={`export-web-service ${
+                                                                checkboxStates[rowIndex] &&
+                                                                "row--selected"
+                                                            }`}
+                                                        >
                                                             <Checkbox
                                                                 checked={checkboxStates[rowIndex]}
                                                                 onClick={() =>
@@ -543,6 +564,7 @@ export const ExportToWeb = () => {
                                                             />
                                                             <InputNumber
                                                                 disabled={!checkboxStates[rowIndex]}
+                                                                value={Price}
                                                                 className='export-web-service__input'
                                                             />
                                                         </div>
@@ -556,6 +578,18 @@ export const ExportToWeb = () => {
                                                 header={header}
                                                 key={field}
                                                 sortable
+                                                body={(_, { rowIndex }) => {
+                                                    return (
+                                                        <div
+                                                            className={`${
+                                                                checkboxStates[rowIndex] &&
+                                                                "row--selected"
+                                                            }`}
+                                                        >
+                                                            {field}
+                                                        </div>
+                                                    );
+                                                }}
                                                 editor={(data: ColumnEditorOptions) => {
                                                     const { field } = data;
                                                     if (

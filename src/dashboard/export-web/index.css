@@ -30,7 +30,15 @@
     max-width: 129px;
 }
 
+.row--selected {
+    background: var(--admss-app-light-green);
+}
+
 .export-web-service__input .p-inputnumber-input {
     width: 94px;
     height: 34px;
+}
+
+.export-web-table tr td:has(.row--selected) {
+    background: var(--admss-app-light-green);
 }
