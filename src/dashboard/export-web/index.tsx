@@ -475,10 +475,21 @@ export const ExportToWeb = () => {
                                         bodyStyle={{ textAlign: "center" }}
                                         header={<Checkbox checked={false} />}
                                         reorderable={false}
-                                        body={(options) => {
+                                        body={(options, { rowIndex }) => {
                                             return (
                                                 <div className='flex gap-3'>
-                                                    <Checkbox checked={false} />
+                                                    <Checkbox
+                                                        checked={checkboxStates[rowIndex]}
+                                                        onClick={() =>
+                                                            setCheckboxStates(
+                                                                checkboxStates.map((state, index) =>
+                                                                    index === rowIndex
+                                                                        ? !state
+                                                                        : state
+                                                                )
+                                                            )
+                                                        }
+                                                    />
                                                     <i
                                                         className='icon adms-edit-item cursor-pointer export-web__icon'
                                                         onClick={() => {
@@ -508,7 +519,7 @@ export const ExportToWeb = () => {
                                                 header={() => (
                                                     <div className='flex gap-3'>
                                                         <Checkbox
-                                                            checked={checkboxStates.every(
+                                                            checked={checkboxStates.some(
                                                                 (checkbox) => !!checkbox
                                                             )}
                                                             onClick={() => {
