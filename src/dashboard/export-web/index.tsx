@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
-import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
+import {
+    DataTable,
+    DataTablePageEvent,
+    DataTableRowClickEvent,
+    DataTableSortEvent,
+} from "primereact/datatable";
 import { getKeyValue } from "services/local-storage.service";
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
@@ -85,8 +90,26 @@ export const ExportToWeb = () => {
     const [selectedServices, setSelectedServices] = useState<SelectionServices[]>(
         serviceColumns.map(({ field }) => ({ field, selected: [] }))
     );
+    const [expandedRows, setExpandedRows] = useState<any[]>([]);
 
     const navigate = useNavigate();
+
+    const rowExpansionTemplate = (data: ExportWebList) => {
+        return (
+            <div className='expanded-row'>
+                <div className='expanded-row__label'>Dealer comment: </div>
+                <div className='expanded-row__text'>{data.DealerComments || ""}</div>
+            </div>
+        );
+    };
+
+    const handleRowExpansionClick = (data: ExportWebList) => {
+        if (expandedRows.includes(data)) {
+            setExpandedRows(expandedRows.filter((item) => item !== data));
+            return;
+        }
+        setExpandedRows([...expandedRows, data]);
+    };
 
     const handleCheckboxCheck = (field: string, index: number | "all"): boolean => {
         const selectedItem = selectedServices.find((item) => item.field === field);
@@ -476,6 +499,11 @@ export const ExportToWeb = () => {
                                     totalRecords={totalRecords}
                                     onPage={pageChanged}
                                     onSort={sortData}
+                                    rowExpansionTemplate={rowExpansionTemplate}
+                                    expandedRows={expandedRows}
+                                    onRowToggle={(e: DataTableRowClickEvent) =>
+                                        setExpandedRows([e.data])
+                                    }
                                     reorderableColumns
                                     resizableColumns
                                     sortOrder={lazyState.sortOrder}
@@ -529,9 +557,15 @@ export const ExportToWeb = () => {
                                                 checked={selectedInventories.every(
                                                     (checkbox) => !!checkbox
                                                 )}
-                                                onClick={() => {
+                                                onClick={({ checked }) => {
                                                     setSelectedInventories(
-                                                        selectedInventories.map(() => true)
+                                                        selectedInventories.map(() => {
+                                                            if (checked) {
+                                                                return true;
+                                                            } else {
+                                                                return false;
+                                                            }
+                                                        })
                                                     );
                                                 }}
                                             />
@@ -540,7 +574,7 @@ export const ExportToWeb = () => {
                                         body={(options, { rowIndex }) => {
                                             return (
                                                 <div
-                                                    className={`flex gap-3 ${
+                                                    className={`flex gap-3 align-items-center  ${
                                                         selectedInventories[rowIndex] &&
                                                         "row--selected"
                                                     }`}
@@ -558,15 +592,23 @@ export const ExportToWeb = () => {
                                                             )
                                                         }
                                                     />
-                                                    <i
-                                                        className='icon adms-edit-item cursor-pointer export-web__icon'
+
+                                                    <Button
+                                                        className='text export-web__icon-button'
+                                                        icon='icon adms-edit-item'
                                                         onClick={() => {
                                                             navigate(
                                                                 `/dashboard/inventory/${options.itemuid}`
                                                             );
                                                         }}
                                                     />
-                                                    <i className='pi pi-angle-down' />
+                                                    <Button
+                                                        className='text export-web__icon-button'
+                                                        icon='pi pi-angle-down'
+                                                        onClick={() =>
+                                                            handleRowExpansionClick(options)
+                                                        }
+                                                    />
                                                 </div>
                                             );
                                         }}
@@ -621,7 +663,10 @@ export const ExportToWeb = () => {
                                                             />
                                                             <InputNumber
                                                                 disabled={
-                                                                    !selectedInventories[rowIndex]
+                                                                    !selectedServices.find(
+                                                                        (item) =>
+                                                                            item.field === field
+                                                                    )?.selected[rowIndex]
                                                                 }
                                                                 value={Price}
                                                                 className='export-web-service__input'
