@@ -637,7 +637,7 @@ export const ExportToWeb = () => {
                                                 header={header}
                                                 key={field}
                                                 sortable
-                                                body={(_, { rowIndex }) => {
+                                                body={(data, { rowIndex }) => {
                                                     return (
                                                         <div
                                                             className={`${
@@ -645,7 +645,7 @@ export const ExportToWeb = () => {
                                                                 "row--selected"
                                                             }`}
                                                         >
-                                                            {field}
+                                                            {data[field]}
                                                         </div>
                                                     );
                                                 }}
