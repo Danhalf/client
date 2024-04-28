@@ -64,6 +64,11 @@ const groupedColumns: GroupedColumn[] = [
     },
 ];
 
+interface SelectionServices {
+    field?: string;
+    selected: boolean[];
+}
+
 export const ExportToWeb = () => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
@@ -76,26 +81,71 @@ export const ExportToWeb = () => {
     const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
         null
     );
-    const [checkboxStates, setCheckboxStates] = useState(Array(20).fill(false));
+    const [selectedInventories, setSelectedInventories] = useState<boolean[]>([]);
+    const [selectedServices, setSelectedServices] = useState<SelectionServices[]>(
+        serviceColumns.map(({ field }) => ({ field, selected: [] }))
+    );
 
     const navigate = useNavigate();
 
-    const handleCheckboxChange = (index: number) => {
-        const newCheckboxStates = [...checkboxStates];
-        newCheckboxStates[index] = !newCheckboxStates[index];
-        setCheckboxStates(newCheckboxStates);
+    const handleCheckboxCheck = (field: string, index: number | "all"): boolean => {
+        const selectedItem = selectedServices.find((item) => item.field === field);
+
+        if (selectedItem) {
+            if (index === "all") {
+                return selectedItem.selected.every((item) => item);
+            } else {
+                return selectedItem.selected[index] || false;
+            }
+        }
+
+        return false;
+    };
+
+    const handleCheckboxChange = (field: string, index: number | "all"): void => {
+        const selectedItem = selectedServices.find((item) => item.field === field);
+        if (selectedItem) {
+            if (index === "all") {
+                const isAllSelected = !selectedItem.selected.every((item) => item);
+                const allChecked = selectedItem.selected.map(() => isAllSelected);
+                selectedItem.selected = allChecked;
+            } else {
+                const currentState = selectedItem.selected[index];
+                selectedItem.selected[index] = !currentState;
+                const newSelectedInventories = [...selectedInventories];
+                newSelectedInventories[index] = !currentState;
+                if (selectedServices.some((item) => item.selected[index])) {
+                    newSelectedInventories[index] = true;
+                } else {
+                    newSelectedInventories[index] = false;
+                }
+
+                setSelectedInventories(newSelectedInventories);
+            }
+        }
+        setSelectedServices([...selectedServices]);
     };
 
     const handleGetExportWebList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
             if (total) {
                 getExportToWebList(authUser.useruid, { ...params, total: 1 }).then((response) => {
-                    response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
+                    if (response && !Array.isArray(response)) {
+                        setTotalRecords(response.total ?? 0);
+                    }
                 });
             }
             getExportToWebList(authUser.useruid, params).then((response) => {
                 if (Array.isArray(response)) {
                     setExportsToWeb(response);
+                    setSelectedInventories(Array(response.length).fill(false));
+
+                    setSelectedServices(
+                        selectedServices.map((item) => ({
+                            ...item,
+                            selected: Array(response.length).fill(false),
+                        }))
+                    );
                 } else {
                     setExportsToWeb([]);
                 }
@@ -476,12 +526,12 @@ export const ExportToWeb = () => {
                                         bodyStyle={{ textAlign: "center" }}
                                         header={
                                             <Checkbox
-                                                checked={checkboxStates.every(
+                                                checked={selectedInventories.every(
                                                     (checkbox) => !!checkbox
                                                 )}
                                                 onClick={() => {
-                                                    setCheckboxStates(
-                                                        checkboxStates.map(() => true)
+                                                    setSelectedInventories(
+                                                        selectedInventories.map(() => true)
                                                     );
                                                 }}
                                             />
@@ -491,17 +541,19 @@ export const ExportToWeb = () => {
                                             return (
                                                 <div
                                                     className={`flex gap-3 ${
-                                                        checkboxStates[rowIndex] && "row--selected"
+                                                        selectedInventories[rowIndex] &&
+                                                        "row--selected"
                                                     }`}
                                                 >
                                                     <Checkbox
-                                                        checked={checkboxStates[rowIndex]}
+                                                        checked={selectedInventories[rowIndex]}
                                                         onClick={() =>
-                                                            setCheckboxStates(
-                                                                checkboxStates.map((state, index) =>
-                                                                    index === rowIndex
-                                                                        ? !state
-                                                                        : state
+                                                            setSelectedInventories(
+                                                                selectedInventories.map(
+                                                                    (state, index) =>
+                                                                        index === rowIndex
+                                                                            ? !state
+                                                                            : state
                                                                 )
                                                             )
                                                         }
@@ -535,14 +587,13 @@ export const ExportToWeb = () => {
                                                 header={() => (
                                                     <div className='flex gap-3'>
                                                         <Checkbox
-                                                            checked={checkboxStates.some(
-                                                                (checkbox) => !!checkbox
+                                                            checked={handleCheckboxCheck(
+                                                                field,
+                                                                "all"
                                                             )}
-                                                            onClick={() => {
-                                                                setCheckboxStates(
-                                                                    checkboxStates.map(() => true)
-                                                                );
-                                                            }}
+                                                            onClick={() =>
+                                                                handleCheckboxChange(field, "all")
+                                                            }
                                                         />
                                                         {header?.toString()}
                                                     </div>
@@ -552,18 +603,26 @@ export const ExportToWeb = () => {
                                                     return (
                                                         <div
                                                             className={`export-web-service ${
-                                                                checkboxStates[rowIndex] &&
+                                                                selectedInventories[rowIndex] &&
                                                                 "row--selected"
                                                             }`}
                                                         >
                                                             <Checkbox
-                                                                checked={checkboxStates[rowIndex]}
+                                                                checked={handleCheckboxCheck(
+                                                                    field,
+                                                                    rowIndex
+                                                                )}
                                                                 onClick={() =>
-                                                                    handleCheckboxChange(rowIndex)
+                                                                    handleCheckboxChange(
+                                                                        field,
+                                                                        rowIndex
+                                                                    )
                                                                 }
                                                             />
                                                             <InputNumber
-                                                                disabled={!checkboxStates[rowIndex]}
+                                                                disabled={
+                                                                    !selectedInventories[rowIndex]
+                                                                }
                                                                 value={Price}
                                                                 className='export-web-service__input'
                                                             />
@@ -582,7 +641,7 @@ export const ExportToWeb = () => {
                                                     return (
                                                         <div
                                                             className={`${
-                                                                checkboxStates[rowIndex] &&
+                                                                selectedInventories[rowIndex] &&
                                                                 "row--selected"
                                                             }`}
                                                         >
