@@ -330,6 +330,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     <InputText
                         className='vehicle-general__text-input w-full'
                         value={inventory?.Trim || ""}
+                        maxLength={16}
                         onChange={({ target: { value } }) =>
                             changeInventory({ key: "Trim", value })
                         }
