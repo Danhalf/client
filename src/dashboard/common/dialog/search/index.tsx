@@ -3,16 +3,14 @@ import { DashboardDialog, DashboardDialogProps } from "..";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
-import { AuthUser } from "http/services/auth.service";
-import { LS_APP_USER } from "common/constants/localStorage";
 import {
     ListData,
     MakesListData,
+    getAutoMakeModelList,
     getInventoryAutomakesList,
-    getInventoryExteriorColorsList,
-    getInventoryInteriorColorsList,
 } from "http/services/inventory-service";
-import { getKeyValue } from "services/local-storage.service";
+
+import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 
 export interface SearchField<T> {
     key: keyof T & string;
@@ -36,8 +34,9 @@ export const AdvancedSearchDialog = <T,>({
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
 
+    const autoMake = fields.find((field) => field.key === "Make")?.value;
+
     useEffect(() => {
-        // const authUser: AuthUser = getKeyValue(LS_APP_USER);
         getInventoryAutomakesList().then((list) => {
             if (list) {
                 const upperCasedList = list.map((item) => ({
@@ -49,19 +48,21 @@ export const AdvancedSearchDialog = <T,>({
         });
     }, []);
 
-    // const handleSelectMake = useCallback(() => {
-    //     getAutoMakeModelList(makeSting).then((list) => {
-    //         if (list && Object.keys(list).length) {
-    //             setAutomakesModelList(list);
-    //         } else {
-    //             setAutomakesModelList([]);
-    //         }
-    //     });
-    // }, [inventory.Make]);
+    const handleSelectMake = useCallback(() => {
+        if (!autoMake) return;
+        const formatedMake = autoMake.toLowerCase().replaceAll(" ", "");
+        getAutoMakeModelList(formatedMake).then((list) => {
+            if (list && Object.keys(list).length) {
+                setAutomakesModelList(list);
+            } else {
+                setAutomakesModelList([]);
+            }
+        });
+    }, [autoMake]);
 
-    // useEffect(() => {
-    //     if (inventory.Make) handleSelectMake();
-    // }, [handleSelectMake, inventory.Make]);
+    useEffect(() => {
+        if (autoMake) handleSelectMake();
+    }, [handleSelectMake, autoMake]);
 
     const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
         if (option) {
@@ -69,8 +70,8 @@ export const AdvancedSearchDialog = <T,>({
                 <div className='flex align-items-center'>
                     <img
                         alt={option.name}
-                        // src={option?.logo || defaultMakesLogo}
-                        className='mr-2 vehicle-general__dropdown-icon'
+                        src={option?.logo || defaultMakesLogo}
+                        className='mr-2 dropdown-icon'
                     />
                     <div>{option.name}</div>
                 </div>
@@ -85,8 +86,8 @@ export const AdvancedSearchDialog = <T,>({
             <div className='flex align-items-center'>
                 <img
                     alt={option.name}
-                    // src={option?.logo || defaultMakesLogo}
-                    className='mr-2 vehicle-general__dropdown-icon'
+                    src={option?.logo || defaultMakesLogo}
+                    className='mr-2 dropdown-icon'
                 />
                 <div>{option.name}</div>
             </div>
@@ -117,13 +118,22 @@ export const AdvancedSearchDialog = <T,>({
                             {type === "dropdown" && (
                                 <Dropdown
                                     className='w-full'
+                                    optionLabel='name'
+                                    optionValue='name'
                                     value={value ?? ""}
+                                    filter
+                                    editable
+                                    valueTemplate={selectedAutoMakesTemplate}
+                                    itemTemplate={autoMakesOptionTemplate}
+                                    options={key === "Make" ? automakesList : automakesModelList}
                                     onChange={({ target }) => onInputChange(key, target.value)}
                                 />
                             )}
                             {value && onSearchClear && (
                                 <i
-                                    className='pi pi-times cursor-pointer search-dialog__clear'
+                                    className={`pi pi-times cursor-pointer search-dialog__clear ${
+                                        type === "dropdown" && "pr-4"
+                                    }`}
                                     onClick={() => onSearchClear(key)}
                                 />
                             )}
