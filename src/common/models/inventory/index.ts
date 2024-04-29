@@ -236,6 +236,7 @@ export interface Inventory {
     Status: string;
     StockNo: string;
     Transmission: string;
+    Trim: string;
     TypeOfFuel: string;
     VIN: string;
     VINimageUID: string;
@@ -248,6 +249,7 @@ export interface Inventory {
     options_info?: InventoryOptionsInfo[];
     updated: string;
     useruid: string;
+    locationuid: string;
     extdata?: InventoryExtData;
     Audit?: Audit;
 }
