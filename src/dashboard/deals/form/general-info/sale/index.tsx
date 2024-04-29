@@ -7,11 +7,12 @@ import { InputText } from "primereact/inputtext";
 import { useStore } from "store/hooks";
 import { getDealTypes, getSaleTypes } from "http/services/deals.service";
 import { DealType, SaleType } from "common/models/deals";
+import { CompanySearch } from "dashboard/contacts/common/company-search";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
-        deal: { dealtype, saletype, inventoryuinfo, name },
+        deal: { dealtype, saletype, inventoryuinfo, name, inventoryuid },
         changeDeal,
     } = store;
 
@@ -30,17 +31,17 @@ export const DealGeneralSale = observer((): ReactElement => {
     return (
         <div className='grid deal-general-sale row-gap-2'>
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='name'
-                        filter
-                        value={name}
-                        required
-                        className='w-full deal-sale__dropdown'
-                    />
-                    <label className='float-label'>Buyer Name (required)</label>
-                </span>
+                <CompanySearch
+                    value={inventoryuid}
+                    onChange={({ target: { value } }) => changeDeal({ key: "inventoryuid", value })}
+                    onRowClick={(value) =>
+                        changeDeal({
+                            key: "inventoryuid",
+                            value,
+                        })
+                    }
+                    name='Buyer Name (required)'
+                />
             </div>
             <div className='col-6'>
                 <span className='p-float-label'>
