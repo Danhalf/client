@@ -1,7 +1,7 @@
 import { authorizedUserApiInstance } from "http/index";
 import { QueryParams } from "common/models/query-params";
 import { BaseResponse, Status } from "common/models/base-response";
-import { Deal, DealType, SaleType } from "common/models/deals";
+import { Deal, IndexedDealList } from "common/models/deals";
 
 export interface TotalDealsList extends BaseResponse {
     total: number;
@@ -32,11 +32,16 @@ export const getDealInfo = async (uid: string) => {
     }
 };
 interface DealTypeResponse extends BaseResponse {
-    deal_types: DealType[];
+    deal_types: IndexedDealList[];
 }
-
+interface DealStatusList extends BaseResponse {
+    deal_status: IndexedDealList[];
+}
 interface SaleTypeResponse extends BaseResponse {
-    sale_types: SaleType[];
+    sale_types: IndexedDealList[];
+}
+interface InventoryStatusResponse extends BaseResponse {
+    inventory_status: IndexedDealList[];
 }
 
 export const getDealTypes = async () => {
@@ -50,12 +55,34 @@ export const getDealTypes = async () => {
     }
 };
 
+export const getDealStatuses = async () => {
+    try {
+        const request = await authorizedUserApiInstance.get<DealStatusList>(
+            "deals/listdealstatuses"
+        );
+        return request.data.deal_status;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
 export const getSaleTypes = async () => {
     try {
         const request = await authorizedUserApiInstance.get<SaleTypeResponse>(
             "deals/listsaletypes"
         );
         return request.data.sale_types;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getDealInventoryStatuses = async () => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryStatusResponse>(
+            "deals/listinventorystatuses"
+        );
+        return request.data.inventory_status;
     } catch (error) {
         // TODO: add error handler
     }
