@@ -11,14 +11,26 @@ export const DealRetailProducts = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
         deal: { price },
-        dealExtData: { GAP_Company },
+        dealExtData: { GAP_Company, Warranty_Name },
         changeDeal,
         changeDealExtData,
     } = store;
     return (
         <div className='grid deal-retail-products row-gap-2'>
             <div className='col-6'>
-                <CompanySearch name='Service Contract Company' />
+                <CompanySearch
+                    name='Service Contract Company'
+                    value={Warranty_Name}
+                    onChange={({ target: { value } }) =>
+                        changeDealExtData({ key: "Warranty_Name", value })
+                    }
+                    onRowClick={(value) =>
+                        changeDealExtData({
+                            key: "Warranty_Name",
+                            value,
+                        })
+                    }
+                />
             </div>
             <div className='col-3'>
                 <CurrencyInput labelPosition='top' title='Price' />
