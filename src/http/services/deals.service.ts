@@ -1,7 +1,7 @@
 import { authorizedUserApiInstance } from "http/index";
 import { QueryParams } from "common/models/query-params";
 import { BaseResponse, Status } from "common/models/base-response";
-import { Deal, IndexedDealList } from "common/models/deals";
+import { Deal, DealFinance, IndexedDealList } from "common/models/deals";
 
 export interface TotalDealsList extends BaseResponse {
     total: number;
@@ -101,6 +101,47 @@ export const setDeal = async (
         if (response.status === 200) {
             return response.data;
         }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const dealFinancesWashout = async (dealuid: string): Promise<BaseResponse | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `deals/${dealuid || 0}/washout`
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const dealFinancesRecalculate = async (
+    dealuid: string
+): Promise<BaseResponse | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `deals/${dealuid || 0}/recalculate`
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getDealFiance = async (dealuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<DealFinance>(
+            `deals/${dealuid || 0}/finance`
+        );
+        return request.data;
     } catch (error) {
         // TODO: add error handler
     }
