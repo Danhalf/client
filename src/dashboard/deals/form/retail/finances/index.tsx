@@ -101,83 +101,139 @@ export const DealRetailFinances = observer((): ReactElement => {
 
                 <div className='finances-item'>
                     <label className='finances-item__label'>Accessory Price</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.Accessory) || 0}
+                        onChange={({ value }) => changeFinance("Accessory", value)}
+                    />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Miscellaneous</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.Misc) || 0}
+                        onChange={({ value }) => changeFinance("Misc", value)}
+                    />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Tag Fee</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.Tags) || 0}
+                        onChange={({ value }) => changeFinance("Tags", value)}
+                    />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Title Transfer Fee</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.Title) || 0}
+                        onChange={({ value }) => changeFinance("Title", value)}
+                    />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>License and Registration Fees</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.LicenseAndReg) || 0}
+                        onChange={({ value }) => changeFinance("LicenseAndReg", value)}
+                    />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Service Contract</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.Warranty) || 0}
+                        onChange={({ value }) => changeFinance("Warranty", value)}
+                    />
                 </div>
             </div>
 
             <div className='col-6 finances-column'>
                 <div className='finances-item'>
                     <label className='finances-item__label'>GAP</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.Gap) || 0}
+                        onChange={({ value }) => changeFinance("Gap", value)}
+                    />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Accident & Health</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.AH) || 0}
+                        onChange={({ value }) => changeFinance("AH", value)}
+                    />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Credit Life</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.CL) || 0}
+                        onChange={({ value }) => changeFinance("CL", value)}
+                    />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>VSI</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.MR) || 0}
+                        onChange={({ value }) => changeFinance("MR", value)}
+                    />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>
                         Electronic Registration & Titling
                     </label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.ERT) || 0}
+                        onChange={({ value }) => changeFinance("ERT", value)}
+                    />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Documentation Fee</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.DocFee) || 0}
+                        onChange={({ value }) => changeFinance("DocFee", value)}
+                    />
                 </div>
 
                 <div className='finances-item finances-item--grey'>
                     <span className='finances-item__label'>Total Price</span>
-                    <span className='finances-item__amount'>$0.00</span>
+                    <span className='finances-item__amount'>${finance?.TotalPrice || "0.00"}</span>
                 </div>
 
                 <div className='finances-item'>
                     <label className='finances-item__label'>Trade in Pay-Off Amount</label>
-                    <span className='finances-item__amount'>$0.00</span>
+                    <span className='finances-item__amount'>
+                        ${finance?.TradeInPayoff || "0.00"}
+                    </span>
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Net Trade Allowance</label>
-                    <span className='finances-item__amount'>$0.00</span>
+                    <span className='finances-item__amount'>
+                        ${finance?.NetTradeAllowance || "0.00"}
+                    </span>
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Cash Down Payment</label>
-                    <CurrencyInput className='finances-item__input' />
+                    <CurrencyInput
+                        className='finances-item__input'
+                        value={Number(finance?.CashDown) || 0}
+                        onChange={({ value }) => changeFinance("CashDown", value)}
+                    />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Total Down Payment</label>
-                    <span className='finances-item__amount'>$0.00</span>
+                    <span className='finances-item__amount'>${finance?.TotalDown || "0.00"}</span>
                 </div>
 
                 <div className='finances-item finances-item--grey'>
                     <span className='finances-item__label'>Amount Financed</span>
-                    <span className='finances-item__amount'>$0.00</span>
+                    <span className='finances-item__amount'>${finance?.BalanceDue || "0.00"}</span>
                 </div>
             </div>
         </div>
