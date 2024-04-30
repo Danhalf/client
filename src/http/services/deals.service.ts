@@ -164,3 +164,23 @@ export const setDealFinance = async (
         // TODO: add error handler
     }
 };
+
+export const getDealPayments = async (dealuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any>(`deals/${dealuid || 0}/ppayments`);
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const getDealPaymentsTotal = async (dealuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any>(
+            `deals/${dealuid || 0}/ppaymenttotal`
+        );
+        return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
