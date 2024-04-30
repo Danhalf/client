@@ -136,12 +136,30 @@ export const dealFinancesRecalculate = async (
     }
 };
 
-export const getDealFiance = async (dealuid: string) => {
+export const getDealFinance = async (dealuid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<DealFinance>(
             `deals/${dealuid || 0}/finance`
         );
         return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const setDealFinance = async (
+    dealuid: string,
+    dealFinanceData: Partial<DealFinance>
+): Promise<BaseResponse | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `deals/${dealuid || 0}/finance`,
+            dealFinanceData
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
     } catch (error) {
         // TODO: add error handler
     }

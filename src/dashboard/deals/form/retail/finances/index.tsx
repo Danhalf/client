@@ -1,29 +1,26 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect } from "react";
 import "./index.css";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
-import {
-    dealFinancesRecalculate,
-    dealFinancesWashout,
-    getDealFiance,
-} from "http/services/deals.service";
+import { dealFinancesRecalculate, dealFinancesWashout } from "http/services/deals.service";
 import { useParams } from "react-router-dom";
 import { DealFinance } from "common/models/deals";
+import { useStore } from "store/hooks";
 
 export const DealRetailFinances = observer((): ReactElement => {
     const { id } = useParams();
-    const [finance, setFinance] = useState<DealFinance>();
+    const store = useStore().dealStore;
+    const { dealFinances, getDealFinances, changeDealFinances } = store;
 
     useEffect(() => {
-        if (id) {
-            getDealFiance(id).then((data) => setFinance(data));
-        }
-    }, [id]);
+        id && getDealFinances(id);
+        // eslint-disable-next-line
+    }, []);
 
-    const changeFinance = (key: string, value: number | null) => {
-        if (finance) {
-            setFinance({ ...finance, [key]: value });
+    const changeFinance = (key: keyof DealFinance, value: number | null) => {
+        if (dealFinances) {
+            changeDealFinances({ key, value: value || 0 });
         }
     };
 
@@ -32,8 +29,7 @@ export const DealRetailFinances = observer((): ReactElement => {
             <div className='col-12'>
                 <div className='flex justify-content-end gap-3 mt-5 mr-3'>
                     <Button
-                        disabled
-                        severity={"secondary"}
+                        outlined
                         onClick={() => {
                             id && dealFinancesWashout(id);
                         }}
@@ -42,7 +38,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                         Washout
                     </Button>
                     <Button
-                        severity={"secondary"}
+                        outlined
                         onClick={() => {
                             id && dealFinancesRecalculate(id);
                         }}
@@ -57,7 +53,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label bold'>Cash Price</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.CashPrice) || 0}
+                        value={Number(dealFinances.CashPrice) || 0}
                         onChange={({ value }) => changeFinance("CashPrice", value)}
                     />
                 </div>
@@ -65,15 +61,15 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>Total Trade Allowance</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.TradeAllowance) || 0}
+                        value={Number(dealFinances.TradeAllowance) || 0}
                         onChange={({ value }) => changeFinance("TradeAllowance", value)}
                     />
                 </div>
 
-                <div className='finances-item finances-item--grey'>
+                <div className='finances-item finances-item--sum'>
                     <span className='finances-item__label'>Taxable amount</span>
                     <span className='finances-item__amount'>
-                        ${finance?.TaxableAmount || "0.00"}
+                        ${dealFinances.TaxableAmount || "0.00"}
                     </span>
                 </div>
 
@@ -81,7 +77,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>Tax Rate</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.TaxRate) || 0}
+                        value={Number(dealFinances.TaxRate) || 0}
                         onChange={({ value }) => changeFinance("TaxRate", value)}
                     />
                 </div>
@@ -89,21 +85,24 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>Taxes</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.Taxes) || 0}
+                        value={Number(dealFinances.Taxes) || 0}
                         onChange={({ value }) => changeFinance("Taxes", value)}
                     />
                 </div>
 
-                <div className='finances-item finances-item--grey'>
+                <div className='finances-item finances-item--sum'>
                     <span className='finances-item__label'>Subtotal</span>
-                    <span className='finances-item__amount'> ${finance?.SubTotal || "0.00"}</span>
+                    <span className='finances-item__amount'>
+                        {" "}
+                        ${dealFinances.SubTotal || "0.00"}
+                    </span>
                 </div>
 
                 <div className='finances-item'>
                     <label className='finances-item__label'>Accessory Price</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.Accessory) || 0}
+                        value={Number(dealFinances.Accessory) || 0}
                         onChange={({ value }) => changeFinance("Accessory", value)}
                     />
                 </div>
@@ -111,7 +110,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>Miscellaneous</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.Misc) || 0}
+                        value={Number(dealFinances.Misc) || 0}
                         onChange={({ value }) => changeFinance("Misc", value)}
                     />
                 </div>
@@ -119,7 +118,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>Tag Fee</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.Tags) || 0}
+                        value={Number(dealFinances.Tags) || 0}
                         onChange={({ value }) => changeFinance("Tags", value)}
                     />
                 </div>
@@ -127,7 +126,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>Title Transfer Fee</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.Title) || 0}
+                        value={Number(dealFinances.Title) || 0}
                         onChange={({ value }) => changeFinance("Title", value)}
                     />
                 </div>
@@ -135,7 +134,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>License and Registration Fees</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.LicenseAndReg) || 0}
+                        value={Number(dealFinances.LicenseAndReg) || 0}
                         onChange={({ value }) => changeFinance("LicenseAndReg", value)}
                     />
                 </div>
@@ -143,7 +142,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>Service Contract</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.Warranty) || 0}
+                        value={Number(dealFinances.Warranty) || 0}
                         onChange={({ value }) => changeFinance("Warranty", value)}
                     />
                 </div>
@@ -154,7 +153,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>GAP</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.Gap) || 0}
+                        value={Number(dealFinances.Gap) || 0}
                         onChange={({ value }) => changeFinance("Gap", value)}
                     />
                 </div>
@@ -162,7 +161,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>Accident & Health</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.AH) || 0}
+                        value={Number(dealFinances.AH) || 0}
                         onChange={({ value }) => changeFinance("AH", value)}
                     />
                 </div>
@@ -170,7 +169,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>Credit Life</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.CL) || 0}
+                        value={Number(dealFinances.CL) || 0}
                         onChange={({ value }) => changeFinance("CL", value)}
                     />
                 </div>
@@ -178,7 +177,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>VSI</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.MR) || 0}
+                        value={Number(dealFinances.MR) || 0}
                         onChange={({ value }) => changeFinance("MR", value)}
                     />
                 </div>
@@ -188,7 +187,7 @@ export const DealRetailFinances = observer((): ReactElement => {
                     </label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.ERT) || 0}
+                        value={Number(dealFinances.ERT) || 0}
                         onChange={({ value }) => changeFinance("ERT", value)}
                     />
                 </div>
@@ -196,44 +195,50 @@ export const DealRetailFinances = observer((): ReactElement => {
                     <label className='finances-item__label'>Documentation Fee</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.DocFee) || 0}
+                        value={Number(dealFinances.DocFee) || 0}
                         onChange={({ value }) => changeFinance("DocFee", value)}
                     />
                 </div>
 
-                <div className='finances-item finances-item--grey'>
+                <div className='finances-item finances-item--sum'>
                     <span className='finances-item__label'>Total Price</span>
-                    <span className='finances-item__amount'>${finance?.TotalPrice || "0.00"}</span>
+                    <span className='finances-item__amount'>
+                        ${dealFinances.TotalPrice || "0.00"}
+                    </span>
                 </div>
 
                 <div className='finances-item'>
                     <label className='finances-item__label'>Trade in Pay-Off Amount</label>
                     <span className='finances-item__amount'>
-                        ${finance?.TradeInPayoff || "0.00"}
+                        ${dealFinances.TradeInPayoff || "0.00"}
                     </span>
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Net Trade Allowance</label>
                     <span className='finances-item__amount'>
-                        ${finance?.NetTradeAllowance || "0.00"}
+                        ${dealFinances.NetTradeAllowance || "0.00"}
                     </span>
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Cash Down Payment</label>
                     <CurrencyInput
                         className='finances-item__input'
-                        value={Number(finance?.CashDown) || 0}
+                        value={Number(dealFinances.CashDown) || 0}
                         onChange={({ value }) => changeFinance("CashDown", value)}
                     />
                 </div>
                 <div className='finances-item'>
                     <label className='finances-item__label'>Total Down Payment</label>
-                    <span className='finances-item__amount'>${finance?.TotalDown || "0.00"}</span>
+                    <span className='finances-item__amount'>
+                        ${dealFinances.TotalDown || "0.00"}
+                    </span>
                 </div>
 
-                <div className='finances-item finances-item--grey'>
+                <div className='finances-item finances-item--sum'>
                     <span className='finances-item__label'>Amount Financed</span>
-                    <span className='finances-item__amount'>${finance?.BalanceDue || "0.00"}</span>
+                    <span className='finances-item__amount'>
+                        ${dealFinances.BalanceDue || "0.00"}
+                    </span>
                 </div>
             </div>
         </div>
