@@ -384,6 +384,31 @@ export const ExportToWeb = () => {
         );
     };
 
+    const handleExport = () => {
+        const columns: ReportsColumn[] = activeColumns.map((column) => ({
+            name: column.header as string,
+            data: column.field,
+        }));
+
+        const data = exportsToWeb.map((item) => {
+            const filteredItem: Record<string, any> = {};
+            columns.forEach((column) => {
+                if (item.hasOwnProperty(column.data)) {
+                    filteredItem[column.data] = item[column.data as keyof typeof item];
+                }
+            });
+            return filteredItem;
+        });
+        const JSONreport = {
+            itemUID: "0",
+            data,
+            columns,
+            format: "",
+        };
+        // eslint-disable-next-line no-console
+        console.log(JSONreport);
+    };
+
     const allowedEditableFields: Partial<keyof ExportWebList>[] = [
         "ExteriorColor",
         "mileage",
