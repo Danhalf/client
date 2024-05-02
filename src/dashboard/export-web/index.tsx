@@ -127,6 +127,14 @@ export const ExportToWeb = () => {
 
     const handleCheckboxChange = (field: string | "all", index: number | "all"): void => {
         const selectedItem = selectedServices.find((item) => item.field === field);
+        if (field === "all" && index === "all") {
+            return setSelectedServices(
+                selectedServices.map((item) => ({
+                    ...item,
+                    selected: item.selected.map(() => selectedInventories.every((item) => !item)),
+                }))
+            );
+        }
         if (field === "all" && index !== "all") {
             selectedServices.forEach((item) => {
                 item.selected[index] = !selectedInventories[index];
@@ -596,6 +604,7 @@ export const ExportToWeb = () => {
                                                     (checkbox) => !!checkbox
                                                 )}
                                                 onClick={({ checked }) => {
+                                                    handleCheckboxChange("all", "all");
                                                     setSelectedInventories(
                                                         selectedInventories.map(() => {
                                                             if (checked) {
