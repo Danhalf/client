@@ -72,6 +72,7 @@ const groupedColumns: GroupedColumn[] = [
 interface SelectionServices {
     field?: string;
     selected: boolean[];
+    price: number[];
 }
 
 export const ExportToWeb = () => {
@@ -88,7 +89,7 @@ export const ExportToWeb = () => {
     );
     const [selectedInventories, setSelectedInventories] = useState<boolean[]>([]);
     const [selectedServices, setSelectedServices] = useState<SelectionServices[]>(
-        serviceColumns.map(({ field }) => ({ field, selected: [] }))
+        serviceColumns.map(({ field }) => ({ field, selected: [], price: [] }))
     );
     const [expandedRows, setExpandedRows] = useState<any[]>([]);
 
@@ -162,6 +163,19 @@ export const ExportToWeb = () => {
         setSelectedServices([...selectedServices]);
     };
 
+    const handlePriceChange = (field: string, index: number, value: number) => {
+        const updatedServices = selectedServices.map((item) => {
+            if (item.field === field) {
+                return {
+                    ...item,
+                    price: [...item.price.slice(0, index), value, ...item.price.slice(index + 1)],
+                };
+            }
+            return item;
+        });
+        setSelectedServices(updatedServices);
+    };
+
     const handleGetExportWebList = async (params: QueryParams, total?: boolean) => {
         if (authUser) {
             if (total) {
@@ -175,11 +189,12 @@ export const ExportToWeb = () => {
                 if (Array.isArray(response)) {
                     setExportsToWeb(response);
                     setSelectedInventories(Array(response.length).fill(false));
-
+                    const price = response.map((item) => item.Price || 0);
                     setSelectedServices(
                         selectedServices.map((item) => ({
                             ...item,
                             selected: Array(response.length).fill(false),
+                            price,
                         }))
                     );
                 } else {
@@ -401,16 +416,21 @@ export const ExportToWeb = () => {
         const data = exportsToWeb
             .map((item, index) => {
                 let filteredItem: Record<string, any> | null = {};
-                const servicesArray: string[] = [];
+                const reportService: { service: string; price: number }[] = [];
                 columns.forEach((column) => {
                     if (item.hasOwnProperty(column.data)) {
                         if (selectedInventories[index] && filteredItem) {
                             filteredItem[column.data] = item[column.data as keyof typeof item];
                             filteredItem["itemuid"] = item["itemuid"];
-                            selectedServices.forEach((service) => {
-                                if (service.selected[index]) {
-                                    !servicesArray.some((elem) => elem === service?.field) &&
-                                        servicesArray.push(service?.field || "");
+                            selectedServices.forEach((serviceItem) => {
+                                if (serviceItem.selected[index]) {
+                                    !reportService.some(
+                                        ({ service }) => service === serviceItem?.field
+                                    ) &&
+                                        reportService.push({
+                                            service: serviceItem?.field!,
+                                            price: serviceItem?.price[index],
+                                        });
                                 }
                             });
                         } else {
@@ -418,7 +438,7 @@ export const ExportToWeb = () => {
                         }
                     }
                 });
-                return servicesArray.length ? { ...filteredItem, services: servicesArray } : null;
+                return reportService.length ? { ...filteredItem, services: reportService } : null;
             })
             .filter(Boolean);
         const JSONreport = !!data.length && {
@@ -716,7 +736,20 @@ export const ExportToWeb = () => {
                                                                             item.field === field
                                                                     )?.selected[rowIndex]
                                                                 }
-                                                                value={Price}
+                                                                value={
+                                                                    selectedServices.find(
+                                                                        (item) =>
+                                                                            item.field === field
+                                                                    )?.price[rowIndex]
+                                                                }
+                                                                onChange={({ value }) =>
+                                                                    value &&
+                                                                    handlePriceChange(
+                                                                        field,
+                                                                        rowIndex,
+                                                                        value
+                                                                    )
+                                                                }
                                                                 className='export-web-service__input'
                                                             />
                                                         </div>
