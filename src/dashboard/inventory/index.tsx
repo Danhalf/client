@@ -111,7 +111,7 @@ export default function Inventories(): ReactElement {
             top: lazyState.rows,
         };
 
-        handleGetInventoryList(params);
+        handleGetInventoryList(params, true);
         setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lazyState, globalSearch, authUser, selectedFilterOptions]);
@@ -358,18 +358,22 @@ export default function Inventories(): ReactElement {
         {
             key: "StockNo",
             value: advancedSearch?.StockNo,
+            type: "text",
         },
         {
             key: "Make",
             value: advancedSearch?.Make,
+            type: "dropdown",
         },
         {
             key: "Model",
             value: advancedSearch?.Model,
+            type: "dropdown",
         },
         {
             key: "VIN",
             value: advancedSearch?.VIN,
+            type: "text",
         },
     ];
 
