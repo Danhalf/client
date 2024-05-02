@@ -254,12 +254,7 @@ export const ExportToWeb = () => {
                         );
                         setActiveColumns(serverColumns);
                     } else {
-                        setActiveColumns([
-                            //@ts-ignore
-                            ...columns.filter(({ checked }) => checked),
-                            //@ts-ignore
-                            serviceColumns[0],
-                        ]);
+                        setActiveColumns(columns.filter(({ checked }) => checked));
                     }
                     settings?.table &&
                         setLazyState({
@@ -390,21 +385,23 @@ export const ExportToWeb = () => {
             data: column.field,
         }));
 
-        const data = exportsToWeb.map((item) => {
-            const filteredItem: Record<string, any> = {};
+        const data = exportsToWeb.map((item, index) => {
+            let filteredItem: Record<string, any> | null = {};
             columns.forEach((column) => {
                 if (item.hasOwnProperty(column.data)) {
-                    filteredItem[column.data] = item[column.data as keyof typeof item];
-                    filteredItem["itemuid"] = item["itemuid"];
+                    if (selectedInventories[index] && filteredItem) {
+                        filteredItem[column.data] = item[column.data as keyof typeof item];
+                        filteredItem["itemuid"] = item["itemuid"];
+                    } else {
+                        filteredItem = null;
+                    }
                 }
             });
             return filteredItem;
         });
         const JSONreport = {
-            itemUID: "0",
-            data,
+            data: data.filter(Boolean),
             columns,
-            format: "",
         };
         // eslint-disable-next-line no-console
         console.log(JSONreport);
