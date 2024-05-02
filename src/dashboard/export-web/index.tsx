@@ -395,6 +395,7 @@ export const ExportToWeb = () => {
             columns.forEach((column) => {
                 if (item.hasOwnProperty(column.data)) {
                     filteredItem[column.data] = item[column.data as keyof typeof item];
+                    filteredItem["itemuid"] = item["itemuid"];
                 }
             });
             return filteredItem;
@@ -429,6 +430,7 @@ export const ExportToWeb = () => {
                                     className='export-web-controls__button px-6 uppercase'
                                     severity='success'
                                     type='button'
+                                    onClick={handleExport}
                                 >
                                     Export now
                                 </Button>

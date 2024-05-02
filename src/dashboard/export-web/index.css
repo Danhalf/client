@@ -5,6 +5,10 @@
     height: 20px;
     border: none;
 }
+.export-web__icon-button.p-button:last-child {
+    color: var(--admss-app-primary);
+}
+
 .export-web__icon-button.p-button:hover {
     color: var(--admss-app-primary-main-green);
     background: transparent;
