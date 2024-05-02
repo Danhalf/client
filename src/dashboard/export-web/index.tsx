@@ -125,7 +125,7 @@ export const ExportToWeb = () => {
         return false;
     };
 
-    const handleCheckboxChange = (field: string, index: number | "all"): void => {
+    const handleCheckboxChange = (field: string | "all", index: number | "all"): void => {
         const selectedItem = selectedServices.find((item) => item.field === field);
         if (selectedItem) {
             if (index === "all") {
@@ -385,22 +385,31 @@ export const ExportToWeb = () => {
             data: column.field,
         }));
 
-        const data = exportsToWeb.map((item, index) => {
-            let filteredItem: Record<string, any> | null = {};
-            columns.forEach((column) => {
-                if (item.hasOwnProperty(column.data)) {
-                    if (selectedInventories[index] && filteredItem) {
-                        filteredItem[column.data] = item[column.data as keyof typeof item];
-                        filteredItem["itemuid"] = item["itemuid"];
-                    } else {
-                        filteredItem = null;
+        const data = exportsToWeb
+            .map((item, index) => {
+                let filteredItem: Record<string, any> | null = {};
+                const servicesArray: string[] = [];
+                columns.forEach((column) => {
+                    if (item.hasOwnProperty(column.data)) {
+                        if (selectedInventories[index] && filteredItem) {
+                            filteredItem[column.data] = item[column.data as keyof typeof item];
+                            filteredItem["itemuid"] = item["itemuid"];
+                            selectedServices.forEach((service) => {
+                                if (service.selected[index]) {
+                                    !servicesArray.some((elem) => elem === service?.field) &&
+                                        servicesArray.push(service?.field || "");
+                                }
+                            });
+                        } else {
+                            filteredItem = null;
+                        }
                     }
-                }
-            });
-            return filteredItem;
-        });
-        const JSONreport = {
-            data: data.filter(Boolean),
+                });
+                return servicesArray.length ? { ...filteredItem, services: servicesArray } : null;
+            })
+            .filter(Boolean);
+        const JSONreport = !!data.length && {
+            data,
             columns,
         };
         // eslint-disable-next-line no-console
@@ -605,7 +614,7 @@ export const ExportToWeb = () => {
                                                 >
                                                     <Checkbox
                                                         checked={selectedInventories[rowIndex]}
-                                                        onClick={() =>
+                                                        onClick={() => {
                                                             setSelectedInventories(
                                                                 selectedInventories.map(
                                                                     (state, index) =>
@@ -613,8 +622,9 @@ export const ExportToWeb = () => {
                                                                             ? !state
                                                                             : state
                                                                 )
-                                                            )
-                                                        }
+                                                            );
+                                                            handleCheckboxChange("all", rowIndex);
+                                                        }}
                                                     />
 
                                                     <Button
