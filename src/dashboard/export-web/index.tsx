@@ -423,7 +423,19 @@ export const ExportToWeb = () => {
                             filteredItem[column.data] = item[column.data as keyof typeof item];
                             filteredItem["itemuid"] = item["itemuid"];
                             selectedServices.forEach((serviceItem) => {
-                                if (serviceItem.selected[index]) {
+                                // activeColumns.forEach(({ field }) => {
+                                //     // eslint-disable-next-line no-console
+                                //     console.log(
+                                //         field === serviceItem.field && field,
+                                //         " - ",
+                                //         serviceItem.field
+                                //     );
+                                // });
+
+                                if (
+                                    serviceItem.selected[index] &&
+                                    activeColumns.some(({ field }) => field === serviceItem.field)
+                                ) {
                                     !reportService.some(
                                         ({ service }) => service === serviceItem?.field
                                     ) &&
@@ -447,6 +459,8 @@ export const ExportToWeb = () => {
         };
         // eslint-disable-next-line no-console
         console.log(JSONreport);
+        // eslint-disable-next-line no-console
+        console.log(JSON.stringify(JSONreport));
     };
 
     const allowedEditableFields: Partial<keyof ExportWebList>[] = [
