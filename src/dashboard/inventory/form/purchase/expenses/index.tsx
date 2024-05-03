@@ -201,6 +201,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
+                        scrollable
                         pt={{
                             wrapper: {
                                 className: "overflow-x-hidden",
@@ -215,10 +216,31 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             body={() => {
                                 return (
                                     <div className='flex gap-3 align-items-center'>
-                                        <i className='icon adms-edit-item cursor-pointer export-web__icon' />
-                                        <i className='pi pi-angle-down' />
+                                        <Button
+                                            type='button'
+                                            icon='icon adms-edit-item'
+                                            tooltip='Edit'
+                                            tooltipOptions={{ position: "mouse" }}
+                                            className='purchase-expenses__table-button purchase-expenses__table-button--success p-button-text'
+                                            onClick={() => {}}
+                                        />
+                                        <Button
+                                            type='button'
+                                            icon='pi pi-angle-down'
+                                            tooltip='Edit'
+                                            tooltipOptions={{ position: "mouse" }}
+                                            className='purchase-expenses__table-button p-button-text'
+                                            onClick={() => {}}
+                                        />
                                     </div>
                                 );
+                            }}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "60px",
+                                    },
+                                },
                             }}
                         />
                         {renderColumnsData.map(({ field, header }) => (
@@ -231,10 +253,19 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
                             />
                         ))}
-                        <Column style={{ flex: "0 0 4rem" }} body={deleteTemplate}></Column>
+                        <Column
+                            body={deleteTemplate}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "20px",
+                                    },
+                                },
+                            }}
+                        ></Column>
                     </DataTable>
                 </div>
-                <div className='col-12 total-sum'>
+                <div className='col-12 total-sum flex justify-content-end '>
                     <span className='total-sum__label'>Total expenses:</span>
                     <span className='total-sum__value'> {expenseTotal}</span>
                 </div>
