@@ -15,7 +15,7 @@ import {
 import { useFormik } from "formik";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { VehicleDecodeInfo, inventoryDecodeVIN } from "http/services/vin-decoder.service";
+import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { Checkbox } from "primereact/checkbox";
 import { Audit, Inventory, InventoryLocations } from "common/models/inventory";
 import { InputNumber } from "primereact/inputnumber";
@@ -45,6 +45,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
     const [groupClassList, setGroupClassList] = useState<UserGroup[]>([]);
     const [locationList, setLocationList] = useState<InventoryLocations[]>([]);
+    const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -123,7 +124,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     };
 
     const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
-        if (vinInfo && inventory.GroupClassName !== "equipment") {
+        if (vinInfo && inventory.GroupClassName !== "equipment" && allowOverwrite) {
             changeInventory({ key: "Make", value: vinInfo.Make });
             changeInventory({ key: "Model", value: vinInfo.Model });
             changeInventory({ key: "Year", value: vinInfo.Year });
@@ -234,6 +235,19 @@ export const VehicleGeneral = observer((): ReactElement => {
 
             <div className='col-12'>
                 <hr className='form-line' />
+            </div>
+
+            <div className='col-12'>
+                <div className='vehicle-general-overwrite pb-3'>
+                    <Checkbox
+                        checked={allowOverwrite}
+                        id='vehicle-general-overwrite'
+                        className='vehicle-general-overwrite__checkbox'
+                        onChange={() => setAllowOverwrite(!allowOverwrite)}
+                    />
+                    <label className='pl-3 vehicle-general-overwrite__label'>Overwrite data</label>
+                    <i className='icon adms-help vehicle-general-overwrite__icon' />
+                </div>
             </div>
 
             <div className='col-6 relative'>
