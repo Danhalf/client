@@ -104,6 +104,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
             <Button
                 type='button'
                 icon='icon adms-trash-can'
+                tooltip='Delete'
+                tooltipOptions={{ position: "mouse" }}
                 className='purchase-expenses__delete-button p-button-text'
                 onClick={() => {
                     setCurrentExpenseUid(itemuid);
@@ -202,6 +204,9 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         pt={{
                             wrapper: {
                                 className: "overflow-x-hidden",
+                                style: {
+                                    height: "249px",
+                                },
                             },
                         }}
                     >
