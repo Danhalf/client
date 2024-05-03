@@ -26,6 +26,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { getKeyValue } from "services/local-storage.service";
 import { getUserGroupActiveList } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
+import { VINDecoder } from "dashboard/common/form/vin-decoder";
 
 //TODO: add validation
 const VIN_VALID_LENGTH = 17;
@@ -242,20 +243,7 @@ export const VehicleGeneral = observer((): ReactElement => {
             </div>
 
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        {...formik.getFieldProps("VIN")}
-                        className={`vehicle-general__text-input w-full ${
-                            formik.touched.VIN && formik.errors.VIN && "p-invalid"
-                        }`}
-                        value={formik.values.VIN}
-                        onChange={({ target: { value } }) => {
-                            formik.setFieldValue("VIN", value);
-                            handleVINchange(value);
-                        }}
-                    />
-                    <label className='float-label'>VIN (required)</label>
-                </span>
+                <VINDecoder vin={formik.values.VIN || ""} />
                 <small className='p-error'>{(formik.touched.VIN && formik.errors.VIN) || ""}</small>
             </div>
 
