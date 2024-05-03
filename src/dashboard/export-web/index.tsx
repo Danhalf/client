@@ -423,15 +423,6 @@ export const ExportToWeb = () => {
                             filteredItem[column.data] = item[column.data as keyof typeof item];
                             filteredItem["itemuid"] = item["itemuid"];
                             selectedServices.forEach((serviceItem) => {
-                                // activeColumns.forEach(({ field }) => {
-                                //     // eslint-disable-next-line no-console
-                                //     console.log(
-                                //         field === serviceItem.field && field,
-                                //         " - ",
-                                //         serviceItem.field
-                                //     );
-                                // });
-
                                 if (
                                     serviceItem.selected[index] &&
                                     activeColumns.some(({ field }) => field === serviceItem.field)
