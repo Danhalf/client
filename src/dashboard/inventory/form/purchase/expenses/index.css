@@ -24,8 +24,8 @@
 }
 
 .purchase-expenses__delete-button.p-button-icon-only {
-    width: 30px;
-    height: 30px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     color: var(--admss-app-light-grey);
     border: none;

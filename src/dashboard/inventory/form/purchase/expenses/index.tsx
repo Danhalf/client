@@ -194,7 +194,6 @@ export const PurchaseExpenses = observer((): ReactElement => {
             <div className='grid'>
                 <div className='col-12'>
                     <DataTable
-                        showGridlines
                         className='mt-6 purchase-expenses__table'
                         value={expensesList}
                         emptyMessage='No expenses yet.'
@@ -221,10 +220,10 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             <Column
                                 field={field}
                                 header={header}
+                                alignHeader={"left"}
                                 key={field}
                                 headerClassName='cursor-move'
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
-                                pt={{}}
                             />
                         ))}
                         <Column style={{ flex: "0 0 4rem" }} body={deleteTemplate}></Column>
