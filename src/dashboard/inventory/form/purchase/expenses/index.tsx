@@ -236,7 +236,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={(options) => {
+                            body={(options, { expander }) => {
                                 return (
                                     <div className='flex gap-3 align-items-center'>
                                         <Button
@@ -244,7 +244,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                             icon='icon adms-edit-item'
                                             tooltip='Edit'
                                             tooltipOptions={{ position: "mouse" }}
-                                            className='purchase-expenses__table-button purchase-expenses__table-button--success p-button-text'
+                                            className={`purchase-expenses__table-button purchase-expenses__table-button--success p-button-text`}
                                             onClick={() => {}}
                                         />
                                         <Button
@@ -252,7 +252,11 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                             icon='pi pi-angle-down'
                                             tooltip='Edit'
                                             tooltipOptions={{ position: "mouse" }}
-                                            className='purchase-expenses__table-button p-button-text'
+                                            className={`purchase-expenses__table-button p-button-text ${
+                                                expandedRows.some((item) => {
+                                                    return item === options;
+                                                }) && "table-button-active"
+                                            }`}
                                             onClick={() => handleRowExpansionClick(options)}
                                         />
                                     </div>
