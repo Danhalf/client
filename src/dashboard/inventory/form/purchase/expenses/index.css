@@ -75,3 +75,13 @@
 .total-sum__label {
     color: var(--admss-app-main-blue);
 }
+
+.purchase-expenses__table .expanded-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-left: 82px;
+}
+.purchase-expenses__table .expanded-row__label {
+    font-weight: 700;
+}
