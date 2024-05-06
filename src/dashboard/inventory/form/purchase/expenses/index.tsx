@@ -120,9 +120,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
         return (
             <div className='expanded-row'>
                 <div className='expanded-row__label'>Notes: </div>
-                <div className='expanded-row__text'>
-                    Call Michael and ask him to send the missing documents to complete the deal.
-                </div>
+                <div className='expanded-row__text'>{data.comment}</div>
             </div>
         );
     };
