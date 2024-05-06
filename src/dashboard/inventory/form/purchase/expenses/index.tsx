@@ -84,7 +84,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
         }
     }, [getExpenses, user]);
 
-    const handleExpenseSubmit = () => {
+    const handleExpenseSubmit = (itemuid?: string) => {
         const expenseData: Partial<Expenses> & { inventoryuid: string } = {
             inventoryuid: id ? id : "",
             operationdate: expenseDate,
@@ -93,7 +93,17 @@ export const PurchaseExpenses = observer((): ReactElement => {
             vendor: expenseVendor,
             comment: expenseNotes,
         };
-        setExpensesItem({ expenseuid: "0", expenseData }).then(() => getExpenses());
+        if (currentExpenseUid) {
+            // expenseData.itemuid = currentExpenseUid;
+        }
+
+        setExpensesItem({ expenseuid: itemuid || "0", expenseData }).then(() => {
+            setExpenseNotes("");
+            setExpenseAmount(0);
+            setExpenseVendor("");
+            setCurrentExpenseUid("");
+            getExpenses();
+        });
     };
 
     const handleDeleteExpenses = () => {
@@ -114,6 +124,18 @@ export const PurchaseExpenses = observer((): ReactElement => {
                 }}
             />
         );
+    };
+
+    const handleEditExpenses = ({ itemuid }: Expenses) => {
+        const expenseItem = expensesList.find((expense) => expense.itemuid === itemuid);
+        if (expenseItem) {
+            setExpenseDate(expenseItem.operationdate);
+            setExpenseType(expenseItem.type);
+            setExpenseAmount(expenseItem.amount / 100);
+            setExpenseVendor(expenseItem.vendor);
+            setExpenseNotes(expenseItem.comment);
+            setCurrentExpenseUid(itemuid);
+        }
     };
 
     const rowExpansionTemplate = (data: Expenses) => {
@@ -207,8 +229,11 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     </span>
                 </div>
 
-                <Button className='purchase-expenses__button' onClick={handleExpenseSubmit}>
-                    Save
+                <Button
+                    className='purchase-expenses__button'
+                    onClick={() => handleExpenseSubmit(currentExpenseUid)}
+                >
+                    {currentExpenseUid ? "Update" : "Save"}
                 </Button>
             </div>
             <div className='grid'>
@@ -235,8 +260,6 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             body={(options) => {
-                                // eslint-disable-next-line no-console
-                                console.log(options);
                                 return (
                                     <div className='flex gap-3 align-items-center'>
                                         <Button
@@ -245,12 +268,12 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                             tooltip='Edit'
                                             tooltipOptions={{ position: "mouse" }}
                                             className={`purchase-expenses__table-button purchase-expenses__table-button--success p-button-text`}
-                                            onClick={() => {}}
+                                            onClick={() => handleEditExpenses(options)}
                                         />
                                         <Button
                                             type='button'
                                             icon='pi pi-angle-down'
-                                            tooltip='Edit'
+                                            tooltip='Show commentary'
                                             disabled={!options?.comment}
                                             tooltipOptions={{ position: "mouse" }}
                                             className={`purchase-expenses__table-button p-button-text ${
