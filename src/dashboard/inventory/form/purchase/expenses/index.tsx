@@ -84,6 +84,16 @@ export const PurchaseExpenses = observer((): ReactElement => {
         }
     }, [getExpenses, user]);
 
+    const handleClearExpense = () => {
+        setCurrentExpenseUid("");
+        setExpenseDate("");
+        setExpenseType(0);
+        setExpenseAmount(0);
+        setExpenseNotBillable(false);
+        setExpenseVendor("");
+        setExpenseNotes("");
+    };
+
     const handleExpenseSubmit = (itemuid?: string) => {
         const expenseData: Partial<Expenses> & { inventoryuid: string } = {
             inventoryuid: id ? id : "",
@@ -98,10 +108,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
         }
 
         setExpensesItem({ expenseuid: itemuid || "0", expenseData }).then(() => {
-            setExpenseNotes("");
-            setExpenseAmount(0);
-            setExpenseVendor("");
-            setCurrentExpenseUid("");
+            handleClearExpense();
             getExpenses();
         });
     };
@@ -228,13 +235,23 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <label className='float-label'>Notes</label>
                     </span>
                 </div>
-
-                <Button
-                    className='purchase-expenses__button'
-                    onClick={() => handleExpenseSubmit(currentExpenseUid)}
-                >
-                    {currentExpenseUid ? "Update" : "Save"}
-                </Button>
+                <div className='purchase-expenses-controls'>
+                    {currentExpenseUid && (
+                        <Button
+                            className='purchase-expenses-controls__button'
+                            onClick={() => handleClearExpense()}
+                            outlined
+                        >
+                            Cancel
+                        </Button>
+                    )}
+                    <Button
+                        className='purchase-expenses-controls__button'
+                        onClick={() => handleExpenseSubmit(currentExpenseUid)}
+                    >
+                        {currentExpenseUid ? "Update" : "Save"}
+                    </Button>
+                </div>
             </div>
             <div className='grid'>
                 <div className='col-12'>
