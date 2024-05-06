@@ -1,5 +1,5 @@
 import { BorderedCheckbox, CurrencyInput, DateInput } from "dashboard/common/form/inputs";
-import { ReactElement, useCallback, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import "./index.css";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
@@ -41,6 +41,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const [currentExpenseUid, setCurrentExpenseUid] = useState<string>("");
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const [expandedRows, setExpandedRows] = useState<any[]>([]);
+    // const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
     const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
         { field: "operationdate", header: "Date" },
@@ -67,6 +68,28 @@ export const PurchaseExpenses = observer((): ReactElement => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         setUser(authUser);
     }, []);
+
+    const handleCompareData = useMemo(() => {
+        const currentExpense = expensesList.find((item) => item.itemuid === currentExpenseUid);
+        if (currentExpense) {
+            const isDataChanged =
+                currentExpense.operationdate !== expenseDate ||
+                currentExpense.type !== expenseType ||
+                currentExpense.amount !== expenseAmount ||
+                currentExpense.vendor !== expenseVendor ||
+                currentExpense.comment !== expenseNotes;
+            return !isDataChanged;
+        }
+        return false;
+    }, [
+        currentExpenseUid,
+        expenseAmount,
+        expenseDate,
+        expenseNotes,
+        expenseType,
+        expenseVendor,
+        expensesList,
+    ]);
 
     useEffect(() => {
         getExpenses();
@@ -247,6 +270,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     )}
                     <Button
                         className='purchase-expenses-controls__button'
+                        disabled={handleCompareData}
+                        severity={handleCompareData ? "secondary" : "success"}
                         onClick={() => handleExpenseSubmit(currentExpenseUid)}
                     >
                         {currentExpenseUid ? "Update" : "Save"}
