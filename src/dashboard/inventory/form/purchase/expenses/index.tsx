@@ -235,8 +235,6 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             body={(options) => {
-                                // eslint-disable-next-line no-console
-                                console.log(options);
                                 return (
                                     <div className='flex gap-3 align-items-center'>
                                         <Button
