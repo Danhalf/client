@@ -545,7 +545,7 @@ export default function Inventories(): ReactElement {
                                     command: () => setCurrentLocation(location),
                                 }))}
                                 rounded
-                                menuStyle={{ transform: "translateX(150px)" }}
+                                menuStyle={{ transform: "translateX(164px)" }}
                                 pt={{
                                     menu: {
                                         className: "inventory-location__menu",
