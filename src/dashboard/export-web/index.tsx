@@ -441,7 +441,9 @@ export const ExportToWeb = () => {
                         }
                     }
                 });
-                return reportService.length ? { ...filteredItem, services: reportService } : null;
+                return reportService.length
+                    ? { ...filteredItem, services: reportService }
+                    : filteredItem;
             })
             .filter(Boolean);
         const JSONreport = !!data.length && {
