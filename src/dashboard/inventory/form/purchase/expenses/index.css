@@ -30,9 +30,12 @@
     height: 22px;
     font-size: 18px;
     border-radius: 50%;
-    color: var(--admss-app-light-grey);
+    color: var(--admss-app-medium-grey);
     border: none;
     background: transparent;
+}
+.purchase-expenses__table-button.p-button-icon-only:disabled {
+    color: var(--admss-app-light-grey);
 }
 
 .purchase-expenses__table-button--success.p-button-icon-only {

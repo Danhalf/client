@@ -234,7 +234,9 @@ export const PurchaseExpenses = observer((): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={(options, { expander }) => {
+                            body={(options) => {
+                                // eslint-disable-next-line no-console
+                                console.log(options);
                                 return (
                                     <div className='flex gap-3 align-items-center'>
                                         <Button
@@ -249,6 +251,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                             type='button'
                                             icon='pi pi-angle-down'
                                             tooltip='Edit'
+                                            disabled={!options?.comment}
                                             tooltipOptions={{ position: "mouse" }}
                                             className={`purchase-expenses__table-button p-button-text ${
                                                 expandedRows.some((item) => {
