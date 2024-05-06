@@ -101,3 +101,7 @@
     color: var(--admss-app-primary);
     transform: rotate(180deg);
 }
+
+.purchase-expenses__dropdown {
+    height: 50px;
+}

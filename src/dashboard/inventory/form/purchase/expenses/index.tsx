@@ -207,7 +207,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 options={expensesTypeList}
                                 value={expenseType}
                                 onChange={({ value }) => value && setExpenseType(Number(value))}
-                                className='w-full'
+                                className='w-full purchase-expenses__dropdown'
                             />
 
                             <label className='float-label'>Type</label>
@@ -222,7 +222,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 options={expensesVendorList}
                                 value={expenseVendor}
                                 onChange={({ value }) => value && setExpenseVendor(String(value))}
-                                className='w-full'
+                                className='w-full purchase-expenses__dropdown'
                             />
 
                             <label className='float-label'>Vendor</label>
