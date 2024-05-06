@@ -531,9 +531,11 @@ export default function Inventories(): ReactElement {
     return (
         <div className='grid'>
             <div className='col-12'>
-                <div className='card'>
+                <div className='card inventory'>
                     <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Inventory</h2>
+                        <h2 className='card-header__title inventory__title uppercase m-0'>
+                            Inventory
+                        </h2>
                         {locations.length > 0 && (
                             <SplitButton
                                 label={currentLocation?.locName || "Select Location"}
@@ -544,6 +546,11 @@ export default function Inventories(): ReactElement {
                                 }))}
                                 rounded
                                 menuStyle={{ transform: "translateX(150px)" }}
+                                pt={{
+                                    menu: {
+                                        className: "inventory-location__menu",
+                                    },
+                                }}
                             />
                         )}
                     </div>
