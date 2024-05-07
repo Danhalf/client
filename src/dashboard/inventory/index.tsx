@@ -148,6 +148,21 @@ export default function Inventories(): ReactElement {
             qry += createStringifyFilterQuery(selectedFilterOptions);
         }
 
+        if (selectedInventoryType.length) {
+            if (
+                globalSearch.length ||
+                Object.values(advancedSearch).length ||
+                selectedFilterOptions
+            )
+                qry += "+";
+            selectedInventoryType.forEach(
+                (type, index) =>
+                    (qry += `${type}.GroupClassName${
+                        index !== selectedInventoryType.length - 1 ? "+" : ""
+                    }`)
+            );
+        }
+
         const params: QueryParams = {
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
@@ -160,7 +175,7 @@ export default function Inventories(): ReactElement {
         handleGetInventoryList(params, true);
         setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lazyState, globalSearch, authUser, selectedFilterOptions]);
+    }, [lazyState, globalSearch, authUser, selectedFilterOptions, selectedInventoryType]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -192,6 +207,9 @@ export default function Inventories(): ReactElement {
                         });
                     if (settings?.selectedFilterOptions) {
                         setSelectedFilterOptions(settings.selectedFilterOptions);
+                    }
+                    if (settings?.selectedInventoryType) {
+                        setSelectedInventoryType(settings.selectedInventoryType);
                     }
                 }
             });
@@ -410,8 +428,18 @@ export default function Inventories(): ReactElement {
                             setSelectedInventoryType(
                                 inventoryType.map(({ description }) => description)
                             );
+                            changeSettings({
+                                ...serverSettings,
+                                selectedInventoryType: inventoryType.map(
+                                    ({ description }) => description
+                                ),
+                            });
                         } else {
                             setSelectedInventoryType([]);
+                            changeSettings({
+                                ...serverSettings,
+                                selectedInventoryType: [],
+                            });
                         }
                     }}
                     className='dropdown-header__checkbox mr-2'
@@ -422,6 +450,10 @@ export default function Inventories(): ReactElement {
                 className='p-multiselect-close p-link'
                 onClick={() => {
                     setSelectedInventoryType([]);
+                    changeSettings({
+                        ...serverSettings,
+                        selectedInventoryType: [],
+                    });
                 }}
             >
                 <i className='pi pi-times' />
@@ -521,6 +553,10 @@ export default function Inventories(): ReactElement {
                     value={selectedInventoryType}
                     onChange={({ value }: MultiSelectChangeEvent) => {
                         setSelectedInventoryType(value);
+                        changeSettings({
+                            ...serverSettings,
+                            selectedInventoryType: value,
+                        });
                     }}
                     placeholder='Inventory Type'
                     className='w-full pb-0 h-full flex align-items-center inventory-filter'
