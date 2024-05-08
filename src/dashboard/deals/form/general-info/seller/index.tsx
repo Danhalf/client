@@ -1,17 +1,17 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement, useState } from "react";
+import { ReactElement } from "react";
 import "./index.css";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
+import { ContactTypeNameList } from "common/models/contact";
 
 export const DealGeneralSeller = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
-        deal: { salesperson1uid, salesperson2uid },
+        deal: { salesperson1uid, salesperson2uid, differentSeller, differentSellerUID },
         changeDeal,
     } = store;
-    const [checked, setChecked] = useState<boolean>(false);
     return (
         <div className='grid deal-general-seller row-gap-2'>
             <div className='col-6'>
@@ -49,14 +49,29 @@ export const DealGeneralSeller = observer((): ReactElement => {
 
             <div className='col-3'>
                 <BorderedCheckbox
-                    checked={checked}
-                    onChange={() => setChecked(!checked)}
+                    checked={!!differentSeller}
+                    onChange={() =>
+                        changeDeal({ key: "differentSeller", value: !differentSeller ? 1 : 0 })
+                    }
                     name='Different seller'
                 />
             </div>
-            {checked && (
+            {!!differentSeller && (
                 <div className='col-6'>
-                    <CompanySearch name='Seller' />
+                    <CompanySearch
+                        name='Seller'
+                        value={differentSellerUID}
+                        onChange={({ target: { value } }) =>
+                            changeDeal({ key: "differentSellerUID", value })
+                        }
+                        onRowClick={(value) =>
+                            changeDeal({
+                                key: "differentSellerUID",
+                                value,
+                            })
+                        }
+                        contactCategory={ContactTypeNameList.DEALERS}
+                    />
                 </div>
             )}
         </div>

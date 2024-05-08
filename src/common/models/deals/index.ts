@@ -1,7 +1,9 @@
 import { TypeList } from "..";
 
 export interface Deal {
+    accountInfo: string;
     accountuid: string;
+    addToInventory: number;
     contactinfo: string;
     contactuid: string;
     created: string;
@@ -9,6 +11,9 @@ export interface Deal {
     datepurchase: string;
     dealstatus: number;
     dealtype: number;
+    differentSeller: 0 | 1;
+    differentSellerInfo: string;
+    differentSellerUID: string;
     extdata: DealExtData;
     inventoryinfo: string;
     inventorystatus: number;
@@ -22,6 +27,7 @@ export interface Deal {
     status: string;
     updated: string;
     useruid: string;
+    warnOverdueDays: number;
 }
 
 export interface IndexedDealList extends TypeList {
@@ -218,6 +224,7 @@ export interface DealExtData {
     Warranty_Miles: string;
     Warranty_Name: string;
     Warranty_Notes: string;
+    Warranty_Price: number;
     Warranty_Term: string;
     created: number;
     dealUID: string;
