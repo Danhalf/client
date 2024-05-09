@@ -14,7 +14,11 @@ import { InputText } from "primereact/inputtext";
 import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
-import { getExportToWebList } from "http/services/export-to-web.service";
+import {
+    addExportTask,
+    addExportTaskToSchedule,
+    getExportToWebList,
+} from "http/services/export-to-web.service";
 import { ExportWebList } from "common/models/export-web";
 import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
@@ -407,7 +411,7 @@ export const ExportToWeb = () => {
         );
     };
 
-    const handleExport = () => {
+    const handleExport = (schedule?: boolean) => {
         const columns: ReportsColumn[] = activeColumns.map((column) => ({
             name: column.header as string,
             data: column.field,
@@ -450,10 +454,14 @@ export const ExportToWeb = () => {
             data,
             columns,
         };
-        // eslint-disable-next-line no-console
-        console.log(JSONreport);
-        // eslint-disable-next-line no-console
-        console.log(JSON.stringify(JSONreport));
+
+        if (JSONreport && authUser) {
+            if (schedule) {
+                addExportTaskToSchedule(authUser.useruid, JSONreport);
+            } else {
+                addExportTask(authUser?.useruid, JSONreport);
+            }
+        }
     };
 
     const allowedEditableFields: Partial<keyof ExportWebList>[] = [
@@ -476,7 +484,8 @@ export const ExportToWeb = () => {
                                     className='export-web-controls__button px-6 uppercase'
                                     severity='success'
                                     type='button'
-                                    onClick={handleExport}
+                                    disabled={selectedInventories.filter(Boolean).length === 0}
+                                    onClick={() => handleExport()}
                                 >
                                     Export now
                                 </Button>
@@ -484,6 +493,8 @@ export const ExportToWeb = () => {
                                     className='export-web-controls__button px-6 uppercase'
                                     severity='success'
                                     type='button'
+                                    disabled={selectedInventories.filter(Boolean).length === 0}
+                                    onClick={() => handleExport(true)}
                                 >
                                     SCHEDULE
                                 </Button>
