@@ -138,7 +138,7 @@ export interface DealExtData {
     OdomNotActual: number;
     OdometerReading: string;
     Plate_Issue_Date: number;
-    Plate_Issued: number;
+    Plate_Issued: 0 | 1;
     Plate_Number: string;
     Plate_Transferred: number;
     Policy_Number: string;
