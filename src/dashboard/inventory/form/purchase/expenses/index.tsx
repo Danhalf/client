@@ -146,7 +146,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                 type='button'
                 icon='icon adms-trash-can'
                 tooltip='Delete'
-                tooltipOptions={{ position: "mouse" }}
+                tooltipOptions={{ showDelay: 300 }}
                 className='purchase-expenses__delete-button p-button-text'
                 onClick={() => {
                     setCurrentExpenseUid(itemuid);
@@ -302,26 +302,31 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             body={(options) => {
+                                const isRowExpanded = expandedRows.some((item) => {
+                                    return item === options;
+                                });
                                 return (
                                     <div className='flex gap-3 align-items-center'>
                                         <Button
                                             type='button'
                                             icon='icon adms-edit-item'
                                             tooltip='Edit'
-                                            tooltipOptions={{ position: "mouse" }}
+                                            tooltipOptions={{ showDelay: 300 }}
                                             className={`purchase-expenses__table-button purchase-expenses__table-button--success p-button-text`}
                                             onClick={() => handleEditExpenses(options)}
                                         />
                                         <Button
                                             type='button'
                                             icon='pi pi-angle-down'
-                                            tooltip='Show commentary'
+                                            tooltip={
+                                                isRowExpanded
+                                                    ? "Hide commentary"
+                                                    : "Show commentary"
+                                            }
+                                            tooltipOptions={{ showDelay: 300 }}
                                             disabled={!options?.comment}
-                                            tooltipOptions={{ position: "mouse" }}
                                             className={`purchase-expenses__table-button p-button-text ${
-                                                expandedRows.some((item) => {
-                                                    return item === options;
-                                                }) && "table-button-active"
+                                                isRowExpanded && "table-button-active"
                                             }`}
                                             onClick={() => handleRowExpansionClick(options)}
                                         />
