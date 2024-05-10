@@ -50,7 +50,7 @@ const DEALS_OTHER_LIST: DealsFilterOptions[] = [
     { name: "All incomplete", value: "0.DealComplete" },
     { name: "Dead or Deleted", value: "6.DealStatus" },
     { name: "Manager's review", value: "1.managerReview" },
-    { name: "Deals not yet sent to RFC", value: "0.RFCSen" },
+    { name: "Deals not yet sent to RFC", value: "0.RFCSent" },
 ];
 
 const DEALS_STATUS_LIST: DealsFilterOptions[] = [
