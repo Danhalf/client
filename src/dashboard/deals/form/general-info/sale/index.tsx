@@ -21,7 +21,6 @@ export const DealGeneralSale = observer((): ReactElement => {
             dealtype,
             dealstatus,
             saletype,
-            inventoryinfo,
             inventoryuid,
             datepurchase,
             dateeffective,
