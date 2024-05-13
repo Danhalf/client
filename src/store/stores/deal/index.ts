@@ -1,5 +1,11 @@
-import { Deal, DealExtData, DealFinance } from "common/models/deals";
-import { getDealFinance, getDealInfo, setDeal, setDealFinance } from "http/services/deals.service";
+import { Deal, DealExtData, DealFinance, DealPrintForm } from "common/models/deals";
+import {
+    getDealFinance,
+    getDealInfo,
+    getDealPrintForms,
+    setDeal,
+    setDealFinance,
+} from "http/services/deals.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 
@@ -11,6 +17,7 @@ export class DealStore {
     private _dealExtData: DealExtData = {} as DealExtData;
     private _dealFinances: DealFinance = {} as DealFinance;
     private _dealID: string = "";
+    private _printList: DealPrintForm[] = [];
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -27,6 +34,10 @@ export class DealStore {
 
     public get dealFinances() {
         return this._dealFinances;
+    }
+
+    public get printList() {
+        return this._printList;
     }
 
     public get isLoading() {
@@ -112,10 +123,25 @@ export class DealStore {
         }
     });
 
+    public getPrintList = action(async (dealuid = this._dealID) => {
+        try {
+            this._isLoading = true;
+            const response = await getDealPrintForms(dealuid);
+            if (response) {
+                this._printList = response;
+            }
+        } catch (error) {
+            // TODO: add error handler
+        } finally {
+            this._isLoading = false;
+        }
+    });
+
     public clearDeal = () => {
         this._deal = {} as DealItem;
         this._dealID = "";
         this._dealExtData = {} as DealExtData;
         this._dealFinances = {} as DealFinance;
+        this._printList = [] as DealPrintForm[];
     };
 }

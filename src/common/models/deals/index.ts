@@ -1,4 +1,4 @@
-import { TypeList } from "..";
+import { PrintForm, TypeList } from "..";
 
 export interface Deal {
     accountInfo: string;
@@ -384,3 +384,5 @@ export interface DealFinance {
     updated: number;
     userUID: string;
 }
+
+export interface DealPrintForm extends PrintForm {}
