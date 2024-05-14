@@ -28,6 +28,23 @@ export const SettingsInventoryGroups = (): ReactElement => {
         }
     }, []);
 
+    const moveItem = (item: Partial<UserGroup>, direction: "up" | "down") => {
+        const currentItemIndex = inventorySettings.find(({ itemuid }) => itemuid === item.itemuid);
+
+        if (currentItemIndex) {
+            const order =
+                direction === "up" ? currentItemIndex.order! - 1 : currentItemIndex.order! + 1;
+            addUserGroupList(getKeyValue(LS_APP_USER).useruid, { ...currentItemIndex, order }).then(
+                () => {
+                    getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
+                        list && setInventorySettings(list);
+                        setIsLoading(false);
+                    });
+                }
+            );
+        }
+    };
+
     return (
         <div className='settings-form'>
             {isLoading && <Loader overlay />}
@@ -87,7 +104,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                         <div className='col-3 flex align-items-center p-0'>Actions</div>
                     </div>
                     <div className='settings-inventory__body grid'>
-                        {inventorySettings.map((item) => (
+                        {inventorySettings.map((item, index) => (
                             <div key={item.itemuid} className='settings-inventory__row grid col-12'>
                                 <div className='col-1 group-order'>
                                     <Button
@@ -96,7 +113,9 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                         text
                                         severity='success'
                                         tooltip='Move up'
-                                        className='group-order__button'
+                                        className='p-button-text group-order__button'
+                                        onClick={() => moveItem(item, "up")}
+                                        disabled={index === 0}
                                     />
                                     <Button
                                         icon='pi pi-arrow-circle-down'
@@ -104,7 +123,9 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                         text
                                         severity='success'
                                         tooltip='Move down'
-                                        className='group-order__button'
+                                        className='p-button-text group-order__button'
+                                        onClick={() => moveItem(item, "down")}
+                                        disabled={index === inventorySettings.length - 1}
                                     />
                                 </div>
                                 <div className='col-1 flex justify-content-center align-items-center'>
@@ -177,6 +198,16 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                     )}
                                 </div>
                                 <div className='col-3 flex align-items-center column-gap-3'>
+                                    <Button
+                                        className='p-button'
+                                        icon='pi pi-star'
+                                        outlined
+                                        severity={
+                                            inventorySettings[0].itemuid === item.itemuid
+                                                ? "secondary"
+                                                : "success"
+                                        }
+                                    />
                                     <Button
                                         className='p-button'
                                         outlined
