@@ -56,6 +56,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
             <div className='grid settings-inventory p-2'>
                 <div className='col-12'>
                     <div className='settings-inventory__header grid'>
+                        <div className='col-1'></div>
                         <div className='col-1 flex justify-content-center align-items-center'>
                             <Checkbox
                                 checked={inventorySettings.every((item) => item.enabled)}
@@ -82,15 +83,34 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                 }}
                             />
                         </div>
-                        <div className='col-9 flex align-items-center'>Group</div>
-                        <div className='col-2 flex align-items-center p-0 '>Actions</div>
+                        <div className='col-7 flex align-items-center'>Group</div>
+                        <div className='col-3 flex align-items-center p-0'>Actions</div>
                     </div>
                     <div className='settings-inventory__body grid'>
                         {inventorySettings.map((item) => (
                             <div key={item.itemuid} className='settings-inventory__row grid col-12'>
+                                <div className='col-1 group-order'>
+                                    <Button
+                                        icon='pi pi-arrow-circle-up'
+                                        rounded
+                                        text
+                                        severity='success'
+                                        tooltip='Move up'
+                                        className='group-order__button'
+                                    />
+                                    <Button
+                                        icon='pi pi-arrow-circle-down'
+                                        rounded
+                                        text
+                                        severity='success'
+                                        tooltip='Move down'
+                                        className='group-order__button'
+                                    />
+                                </div>
                                 <div className='col-1 flex justify-content-center align-items-center'>
                                     <Checkbox
                                         checked={!!item.enabled}
+                                        tooltip='Select visible inventory groups'
                                         disabled={inventorySettings[0].itemuid === item.itemuid}
                                         onClick={() => {
                                             if (inventorySettings[0].itemuid === item.itemuid)
@@ -111,7 +131,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                         }}
                                     />
                                 </div>
-                                <div className='col-9 flex align-items-center'>
+                                <div className='col-7 flex align-items-center'>
                                     {editedItem.itemuid === item.itemuid ? (
                                         <div className='flex row-edit'>
                                             <InputText
@@ -156,7 +176,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                         item.description
                                     )}
                                 </div>
-                                <div className='col-2 flex align-items-center column-gap-3'>
+                                <div className='col-3 flex align-items-center column-gap-3'>
                                     <Button
                                         className='p-button'
                                         outlined

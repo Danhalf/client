@@ -44,3 +44,13 @@
 .settings-inventory__delete.p-button.p-button-danger {
     color: var(--admss-app-red);
 }
+
+.group-order {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-form .group-order__button {
+    padding: 0;
+}
