@@ -648,7 +648,13 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                 model={[
                                     {
                                         label: "Any Location",
-                                        command: () => setCurrentLocation({} as InventoryLocations),
+                                        command: () => {
+                                            setCurrentLocation({} as InventoryLocations);
+                                            changeSettings({
+                                                ...serverSettings,
+                                                currentLocation: "",
+                                            });
+                                        },
                                     },
                                     ...locations.map((location) => ({
                                         label: location.locName,
