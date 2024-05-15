@@ -28,20 +28,26 @@ export const SettingsInventoryGroups = (): ReactElement => {
         }
     }, []);
 
-    const moveItem = (item: Partial<UserGroup>, direction: "up" | "down") => {
-        const currentItemIndex = inventorySettings.find(({ itemuid }) => itemuid === item.itemuid);
-
-        if (currentItemIndex) {
-            const order =
-                direction === "up" ? currentItemIndex.order! - 1 : currentItemIndex.order! + 1;
-            addUserGroupList(getKeyValue(LS_APP_USER).useruid, { ...currentItemIndex, order }).then(
-                () => {
+    const moveItem = (
+        currentItem: UserGroup,
+        replacedItem: UserGroup,
+        direction: "up" | "down"
+    ) => {
+        if (currentItem) {
+            const order = direction === "up" ? --currentItem.order : ++currentItem.order;
+            const replacedItemOrder =
+                direction === "up" ? ++replacedItem.order : --replacedItem.order;
+            [currentItem, replacedItem].forEach((item, index) => {
+                addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+                    ...item,
+                    order: index === 0 ? order : replacedItemOrder,
+                }).then(() => {
                     getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
                         list && setInventorySettings(list);
                         setIsLoading(false);
                     });
-                }
-            );
+                });
+            });
         }
     };
 
@@ -104,7 +110,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                         <div className='col-3 flex align-items-center p-0'>Actions</div>
                     </div>
                     <div className='settings-inventory__body grid'>
-                        {inventorySettings.map((item, index) => (
+                        {inventorySettings.map((item, index, currentArray) => (
                             <div key={item.itemuid} className='settings-inventory__row grid col-12'>
                                 <div className='col-1 group-order'>
                                     <Button
@@ -114,7 +120,13 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                         severity='success'
                                         tooltip='Move up'
                                         className='p-button-text group-order__button'
-                                        onClick={() => moveItem(item, "up")}
+                                        onClick={() =>
+                                            moveItem(
+                                                item as UserGroup,
+                                                currentArray[index - 1] as UserGroup,
+                                                "up"
+                                            )
+                                        }
                                         disabled={index === 0}
                                     />
                                     <Button
@@ -124,7 +136,13 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                         severity='success'
                                         tooltip='Move down'
                                         className='p-button-text group-order__button'
-                                        onClick={() => moveItem(item, "down")}
+                                        onClick={() =>
+                                            moveItem(
+                                                item as UserGroup,
+                                                currentArray[index + 1] as UserGroup,
+                                                "down"
+                                            )
+                                        }
                                         disabled={index === inventorySettings.length - 1}
                                     />
                                 </div>
