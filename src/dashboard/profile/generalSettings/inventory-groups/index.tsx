@@ -28,24 +28,30 @@ export const SettingsInventoryGroups = (): ReactElement => {
         }
     }, []);
 
-    const moveItem = (
-        currentItem: UserGroup,
-        replacedItem: UserGroup,
-        direction: "up" | "down"
-    ) => {
+    const handleMoveItem = (currentItem: UserGroup, direction: "up" | "down") => {
         if (currentItem) {
             const order = direction === "up" ? --currentItem.order : ++currentItem.order;
-            const replacedItemOrder =
-                direction === "up" ? ++replacedItem.order : --replacedItem.order;
-            [currentItem, replacedItem].forEach((item, index) => {
-                addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
-                    ...item,
-                    order: index === 0 ? order : replacedItemOrder,
-                }).then(() => {
-                    getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
-                        list && setInventorySettings(list);
-                        setIsLoading(false);
-                    });
+            addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+                ...currentItem,
+                order,
+            }).then(() => {
+                getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
+                    list && setInventorySettings(list);
+                    setIsLoading(false);
+                });
+            });
+        }
+    };
+
+    const handleSetGroupDefault = (item: UserGroup) => {
+        if (item) {
+            addUserGroupList(getKeyValue(LS_APP_USER).useruid, {
+                ...item,
+                isdefault: !!item.isdefault ? 0 : 1,
+            }).then(() => {
+                getUserGroupList(getKeyValue(LS_APP_USER).useruid).then((list) => {
+                    list && setInventorySettings(list);
+                    setIsLoading(false);
                 });
             });
         }
@@ -110,7 +116,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                         <div className='col-3 flex align-items-center p-0'>Actions</div>
                     </div>
                     <div className='settings-inventory__body grid'>
-                        {inventorySettings.map((item, index, currentArray) => (
+                        {inventorySettings.map((item, index) => (
                             <div key={item.itemuid} className='settings-inventory__row grid col-12'>
                                 <div className='col-1 group-order'>
                                     <Button
@@ -120,13 +126,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                         severity='success'
                                         tooltip='Move up'
                                         className='p-button-text group-order__button'
-                                        onClick={() =>
-                                            moveItem(
-                                                item as UserGroup,
-                                                currentArray[index - 1] as UserGroup,
-                                                "up"
-                                            )
-                                        }
+                                        onClick={() => handleMoveItem(item as UserGroup, "up")}
                                         disabled={index === 0}
                                     />
                                     <Button
@@ -136,13 +136,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                         severity='success'
                                         tooltip='Move down'
                                         className='p-button-text group-order__button'
-                                        onClick={() =>
-                                            moveItem(
-                                                item as UserGroup,
-                                                currentArray[index + 1] as UserGroup,
-                                                "down"
-                                            )
-                                        }
+                                        onClick={() => handleMoveItem(item as UserGroup, "down")}
                                         disabled={index === inventorySettings.length - 1}
                                     />
                                 </div>
@@ -218,23 +212,14 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                 <div className='col-3 flex align-items-center column-gap-3'>
                                     <Button
                                         className='p-button'
-                                        icon='pi pi-star'
+                                        icon={`pi pi-star${!!item.isdefault ? "-fill" : ""}`}
                                         outlined
-                                        severity={
-                                            inventorySettings[0].itemuid === item.itemuid
-                                                ? "secondary"
-                                                : "success"
-                                        }
+                                        severity={!item.isdefault ? "secondary" : "success"}
+                                        onClick={() => handleSetGroupDefault(item as UserGroup)}
                                     />
                                     <Button
                                         className='p-button'
                                         outlined
-                                        disabled={inventorySettings[0].itemuid === item.itemuid}
-                                        severity={
-                                            inventorySettings[0].itemuid === item.itemuid
-                                                ? "secondary"
-                                                : "success"
-                                        }
                                         onClick={() => {
                                             editedItem.itemuid
                                                 ? setEditedItem({})
@@ -246,12 +231,8 @@ export const SettingsInventoryGroups = (): ReactElement => {
                                     <Button
                                         className='p-button settings-inventory__delete'
                                         outlined
-                                        disabled={inventorySettings[0].itemuid === item.itemuid}
-                                        severity={
-                                            inventorySettings[0].itemuid === item.itemuid
-                                                ? "secondary"
-                                                : "danger"
-                                        }
+                                        disabled={!!item.isdefault}
+                                        severity={!!item.isdefault ? "secondary" : "danger"}
                                         onClick={() => {
                                             setIsLoading(true);
                                             item.itemuid &&
