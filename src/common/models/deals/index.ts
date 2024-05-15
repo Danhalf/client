@@ -1,4 +1,5 @@
 import { PrintForm, TypeList } from "..";
+import { Status } from "../base-response";
 
 export interface Deal {
     accountInfo: string;
@@ -380,9 +381,14 @@ export interface DealFinance {
     deleted: number;
     index: number;
     itemUID: string;
-    status: string;
+    status: Status;
     updated: number;
     userUID: string;
 }
 
 export interface DealPrintForm extends PrintForm {}
+
+export interface DealPrintFormResponse {
+    status: Status;
+    "Spanish Form Pack": DealPrintForm[];
+}
