@@ -44,9 +44,13 @@ import {
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 
+interface InventoriesProps {
+    onRowClick?: (companyName: string) => void;
+}
+
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
-export default function Inventories(): ReactElement {
+export default function Inventories({ onRowClick }: InventoriesProps): ReactElement {
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -105,66 +109,6 @@ export default function Inventories(): ReactElement {
         setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeColumns]);
-
-    useEffect(() => {
-        setIsLoading(true);
-        if (selectedFilterOptions) {
-            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
-        }
-        let qry: string = "";
-
-        if (globalSearch) {
-            qry += globalSearch;
-        } else {
-            qry += createStringifySearchQuery(advancedSearch);
-        }
-
-        if (selectedFilterOptions) {
-            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
-            qry += createStringifyFilterQuery(selectedFilterOptions);
-        }
-
-        if (selectedInventoryType.length) {
-            if (
-                globalSearch.length ||
-                Object.values(advancedSearch).length ||
-                selectedFilterOptions
-            )
-                qry += "+";
-            selectedInventoryType.forEach(
-                (type, index) =>
-                    (qry += `${type}.GroupClass${
-                        index !== selectedInventoryType.length - 1 ? "+" : ""
-                    }`)
-            );
-        }
-
-        if (Object.values(currentLocation).some((value) => value.trim().length)) {
-            if (!!qry.length) qry += "+";
-            qry += `${currentLocation.locationuid}.locationuid`;
-            changeSettings({ currentLocation: currentLocation.locationuid });
-        }
-
-        const params: QueryParams = {
-            ...(lazyState.sortOrder === 1 && { type: "asc" }),
-            ...(lazyState.sortOrder === -1 && { type: "desc" }),
-            ...(lazyState.sortField && { column: lazyState.sortField }),
-            qry,
-            skip: lazyState.first,
-            top: lazyState.rows,
-        };
-
-        handleGetInventoryList(params, true);
-        setIsLoading(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        lazyState,
-        globalSearch,
-        authUser,
-        selectedFilterOptions,
-        currentLocation,
-        selectedInventoryType,
-    ]);
 
     useEffect(() => {
         setIsLoading(true);
@@ -455,6 +399,69 @@ export default function Inventories(): ReactElement {
         </div>
     );
 
+    useEffect(() => {
+        setIsLoading(true);
+        if (selectedFilterOptions) {
+            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
+        }
+        let qry: string = "";
+
+        if (globalSearch) {
+            qry += globalSearch;
+        } else {
+            qry += createStringifySearchQuery(advancedSearch);
+        }
+
+        if (selectedFilterOptions) {
+            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
+            qry += createStringifyFilterQuery(selectedFilterOptions);
+        }
+
+        if (selectedInventoryType.length) {
+            if (
+                globalSearch.length ||
+                Object.values(advancedSearch).length ||
+                selectedFilterOptions
+            )
+                qry += "+";
+            selectedInventoryType.forEach(
+                (type, index) =>
+                    (qry += `${type}.GroupClass${
+                        index !== selectedInventoryType.length - 1 ? "+" : ""
+                    }`)
+            );
+        }
+
+        if (Object.values(currentLocation).some((value) => value.trim().length)) {
+            if (!!qry.length) qry += "+";
+            qry += `${currentLocation.locationuid}.locationuid`;
+            changeSettings({ currentLocation: currentLocation.locationuid });
+        }
+
+        const params: QueryParams = {
+            ...(lazyState.sortOrder === 1 && { type: "asc" }),
+            ...(lazyState.sortOrder === -1 && { type: "desc" }),
+            ...(lazyState.sortField && { column: lazyState.sortField }),
+            skip: lazyState.first,
+            top: lazyState.rows,
+        };
+
+        if (qry.length > 0) {
+            params.qry = qry;
+        }
+
+        handleGetInventoryList(params, true);
+        setIsLoading(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        lazyState,
+        globalSearch,
+        authUser,
+        selectedFilterOptions,
+        currentLocation,
+        selectedInventoryType,
+    ]);
+
     const searchFields: SearchField<AdvancedSearch>[] = [
         {
             key: "StockNo",
@@ -620,6 +627,14 @@ export default function Inventories(): ReactElement {
         </div>
     );
 
+    const handleOnRowClick = ({ data: { itemuid, name } }: DataTableRowClickEvent) => {
+        if (onRowClick) {
+            onRowClick(name);
+        } else {
+            navigate(itemuid);
+        }
+    };
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -630,12 +645,24 @@ export default function Inventories(): ReactElement {
                         </h2>
                         {locations.length > 0 && (
                             <SplitButton
-                                label={currentLocation?.locName || "Select Location"}
+                                label={currentLocation?.locName || "Any Location"}
                                 className='inventory-location'
-                                model={locations.map((location) => ({
-                                    label: location.locName,
-                                    command: () => setCurrentLocation(location),
-                                }))}
+                                model={[
+                                    {
+                                        label: "Any Location",
+                                        command: () => {
+                                            setCurrentLocation({} as InventoryLocations);
+                                            changeSettings({
+                                                ...serverSettings,
+                                                currentLocation: "",
+                                            });
+                                        },
+                                    },
+                                    ...locations.map((location) => ({
+                                        label: location.locName,
+                                        command: () => setCurrentLocation(location),
+                                    })),
+                                ]}
                                 rounded
                                 menuStyle={{ transform: "translateX(164px)" }}
                                 pt={{
@@ -673,9 +700,7 @@ export default function Inventories(): ReactElement {
                                         resizableColumns
                                         header={header}
                                         rowClassName={() => "hover:text-primary cursor-pointer"}
-                                        onRowClick={({
-                                            data: { itemuid },
-                                        }: DataTableRowClickEvent) => navigate(itemuid)}
+                                        onRowClick={handleOnRowClick}
                                         onColReorder={(event: any) => {
                                             if (authUser && Array.isArray(event.columns)) {
                                                 const orderArray = event.columns?.map(
