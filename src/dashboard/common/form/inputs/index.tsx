@@ -11,6 +11,8 @@ type LabelPosition = "left" | "right" | "top";
 interface DashboardRadioProps {
     radioArray: RadioButtonProps[];
     style?: CSSProperties;
+    disabled?: boolean;
+    initialValue?: string | number;
     onChange?: (value: string | number) => void;
 }
 
@@ -24,7 +26,9 @@ interface PercentInputProps extends InputNumberProps {
 
 export const DashboardRadio = ({
     radioArray,
+    initialValue,
     style,
+    disabled,
     onChange,
 }: DashboardRadioProps): ReactElement => {
     const [radioValue, setRadioValue] = useState<string | number>("" || 0);
@@ -34,6 +38,10 @@ export const DashboardRadio = ({
         setRadioValue(value);
         onChange && onChange(value);
     };
+
+    useEffect(() => {
+        initialValue && setRadioValue(initialValue);
+    }, [initialValue]);
 
     return (
         <div className='flex flex-wrap row-gap-3 justify-content-between radio'>
@@ -47,6 +55,7 @@ export const DashboardRadio = ({
                         <RadioButton
                             inputId={name}
                             name={name}
+                            disabled={disabled}
                             value={value}
                             onChange={handleRadioChange}
                             checked={radioValue === value}
