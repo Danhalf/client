@@ -39,7 +39,7 @@ export const PrintDealForms = observer((): ReactElement => {
                 store.isLoading = true;
                 const response = await getDealPrintFormTemplate(id, templateuid);
                 if (!response) {
-                    return;
+                    throw new Error("Server not responding");
                 }
                 setIsButtonDisabled(true);
                 setTimeout(() => {
@@ -59,6 +59,8 @@ export const PrintDealForms = observer((): ReactElement => {
                     }
                 }, 3000);
             } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error(error);
                 //TODO: handle error
             } finally {
                 store.isLoading = false;
