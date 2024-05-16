@@ -38,6 +38,9 @@ export const PrintDealForms = observer((): ReactElement => {
             try {
                 store.isLoading = true;
                 const response = await getDealPrintFormTemplate(id, templateuid);
+                if (!response) {
+                    return;
+                }
                 setIsButtonDisabled(true);
                 setTimeout(() => {
                     const url = new Blob([response], { type: "application/pdf" });
