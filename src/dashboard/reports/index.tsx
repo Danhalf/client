@@ -10,9 +10,12 @@ import {
 import { Button } from "primereact/button";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { Accordion, AccordionTab } from "primereact/accordion";
+import { InputText } from "primereact/inputtext";
+import "./index.css";
 
 export default function Reports() {
     const [authUser, setUser] = useState<AuthUser | null>(null);
+    const [reportSearch, setReportSearch] = useState<string>("");
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -31,8 +34,27 @@ export default function Reports() {
                     </div>
                     <div className='card-content'>
                         <div className='grid'>
+                            <div className='reports-header col-12'>
+                                <Button icon='pi pi-plus' className='reports-header__button'>
+                                    New collection
+                                </Button>
+                                <Button className='reports-header__button'>Custom Report</Button>
+                                <span className='p-input-icon-right reports-header__search'>
+                                    <i
+                                        className={`pi pi-${
+                                            !reportSearch ? "search" : "times cursor-pointer"
+                                        }`}
+                                        onClick={() => setReportSearch("")}
+                                    />
+                                    <InputText
+                                        value={reportSearch}
+                                        placeholder='Search'
+                                        onChange={(e) => setReportSearch(e.target.value)}
+                                    />
+                                </span>
+                            </div>
                             <div className='col-12'>
-                                <Accordion multiple>
+                                <Accordion multiple activeIndex={[0]}>
                                     <AccordionTab header='Favorites'>
                                         <p className='m-0'>Favorites</p>
                                     </AccordionTab>
