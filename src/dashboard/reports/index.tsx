@@ -9,28 +9,10 @@ import {
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { LS_APP_USER } from "common/constants/localStorage";
+import { Accordion, AccordionTab } from "primereact/accordion";
 
 export default function Reports() {
     const [authUser, setUser] = useState<AuthUser | null>(null);
-
-    const printTableData = () => {
-        makeReports(authUser?.useruid).then((response) => {
-            setTimeout(() => {
-                getReportById(response.taskuid).then((response) => {
-                    const url = new Blob([response], { type: "application/pdf" });
-                    let link = document.createElement("a");
-                    link.href = window.URL.createObjectURL(url);
-                    link.download = "Report.pdf";
-                    link.click();
-                });
-            }, 5000);
-        });
-    };
-
-    const printUserDocument = () => {
-        // eslint-disable-next-line no-console
-        printDocumentByUser(authUser?.useruid).then((document) => console.log(document));
-    };
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -49,24 +31,33 @@ export default function Reports() {
                     </div>
                     <div className='card-content'>
                         <div className='grid'>
-                            <div className='col-6'>
-                                <div className='contact-top-controls'>
-                                    <Button
-                                        severity='success'
-                                        label='Print report'
-                                        className='m-r-20px'
-                                        type='button'
-                                        icon='pi pi-print'
-                                        onClick={printTableData}
-                                    />
-                                    <Button
-                                        severity='success'
-                                        label='Print document'
-                                        type='button'
-                                        icon='pi pi-print'
-                                        onClick={printUserDocument}
-                                    />
-                                </div>
+                            <div className='col-12'>
+                                <Accordion multiple>
+                                    <AccordionTab header='Favorites'>
+                                        <p className='m-0'>Favorites</p>
+                                    </AccordionTab>
+                                    <AccordionTab header='AR Reports'>
+                                        <p className='m-0'>AR Reports</p>
+                                    </AccordionTab>
+                                    <AccordionTab header='BHPH Reports'>
+                                        <p className='m-0'>BHPH Reports</p>
+                                    </AccordionTab>
+                                    <AccordionTab header='Custom Collections'>
+                                        <p className='m-0'>Custom Collections</p>
+                                    </AccordionTab>
+                                    <AccordionTab header='Custom Reports'>
+                                        <p className='m-0'>Custom Reports</p>
+                                    </AccordionTab>
+                                    <AccordionTab header='Inventory Reports'>
+                                        <p className='m-0'>Inventory Reports</p>
+                                    </AccordionTab>
+                                    <AccordionTab header='Miscellaneous'>
+                                        <p className='m-0'>Miscellaneous</p>
+                                    </AccordionTab>
+                                    <AccordionTab header='Sales Reports'>
+                                        <p className='m-0'>Sales Reports</p>
+                                    </AccordionTab>
+                                </Accordion>
                             </div>
                         </div>
                     </div>
