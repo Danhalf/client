@@ -199,9 +199,20 @@ export const SearchInput = ({
 
 interface DateInputProps extends CalendarProps {
     date?: number;
+    checkbox?: boolean;
+    checkboxValue?: 0 | 1;
+    onCheckboxChange?: (value: 0 | 1) => void;
 }
 
-export const DateInput = ({ date, name, value, ...props }: DateInputProps): ReactElement => {
+export const DateInput = ({
+    date,
+    name,
+    value,
+    checkbox,
+    checkboxValue,
+    onCheckboxChange,
+    ...props
+}: DateInputProps): ReactElement => {
     const [innerDate, setInnerDate] = useState<Date>(new Date());
 
     useEffect(() => {
@@ -220,10 +231,20 @@ export const DateInput = ({ date, name, value, ...props }: DateInputProps): Reac
             <label htmlFor={name} className='date-item__label label-top'>
                 {name}
             </label>
-            <div className='date-item__input flex justify-content-center'>
+            <div className='date-item__input flex'>
+                {checkbox && (
+                    <Checkbox
+                        className='date-item__checkbox'
+                        checked={!!checkboxValue}
+                        onChange={() =>
+                            onCheckboxChange && onCheckboxChange(checkboxValue === 1 ? 0 : 1)
+                        }
+                    />
+                )}
                 <Calendar
                     inputId={name}
                     value={innerDate}
+                    className={`date-item__calendar ${checkbox && "date-item__calendar--checkbox"}`}
                     onChange={(e) => dateToNumber(e.value as Date)}
                     {...props}
                 />

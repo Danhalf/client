@@ -27,6 +27,9 @@ export const DealRetailPickup = observer((): ReactElement => {
         <div className='grid deal-retail-pickup row-gap-2'>
             <div className='col-4 pickup-column'>
                 <div className='pickup-header'>Date</div>
+                <div className='pickup-item'>
+                    <DateInput checkbox />
+                </div>
                 {arrayItem.map((item) => (
                     <div key={item} className='pickup-item'>
                         <DateInput />
