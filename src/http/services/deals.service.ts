@@ -191,7 +191,8 @@ export const getDealPrintForms = async (dealuid: string) => {
             `print/${dealuid}/deallistforms `
         );
         if (request.status === 200 && request.data.status === Status.OK) {
-            return request.data["Spanish Form Pack"];
+            const { status, ...dataWithoutStatus } = request.data;
+            return dataWithoutStatus;
         }
     } catch (error) {
         // TODO: add error handler
