@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import {
@@ -13,7 +13,22 @@ import { Accordion, AccordionTab } from "primereact/accordion";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
 
-export default function Reports() {
+const mockReports = [
+    {
+        id: "1",
+        name: "Report 1",
+    },
+    {
+        id: "2",
+        name: "Report 2",
+    },
+    {
+        id: "3",
+        name: "Report 3",
+    },
+];
+
+export default function Reports(): ReactElement {
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
 
@@ -25,10 +40,23 @@ export default function Reports() {
         }
     }, []);
 
+    const ActionButtons = ({ reportuid }: { reportuid: string }): ReactElement => {
+        return (
+            <div className='reports-actions flex gap-3'>
+                <Button className='p-button reports-actions__button' outlined>
+                    Preview
+                </Button>
+                <Button className='p-button reports-actions__button' outlined>
+                    Download
+                </Button>
+            </div>
+        );
+    };
+
     return (
         <div className='grid'>
             <div className='col-12'>
-                <div className='card'>
+                <div className='card reports'>
                     <div className='card-header'>
                         <h2 className='card-header__title uppercase m-0'>Reports</h2>
                     </div>
@@ -54,30 +82,43 @@ export default function Reports() {
                                 </span>
                             </div>
                             <div className='col-12'>
-                                <Accordion multiple activeIndex={[0]}>
-                                    <AccordionTab header='Favorites'>
-                                        <p className='m-0'>Favorites</p>
+                                <Accordion
+                                    multiple
+                                    activeIndex={[0]}
+                                    className='reports__accordion'
+                                >
+                                    <AccordionTab header='Favorites' className='reports__list'>
+                                        {mockReports.map((report) => (
+                                            <div
+                                                className='reports__list-item'
+                                                key={report.id}
+                                                onClick={() => getReportById(report.id)}
+                                            >
+                                                <p>{report.name}</p>
+                                                <ActionButtons reportuid={report.id} />
+                                            </div>
+                                        ))}
                                     </AccordionTab>
                                     <AccordionTab header='AR Reports'>
-                                        <p className='m-0'>AR Reports</p>
+                                        <p>AR Reports</p>
                                     </AccordionTab>
                                     <AccordionTab header='BHPH Reports'>
-                                        <p className='m-0'>BHPH Reports</p>
+                                        <p>BHPH Reports</p>
                                     </AccordionTab>
                                     <AccordionTab header='Custom Collections'>
-                                        <p className='m-0'>Custom Collections</p>
+                                        <p>Custom Collections</p>
                                     </AccordionTab>
                                     <AccordionTab header='Custom Reports'>
-                                        <p className='m-0'>Custom Reports</p>
+                                        <p>Custom Reports</p>
                                     </AccordionTab>
                                     <AccordionTab header='Inventory Reports'>
-                                        <p className='m-0'>Inventory Reports</p>
+                                        <p>Inventory Reports</p>
                                     </AccordionTab>
                                     <AccordionTab header='Miscellaneous'>
-                                        <p className='m-0'>Miscellaneous</p>
+                                        <p>Miscellaneous</p>
                                     </AccordionTab>
                                     <AccordionTab header='Sales Reports'>
-                                        <p className='m-0'>Sales Reports</p>
+                                        <p>Sales Reports</p>
                                     </AccordionTab>
                                 </Accordion>
                             </div>
