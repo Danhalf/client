@@ -1,3 +1,4 @@
+import { BaseResponse } from "common/models/base-response";
 import { PrintForm, TypeList } from "..";
 import { Status } from "../base-response";
 
@@ -388,7 +389,6 @@ export interface DealFinance {
 
 export interface DealPrintForm extends PrintForm {}
 
-export interface DealPrintFormResponse {
-    status: Status;
-    "Spanish Form Pack": DealPrintForm[];
-}
+export type DealPrintFormResponse = BaseResponse & {
+    [key: string]: DealPrintForm[];
+};
