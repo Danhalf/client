@@ -1,10 +1,18 @@
-import { Deal, DealExtData, DealFinance, DealPrintForm } from "common/models/deals";
+import {
+    Deal,
+    DealExtData,
+    DealFinance,
+    DealPickupPayment,
+    DealPrintForm,
+} from "common/models/deals";
 import {
     getDealFinance,
     getDealInfo,
+    getDealPayments,
     getDealPrintForms,
     setDeal,
     setDealFinance,
+    setDealPayments,
 } from "http/services/deals.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -16,6 +24,7 @@ export class DealStore {
     private _deal: DealItem = {} as DealItem;
     private _dealExtData: DealExtData = {} as DealExtData;
     private _dealFinances: DealFinance = {} as DealFinance;
+    private _dealPickupPayments: (DealPickupPayment & { changed?: boolean })[] = [];
     private _dealID: string = "";
     private _printList: DealPrintForm[] = [];
     protected _isLoading = false;
@@ -38,6 +47,10 @@ export class DealStore {
 
     public get printList() {
         return this._printList;
+    }
+
+    public get dealPickupPayments() {
+        return this._dealPickupPayments;
     }
 
     public get isLoading() {
@@ -103,6 +116,24 @@ export class DealStore {
         }
     );
 
+    public changeDealPickupPayments = action(
+        (
+            itemuid: string,
+            { key, value }: { key: keyof DealPickupPayment; value: string | number }
+        ) => {
+            const dealStore = this.rootStore.dealStore;
+            if (dealStore) {
+                const currentPayment = dealStore.dealPickupPayments.find(
+                    (item) => item.itemuid === itemuid
+                );
+                if (currentPayment) {
+                    (currentPayment as Record<typeof key, string | number>)[key] = value;
+                    currentPayment.changed = true;
+                }
+            }
+        }
+    );
+
     public saveDeal = action(async (): Promise<string | undefined> => {
         try {
             this._isLoading = true;
@@ -112,8 +143,14 @@ export class DealStore {
             };
             const dealResponse = await setDeal(this._dealID, dealData);
             const financesResponse = await setDealFinance(this._dealID, this._dealFinances);
-            await Promise.race([dealResponse, financesResponse]).then((response) =>
-                response ? this._dealID : undefined
+            const paymentsResponse = await this._dealPickupPayments
+                .filter((item) => item.changed)
+                .forEach((item) => {
+                    const { changed, ...payment } = item;
+                    setDealPayments(item.itemuid, payment);
+                });
+            await Promise.race([dealResponse, financesResponse, paymentsResponse]).then(
+                (response) => (response ? this._dealID : undefined)
             );
         } catch (error) {
             // TODO: add error handlers
@@ -140,11 +177,26 @@ export class DealStore {
         }
     });
 
+    public getPickupPayments = action(async (dealuid = this._dealID) => {
+        try {
+            this._isLoading = true;
+            const response = await getDealPayments(dealuid);
+            if (response) {
+                this._dealPickupPayments = response;
+            }
+        } catch (error) {
+            // TODO: add error handler
+        } finally {
+            this._isLoading = false;
+        }
+    });
+
     public clearDeal = () => {
         this._deal = {} as DealItem;
         this._dealID = "";
         this._dealExtData = {} as DealExtData;
         this._dealFinances = {} as DealFinance;
         this._printList = [] as DealPrintForm[];
+        this._dealPickupPayments = [] as DealPickupPayment[];
     };
 }

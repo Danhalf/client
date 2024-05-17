@@ -200,8 +200,6 @@ export const SearchInput = ({
 interface DateInputProps extends CalendarProps {
     date?: number;
     checkbox?: boolean;
-    checkboxValue?: 0 | 1;
-    onCheckboxChange?: (value: 0 | 1) => void;
 }
 
 export const DateInput = ({
@@ -209,11 +207,10 @@ export const DateInput = ({
     name,
     value,
     checkbox,
-    checkboxValue,
-    onCheckboxChange,
     ...props
 }: DateInputProps): ReactElement => {
     const [innerDate, setInnerDate] = useState<Date>(new Date());
+    const [isChecked, setIsChecked] = useState<boolean>(false);
 
     useEffect(() => {
         if (!!date) {
@@ -235,15 +232,14 @@ export const DateInput = ({
                 {checkbox && (
                     <Checkbox
                         className='date-item__checkbox'
-                        checked={!!checkboxValue}
-                        onChange={() =>
-                            onCheckboxChange && onCheckboxChange(checkboxValue === 1 ? 0 : 1)
-                        }
+                        checked={isChecked}
+                        onChange={() => setIsChecked(!isChecked)}
                     />
                 )}
                 <Calendar
                     inputId={name}
                     value={innerDate}
+                    disabled={!isChecked}
                     className={`date-item__calendar ${checkbox && "date-item__calendar--checkbox"}`}
                     onChange={(e) => dateToNumber(e.value as Date)}
                     {...props}

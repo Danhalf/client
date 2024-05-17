@@ -392,3 +392,14 @@ export interface DealPrintForm extends PrintForm {}
 export type DealPrintFormResponse = BaseResponse & {
     [key: string]: DealPrintForm[];
 };
+
+export interface DealPickupPayment {
+    amount: number;
+    created: string;
+    dealuid: string;
+    itemuid: string;
+    paid: number;
+    paydate: string;
+    updated: string;
+    useruid: string;
+}

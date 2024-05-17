@@ -1,7 +1,13 @@
 import { authorizedUserApiInstance } from "http/index";
 import { QueryParams } from "common/models/query-params";
 import { BaseResponse, Status } from "common/models/base-response";
-import { Deal, DealFinance, DealPrintFormResponse, IndexedDealList } from "common/models/deals";
+import {
+    Deal,
+    DealFinance,
+    DealPickupPayment,
+    DealPrintFormResponse,
+    IndexedDealList,
+} from "common/models/deals";
 
 export interface TotalDealsList extends BaseResponse {
     total: number;
@@ -167,8 +173,28 @@ export const setDealFinance = async (
 
 export const getDealPayments = async (dealuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any>(`deals/${dealuid || 0}/ppayments`);
+        const request = await authorizedUserApiInstance.get<DealPickupPayment[]>(
+            `deals/${dealuid || 0}/ppayments`
+        );
         return request.data;
+    } catch (error) {
+        // TODO: add error handler
+    }
+};
+
+export const setDealPayments = async (
+    dealuid: string,
+    dealPaymentData: Partial<DealPickupPayment>
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponse>(
+            `deals/${dealuid}/ppayment`,
+            dealPaymentData
+        );
+
+        if (request.status === 200) {
+            return request.data;
+        }
     } catch (error) {
         // TODO: add error handler
     }

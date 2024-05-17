@@ -74,6 +74,7 @@
     height: 50px;
     border: 1px solid var(--admss-app-light-grey);
     border-radius: 5px 0 0 5px;
+    border-right: none;
 }
 
 .date-item__input .date-item__icon {
@@ -86,7 +87,6 @@
 
 .date-item__calendar--checkbox .p-inputtext {
     border-radius: 0px;
-    border-left: none;
 }
 
 .label-top {
