@@ -116,7 +116,7 @@ export const PrintDealForms = observer((): ReactElement => {
                     ) => setSelectedPrints(event.value)}
                     dataKey='itemuid'
                 >
-                    <Column selectionMode='multiple' headerStyle={{ width: "3rem" }}></Column>
+                    <Column selectionMode='multiple' headerStyle={{ width: "3rem" }} />
                     <Column field='name' header='Form' />
                     <Column body={ActionButton} className='deal-print__table-action' />
                 </DataTable>

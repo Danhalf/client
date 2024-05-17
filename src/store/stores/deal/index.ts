@@ -128,12 +128,11 @@ export class DealStore {
             this._isLoading = true;
             const response = await getDealPrintForms(dealuid);
             if (response) {
+                this._printList = [];
                 Object.values(response).forEach((item) => {
-                    this._printList.push(...item);
+                    this._printList = [...this._printList, ...item];
                 });
             }
-            // eslint-disable-next-line no-console
-            console.log(response);
         } catch (error) {
             // TODO: add error handler
         } finally {
