@@ -1,54 +1,98 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
-import {
-    getReportById,
-    getReportsList,
-    makeReports,
-    printDocumentByUser,
-} from "http/services/reports.service";
+import { getCommonReportsList, getReportById, getReportsList } from "http/services/reports.service";
 import { Button } from "primereact/button";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
+import { getKeyValue } from "services/local-storage.service";
+import { LS_APP_USER } from "common/constants/localStorage";
 
-const mockReports = [
+const mockReportsGroup = [
     {
         id: "1",
-        name: "Report 1",
+        name: "Favorites",
     },
     {
         id: "2",
-        name: "Report 2",
+        name: "AR Reports",
     },
     {
         id: "3",
-        name: "Report 3",
+        name: "BHPH Reports",
+    },
+    {
+        id: "4",
+        name: "Custom Collections",
+    },
+    {
+        id: "5",
+        name: "Custom Reports",
+    },
+    {
+        id: "6",
+        name: "Inventory Reports",
+    },
+    {
+        id: "7",
+        name: "Miscellaneous",
+    },
+    {
+        id: "8",
+        name: "Sales Reports",
     },
 ];
 
+const getMockReports = () => {
+    return Array.from({ length: Math.random() * 7 + 1 }, (_, i) => ({
+        id: i.toString(),
+        name: `report ${i + 1}`,
+    }));
+};
+
 export default function Reports(): ReactElement {
-    const [authUser, setUser] = useState<AuthUser | null>(null);
+    const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        if (authUser) {
-            setUser(authUser);
-            getReportsList(authUser.useruid, { total: 1 }).then((response) => {});
-        }
+        setUser(authUser);
     }, []);
+
+    useEffect(() => {
+        if (user) {
+            setUser(user);
+            getReportsList(user.useruid, { total: 1 }).then((response) => {});
+            getCommonReportsList().then((response) => {});
+        }
+    }, [user]);
 
     const ActionButtons = ({ reportuid }: { reportuid: string }): ReactElement => {
         return (
             <div className='reports-actions flex gap-3'>
+                <Button className='p-button' icon='pi pi-plus' outlined />
+                <Button className='p-button' icon='pi pi-heart' outlined />
                 <Button className='p-button reports-actions__button' outlined>
                     Preview
                 </Button>
                 <Button className='p-button reports-actions__button' outlined>
                     Download
                 </Button>
+            </div>
+        );
+    };
+
+    const ReportsAccordionHeader = ({
+        title,
+        info,
+    }: {
+        title: string;
+        info: string;
+    }): ReactElement => {
+        return (
+            <div className='reports-accordion-header flex gap-1'>
+                <div className='reports-accordion-header__title'>{title}</div>
+                <div className='reports-accordion-header__info'>{info}</div>
             </div>
         );
     };
@@ -87,39 +131,32 @@ export default function Reports(): ReactElement {
                                     activeIndex={[0]}
                                     className='reports__accordion'
                                 >
-                                    <AccordionTab header='Favorites' className='reports__list'>
-                                        {mockReports.map((report) => (
-                                            <div
-                                                className='reports__list-item'
-                                                key={report.id}
-                                                onClick={() => getReportById(report.id)}
+                                    {mockReportsGroup.map((group) => {
+                                        const mockReports = getMockReports();
+                                        return (
+                                            <AccordionTab
+                                                key={group.id}
+                                                header={
+                                                    <ReportsAccordionHeader
+                                                        title={group.name}
+                                                        info={`(${mockReports.length} reports)`}
+                                                    />
+                                                }
+                                                className='reports__accordion-tab'
                                             >
-                                                <p>{report.name}</p>
-                                                <ActionButtons reportuid={report.id} />
-                                            </div>
-                                        ))}
-                                    </AccordionTab>
-                                    <AccordionTab header='AR Reports'>
-                                        <p>AR Reports</p>
-                                    </AccordionTab>
-                                    <AccordionTab header='BHPH Reports'>
-                                        <p>BHPH Reports</p>
-                                    </AccordionTab>
-                                    <AccordionTab header='Custom Collections'>
-                                        <p>Custom Collections</p>
-                                    </AccordionTab>
-                                    <AccordionTab header='Custom Reports'>
-                                        <p>Custom Reports</p>
-                                    </AccordionTab>
-                                    <AccordionTab header='Inventory Reports'>
-                                        <p>Inventory Reports</p>
-                                    </AccordionTab>
-                                    <AccordionTab header='Miscellaneous'>
-                                        <p>Miscellaneous</p>
-                                    </AccordionTab>
-                                    <AccordionTab header='Sales Reports'>
-                                        <p>Sales Reports</p>
-                                    </AccordionTab>
+                                                {mockReports.map((report) => (
+                                                    <div
+                                                        className='reports__list-item'
+                                                        key={report.id}
+                                                        onClick={() => getReportById(report.id)}
+                                                    >
+                                                        <p>{`${group.name} ${report.name}`}</p>
+                                                        <ActionButtons reportuid={report.id} />
+                                                    </div>
+                                                ))}
+                                            </AccordionTab>
+                                        );
+                                    })}
                                 </Accordion>
                             </div>
                         </div>
