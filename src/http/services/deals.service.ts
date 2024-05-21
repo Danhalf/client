@@ -1,7 +1,13 @@
 import { authorizedUserApiInstance } from "http/index";
 import { QueryParams } from "common/models/query-params";
-import { BaseResponse, Status } from "common/models/base-response";
-import { Deal, DealFinance, IndexedDealList } from "common/models/deals";
+import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
+import {
+    Deal,
+    DealFinance,
+    DealPickupPayment,
+    DealPrintFormResponse,
+    IndexedDealList,
+} from "common/models/deals";
 
 export interface TotalDealsList extends BaseResponse {
     total: number;
@@ -17,7 +23,10 @@ export const getDealsList = async (uid: string, queryParams: QueryParams) => {
         );
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting deals list",
+        };
     }
 };
 
@@ -28,7 +37,10 @@ export const getDealInfo = async (uid: string) => {
             return request.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting deal info",
+        };
     }
 };
 interface DealTypeResponse extends BaseResponse {
@@ -51,7 +63,10 @@ export const getDealTypes = async () => {
         );
         return request.data.deal_types;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while get deal types",
+        };
     }
 };
 
@@ -62,7 +77,10 @@ export const getDealStatuses = async () => {
         );
         return request.data.deal_status;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while get deal statuses",
+        };
     }
 };
 
@@ -73,7 +91,10 @@ export const getSaleTypes = async () => {
         );
         return request.data.sale_types;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while get deal sale types",
+        };
     }
 };
 
@@ -84,14 +105,17 @@ export const getDealInventoryStatuses = async () => {
         );
         return request.data.inventory_status;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while get deal inventory statuses",
+        };
     }
 };
 
 export const setDeal = async (
     dealuid: string,
     dealData: Partial<Deal>
-): Promise<BaseResponse | undefined> => {
+): Promise<BaseResponseError | undefined> => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
             `deals/${dealuid || 0}/set`,
@@ -102,11 +126,16 @@ export const setDeal = async (
             return response.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while set deal",
+        };
     }
 };
 
-export const dealFinancesWashout = async (dealuid: string): Promise<BaseResponse | undefined> => {
+export const dealFinancesWashout = async (
+    dealuid: string
+): Promise<BaseResponseError | undefined> => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
             `deals/${dealuid || 0}/washout`
@@ -116,13 +145,16 @@ export const dealFinancesWashout = async (dealuid: string): Promise<BaseResponse
             return response.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while washout deal finance",
+        };
     }
 };
 
 export const dealFinancesRecalculate = async (
     dealuid: string
-): Promise<BaseResponse | undefined> => {
+): Promise<BaseResponseError | undefined> => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
             `deals/${dealuid || 0}/recalculate`
@@ -132,25 +164,31 @@ export const dealFinancesRecalculate = async (
             return response.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while recalculate deal finance",
+        };
     }
 };
 
 export const getDealFinance = async (dealuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<DealFinance>(
+        const request = await authorizedUserApiInstance.get<DealFinance | BaseResponseError>(
             `deals/${dealuid || 0}/finance`
         );
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting deal finance",
+        };
     }
 };
 
 export const setDealFinance = async (
     dealuid: string,
     dealFinanceData: Partial<DealFinance>
-): Promise<BaseResponse | undefined> => {
+): Promise<BaseResponseError | undefined> => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
             `deals/${dealuid || 0}/finance`,
@@ -161,16 +199,43 @@ export const setDealFinance = async (
             return response.data;
         }
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while setting deal finance",
+        };
     }
 };
 
 export const getDealPayments = async (dealuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any>(`deals/${dealuid || 0}/ppayments`);
+        const request = await authorizedUserApiInstance.get<
+            DealPickupPayment[] | BaseResponseError
+        >(`deals/${dealuid || 0}/ppayments`);
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting user report collections",
+        };
+    }
+};
+
+export const setDealPayments = async (
+    dealuid: string,
+    dealPaymentData: Partial<DealPickupPayment>
+) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponse>(
+            `deals/${dealuid}/ppayment`,
+            dealPaymentData
+        );
+
+        return request.data;
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while setting deal payments",
+        };
     }
 };
 
@@ -181,6 +246,43 @@ export const getDealPaymentsTotal = async (dealuid: string) => {
         );
         return request.data;
     } catch (error) {
-        // TODO: add error handler
+        return {
+            status: Status.ERROR,
+            error: "Error while getting deal payments total",
+        };
+    }
+};
+
+export const getDealPrintForms = async (dealuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<DealPrintFormResponse>(
+            `print/${dealuid}/deallistforms `
+        );
+        if (request.data.status === Status.OK) {
+            const { status, ...dataWithoutStatus } = request.data;
+            return dataWithoutStatus;
+        }
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while getting deal print forms",
+        };
+    }
+};
+
+export const getDealPrintFormTemplate = async (dealuid: string, templateuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any>(
+            `print/${dealuid}/${templateuid}/dealform `,
+            {
+                responseType: "blob",
+            }
+        );
+        return request.data;
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while getting deal print form template",
+        };
     }
 };
