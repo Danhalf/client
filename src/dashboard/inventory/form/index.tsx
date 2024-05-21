@@ -80,8 +80,6 @@ export const InventoryForm = observer(() => {
                 });
             }
         }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stepActiveIndex, stepsRef.current]);
 
     const getUrl = (activeIndex: number) => {
