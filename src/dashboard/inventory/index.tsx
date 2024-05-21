@@ -17,7 +17,11 @@ import { DatatableQueries, initialDataTableQueries } from "common/models/datatab
 import { LS_APP_USER } from "common/constants/localStorage";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
-import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import {
+    MultiSelect,
+    MultiSelectChangeEvent,
+    MultiSelectPanelHeaderTemplateEvent,
+} from "primereact/multiselect";
 import { ROWS_PER_PAGE } from "common/settings";
 import { AdvancedSearchDialog, SearchField } from "dashboard/common/dialog/search";
 import {
@@ -112,70 +116,12 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
 
     useEffect(() => {
         setIsLoading(true);
-        if (selectedFilterOptions) {
-            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
-        }
-        let qry: string = "";
-
-        if (globalSearch) {
-            qry += globalSearch;
-        } else {
-            qry += createStringifySearchQuery(advancedSearch);
-        }
-
-        if (selectedFilterOptions) {
-            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
-            qry += createStringifyFilterQuery(selectedFilterOptions);
-        }
-
-        if (selectedInventoryType.length) {
-            if (
-                globalSearch.length ||
-                Object.values(advancedSearch).length ||
-                selectedFilterOptions
-            )
-                qry += "+";
-            selectedInventoryType.forEach(
-                (type, index) =>
-                    (qry += `${type}.GroupClass${
-                        index !== selectedInventoryType.length - 1 ? "+" : ""
-                    }`)
-            );
-        }
-
-        if (Object.values(currentLocation).some((value) => value.trim().length)) {
-            if (!!qry.length) qry += "+";
-            qry += `${currentLocation.locationuid}.locationuid`;
-            changeSettings({ currentLocation: currentLocation.locationuid });
-        }
-
-        const params: QueryParams = {
-            ...(lazyState.sortOrder === 1 && { type: "asc" }),
-            ...(lazyState.sortOrder === -1 && { type: "desc" }),
-            ...(lazyState.sortField && { column: lazyState.sortField }),
-            qry,
-            skip: lazyState.first,
-            top: lazyState.rows,
-        };
-
-        handleGetInventoryList(params, true);
-        setIsLoading(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        lazyState,
-        globalSearch,
-        authUser,
-        selectedFilterOptions,
-        currentLocation,
-        selectedInventoryType,
-    ]);
-
-    useEffect(() => {
-        setIsLoading(true);
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
-                    const allSettings: ServerUserSettings = JSON.parse(response.profile);
+                    const allSettings: ServerUserSettings = response.profile
+                        ? JSON.parse(response.profile)
+                        : {};
                     setServerSettings(allSettings);
                     const { inventory: settings } = allSettings;
                     if (settings?.activeColumns?.length) {
@@ -266,7 +212,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     };
 
     const changeSettings = (settings: Partial<InventoryUserSettings>) => {
-        setIsLoading(true);
         if (authUser) {
             const newSettings = {
                 ...serverSettings,
@@ -275,10 +220,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
             setServerSettings(newSettings);
             setUserSettings(authUser.useruid, newSettings);
         }
-    };
-
-    const onColumnToggle = ({ value }: MultiSelectChangeEvent) => {
-        return setActiveColumns(value);
     };
 
     const handleGetInventoryList = async (params: QueryParams, total?: boolean) => {
@@ -350,115 +291,187 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         }
     };
 
-    const dropdownHeaderPanel = (
-        <div className='dropdown-header flex pb-1'>
-            <label className='cursor-pointer dropdown-header__label'>
-                <Checkbox
-                    onChange={() => {
-                        if (columns.length === activeColumns.length) {
-                            setActiveColumns(columns.filter(({ checked }) => checked));
-                        } else {
-                            setActiveColumns(columns);
+    const dropdownHeaderPanel = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
+        return (
+            <div className='dropdown-header flex pb-1'>
+                <label className='cursor-pointer dropdown-header__label'>
+                    <Checkbox
+                        onChange={() => {
+                            if (columns.length === activeColumns.length) {
+                                setActiveColumns(columns.filter(({ checked }) => checked));
+                            } else {
+                                setActiveColumns(columns);
+                            }
+                        }}
+                        checked={columns.length === activeColumns.length}
+                        className='dropdown-header__checkbox mr-2'
+                    />
+                    Select All
+                </label>
+                <button
+                    className='p-multiselect-close p-link'
+                    onClick={(e) => {
+                        setActiveColumns(columns.filter(({ checked }) => checked));
+                        onCloseClick(e);
+                    }}
+                >
+                    <i className='pi pi-times' />
+                </button>
+            </div>
+        );
+    };
+
+    const dropdownFilterHeaderPanel = (evt: MultiSelectPanelHeaderTemplateEvent) => {
+        return (
+            <div className='dropdown-header flex pb-1'>
+                <label className='cursor-pointer dropdown-header__label'>
+                    <Checkbox
+                        checked={
+                            filterOptions.filter((option) => !option.disabled).length ===
+                            selectedFilter.length
                         }
-                    }}
-                    checked={columns.length === activeColumns.length}
-                    className='dropdown-header__checkbox mr-2'
-                />
-                Select All
-            </label>
-            <button
-                className='p-multiselect-close p-link'
-                onClick={() => {
-                    return setActiveColumns(columns.filter(({ checked }) => checked));
-                }}
-            >
-                <i className='pi pi-times' />
-            </button>
-        </div>
-    );
-
-    const dropdownFilterHeaderPanel = (
-        <div className='dropdown-header flex pb-1'>
-            <label className='cursor-pointer dropdown-header__label'>
-                <Checkbox
-                    checked={
-                        filterOptions.filter((option) => !option.disabled).length ===
-                        selectedFilter.length
-                    }
-                    onChange={(e) => {
-                        const isChecked = e.target.checked;
-                        setSelectedFilter(
-                            isChecked
-                                ? filterOptions.map((option) => ({ value: option.value }))
-                                : []
-                        );
-                        const selectedOptions = isChecked ? filterOptions : [];
-                        setSelectedFilterOptions(
-                            selectedOptions.filter((option) => !option.disabled)
-                        );
-                    }}
-                    className='dropdown-header__checkbox mr-2'
-                />
-                Select All
-            </label>
-            <button
-                className='p-multiselect-close p-link'
-                onClick={() => {
-                    setSelectedFilter([]);
-                    setSelectedFilterOptions([]);
-                    changeSettings({
-                        ...serverSettings,
-                        selectedFilterOptions: [],
-                    });
-                }}
-            >
-                <i className='pi pi-times' />
-            </button>
-        </div>
-    );
-
-    const dropdownTypeHeaderPanel = (
-        <div className='dropdown-header flex pb-1'>
-            <label className='cursor-pointer dropdown-header__label'>
-                <Checkbox
-                    checked={selectedInventoryType.length === inventoryType.length}
-                    onChange={() => {
-                        if (inventoryType.length !== selectedInventoryType.length) {
-                            setSelectedInventoryType(
-                                inventoryType.map(({ description }) => description)
+                        onChange={(e) => {
+                            const isChecked = e.target.checked;
+                            setSelectedFilter(
+                                isChecked
+                                    ? filterOptions.map((option) => ({ value: option.value }))
+                                    : []
                             );
-                            changeSettings({
-                                ...serverSettings,
-                                selectedInventoryType: inventoryType.map(
-                                    ({ description }) => description
-                                ),
-                            });
-                        } else {
-                            setSelectedInventoryType([]);
-                            changeSettings({
-                                ...serverSettings,
-                                selectedInventoryType: [],
-                            });
-                        }
+                            const selectedOptions = isChecked ? filterOptions : [];
+                            setSelectedFilterOptions(
+                                selectedOptions.filter((option) => !option.disabled)
+                            );
+                        }}
+                        className='dropdown-header__checkbox mr-2'
+                    />
+                    Select All
+                </label>
+                <button
+                    className='p-multiselect-close p-link'
+                    onClick={(e) => {
+                        setSelectedFilter([]);
+                        setSelectedFilterOptions([]);
+                        changeSettings({
+                            ...serverSettings,
+                            selectedFilterOptions: [],
+                        });
+                        evt.onCloseClick(e);
                     }}
-                    className='dropdown-header__checkbox mr-2'
-                />
-                Select All
-            </label>
-            <button
-                className='p-multiselect-close p-link'
-                onClick={() => {
-                    setSelectedInventoryType([]);
-                    changeSettings({
-                        ...serverSettings,
-                        selectedInventoryType: [],
-                    });
-                }}
-            >
-                <i className='pi pi-times' />
-            </button>
-        </div>
-    );
+                >
+                    <i className='pi pi-times' />
+                </button>
+            </div>
+        );
+    };
+
+    const dropdownTypeHeaderPanel = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
+        return (
+            <div className='dropdown-header flex pb-1'>
+                <label className='cursor-pointer dropdown-header__label'>
+                    <Checkbox
+                        checked={selectedInventoryType.length === inventoryType.length}
+                        onChange={() => {
+                            if (inventoryType.length !== selectedInventoryType.length) {
+                                setSelectedInventoryType(
+                                    inventoryType.map(({ description }) => description)
+                                );
+                                changeSettings({
+                                    ...serverSettings,
+                                    selectedInventoryType: inventoryType.map(
+                                        ({ description }) => description
+                                    ),
+                                });
+                            } else {
+                                setSelectedInventoryType([]);
+                                changeSettings({
+                                    ...serverSettings,
+                                    selectedInventoryType: [],
+                                });
+                            }
+                        }}
+                        className='dropdown-header__checkbox mr-2'
+                    />
+                    Select All
+                </label>
+                <button
+                    className='p-multiselect-close p-link'
+                    onClick={(e) => {
+                        setSelectedInventoryType([]);
+                        changeSettings({
+                            ...serverSettings,
+                            selectedInventoryType: [],
+                        });
+                        onCloseClick(e);
+                    }}
+                >
+                    <i className='pi pi-times' />
+                </button>
+            </div>
+        );
+    };
+
+    useEffect(() => {
+        setIsLoading(true);
+        if (selectedFilterOptions) {
+            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
+        }
+        let qry: string = "";
+
+        if (globalSearch) {
+            qry += globalSearch;
+        } else {
+            qry += createStringifySearchQuery(advancedSearch);
+        }
+
+        if (selectedFilterOptions) {
+            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
+            qry += createStringifyFilterQuery(selectedFilterOptions);
+        }
+
+        if (selectedInventoryType.length) {
+            if (
+                globalSearch.length ||
+                Object.values(advancedSearch).length ||
+                selectedFilterOptions
+            )
+                qry += "+";
+            selectedInventoryType.forEach(
+                (type, index) =>
+                    (qry += `${type}.GroupClass${
+                        index !== selectedInventoryType.length - 1 ? "+" : ""
+                    }`)
+            );
+        }
+
+        if (Object.values(currentLocation).some((value) => value.trim().length)) {
+            if (!!qry.length) qry += "+";
+            qry += `${currentLocation.locationuid}.locationuid`;
+            changeSettings({ currentLocation: currentLocation.locationuid });
+        }
+
+        const params: QueryParams = {
+            ...(lazyState.sortOrder === 1 && { type: "asc" }),
+            ...(lazyState.sortOrder === -1 && { type: "desc" }),
+            ...(lazyState.sortField && { column: lazyState.sortField }),
+            skip: lazyState.first,
+            top: lazyState.rows,
+        };
+
+        if (qry.length > 0) {
+            params.qry = qry;
+        }
+
+        handleGetInventoryList(params, true);
+        setIsLoading(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        lazyState,
+        globalSearch,
+        authUser,
+        selectedFilterOptions,
+        currentLocation,
+        selectedInventoryType,
+    ]);
 
     const searchFields: SearchField<AdvancedSearch>[] = [
         {
@@ -496,7 +509,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                             value.includes(option.value)
                         );
                         setSelectedFilterOptions(selectedOptions);
-                        setSelectedFilter(value);
 
                         changeSettings({
                             ...serverSettings,
@@ -526,8 +538,10 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                     options={columns}
                     value={activeColumns}
                     optionLabel='header'
-                    onChange={onColumnToggle}
-                    showSelectAll={false}
+                    onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                        stopPropagation();
+                        setActiveColumns(value);
+                    }}
                     panelHeaderTemplate={dropdownHeaderPanel}
                     className='w-full pb-0 h-full flex align-items-center column-picker'
                     display='chip'
@@ -550,7 +564,8 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                     optionLabel='description'
                     options={inventoryType}
                     value={selectedInventoryType}
-                    onChange={({ value }: MultiSelectChangeEvent) => {
+                    onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                        stopPropagation();
                         setSelectedInventoryType(value);
                         changeSettings({
                             ...serverSettings,
@@ -643,12 +658,24 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                         </h2>
                         {locations.length > 0 && (
                             <SplitButton
-                                label={currentLocation?.locName || "Select Location"}
+                                label={currentLocation?.locName || "Any Location"}
                                 className='inventory-location'
-                                model={locations.map((location) => ({
-                                    label: location.locName,
-                                    command: () => setCurrentLocation(location),
-                                }))}
+                                model={[
+                                    {
+                                        label: "Any Location",
+                                        command: () => {
+                                            setCurrentLocation({} as InventoryLocations);
+                                            changeSettings({
+                                                ...serverSettings,
+                                                currentLocation: "",
+                                            });
+                                        },
+                                    },
+                                    ...locations.map((location) => ({
+                                        label: location.locName,
+                                        command: () => setCurrentLocation(location),
+                                    })),
+                                ]}
                                 rounded
                                 menuStyle={{ transform: "translateX(164px)" }}
                                 pt={{
