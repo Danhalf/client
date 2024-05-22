@@ -1,6 +1,11 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
-import { getCommonReportsList, getReportById, getReportsList } from "http/services/reports.service";
+import {
+    getCommonReportsList,
+    getReportById,
+    getReportsList,
+    getUserReportCollections,
+} from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { InputText } from "primereact/inputtext";
@@ -10,6 +15,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
+import { Panel } from "primereact/panel";
 
 const mockReportsGroup = [
     {
@@ -56,6 +62,7 @@ const getMockReports = () => {
 export default function Reports(): ReactElement {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
+    const panelRef = useRef<Panel>(null);
 
     const toast = useToast();
 
@@ -67,6 +74,7 @@ export default function Reports(): ReactElement {
     useEffect(() => {
         if (user) {
             getReportsList(user.useruid, { total: 1 }).then((response) => {});
+            getUserReportCollections(user.useruid).then((response) => {});
             getCommonReportsList().then((response) => {
                 if (response.status === Status.ERROR && toast.current) {
                     const { error } = response as BaseResponseError;
@@ -138,6 +146,18 @@ export default function Reports(): ReactElement {
                                         onChange={(e) => setReportSearch(e.target.value)}
                                     />
                                 </span>
+                            </div>
+                            <div className='col-12'>
+                                <Panel
+                                    ref={panelRef}
+                                    header={<></>}
+                                    className='new-collection'
+                                    toggleable
+                                >
+                                    <h3 className='uppercase new-collection__title'>
+                                        Add new collection
+                                    </h3>
+                                </Panel>
                             </div>
                             <div className='col-12'>
                                 <Accordion
