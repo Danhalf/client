@@ -6,6 +6,7 @@ import { CurrencyInput, DateInput, PercentInput } from "dashboard/common/form/in
 import { Dropdown } from "primereact/dropdown";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
+import { PAYMENT_FREQUENCY_LIST, TERM_MONTH_LIST } from "common/constants/contract-options";
 
 export const DealRetailContract = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -58,10 +59,13 @@ export const DealRetailContract = observer((): ReactElement => {
             <div className='col-3'>
                 <span className='p-float-label'>
                     <Dropdown
+                        optionLabel='name'
+                        optionValue='id'
                         value={Con_Pmt_Freq}
                         onChange={({ target: { value } }) =>
                             changeDealExtData({ key: "Con_Pmt_Freq", value })
                         }
+                        options={PAYMENT_FREQUENCY_LIST}
                         filter
                         required
                         className='w-full deal-sale__dropdown'
@@ -76,7 +80,7 @@ export const DealRetailContract = observer((): ReactElement => {
                         onChange={({ target: { value } }) =>
                             changeDealExtData({ key: "Con_Term", value })
                         }
-                        options={[3, 6, 12, 24]}
+                        options={TERM_MONTH_LIST}
                         editable
                         filter
                         required
@@ -140,7 +144,14 @@ export const DealRetailContract = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputNumber min={1} className='deal-contract__text-input w-full' />
+                    <InputNumber
+                        min={1}
+                        value={Con_Grace_Period}
+                        onChange={({ value }) =>
+                            changeDealExtData({ key: "Con_Grace_Period", value: Number(value) })
+                        }
+                        className='deal-contract__text-input w-full'
+                    />
                     <label className='float-label'>Days to First Payment</label>
                 </span>
             </div>
