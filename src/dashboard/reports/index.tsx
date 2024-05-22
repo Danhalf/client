@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import {
     getCommonReportsList,
@@ -15,42 +15,8 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
-import { Panel } from "primereact/panel";
-
-const mockReportsGroup = [
-    {
-        id: 1,
-        name: "Favorites",
-    },
-    {
-        id: 2,
-        name: "AR Reports",
-    },
-    {
-        id: 3,
-        name: "BHPH Reports",
-    },
-    {
-        id: 4,
-        name: "Custom Collections",
-    },
-    {
-        id: 5,
-        name: "Custom Reports",
-    },
-    {
-        id: 6,
-        name: "Inventory Reports",
-    },
-    {
-        id: 7,
-        name: "Miscellaneous",
-    },
-    {
-        id: 8,
-        name: "Sales Reports",
-    },
-];
+import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
+import { MultiSelect } from "primereact/multiselect";
 
 const getMockReports = () => {
     return Array.from({ length: Math.random() * 7 + 1 }, (_, i) => ({
@@ -59,10 +25,52 @@ const getMockReports = () => {
     }));
 };
 
+const mockReportsGroup = [
+    {
+        id: 1,
+        name: "Favorites",
+        items: getMockReports(),
+    },
+    {
+        id: 2,
+        name: "AR Reports",
+        items: getMockReports(),
+    },
+    {
+        id: 3,
+        name: "BHPH Reports",
+        items: getMockReports(),
+    },
+    {
+        id: 4,
+        name: "Custom Collections",
+        items: getMockReports(),
+    },
+    {
+        id: 5,
+        name: "Custom Reports",
+        items: getMockReports(),
+    },
+    {
+        id: 6,
+        name: "Inventory Reports",
+        items: getMockReports(),
+    },
+    {
+        id: 7,
+        name: "Miscellaneous",
+        items: getMockReports(),
+    },
+    {
+        id: 8,
+        name: "Sales Reports",
+        items: getMockReports(),
+    },
+];
+
 export default function Reports(): ReactElement {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
-    const panelRef = useRef<Panel>(null);
 
     const toast = useToast();
 
@@ -119,6 +127,32 @@ export default function Reports(): ReactElement {
         );
     };
 
+    const ReportsPanelHeader = (options: PanelHeaderTemplateOptions) => {
+        return (
+            <div className='reports-header col-12 px-0 pb-3'>
+                <Button
+                    icon='pi pi-plus'
+                    className='reports-header__button'
+                    onClick={options.onTogglerClick}
+                >
+                    New collection
+                </Button>
+                <Button className='reports-header__button'>Custom Report</Button>
+                <span className='p-input-icon-right reports-header__search'>
+                    <i
+                        className={`pi pi-${!reportSearch ? "search" : "times cursor-pointer"}`}
+                        onClick={() => setReportSearch("")}
+                    />
+                    <InputText
+                        value={reportSearch}
+                        placeholder='Search'
+                        onChange={(e) => setReportSearch(e.target.value)}
+                    />
+                </span>
+            </div>
+        );
+    };
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -128,35 +162,44 @@ export default function Reports(): ReactElement {
                     </div>
                     <div className='card-content'>
                         <div className='grid'>
-                            <div className='reports-header col-12'>
-                                <Button icon='pi pi-plus' className='reports-header__button'>
-                                    New collection
-                                </Button>
-                                <Button className='reports-header__button'>Custom Report</Button>
-                                <span className='p-input-icon-right reports-header__search'>
-                                    <i
-                                        className={`pi pi-${
-                                            !reportSearch ? "search" : "times cursor-pointer"
-                                        }`}
-                                        onClick={() => setReportSearch("")}
-                                    />
-                                    <InputText
-                                        value={reportSearch}
-                                        placeholder='Search'
-                                        onChange={(e) => setReportSearch(e.target.value)}
-                                    />
-                                </span>
-                            </div>
                             <div className='col-12'>
                                 <Panel
-                                    ref={panelRef}
-                                    header={<></>}
-                                    className='new-collection'
+                                    headerTemplate={ReportsPanelHeader}
+                                    className='new-collection w-full'
                                     toggleable
                                 >
                                     <h3 className='uppercase new-collection__title'>
                                         Add new collection
                                     </h3>
+                                    <div className='grid new-collection__form'>
+                                        <div className='col-4'>
+                                            <InputText
+                                                className='w-full'
+                                                placeholder='Collection name'
+                                            />
+                                        </div>
+                                        <div className='col-8'>
+                                            <MultiSelect
+                                                filter
+                                                optionGroupLabel='name'
+                                                optionGroupChildren='items'
+                                                optionLabel='name'
+                                                options={mockReportsGroup}
+                                                className='w-full new-collection__multiselect'
+                                                placeholder='Select reports'
+                                                pt={{
+                                                    wrapper: {
+                                                        style: {
+                                                            minHeight: "420px",
+                                                        },
+                                                    },
+                                                }}
+                                            />
+                                        </div>
+                                        <div className='col-12 flex justify-content-end'>
+                                            <Button outlined>Create collection</Button>
+                                        </div>
+                                    </div>
                                 </Panel>
                             </div>
                             <div className='col-12'>
@@ -166,19 +209,18 @@ export default function Reports(): ReactElement {
                                     className='reports__accordion'
                                 >
                                     {mockReportsGroup.map((group) => {
-                                        const mockReports = getMockReports();
                                         return (
                                             <AccordionTab
                                                 key={group.id}
                                                 header={
                                                     <ReportsAccordionHeader
                                                         title={group.name}
-                                                        info={`(${mockReports.length} reports)`}
+                                                        info={`(${group.items.length} reports)`}
                                                     />
                                                 }
                                                 className='reports__accordion-tab'
                                             >
-                                                {mockReports.map((report) => (
+                                                {group.items.map((report) => (
                                                     <div
                                                         className='reports__list-item'
                                                         key={report.id}
