@@ -71,8 +71,8 @@ export default function Deals() {
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [dealType, setDealType] = useState<string>(DEALS_TYPE_LIST[0].value);
-    const [dealOther, setDealOther] = useState<string[]>([DEALS_OTHER_LIST[0].value]);
     const [dealStatus, setDealStatus] = useState<string>(DEALS_STATUS_LIST[0].value);
+    const [dealOther, setDealOther] = useState<string[]>([DEALS_OTHER_LIST[0].value]);
 
     const navigate = useNavigate();
     const toast = useToast();
@@ -193,7 +193,7 @@ export default function Deals() {
                         <div className='grid datatable-controls'>
                             <div className='col-2'>
                                 <span className='p-float-label'>
-                                    <Dropdown
+                                    <MultiSelect
                                         optionValue='value'
                                         optionLabel='name'
                                         value={dealType}
