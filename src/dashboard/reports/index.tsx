@@ -1,7 +1,7 @@
 import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import {
-    getCommonReportsList,
+    createReportCollection,
     getReportById,
     getReportsList,
     getUserReportCollections,
@@ -12,12 +12,13 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { BaseResponseError, Status } from "common/models/base-response";
+import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { MultiSelect } from "primereact/multiselect";
 import { Checkbox } from "primereact/checkbox";
+import { ReportDocument } from "common/models/reports";
 
 const getMockReports = (groupName?: string) => {
     return Array.from({ length: Math.random() * 7 + 1 }, (_, i) => ({
@@ -83,6 +84,9 @@ const mockReportsGroup: ReportGroup[] = [
 export default function Reports(): ReactElement {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
+    // eslint-disable-next-line
+    const [reports, setReports] = useState<ReportDocument[]>([]);
+    const [collectionName, setCollectionName] = useState<string>("");
     const [selectedReports, setSelectedReports] = useState<Report[]>([]);
 
     const toast = useToast();
@@ -94,19 +98,21 @@ export default function Reports(): ReactElement {
 
     useEffect(() => {
         if (user) {
-            getReportsList(user.useruid, { total: 1 }).then((response) => {});
-            getUserReportCollections(user.useruid).then((response) => {});
-            getCommonReportsList().then((response) => {
-                if (response.status === Status.ERROR && toast.current) {
-                    const { error } = response as BaseResponseError;
-                    toast.current.show({
+            getReportsList(user.useruid).then((response) => {
+                const { error } = response as BaseResponseError;
+                if (error && toast.current) {
+                    return toast.current.show({
                         severity: "error",
                         summary: "Error",
                         detail: error,
                         life: TOAST_LIFETIME,
                     });
+                } else {
+                    const document = response as ReportDocument[];
+                    setReports(document);
                 }
             });
+            getUserReportCollections(user.useruid).then((response) => {});
         }
     }, [toast, user]);
 
@@ -183,6 +189,22 @@ export default function Reports(): ReactElement {
         }
     };
 
+    const handleCreateCollection = () => {
+        if (collectionName) {
+            createReportCollection(user!.useruid, collectionName).then((response) => {
+                const { error } = response as BaseResponseError;
+                if (error && toast.current) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
+        }
+    };
+
     return (
         <div className='grid'>
             <div className='col-12'>
@@ -196,6 +218,7 @@ export default function Reports(): ReactElement {
                                 <Panel
                                     headerTemplate={ReportsPanelHeader}
                                     className='new-collection w-full'
+                                    collapsed
                                     toggleable
                                 >
                                     <h3 className='uppercase new-collection__title'>
@@ -205,6 +228,8 @@ export default function Reports(): ReactElement {
                                         <div className='col-4'>
                                             <InputText
                                                 className='w-full'
+                                                value={collectionName}
+                                                onChange={(e) => setCollectionName(e.target.value)}
                                                 placeholder='Collection name'
                                             />
                                         </div>
@@ -257,7 +282,9 @@ export default function Reports(): ReactElement {
                                             />
                                         </div>
                                         <div className='col-12 flex justify-content-end'>
-                                            <Button outlined>Create collection</Button>
+                                            <Button onClick={handleCreateCollection} outlined>
+                                                Create collection
+                                            </Button>
                                         </div>
                                     </div>
                                 </Panel>

@@ -1,14 +1,23 @@
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
-import { ReportsPostData } from "common/models/reports";
+import { ReportsListResponse, ReportsPostData } from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getReportsList = async (uid: string, queryParams?: QueryParams) => {
     try {
-        const request = await authorizedUserApiInstance.get<any[]>(`reports/${uid}/list`, {
-            params: queryParams,
-        });
-        return request.data;
+        const request = await authorizedUserApiInstance.get<ReportsListResponse>(
+            `reports/${uid}/list`,
+            {
+                params: queryParams,
+            }
+        );
+        if (request.data.status === Status.ERROR) {
+            return {
+                status: Status.ERROR,
+                error: request.data.error,
+            };
+        }
+        return request.data.documents;
     } catch (error) {
         return {
             status: Status.ERROR,
@@ -170,6 +179,21 @@ export const getReportById = async (reportId: string) => {
         return {
             status: Status.ERROR,
             error: "Error while getting report",
+        };
+    }
+};
+
+export const createReportCollection = async (useruid: string, name: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `reports/${useruid}/collection`,
+            { name }
+        );
+        return request.data;
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while creating report collection",
         };
     }
 };

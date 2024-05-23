@@ -25,3 +25,17 @@ export interface ReportCollection {
 export interface ReportCollectionResponse extends BaseResponseError {
     collections: ReportCollection[];
 }
+
+export interface ReportDocument {
+    description: string;
+    index: number;
+    itemuid: string;
+    name: string;
+    state: string;
+    type: string;
+    version: string;
+}
+
+export interface ReportsListResponse extends BaseResponseError {
+    documents: ReportDocument[];
+}
