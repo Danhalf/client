@@ -268,7 +268,7 @@ export default function Deals() {
                                     />
                                 </div>
                             </div>
-                            <div className='col-4 text-right'>
+                            <div className='col-4 text-right flex flex-nowrap'>
                                 <Button
                                     className='contact-top-controls__button m-r-20px'
                                     label='Advanced search'
