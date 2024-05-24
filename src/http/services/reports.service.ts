@@ -1,6 +1,10 @@
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
-import { ReportsListResponse, ReportsPostData } from "common/models/reports";
+import {
+    ReportCollectionResponse,
+    ReportsListResponse,
+    ReportsPostData,
+} from "common/models/reports";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getReportsList = async (uid: string, queryParams?: QueryParams) => {
@@ -40,8 +44,10 @@ export const getReportCollection = async (uid: string) => {
 
 export const getUserReportCollections = async (uid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any[]>(`reports/${uid}/collections`);
-        return request.data;
+        const request = await authorizedUserApiInstance.get<ReportCollectionResponse>(
+            `reports/${uid}/collections`
+        );
+        return request.data.collections;
     } catch (error) {
         return {
             status: Status.ERROR,

@@ -2,7 +2,6 @@ import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import {
     createReportCollection,
-    getReportById,
     getReportsList,
     getUserReportCollections,
 } from "http/services/reports.service";
@@ -17,75 +16,19 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { MultiSelect } from "primereact/multiselect";
-import { Checkbox } from "primereact/checkbox";
-import { ReportDocument } from "common/models/reports";
-
-const getMockReports = (groupName?: string) => {
-    return Array.from({ length: Math.random() * 7 + 1 }, (_, i) => ({
-        id: i.toString(),
-        name: `${groupName} report ${i + 1}`,
-    }));
-};
+import { ReportCollection, ReportDocument } from "common/models/reports";
 
 interface Report {
     id: string;
     name: string;
 }
 
-interface ReportGroup {
-    id: number;
-    name: string;
-    items: Report[];
-}
-
-const mockReportsGroup: ReportGroup[] = [
-    {
-        id: 1,
-        name: "Favorites",
-        items: getMockReports("Favorites"),
-    },
-    {
-        id: 2,
-        name: "AR Reports",
-        items: getMockReports("AR Reports"),
-    },
-    {
-        id: 3,
-        name: "BHPH Reports",
-        items: getMockReports("BHPH Reports"),
-    },
-    {
-        id: 4,
-        name: "Custom Collections",
-        items: getMockReports("Custom Collections"),
-    },
-    {
-        id: 5,
-        name: "Custom Reports",
-        items: getMockReports("Custom Reports"),
-    },
-    {
-        id: 6,
-        name: "Inventory Reports",
-        items: getMockReports("Inventory Reports"),
-    },
-    {
-        id: 7,
-        name: "Miscellaneous",
-        items: getMockReports("Miscellaneous"),
-    },
-    {
-        id: 8,
-        name: "Sales Reports",
-        items: getMockReports("Sales Reports"),
-    },
-];
-
 export default function Reports(): ReactElement {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
     // eslint-disable-next-line
     const [reports, setReports] = useState<ReportDocument[]>([]);
+    const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
     const [selectedReports, setSelectedReports] = useState<Report[]>([]);
 
@@ -112,10 +55,24 @@ export default function Reports(): ReactElement {
                     setReports(document);
                 }
             });
-            getUserReportCollections(user.useruid).then((response) => {});
+            getUserReportCollections(user.useruid).then((response) => {
+                const { error } = response as BaseResponseError;
+                if (error && toast.current) {
+                    return toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: error,
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    const collections = response as ReportCollection[];
+                    setCollections(collections);
+                }
+            });
         }
     }, [toast, user]);
 
+    // eslint-disable-next-line
     const ActionButtons = ({ reportuid }: { reportuid: string }): ReactElement => {
         return (
             <div className='reports-actions flex gap-3'>
@@ -172,6 +129,7 @@ export default function Reports(): ReactElement {
         );
     };
 
+    // eslint-disable-next-line
     const handleReportGroupSelect = (items: Report[]) => {
         const allItemsSelected = items.every((item) =>
             selectedReports.some((selected) => selected.id === item.id)
@@ -236,33 +194,8 @@ export default function Reports(): ReactElement {
                                         <div className='col-8'>
                                             <MultiSelect
                                                 filter
-                                                optionGroupLabel='name'
-                                                optionGroupChildren='items'
                                                 optionLabel='name'
-                                                options={mockReportsGroup}
-                                                optionGroupTemplate={({ name, items }) => {
-                                                    return (
-                                                        <div className='flex pl-2 align-items-center'>
-                                                            <Checkbox
-                                                                onChange={() =>
-                                                                    handleReportGroupSelect(items)
-                                                                }
-                                                                checked={items.every(
-                                                                    (item: Report) =>
-                                                                        selectedReports.some(
-                                                                            (selected) =>
-                                                                                selected.name ===
-                                                                                item.name
-                                                                        )
-                                                                )}
-                                                                className='mr-2'
-                                                            />
-                                                            <span className='font-bold'>
-                                                                {name}
-                                                            </span>
-                                                        </div>
-                                                    );
-                                                }}
+                                                options={reports}
                                                 className='w-full new-collection__multiselect'
                                                 placeholder='Select reports'
                                                 showSelectAll={false}
@@ -295,29 +228,19 @@ export default function Reports(): ReactElement {
                                     activeIndex={[0]}
                                     className='reports__accordion'
                                 >
-                                    {mockReportsGroup.map((group) => (
-                                        <AccordionTab
-                                            key={group.id}
-                                            header={
-                                                <ReportsAccordionHeader
-                                                    title={group.name}
-                                                    info={`(${group.items.length} reports)`}
-                                                />
-                                            }
-                                            className='reports__accordion-tab'
-                                        >
-                                            {group.items.map((report) => (
-                                                <div
-                                                    className='reports__list-item'
-                                                    key={report.id}
-                                                    onClick={() => getReportById(report.id)}
-                                                >
-                                                    <p>{`${group.name} ${report.name}`}</p>
-                                                    <ActionButtons reportuid={report.id} />
-                                                </div>
-                                            ))}
-                                        </AccordionTab>
-                                    ))}
+                                    {collections &&
+                                        collections.map(({ itemuid, name }) => (
+                                            <AccordionTab
+                                                key={itemuid}
+                                                header={
+                                                    <ReportsAccordionHeader
+                                                        title={name}
+                                                        info={`(0 reports)`}
+                                                    />
+                                                }
+                                                className='reports__accordion-tab'
+                                            ></AccordionTab>
+                                        ))}
                                 </Accordion>
                             </div>
                         </div>

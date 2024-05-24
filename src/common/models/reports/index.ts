@@ -13,13 +13,12 @@ export interface ReportsPostData {
 }
 
 export interface ReportCollection {
-    info: string;
-    index: number;
     created: string;
-    updated: string;
+    description: string;
+    index: number;
     itemuid: string;
     name: string;
-    description: string;
+    updated: string;
 }
 
 export interface ReportCollectionResponse extends BaseResponseError {
