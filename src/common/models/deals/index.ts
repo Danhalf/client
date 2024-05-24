@@ -71,6 +71,7 @@ export interface DealExtData {
     Con_Total_of_Pmts: number;
     Date_Acquired: number;
     Date_First_Operated: number;
+    Days_to_First_Payment: number;
     Dealer_Number: string;
     DismantledDate: number;
     DismantledSoldTo: string;

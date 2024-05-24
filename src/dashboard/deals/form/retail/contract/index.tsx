@@ -26,6 +26,7 @@ export const DealRetailContract = observer((): ReactElement => {
             Con_Late_Fee_Max,
             Con_Late_Percent,
             Con_Grace_Period,
+            Days_to_First_Payment,
         },
         changeDealExtData,
     } = store;
@@ -146,9 +147,12 @@ export const DealRetailContract = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputNumber
                         min={1}
-                        value={Con_Grace_Period}
+                        value={Days_to_First_Payment}
                         onChange={({ value }) =>
-                            changeDealExtData({ key: "Con_Grace_Period", value: Number(value) })
+                            changeDealExtData({
+                                key: "Days_to_First_Payment",
+                                value: Number(value),
+                            })
                         }
                         className='deal-contract__text-input w-full'
                     />
