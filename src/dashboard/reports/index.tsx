@@ -39,37 +39,44 @@ export default function Reports(): ReactElement {
         setUser(authUser);
     }, []);
 
+    const handleGetReportList = (useruid: string) =>
+        getReportsList(useruid).then((response) => {
+            const { error } = response as BaseResponseError;
+            if (error && toast.current) {
+                return toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                const document = response as ReportDocument[];
+                setReports(document);
+            }
+        });
+
+    const handleGetUserReportCollections = (useruid: string) =>
+        getUserReportCollections(useruid).then((response) => {
+            const { error } = response as BaseResponseError;
+            if (error && toast.current) {
+                return toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                const collections = response as ReportCollection[];
+                setCollections(collections);
+            }
+        });
+
     useEffect(() => {
         if (user) {
-            getReportsList(user.useruid).then((response) => {
-                const { error } = response as BaseResponseError;
-                if (error && toast.current) {
-                    return toast.current.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: error,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    const document = response as ReportDocument[];
-                    setReports(document);
-                }
-            });
-            getUserReportCollections(user.useruid).then((response) => {
-                const { error } = response as BaseResponseError;
-                if (error && toast.current) {
-                    return toast.current.show({
-                        severity: "error",
-                        summary: "Error",
-                        detail: error,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    const collections = response as ReportCollection[];
-                    setCollections(collections);
-                }
-            });
+            handleGetReportList(user.useruid);
+            handleGetUserReportCollections(user.useruid);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [toast, user]);
 
     // eslint-disable-next-line
@@ -158,6 +165,8 @@ export default function Reports(): ReactElement {
                         detail: error,
                         life: TOAST_LIFETIME,
                     });
+                } else {
+                    user && handleGetUserReportCollections(user.useruid);
                 }
             });
         }
@@ -223,11 +232,7 @@ export default function Reports(): ReactElement {
                                 </Panel>
                             </div>
                             <div className='col-12'>
-                                <Accordion
-                                    multiple
-                                    activeIndex={[0]}
-                                    className='reports__accordion'
-                                >
+                                <Accordion multiple className='reports__accordion'>
                                     {collections &&
                                         collections.map(({ itemuid, name }) => (
                                             <AccordionTab
