@@ -18,75 +18,106 @@ import { ExportToWeb } from "dashboard/export-web";
 import { DealsForm } from "dashboard/deals/form";
 import { AccountsForm } from "dashboard/accounts/form";
 import { GeneralSettings } from "dashboard/profile/generalSettings";
+import { ReactElement, useEffect, useState } from "react";
+import { AuthUser } from "http/services/auth.service";
+import { LS_APP_USER } from "common/constants/localStorage";
+import { getKeyValue } from "services/local-storage.service";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
-const router: RemixRouter = createBrowserRouter([
-    {
-        path: "/",
-        element: <App />,
-        errorElement: <NotFound />,
-        children: [
-            {
-                path: "",
-                element: <SignIn />,
-            },
-            {
-                path: "/dashboard",
-                element: <Dashboard />,
-                children: [
-                    {
-                        path: "",
-                        element: <Home />,
-                    },
-                    {
-                        path: "inventory",
-                        children: [
-                            { path: "", element: <Inventory /> },
-                            { path: "create", element: <InventoryForm /> },
-                            { path: ":id", element: <InventoryForm /> },
-                        ],
-                    },
-                    {
-                        path: "contacts",
-                        children: [
-                            { path: "", element: <Contacts /> },
-                            { path: "create", element: <ContactForm /> },
-                            { path: ":id", element: <ContactForm /> },
-                        ],
-                    },
-                    {
-                        path: "deals",
-                        children: [
-                            { path: "", element: <Deals /> },
-                            { path: "create", element: <DealsForm /> },
-                            { path: ":id", element: <DealsForm /> },
-                        ],
-                    },
-                    {
-                        path: "accounts",
-                        children: [
-                            { path: "", element: <Accounts /> },
-                            { path: "create", element: <AccountsForm /> },
-                            { path: ":id", element: <AccountsForm /> },
-                        ],
-                    },
-                    {
-                        path: "settings",
-                        element: <GeneralSettings />,
-                    },
-                    {
-                        path: "reports",
-                        element: <Reports />,
-                    },
-                    {
-                        path: "export-web",
-                        element: <ExportToWeb />,
-                    },
-                ],
-            },
-        ],
-    },
-]);
+const AppRouter = (): ReactElement => {
+    const [isSalesPerson, setIsSalesPerson] = useState<boolean>(false);
 
-root.render(<RouterProvider router={router} />);
+    useEffect(() => {
+        const authUser: AuthUser = getKeyValue(LS_APP_USER);
+        if (authUser) {
+            setIsSalesPerson(!!authUser?.issalesperson);
+        }
+    }, []);
+
+    const routes = isSalesPerson
+        ? [
+              {
+                  path: "/",
+                  element: <App />,
+                  errorElement: <NotFound />,
+                  children: [
+                      { path: "", element: <SignIn /> },
+                      {
+                          path: "/dashboard",
+                          element: <Dashboard />,
+                          children: [
+                              { path: "", element: <Home /> },
+                              {
+                                  path: "inventory",
+                                  children: [
+                                      { path: "", element: <Inventory /> },
+                                      { path: "create", element: <InventoryForm /> },
+                                      { path: ":id", element: <InventoryForm /> },
+                                  ],
+                              },
+                              { path: "settings", element: <GeneralSettings /> },
+                          ],
+                      },
+                  ],
+              },
+          ]
+        : [
+              {
+                  path: "/",
+                  element: <App />,
+                  errorElement: <NotFound />,
+                  children: [
+                      { path: "", element: <SignIn /> },
+                      {
+                          path: "/dashboard",
+                          element: <Dashboard />,
+                          children: [
+                              { path: "", element: <Home /> },
+                              {
+                                  path: "inventory",
+                                  children: [
+                                      { path: "", element: <Inventory /> },
+                                      { path: "create", element: <InventoryForm /> },
+                                      { path: ":id", element: <InventoryForm /> },
+                                  ],
+                              },
+                              {
+                                  path: "contacts",
+                                  children: [
+                                      { path: "", element: <Contacts /> },
+                                      { path: "create", element: <ContactForm /> },
+                                      { path: ":id", element: <ContactForm /> },
+                                  ],
+                              },
+                              {
+                                  path: "deals",
+                                  children: [
+                                      { path: "", element: <Deals /> },
+                                      { path: "create", element: <DealsForm /> },
+                                      { path: ":id", element: <DealsForm /> },
+                                  ],
+                              },
+                              {
+                                  path: "accounts",
+                                  children: [
+                                      { path: "", element: <Accounts /> },
+                                      { path: "create", element: <AccountsForm /> },
+                                      { path: ":id", element: <AccountsForm /> },
+                                  ],
+                              },
+                              { path: "settings", element: <GeneralSettings /> },
+                              { path: "reports", element: <Reports /> },
+                              { path: "export-web", element: <ExportToWeb /> },
+                          ],
+                      },
+                  ],
+              },
+          ];
+
+    const router: RemixRouter = createBrowserRouter(routes);
+
+    return <RouterProvider router={router} />;
+};
+
+root.render(<AppRouter />);
