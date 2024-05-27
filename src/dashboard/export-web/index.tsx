@@ -503,7 +503,7 @@ export const ExportToWeb = () => {
                                     disabled={selectedInventories.filter(Boolean).length === 0}
                                     onClick={() => handleExport(true)}
                                 >
-                                    SCHEDULE
+                                    Save to Schedule
                                 </Button>
                                 <div className='export-web-controls__input'>
                                     <TableFilter
