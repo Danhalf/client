@@ -99,8 +99,22 @@ const AppRouter = (): ReactElement => {
                                 </ProtectedRoute>
                             ),
                         },
-                        { path: "reports", element: <Reports /> },
-                        { path: "export-web", element: <ExportToWeb /> },
+                        {
+                            path: "reports",
+                            element: (
+                                <ProtectedRoute allowedRoles={["admin"]}>
+                                    <Outlet />
+                                </ProtectedRoute>
+                            ),
+                        },
+                        {
+                            path: "export-web",
+                            element: (
+                                <ProtectedRoute allowedRoles={["admin"]}>
+                                    <Outlet />
+                                </ProtectedRoute>
+                            ),
+                        },
                     ],
                 },
             ],
