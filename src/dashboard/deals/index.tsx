@@ -213,7 +213,10 @@ export default function Deals() {
                                         panelHeaderTemplate={<></>}
                                         display='chip'
                                         className='deals__dropdown'
-                                        onChange={(e) => setDealSelectedGroup(e.value)}
+                                        onChange={(e) => {
+                                            e.stopPropagation();
+                                            setDealSelectedGroup(e.value);
+                                        }}
                                         pt={{
                                             wrapper: {
                                                 style: {
