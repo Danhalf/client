@@ -84,12 +84,17 @@ const ProtectedRoute = ({ notAllowed, children }: ProtectedRouteProps): ReactEle
 
     useEffect(() => {
         if (authUser) {
+            const { isadmin, issalesperson, ismanager, islocaladmin } = authUser;
             const userRoles: UserRoles = {
-                admin: !!authUser.isadmin,
-                localAdmin: !!authUser.islocaladmin,
-                manager: !!authUser.ismanager,
-                salesPerson: !!authUser.issalesperson,
+                admin: !!isadmin,
+                localAdmin: !!islocaladmin,
+                manager: !!ismanager,
+                salesPerson: !!issalesperson,
             };
+
+            if ([isadmin, islocaladmin, ismanager].some(Boolean)) {
+                return setHasRequiredRole(true);
+            }
 
             if (notAllowed) {
                 setHasRequiredRole(notAllowed.some((role) => !userRoles[role]));
