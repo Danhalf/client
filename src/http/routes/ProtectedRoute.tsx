@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { ReactElement, ReactNode, useEffect, useState } from "react";
+import { ReactElement, ReactNode, useEffect, useState, useRef } from "react";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue, localStorageClear, setKey } from "services/local-storage.service";
@@ -17,53 +17,56 @@ interface ProtectedRouteProps {
     children?: ReactNode;
 }
 
-const throttle = (func: (...args: any[]) => void, limit: number) => {
-    let inThrottle: boolean;
-    return function (this: any, ...args: any[]) {
-        const context = this;
-        if (!inThrottle) {
-            func.apply(context, args);
-            inThrottle = true;
-            setTimeout(() => (inThrottle = false), limit);
+let isFetching = false;
+
+const updatePermissions = async (
+    authUser: AuthUser | null,
+    setAuthUser: (user: AuthUser) => void,
+    lastUpdateRef: React.MutableRefObject<number>
+) => {
+    if (authUser && !isFetching) {
+        const now = Date.now();
+        if (now - lastUpdateRef.current < 3000) return;
+
+        isFetching = true;
+        lastUpdateRef.current = now;
+
+        try {
+            const permissions = await getUserPermissions(authUser.useruid);
+            const { uaSystemAdmin, uaLocationAdmin, uaManager, uaSalesPerson } = permissions;
+
+            const user: AuthUser = getKeyValue(LS_APP_USER);
+
+            user.islocaladmin = uaLocationAdmin || 0;
+            authUser.islocaladmin = uaLocationAdmin || 0;
+            user.isadmin = uaSystemAdmin || 0;
+            authUser.isadmin = uaSystemAdmin || 0;
+            user.ismanager = uaManager || 0;
+            authUser.ismanager = uaManager || 0;
+            user.issalesperson = uaSalesPerson || 0;
+            authUser.issalesperson = uaSalesPerson || 0;
+
+            localStorageClear(LS_APP_USER);
+            setKey(LS_APP_USER, JSON.stringify(user));
+            setAuthUser(user);
+        } finally {
+            isFetching = false;
         }
-    };
+    }
 };
 
 export const useAuth = (): AuthUser | null => {
     const [authUser, setAuthUser] = useState<AuthUser | null>(() => getKeyValue(LS_APP_USER));
     const location = useLocation();
-
-    const updatePermissions = async () => {
-        if (authUser) {
-            getUserPermissions(authUser.useruid).then(
-                ({ uaSystemAdmin, uaLocationAdmin, uaManager, uaSalesPerson }) => {
-                    const user: AuthUser = getKeyValue(LS_APP_USER);
-
-                    user.islocaladmin = uaLocationAdmin || 0;
-                    authUser.islocaladmin = uaLocationAdmin || 0;
-                    user.isadmin = uaSystemAdmin || 0;
-                    authUser.isadmin = uaSystemAdmin || 0;
-                    user.ismanager = uaManager || 0;
-                    authUser.ismanager = uaManager || 0;
-                    user.issalesperson = uaSalesPerson || 0;
-                    authUser.issalesperson = uaSalesPerson || 0;
-
-                    localStorageClear(LS_APP_USER);
-                    setKey(LS_APP_USER, JSON.stringify(user));
-                    setAuthUser(user);
-                }
-            );
-        }
-    };
-
-    const throttledUpdatePermissions = throttle(updatePermissions, 3000);
+    const lastUpdateRef = useRef<number>(0);
 
     useEffect(() => {
         const handleStorageChange = () => {
             setAuthUser(getKeyValue(LS_APP_USER));
+            updatePermissions(authUser, setAuthUser, lastUpdateRef);
         };
 
-        throttledUpdatePermissions();
+        updatePermissions(authUser, setAuthUser, lastUpdateRef);
         window.addEventListener("storage", handleStorageChange);
 
         return () => {
