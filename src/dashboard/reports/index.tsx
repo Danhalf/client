@@ -3,7 +3,7 @@ import { AuthUser } from "http/services/auth.service";
 import {
     createReportCollection,
     getReportsList,
-    getUserReportCollections,
+    getUserReportCollectionsContent,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { Accordion, AccordionTab } from "primereact/accordion";
@@ -16,7 +16,7 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { MultiSelect } from "primereact/multiselect";
-import { ReportCollection, ReportDocument } from "common/models/reports";
+import { ReportCollectionContent, ReportDocument } from "common/models/reports";
 
 interface Report {
     id: string;
@@ -28,7 +28,7 @@ export default function Reports(): ReactElement {
     const [reportSearch, setReportSearch] = useState<string>("");
     // eslint-disable-next-line
     const [reports, setReports] = useState<ReportDocument[]>([]);
-    const [collections, setCollections] = useState<ReportCollection[]>([]);
+    const [collections, setCollections] = useState<ReportCollectionContent[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
     const [selectedReports, setSelectedReports] = useState<Report[]>([]);
 
@@ -56,7 +56,7 @@ export default function Reports(): ReactElement {
         });
 
     const handleGetUserReportCollections = (useruid: string) =>
-        getUserReportCollections(useruid).then((response) => {
+        getUserReportCollectionsContent(useruid).then((response) => {
             const { error } = response as BaseResponseError;
             if (error && toast.current) {
                 return toast.current.show({
@@ -66,7 +66,7 @@ export default function Reports(): ReactElement {
                     life: TOAST_LIFETIME,
                 });
             } else {
-                const collections = response as ReportCollection[];
+                const collections = response as ReportCollectionContent[];
                 setCollections(collections);
             }
         });
@@ -234,9 +234,9 @@ export default function Reports(): ReactElement {
                             <div className='col-12'>
                                 <Accordion multiple className='reports__accordion'>
                                     {collections &&
-                                        collections.map(({ itemuid, name }) => (
+                                        collections.map(({ itemUID, name }) => (
                                             <AccordionTab
-                                                key={itemuid}
+                                                key={itemUID}
                                                 header={
                                                     <ReportsAccordionHeader
                                                         title={name}

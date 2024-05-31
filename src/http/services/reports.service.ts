@@ -1,6 +1,7 @@
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import {
+    ReportCollectionContent,
     ReportCollectionResponse,
     ReportsListResponse,
     ReportsPostData,
@@ -209,4 +210,18 @@ export const printDocumentByUser = async (userId: string | undefined) => {
         .get<any>(`print/${userId}/${userId}`)
         .then((response) => response.data);
     return request;
+};
+
+export const getUserReportCollectionsContent = async (uid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<
+            BaseResponseError | ReportCollectionContent[]
+        >(`reports/${uid}/collectionscontent `);
+        return request.data;
+    } catch (error) {
+        return {
+            status: Status.ERROR,
+            error: "Error while getting user report collections content",
+        };
+    }
 };

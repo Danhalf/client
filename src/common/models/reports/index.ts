@@ -21,6 +21,18 @@ export interface ReportCollection {
     updated: string;
 }
 
+export interface ReportCollectionContent {
+    accessed: string;
+    created: string;
+    description: string;
+    index: number;
+    isfavorite: 0 | 1;
+    itemUID: string;
+    name: string;
+    updated: string;
+    userUID: string;
+}
+
 export interface ReportCollectionResponse extends BaseResponseError {
     collections: ReportCollection[];
 }
