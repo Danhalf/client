@@ -23,7 +23,7 @@ export const DealsForm = observer(() => {
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { getDeal, saveDeal } = store;
+    const { getDeal, saveDeal, isFormValid } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -233,6 +233,7 @@ export const DealsForm = observer(() => {
                                 </Button>
                                 <Button
                                     onClick={saveDeal}
+                                    disabled={!isFormValid}
                                     className='form-nav__button deal__button'
                                 >
                                     Save
