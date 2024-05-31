@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { ReactElement, ReactNode, useEffect, useState } from "react";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { AuthUser } from "http/services/auth.service";
@@ -20,7 +20,6 @@ interface ProtectedRouteProps {
 
 export const useAuth = (): AuthUser | null => {
     const [authUser, setAuthUser] = useState<AuthUser | null>(() => getKeyValue(LS_APP_USER));
-    const location = useLocation();
     useEffect(() => {
         const handleStorageChange = () => {
             setAuthUser(getKeyValue(LS_APP_USER));
@@ -38,7 +37,7 @@ export const useAuth = (): AuthUser | null => {
             window.removeEventListener("storage", handleStorageChange);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [location]);
+    }, []);
 
     return authUser;
 };
