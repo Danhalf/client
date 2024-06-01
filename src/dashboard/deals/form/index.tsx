@@ -13,15 +13,30 @@ import { DealRetail } from "./retail";
 import { useStore } from "store/hooks";
 import { Loader } from "dashboard/common/loader";
 import { PrintDealForms } from "./print-forms";
-import { Form, Formik } from "formik";
+import { Form, Formik, FormikErrors, FormikProps } from "formik";
 import { Deal, DealExtData } from "common/models/deals";
 import * as Yup from "yup";
+import { useToast } from "dashboard/common/toast";
 
 const STEP = "step";
+
+export const DealFormSchema = Yup.object().shape({
+    contactuid: Yup.string().required("Data is required."),
+    inventoryuid: Yup.string().required("Data is required."),
+    dealtype: Yup.string().required("Data is required."),
+    dealstatus: Yup.string().required("Data is required."),
+    saletype: Yup.string().required("Data is required."),
+    datepurchase: Yup.string().required("Data is required."),
+    dateeffective: Yup.string().required("Data is required."),
+    inventorystatus: Yup.string().required("Data is required."),
+    HowFoundOut: Yup.string().required("Data is required."),
+    SaleID: Yup.string().required("Data is required."),
+});
 
 export const DealsForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
+    const toast = useToast();
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
@@ -36,6 +51,7 @@ export const DealsForm = observer(() => {
     const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
+    const formikRef = useRef<FormikProps<Partial<Deal> & Partial<DealExtData>>>(null);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -89,17 +105,17 @@ export const DealsForm = observer(() => {
         setStepActiveIndex(printActiveIndex);
     };
 
-    const DealSaleSchema = Yup.object().shape({
-        contactuid: Yup.string().required("Data is required."),
-        inventoryuid: Yup.string().required("Data is required."),
-        dealtype: Yup.string().required("Data is required."),
-        dealstatus: Yup.string().required("Data is required."),
-        saletype: Yup.string().required("Data is required."),
-        datepurchase: Yup.string().required("Data is required."),
-        dateeffective: Yup.string().required("Data is required."),
-        inventorystatus: Yup.string().required("Data is required."),
-        SaleID: Yup.string().required("Data is required."),
-    });
+    const handleSaveDealForm = () => {
+        if (!isFormValid) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Validation Error",
+                detail: "Please fill in all required fields.",
+            });
+        } else {
+            formikRef.current?.submitForm();
+        }
+    };
 
     return (
         <Suspense>
@@ -181,6 +197,7 @@ export const DealsForm = observer(() => {
                                 <div className='w-full flex flex-column p-0 card-content__wrapper'>
                                     <div className='flex flex-grow-1'>
                                         <Formik
+                                            innerRef={formikRef}
                                             initialValues={
                                                 {
                                                     contactuid: deal.contactuid,
@@ -196,16 +213,43 @@ export const DealsForm = observer(() => {
                                                     SaleID: dealExtData?.SaleID || "",
                                                 } as Partial<Deal> & Partial<DealExtData>
                                             }
-                                            validationSchema={DealSaleSchema}
-                                            // onChange={() => {
-                                            //     if (Object.keys(errors).length > 0) store.isFormValid = false;
-                                            // }}
-
-                                            onSubmit={(values, actions) => {
-                                                setTimeout(() => {
-                                                    alert(JSON.stringify(values, null, 2));
-                                                    actions.setSubmitting(false);
-                                                }, 1000);
+                                            enableReinitialize
+                                            validationSchema={DealFormSchema}
+                                            onSubmit={() => {
+                                                saveDeal();
+                                                navigate(`/dashboard/deals`);
+                                                toast.current?.show({
+                                                    severity: "success",
+                                                    summary: "Success",
+                                                    detail: "Deal saved successfully",
+                                                });
+                                            }}
+                                            validate={(values) => {
+                                                const errors: FormikErrors<
+                                                    Partial<Deal> & Partial<DealExtData>
+                                                > = {};
+                                                try {
+                                                    DealFormSchema.validateSync(values, {
+                                                        abortEarly: false,
+                                                    });
+                                                } catch (err) {
+                                                    if (err instanceof Yup.ValidationError) {
+                                                        err.inner.forEach((validationError) => {
+                                                            if (validationError.path) {
+                                                                errors[
+                                                                    validationError.path as keyof (Partial<Deal> &
+                                                                        Partial<DealExtData>)
+                                                                ] = validationError.message;
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                                if (Object.keys(errors).length > 0) {
+                                                    store.isFormValid = false;
+                                                } else {
+                                                    store.isFormValid = true;
+                                                }
+                                                return errors;
                                             }}
                                         >
                                             <Form name='dealForm'>
@@ -278,7 +322,7 @@ export const DealsForm = observer(() => {
                                     Next
                                 </Button>
                                 <Button
-                                    onClick={saveDeal}
+                                    onClick={handleSaveDealForm}
                                     className='form-nav__button deal__button'
                                 >
                                     Save

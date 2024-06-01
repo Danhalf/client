@@ -83,9 +83,6 @@ export const DealGeneralSale = observer((): ReactElement => {
         });
     }, [toast]);
 
-    // eslint-disable-next-line no-console
-    console.log(values.contactuid);
-
     return (
         <section className='grid deal-general-sale row-gap-2'>
             <div className='col-6 relative'>
@@ -294,9 +291,9 @@ export const DealGeneralSale = observer((): ReactElement => {
                         {...getFieldProps("HowFoundOut")}
                         required
                         {...getFieldProps("HowFoundOut")}
-                        optionLabel='name'
-                        optionValue='name'
-                        value={values.HowFoundOut}
+                        // optionLabel='name'
+                        // optionValue='name'
+                        // value={values.HowFoundOut}
                         onChange={(e) => {
                             setFieldValue("HowFoundOut", e.value);
                             changeDealExtData({ key: "HowFoundOut", value: e.value });
@@ -309,7 +306,9 @@ export const DealGeneralSale = observer((): ReactElement => {
                     />
                     <label className='float-label'>How did you hear about us? (required)</label>
                 </span>
-                <small className='p-error'>{errors.HowFoundOut ? errors.HowFoundOut : ""}</small>
+                <small className='p-error'>
+                    {errors.HowFoundOut && touched.HowFoundOut ? errors.HowFoundOut : ""}
+                </small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
