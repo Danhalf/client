@@ -13,6 +13,9 @@ import { DealRetail } from "./retail";
 import { useStore } from "store/hooks";
 import { Loader } from "dashboard/common/loader";
 import { PrintDealForms } from "./print-forms";
+import { Form, Formik } from "formik";
+import { Deal, DealExtData } from "common/models/deals";
+import * as Yup from "yup";
 
 const STEP = "step";
 
@@ -23,7 +26,7 @@ export const DealsForm = observer(() => {
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { getDeal, saveDeal, isFormValid } = store;
+    const { deal, dealExtData, getDeal, saveDeal, isFormValid } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -85,6 +88,18 @@ export const DealsForm = observer(() => {
         navigate(getUrl(printActiveIndex));
         setStepActiveIndex(printActiveIndex);
     };
+
+    const DealSaleSchema = Yup.object().shape({
+        contactuid: Yup.string().required("Data is required."),
+        inventoryuid: Yup.string().required("Data is required."),
+        dealtype: Yup.string().required("Data is required."),
+        dealstatus: Yup.string().required("Data is required."),
+        saletype: Yup.string().required("Data is required."),
+        datepurchase: Yup.string().required("Data is required."),
+        dateeffective: Yup.string().required("Data is required."),
+        inventorystatus: Yup.string().required("Data is required."),
+        SaleID: Yup.string().required("Data is required."),
+    });
 
     return (
         <Suspense>
@@ -165,35 +180,66 @@ export const DealsForm = observer(() => {
                                 </div>
                                 <div className='w-full flex flex-column p-0 card-content__wrapper'>
                                     <div className='flex flex-grow-1'>
-                                        {dealsSections.map((section) =>
-                                            section.items.map((item: DealsItem) => (
-                                                <div
-                                                    key={item.itemIndex}
-                                                    className={`${
-                                                        stepActiveIndex === item.itemIndex
-                                                            ? "block deal-form"
-                                                            : "hidden"
-                                                    }`}
-                                                >
-                                                    <div className='deal-form__title uppercase'>
-                                                        {item.itemLabel}
+                                        <Formik
+                                            initialValues={
+                                                {
+                                                    contactuid: deal.contactuid,
+                                                    inventoryuid: deal.inventoryuid,
+                                                    dealtype: deal.dealtype,
+                                                    dealstatus: deal.dealstatus,
+                                                    saletype: deal.saletype,
+                                                    datepurchase: deal.datepurchase,
+                                                    dateeffective: deal.dateeffective,
+                                                    inventorystatus: deal.inventorystatus,
+                                                    accountuid: deal.accountuid,
+                                                    HowFoundOut: dealExtData?.HowFoundOut || "",
+                                                    SaleID: dealExtData?.SaleID || "",
+                                                } as Partial<Deal> & Partial<DealExtData>
+                                            }
+                                            validationSchema={DealSaleSchema}
+                                            // onChange={() => {
+                                            //     if (Object.keys(errors).length > 0) store.isFormValid = false;
+                                            // }}
+
+                                            onSubmit={(values, actions) => {
+                                                setTimeout(() => {
+                                                    alert(JSON.stringify(values, null, 2));
+                                                    actions.setSubmitting(false);
+                                                }, 1000);
+                                            }}
+                                        >
+                                            <Form name='dealForm'>
+                                                {dealsSections.map((section) =>
+                                                    section.items.map((item: DealsItem) => (
+                                                        <div
+                                                            key={item.itemIndex}
+                                                            className={`${
+                                                                stepActiveIndex === item.itemIndex
+                                                                    ? "block deal-form"
+                                                                    : "hidden"
+                                                            }`}
+                                                        >
+                                                            <div className='deal-form__title uppercase'>
+                                                                {item.itemLabel}
+                                                            </div>
+                                                            {stepActiveIndex === item.itemIndex && (
+                                                                <Suspense fallback={<Loader />}>
+                                                                    {item.component}
+                                                                </Suspense>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                )}
+                                                {stepActiveIndex === printActiveIndex && (
+                                                    <div className='deal-form'>
+                                                        <div className='deal-form__title uppercase'>
+                                                            Print forms
+                                                        </div>
+                                                        <PrintDealForms />
                                                     </div>
-                                                    {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense fallback={<Loader />}>
-                                                            {item.component}
-                                                        </Suspense>
-                                                    )}
-                                                </div>
-                                            ))
-                                        )}
-                                        {stepActiveIndex === printActiveIndex && (
-                                            <div className='deal-form'>
-                                                <div className='deal-form__title uppercase'>
-                                                    Print forms
-                                                </div>
-                                                <PrintDealForms />
-                                            </div>
-                                        )}
+                                                )}
+                                            </Form>
+                                        </Formik>
                                     </div>
                                 </div>
                             </div>
@@ -233,7 +279,6 @@ export const DealsForm = observer(() => {
                                 </Button>
                                 <Button
                                     onClick={saveDeal}
-                                    disabled={!isFormValid}
                                     className='form-nav__button deal__button'
                                 >
                                     Save
