@@ -126,6 +126,8 @@ export const DealGeneralSale = observer((): ReactElement => {
         onSubmit: (values) => {},
     });
 
+    const { errors, touched } = formik;
+
     return (
         <form
             onSubmit={formik.handleSubmit}
@@ -147,15 +149,17 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDeal({ key: "contactuid", value });
                     }}
                     name='Buyer Name (required)'
-                    className={`${formik.errors.contactuid && "p-invalid"}`}
+                    className={`${errors.contactuid && "p-invalid"}`}
                 />
-                <small className='p-error'>{formik.errors.contactuid || ""}</small>
+                <small className='p-error'>
+                    {touched.contactuid && errors.contactuid ? errors.contactuid : ""}
+                </small>
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InventorySearch
                         {...formik.getFieldProps("inventoryuid")}
-                        className={`${formik.errors.inventoryuid && "p-invalid"}`}
+                        className={`${errors.inventoryuid && "p-invalid"}`}
                         onChange={({ target: { value } }) => {
                             formik.setFieldValue("inventoryuid", value);
                             changeDeal({ key: "inventoryuid", value });
@@ -168,7 +172,9 @@ export const DealGeneralSale = observer((): ReactElement => {
                     />
                     <label className='float-label'></label>
                 </span>
-                <small className='p-error'>{formik.errors.inventoryuid || ""}</small>
+                <small className='p-error'>
+                    {touched.inventoryuid && errors.inventoryuid ? errors.inventoryuid : ""}
+                </small>
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
@@ -184,13 +190,13 @@ export const DealGeneralSale = observer((): ReactElement => {
                             formik.setFieldValue("dealtype", e.value);
                             changeDeal({ key: "dealtype", value: e.value });
                         }}
-                        className={`w-full deal-sale__dropdown ${
-                            formik.errors.dealtype && "p-invalid"
-                        }`}
+                        className={`w-full deal-sale__dropdown ${errors.dealtype && "p-invalid"}`}
                     />
                     <label className='float-label'>Type of Deal (required)</label>
                 </span>
-                <small className='p-error'>{formik.errors.dealtype || ""}</small>
+                <small className='p-error'>
+                    {touched.dealtype && errors.dealtype ? errors.dealtype : ""}
+                </small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
@@ -206,13 +212,13 @@ export const DealGeneralSale = observer((): ReactElement => {
                         options={dealStatusesList}
                         filter
                         required
-                        className={`w-full deal-sale__dropdown ${
-                            formik.errors.dealstatus && "p-invalid"
-                        }`}
+                        className={`w-full deal-sale__dropdown ${errors.dealstatus && "p-invalid"}`}
                     />
                     <label className='float-label'>Sale status (required)</label>
                 </span>
-                <small className='p-error'>{formik.errors.dealstatus || ""}</small>
+                <small className='p-error'>
+                    {touched.dealstatus && errors.dealstatus ? errors.dealstatus : ""}
+                </small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
@@ -228,18 +234,18 @@ export const DealGeneralSale = observer((): ReactElement => {
                             formik.setFieldValue("saletype", e.value);
                             changeDeal({ key: "saletype", value: e.value });
                         }}
-                        className={`w-full deal-sale__dropdown ${
-                            formik.errors.saletype && "p-invalid"
-                        }`}
+                        className={`w-full deal-sale__dropdown ${errors.saletype && "p-invalid"}`}
                     />
                     <label className='float-label'>Sale type (required)</label>
                 </span>
-                <small className='p-error'>{formik.errors.saletype || ""}</small>
+                <small className='p-error'>
+                    {touched.saletype && errors.saletype ? errors.saletype : ""}
+                </small>
             </div>
             <div className='col-3 relative'>
                 <DateInput
                     {...formik.getFieldProps("datepurchase")}
-                    className={`${formik.errors.datepurchase && "p-invalid"}`}
+                    className={`${errors.datepurchase && "p-invalid"}`}
                     name='Sale date (required)'
                     date={Number(formik.values.datepurchase)}
                     onChange={({ value }) => {
@@ -247,12 +253,14 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDeal({ key: "datepurchase", value: Number(value) });
                     }}
                 />
-                <small className='p-error'>{formik.errors.datepurchase || ""}</small>
+                <small className='p-error'>
+                    {touched.datepurchase && errors.datepurchase ? errors.datepurchase : ""}
+                </small>
             </div>
             <div className='col-3 relative'>
                 <DateInput
                     {...formik.getFieldProps("dateeffective")}
-                    className={`${formik.errors.dateeffective && "p-invalid"}`}
+                    className={`${errors.dateeffective && "p-invalid"}`}
                     name='First operated (req.)'
                     value={formik.values.dateeffective}
                     onChange={({ value }) => {
@@ -260,7 +268,9 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDeal({ key: "dateeffective", value: Number(value) });
                     }}
                 />
-                <small className='p-error'>{formik.errors.dateeffective || ""}</small>
+                <small className='p-error'>
+                    {touched.dateeffective && errors.dateeffective ? errors.dateeffective : ""}
+                </small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
@@ -277,14 +287,16 @@ export const DealGeneralSale = observer((): ReactElement => {
                         filter
                         required
                         className={`w-full deal-sale__dropdown ${
-                            formik.errors.inventorystatus &&
-                            formik.touched.inventorystatus &&
-                            "p-invalid"
+                            errors.inventorystatus && touched.inventorystatus && "p-invalid"
                         }`}
                     />
                     <label className='float-label'>New or Used (req.)</label>
                 </span>
-                <small className='p-error'>{formik.errors.inventorystatus || ""}</small>
+                <small className='p-error'>
+                    {touched.inventorystatus && errors.inventorystatus
+                        ? errors.inventorystatus
+                        : ""}
+                </small>
             </div>
 
             <div className='col-12 text-line'>
@@ -328,20 +340,20 @@ export const DealGeneralSale = observer((): ReactElement => {
                         editable
                         filter
                         className={`w-full deal-sale__dropdown ${
-                            formik.errors.HowFoundOut && "p-invalid"
+                            errors.HowFoundOut && "p-invalid"
                         }`}
                     />
                     <label className='float-label'>How did you hear about us? (required)</label>
                 </span>
-                <small className='p-error'>{formik.errors.HowFoundOut || ""}</small>
+                <small className='p-error'>
+                    {touched.HowFoundOut && errors.HowFoundOut ? errors.HowFoundOut : ""}
+                </small>
             </div>
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <InputText
                         {...formik.getFieldProps("SaleID")}
-                        className={`deal-sale__text-input w-full ${
-                            formik.errors.SaleID && "p-invalid"
-                        }`}
+                        className={`deal-sale__text-input w-full ${errors.SaleID && "p-invalid"}`}
                         value={formik.values.SaleID}
                         onChange={(e) => {
                             formik.setFieldValue("SaleID", e.target.value);
@@ -350,12 +362,9 @@ export const DealGeneralSale = observer((): ReactElement => {
                     />
                     <label className='float-label'>ROS SaleID (required)</label>
                 </span>
-                <small className='p-error'>{formik.errors.SaleID || ""}</small>
-            </div>
-            <div className='col-12'>
-                <button type='submit' className='p-button p-component p-button-primary'>
-                    Submit
-                </button>
+                <small className='p-error'>
+                    {touched.SaleID && errors.SaleID ? errors.SaleID : ""}
+                </small>
             </div>
         </form>
     );
