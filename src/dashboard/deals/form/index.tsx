@@ -31,6 +31,8 @@ export const DealFormSchema = Yup.object().shape({
     inventorystatus: Yup.string().required("Data is required."),
     HowFoundOut: Yup.string().required("Data is required."),
     SaleID: Yup.string().required("Data is required."),
+    OdometerReading: Yup.string().required("Data is required."),
+    OdomDigits: Yup.string().required("Data is required."),
 });
 
 export const DealsForm = observer(() => {
@@ -209,8 +211,10 @@ export const DealsForm = observer(() => {
                                                     dateeffective: deal.dateeffective,
                                                     inventorystatus: deal.inventorystatus,
                                                     accountuid: deal.accountuid,
-                                                    HowFoundOut: dealExtData?.HowFoundOut || "",
-                                                    SaleID: dealExtData?.SaleID || "",
+                                                    HowFoundOut: dealExtData?.HowFoundOut,
+                                                    SaleID: dealExtData?.SaleID,
+                                                    OdometerReading: dealExtData?.OdometerReading,
+                                                    OdomDigits: dealExtData?.OdomDigits,
                                                 } as Partial<Deal> & Partial<DealExtData>
                                             }
                                             enableReinitialize

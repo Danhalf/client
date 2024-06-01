@@ -291,9 +291,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         {...getFieldProps("HowFoundOut")}
                         required
                         {...getFieldProps("HowFoundOut")}
-                        // optionLabel='name'
-                        // optionValue='name'
-                        // value={values.HowFoundOut}
+                        value={values.HowFoundOut}
                         onChange={(e) => {
                             setFieldValue("HowFoundOut", e.value);
                             changeDealExtData({ key: "HowFoundOut", value: e.value });

@@ -6,7 +6,6 @@ import {
     DealPickupPayment,
     DealPrintForm,
 } from "common/models/deals";
-import { DealFormSchema } from "dashboard/deals/form";
 import {
     getDealFinance,
     getDealInfo,
