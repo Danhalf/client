@@ -49,6 +49,7 @@
     .deal-print__accordion-tab.p-accordion-header:not(.p-disabled).p-highlight
     .p-accordion-header-link {
     background-color: var(--admss-app-white);
+    padding-left: 30px;
     border: none;
     border-bottom: 1px solid var(--admss-app-light-grey);
 }
