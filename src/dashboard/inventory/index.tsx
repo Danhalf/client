@@ -115,13 +115,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     }, []);
 
     useEffect(() => {
-        setIsLoading(true);
-        // changeSettings({ activeColumns: activeColumns.map(({ field }) => field) });
-        setIsLoading(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeColumns]);
-
-    useEffect(() => {
         if (authUser && locations.length > 0) {
             setIsLoading(true);
             getUserSettings(authUser.useruid)
