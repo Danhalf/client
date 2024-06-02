@@ -271,7 +271,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     const handleAdvancedSearch = () => {
         setIsLoading(true);
         const searchParams = createStringifySearchQuery(advancedSearch);
-
         handleGetInventoryList({ ...filterParams(lazyState), qry: searchParams }, true);
         setDialogVisible(false);
         setIsLoading(false);
@@ -299,7 +298,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                 skip: lazyState.first,
                 top: lazyState.rows,
             };
-
             await handleGetInventoryList(params);
         } finally {
             setButtonDisabled(false);
@@ -426,59 +424,58 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
+        setIsLoading(true);
+        if (selectedFilterOptions) {
+            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
+        }
+        let qry: string = "";
 
-            let qry: string = "";
+        if (globalSearch) {
+            qry += globalSearch;
+        } else {
+            qry += createStringifySearchQuery(advancedSearch);
+        }
 
-            if (globalSearch) {
-                qry += globalSearch;
-            } else {
-                qry += createStringifySearchQuery(advancedSearch);
-            }
+        if (selectedFilterOptions) {
+            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
+            qry += createStringifyFilterQuery(selectedFilterOptions);
+        }
 
-            if (selectedFilterOptions) {
-                if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
-                qry += createStringifyFilterQuery(selectedFilterOptions);
-            }
+        if (selectedInventoryType.length) {
+            if (
+                globalSearch.length ||
+                Object.values(advancedSearch).length ||
+                selectedFilterOptions
+            )
+                qry += "+";
+            selectedInventoryType.forEach(
+                (type, index) =>
+                    (qry += `${type}.GroupClass${
+                        index !== selectedInventoryType.length - 1 ? "+" : ""
+                    }`)
+            );
+        }
 
-            if (selectedInventoryType.length) {
-                if (
-                    globalSearch.length ||
-                    Object.values(advancedSearch).length ||
-                    selectedFilterOptions
-                )
-                    qry += "+";
-                selectedInventoryType.forEach(
-                    (type, index) =>
-                        (qry += `${type}.GroupClass${
-                            index !== selectedInventoryType.length - 1 ? "+" : ""
-                        }`)
-                );
-            }
+        if (Object.values(currentLocation).some((value) => value.trim().length)) {
+            if (!!qry.length) qry += "+";
+            qry += `${currentLocation.locationuid}.locationuid`;
+            changeSettings({ currentLocation: currentLocation.locationuid });
+        }
 
-            if (Object.values(currentLocation).some((value) => value.trim().length)) {
-                if (!!qry.length) qry += "+";
-                qry += `${currentLocation.locationuid}.locationuid`;
-                changeSettings({ currentLocation: currentLocation.locationuid });
-            }
-
-            const params: QueryParams = {
-                ...(lazyState.sortOrder === 1 && { type: "asc" }),
-                ...(lazyState.sortOrder === -1 && { type: "desc" }),
-                ...(lazyState.sortField && { column: lazyState.sortField }),
-                skip: lazyState.first,
-                top: lazyState.rows,
-            };
-
-            if (qry.length > 0) {
-                params.qry = qry;
-            }
-            await handleGetInventoryList(params, true);
-            setIsLoading(false);
+        const params: QueryParams = {
+            ...(lazyState.sortOrder === 1 && { type: "asc" }),
+            ...(lazyState.sortOrder === -1 && { type: "desc" }),
+            ...(lazyState.sortField && { column: lazyState.sortField }),
+            skip: lazyState.first,
+            top: lazyState.rows,
         };
 
-        fetchData();
+        if (qry.length > 0) {
+            params.qry = qry;
+        }
+
+        handleGetInventoryList(params, true);
+        setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lazyState, globalSearch, selectedFilterOptions, currentLocation, selectedInventoryType]);
 
