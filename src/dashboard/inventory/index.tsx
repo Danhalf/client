@@ -116,7 +116,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
 
     useEffect(() => {
         setIsLoading(true);
-        changeSettings({ activeColumns: activeColumns.map(({ field }) => field) });
+        // changeSettings({ activeColumns: activeColumns.map(({ field }) => field) });
         setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeColumns]);
@@ -312,8 +312,12 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                         onChange={() => {
                             if (columns.length === activeColumns.length) {
                                 setActiveColumns(columns.filter(({ checked }) => checked));
+                                changeSettings({ activeColumns: [] });
                             } else {
                                 setActiveColumns(columns);
+                                changeSettings({
+                                    activeColumns: columns.map(({ field }) => field),
+                                });
                             }
                         }}
                         checked={columns.length === activeColumns.length}
@@ -325,6 +329,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                     className='p-multiselect-close p-link'
                     onClick={(e) => {
                         setActiveColumns(columns.filter(({ checked }) => checked));
+                        changeSettings({ activeColumns: [] });
                         onCloseClick(e);
                     }}
                 >
@@ -459,7 +464,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         if (Object.values(currentLocation).some((value) => value.trim().length)) {
             if (!!qry.length) qry += "+";
             qry += `${currentLocation.locationuid}.locationuid`;
-            changeSettings({ currentLocation: currentLocation.locationuid });
         }
 
         const params: QueryParams = {
@@ -547,6 +551,9 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                     onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
                         stopPropagation();
                         setActiveColumns(value);
+                        changeSettings({
+                            activeColumns: value.map(({ field }: { field: string }) => field),
+                        });
                     }}
                     panelHeaderTemplate={dropdownHeaderPanel}
                     className='w-full pb-0 h-full flex align-items-center column-picker'
@@ -679,7 +686,13 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                     },
                                     ...locations.map((location) => ({
                                         label: location.locName,
-                                        command: () => setCurrentLocation(location),
+                                        command: () => {
+                                            setCurrentLocation(location);
+                                            changeSettings({
+                                                ...serverSettings,
+                                                currentLocation: location.locationuid,
+                                            });
+                                        },
                                     })),
                                 ]}
                                 rounded
