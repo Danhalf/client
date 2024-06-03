@@ -43,7 +43,7 @@ export const DealsForm = observer(() => {
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { deal, dealExtData, getDeal, saveDeal, isFormValid } = store;
+    const { deal, dealExtData, getDeal, saveDeal, isFormValid, clearDeal, isFormChanged } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -84,7 +84,7 @@ export const DealsForm = observer(() => {
         setItemsMenuCount(itemsMenuCount);
         setPrintActiveIndex(itemsMenuCount + 1);
 
-        id && getDeal(id);
+        id ? getDeal(id) : clearDeal();
         return () => {
             sections.forEach((section) => section.clearCount());
         };
@@ -202,23 +202,26 @@ export const DealsForm = observer(() => {
                                             innerRef={formikRef}
                                             initialValues={
                                                 {
-                                                    contactuid: deal.contactuid,
-                                                    inventoryuid: deal.inventoryuid,
+                                                    contactuid: deal.contactuid || "",
+                                                    inventoryuid: deal.inventoryuid || "",
                                                     dealtype: deal.dealtype,
                                                     dealstatus: deal.dealstatus,
                                                     saletype: deal.saletype,
                                                     datepurchase: deal.datepurchase,
                                                     dateeffective: deal.dateeffective,
                                                     inventorystatus: deal.inventorystatus,
-                                                    accountuid: deal.accountuid,
-                                                    HowFoundOut: dealExtData?.HowFoundOut,
-                                                    SaleID: dealExtData?.SaleID,
-                                                    OdometerReading: dealExtData?.OdometerReading,
-                                                    OdomDigits: dealExtData?.OdomDigits,
+                                                    accountuid: deal.accountuid || "",
+                                                    HowFoundOut: dealExtData?.HowFoundOut || "",
+                                                    SaleID: dealExtData?.SaleID || "",
+                                                    OdometerReading:
+                                                        dealExtData?.OdometerReading || "",
+                                                    OdomDigits: dealExtData?.OdomDigits || "",
                                                 } as Partial<Deal> & Partial<DealExtData>
                                             }
                                             enableReinitialize
                                             validationSchema={DealFormSchema}
+                                            validateOnChange={false}
+                                            validateOnBlur={false}
                                             onSubmit={() => {
                                                 saveDeal();
                                                 navigate(`/dashboard/deals`);
@@ -227,33 +230,6 @@ export const DealsForm = observer(() => {
                                                     summary: "Success",
                                                     detail: "Deal saved successfully",
                                                 });
-                                            }}
-                                            validate={(values) => {
-                                                const errors: FormikErrors<
-                                                    Partial<Deal> & Partial<DealExtData>
-                                                > = {};
-                                                try {
-                                                    DealFormSchema.validateSync(values, {
-                                                        abortEarly: false,
-                                                    });
-                                                } catch (err) {
-                                                    if (err instanceof Yup.ValidationError) {
-                                                        err.inner.forEach((validationError) => {
-                                                            if (validationError.path) {
-                                                                errors[
-                                                                    validationError.path as keyof (Partial<Deal> &
-                                                                        Partial<DealExtData>)
-                                                                ] = validationError.message;
-                                                            }
-                                                        });
-                                                    }
-                                                }
-                                                if (Object.keys(errors).length > 0) {
-                                                    store.isFormValid = false;
-                                                } else {
-                                                    store.isFormValid = true;
-                                                }
-                                                return errors;
                                             }}
                                         >
                                             <Form name='dealForm'>
@@ -328,6 +304,7 @@ export const DealsForm = observer(() => {
                                 <Button
                                     onClick={handleSaveDealForm}
                                     className='form-nav__button deal__button'
+                                    disabled={!isFormChanged}
                                 >
                                     Save
                                 </Button>

@@ -31,6 +31,7 @@ export class DealStore {
     private _dealErrorMessage: string = "";
     protected _isFormValid = false;
     protected _isLoading = false;
+    protected _isFormChanged = false;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -68,6 +69,10 @@ export class DealStore {
         return this._isFormValid;
     }
 
+    public get isFormChanged() {
+        return this._isFormChanged;
+    }
+
     public set isLoading(state: boolean) {
         this._isLoading = state;
     }
@@ -87,6 +92,7 @@ export class DealStore {
                 this._dealErrorMessage = error!;
             }
         } finally {
+            this._isFormChanged = false;
             this._isLoading = false;
         }
     };
@@ -110,6 +116,7 @@ export class DealStore {
 
     public changeDeal = action(({ key, value }: { key: keyof Deal; value: string | number }) => {
         if (this._deal && key !== "extdata") {
+            this._isFormChanged = true;
             (this._deal as Record<typeof key, string | number>)[key] = value;
         }
     });
@@ -118,6 +125,7 @@ export class DealStore {
         ({ key, value }: { key: keyof DealExtData; value: string | number }) => {
             const dealStore = this.rootStore.dealStore;
             if (dealStore) {
+                this._isFormChanged = true;
                 const { dealExtData } = dealStore;
                 (dealExtData as Record<typeof key, string | number>)[key] = value;
             }
