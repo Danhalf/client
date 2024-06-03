@@ -13,7 +13,7 @@ import { DealRetail } from "./retail";
 import { useStore } from "store/hooks";
 import { Loader } from "dashboard/common/loader";
 import { PrintDealForms } from "./print-forms";
-import { Form, Formik, FormikErrors, FormikProps } from "formik";
+import { Form, Formik, FormikProps } from "formik";
 import { Deal, DealExtData } from "common/models/deals";
 import * as Yup from "yup";
 import { useToast } from "dashboard/common/toast";
@@ -43,7 +43,7 @@ export const DealsForm = observer(() => {
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { deal, dealExtData, getDeal, saveDeal, isFormValid, clearDeal, isFormChanged } = store;
+    const { deal, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -109,15 +109,17 @@ export const DealsForm = observer(() => {
     };
 
     const handleSaveDealForm = () => {
-        if (!isFormValid) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Validation Error",
-                detail: "Please fill in all required fields.",
-            });
-        } else {
-            formikRef.current?.submitForm();
-        }
+        formikRef.current?.validateForm().then((errors) => {
+            if (!Object.keys(errors).length) {
+                formikRef.current?.submitForm();
+            } else {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Validation Error",
+                    detail: "Please fill in all required fields.",
+                });
+            }
+        });
     };
 
     return (
@@ -305,6 +307,7 @@ export const DealsForm = observer(() => {
                                 <Button
                                     onClick={handleSaveDealForm}
                                     className='form-nav__button deal__button'
+                                    severity={isFormChanged ? "success" : "secondary"}
                                     disabled={!isFormChanged}
                                 >
                                     Save

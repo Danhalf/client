@@ -33,7 +33,6 @@ export class DealStore {
     private _dealID: string = "";
     private _printList: DealPrintCollection = {};
     private _dealErrorMessage: string = "";
-    protected _isFormValid = false;
     protected _isLoading = false;
     protected _isFormChanged = false;
 
@@ -67,10 +66,6 @@ export class DealStore {
 
     public get isLoading() {
         return this._isLoading;
-    }
-
-    public get isFormValid() {
-        return this._isFormValid;
     }
 
     public get isFormChanged() {
@@ -217,10 +212,6 @@ export class DealStore {
             this._isLoading = false;
         }
     });
-
-    public set isFormValid(state: boolean) {
-        this._isFormValid = state;
-    }
 
     public clearDeal = () => {
         this._deal = {} as DealItem;
