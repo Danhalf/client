@@ -1,8 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { ReactElement, ReactNode, useEffect, useState } from "react";
-import { LS_APP_USER } from "common/constants/localStorage";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
 interface UserRoles {
     admin: boolean;
@@ -16,56 +15,31 @@ interface ProtectedRouteProps {
     children?: ReactNode;
 }
 
-export const useAuth = (): AuthUser | null => {
-    const [authUser, setAuthUser] = useState<AuthUser | null>(() => getKeyValue(LS_APP_USER));
-
-    useEffect(() => {
-        const handleStorageChange = () => {
-            setAuthUser(getKeyValue(LS_APP_USER));
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-
-        return () => {
-            window.removeEventListener("storage", handleStorageChange);
-        };
-    }, []);
-
-    return authUser;
-};
-
-const ProtectedRoute = ({ notAllowed, children }: ProtectedRouteProps): ReactElement => {
-    const authUser = useAuth();
+const ProtectedRoute = observer(({ notAllowed, children }: ProtectedRouteProps): ReactElement => {
+    const store = useStore().userStore;
+    const { authUser } = store;
     const [hasRequiredRole, setHasRequiredRole] = useState<boolean>(true);
 
     useEffect(() => {
         if (authUser) {
-            const userRoles: UserRoles = {
-                admin: !!authUser.isadmin,
-                localAdmin: !!authUser.islocaladmin,
-                manager: !!authUser.ismanager,
-                salesPerson: !!authUser.issalesperson,
-            };
+            const { permissions } = authUser;
+            if (!permissions) return setHasRequiredRole(false);
 
-            if (notAllowed) {
-                setHasRequiredRole(
-                    notAllowed.some((role) => {
-                        return !userRoles[role];
-                    })
-                );
-            }
+            const { uaSalesPerson, ...otherPermissions } = permissions;
+            if (Object.values(otherPermissions).some((permission) => permission === 1)) {
+                return setHasRequiredRole(true);
+            } else if (!!uaSalesPerson) setHasRequiredRole(false);
         }
-    }, [notAllowed, authUser]);
+    }, [authUser]);
 
     if (!authUser) {
         return <Navigate to='/' replace />;
     }
-
-    if (!hasRequiredRole) {
+    if (!hasRequiredRole && notAllowed) {
         return <Navigate to='/dashboard' replace />;
     }
 
     return children ? <>{children}</> : <Outlet />;
-};
+});
 
 export default ProtectedRoute;
