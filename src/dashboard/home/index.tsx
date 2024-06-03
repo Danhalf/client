@@ -1,18 +1,24 @@
 import "./index.css";
 import { Calendar } from "primereact/calendar";
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Tasks } from "dashboard/tasks";
-import { useAuth } from "http/routes/ProtectedRoute";
+import { useStore } from "store/hooks";
 
-export default function Home() {
-    const authUser = useAuth();
-    const [isSalesPerson, setIsSalesPerson] = useState(false);
+export const Home = (): ReactElement => {
+    const store = useStore().userStore;
+    const { authUser } = store;
+    const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
-        if (authUser) {
-            setIsSalesPerson(!!authUser?.issalesperson);
+        if (authUser && Object.keys(authUser.permissions).length) {
+            const { permissions } = authUser;
+            const { uaSalesPerson, ...otherPermissions } = permissions;
+            if (Object.values(otherPermissions).some((permission) => permission === 1)) {
+                return setIsSalesPerson(false);
+            }
+            if (!!uaSalesPerson) setIsSalesPerson(true);
         }
-    }, [authUser]);
+    }, [authUser, authUser?.permissions]);
     const [date] = useState(null);
 
     return (
@@ -197,4 +203,4 @@ export default function Home() {
             </div>
         </div>
     );
-}
+};

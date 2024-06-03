@@ -1,16 +1,24 @@
 import { Link } from "react-router-dom";
 import "./index.css";
-import { useState, useEffect } from "react";
-import { useAuth } from "http/routes/ProtectedRoute";
+import { useState, useEffect, ReactElement } from "react";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
-export default function Sidebar() {
-    const authUser = useAuth();
-    const [isSalesPerson, setIsSalesPerson] = useState(false);
+export const Sidebar = observer((): ReactElement => {
+    const store = useStore().userStore;
+    const { authUser } = store;
+    const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
-        if (authUser) {
-            setIsSalesPerson(!!authUser?.issalesperson);
+        if (authUser && Object.keys(authUser.permissions).length) {
+            const { permissions } = authUser;
+            const { uaSalesPerson, ...otherPermissions } = permissions;
+            if (Object.values(otherPermissions).some((permission) => permission === 1)) {
+                return setIsSalesPerson(false);
+            }
+            if (!!uaSalesPerson) setIsSalesPerson(true);
         }
-    }, [authUser]);
+    }, [authUser, authUser?.permissions]);
+
     return (
         <aside className='sidebar hidden lg:block'>
             <ul className='sidebar-nav'>
@@ -64,4 +72,4 @@ export default function Sidebar() {
             </ul>
         </aside>
     );
-}
+});
