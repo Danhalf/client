@@ -193,17 +193,28 @@ export const InventoryForm = observer(() => {
                             <h2 className='card-header__title uppercase m-0'>
                                 {id ? "Edit" : "Create new"} inventory
                             </h2>
-                            <div className='card-header-info'>
-                                Stock#
-                                <span className='card-header-info__data'>{inventory?.StockNo}</span>
-                                Make
-                                <span className='card-header-info__data'>{inventory?.Make}</span>
-                                Model
-                                <span className='card-header-info__data'>{inventory?.Model}</span>
-                                Year
-                                <span className='card-header-info__data'>{inventory?.Year}</span>
-                                VIN <span className='card-header-info__data'>{inventory?.VIN}</span>
-                            </div>
+                            {id && (
+                                <div className='card-header-info'>
+                                    Stock#
+                                    <span className='card-header-info__data'>
+                                        {inventory?.StockNo}
+                                    </span>
+                                    Make
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Make}
+                                    </span>
+                                    Model
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Model}
+                                    </span>
+                                    Year
+                                    <span className='card-header-info__data'>
+                                        {inventory?.Year}
+                                    </span>
+                                    VIN{" "}
+                                    <span className='card-header-info__data'>{inventory?.VIN}</span>
+                                </div>
+                            )}
                         </div>
                         <div className='card-content inventory__card'>
                             <div className='grid flex-nowrap inventory__card-content'>
@@ -214,6 +225,71 @@ export const InventoryForm = observer(() => {
                                         className='inventory__accordion'
                                         multiple
                                     >
+                                        {inventorySections.map((section) => (
+                                            <AccordionTab
+                                                key={section.sectionId}
+                                                header={section.label}
+                                            >
+                                                <Steps
+                                                    readOnly={false}
+                                                    activeIndex={
+                                                        stepActiveIndex - section.startIndex
+                                                    }
+                                                    onSelect={(e) => {
+                                                        setStepActiveIndex(
+                                                            e.index + section.startIndex
+                                                        );
+                                                    }}
+                                                    model={section.items.map(
+                                                        ({ itemLabel, template }, idx) => ({
+                                                            label: itemLabel,
+                                                            template,
+                                                            command: () => {
+                                                                navigate(
+                                                                    getUrl(section.startIndex + idx)
+                                                                );
+                                                            },
+                                                        })
+                                                    )}
+                                                    className='vertical-step-menu'
+                                                    pt={{
+                                                        menu: {
+                                                            className: "flex-column w-full",
+                                                        },
+                                                        step: {
+                                                            className:
+                                                                "border-circle inventory-step",
+                                                        },
+                                                    }}
+                                                />
+                                            </AccordionTab>
+                                        ))}
+                                    </Accordion>
+                                    {id && (
+                                        <Button
+                                            icon='icon adms-print'
+                                            className={`p-button gap-2 inventory__print-nav ${
+                                                stepActiveIndex === printActiveIndex &&
+                                                "inventory__print-nav--active"
+                                            } w-full`}
+                                            onClick={handleActivePrintForms}
+                                        >
+                                            Print forms
+                                        </Button>
+                                    )}
+                                    {id && (
+                                        <Button
+                                            icon='pi pi-times'
+                                            className='p-button gap-2 inventory__delete-nav w-full'
+                                            severity='danger'
+                                            onClick={() => setStepActiveIndex(deleteActiveIndex)}
+                                        >
+                                            Delete inventory
+                                        </Button>
+                                    )}
+                                </div>
+                                <div className='w-full flex flex-column p-0 card-content__wrapper'>
+                                    <div className='flex flex-grow-1'>
                                         <Formik
                                             innerRef={formikRef}
                                             validationSchema={InventoryFormSchema}
@@ -242,97 +318,29 @@ export const InventoryForm = observer(() => {
                                             }}
                                         >
                                             <Form name='inventoryForm'>
-                                                {inventorySections.map((section) => (
-                                                    <AccordionTab
-                                                        key={section.sectionId}
-                                                        header={section.label}
-                                                    >
-                                                        <Steps
-                                                            readOnly={false}
-                                                            activeIndex={
-                                                                stepActiveIndex - section.startIndex
-                                                            }
-                                                            onSelect={(e) => {
-                                                                setStepActiveIndex(
-                                                                    e.index + section.startIndex
-                                                                );
-                                                            }}
-                                                            model={section.items.map(
-                                                                ({ itemLabel, template }, idx) => ({
-                                                                    label: itemLabel,
-                                                                    template,
-                                                                    command: () => {
-                                                                        navigate(
-                                                                            getUrl(
-                                                                                section.startIndex +
-                                                                                    idx
-                                                                            )
-                                                                        );
-                                                                    },
-                                                                })
+                                                {inventorySections.map((section) =>
+                                                    section.items.map((item: InventoryItem) => (
+                                                        <div
+                                                            key={item.itemIndex}
+                                                            className={`${
+                                                                stepActiveIndex === item.itemIndex
+                                                                    ? "block inventory-form"
+                                                                    : "hidden"
+                                                            }`}
+                                                        >
+                                                            <div className='inventory-form__title uppercase'>
+                                                                {item.itemLabel}
+                                                            </div>
+                                                            {stepActiveIndex === item.itemIndex && (
+                                                                <Suspense fallback={<Loader />}>
+                                                                    {item.component}
+                                                                </Suspense>
                                                             )}
-                                                            className='vertical-step-menu'
-                                                            pt={{
-                                                                menu: {
-                                                                    className: "flex-column w-full",
-                                                                },
-                                                                step: {
-                                                                    className:
-                                                                        "border-circle inventory-step",
-                                                                },
-                                                            }}
-                                                        />
-                                                    </AccordionTab>
-                                                ))}
+                                                        </div>
+                                                    ))
+                                                )}
                                             </Form>
                                         </Formik>
-                                    </Accordion>
-                                    {id && (
-                                        <Button
-                                            icon='icon adms-print'
-                                            className={`p-button gap-2 inventory__print-nav ${
-                                                stepActiveIndex === printActiveIndex &&
-                                                "inventory__print-nav--active"
-                                            } w-full`}
-                                            onClick={handleActivePrintForms}
-                                        >
-                                            Print forms
-                                        </Button>
-                                    )}
-                                    {id && (
-                                        <Button
-                                            icon='pi pi-times'
-                                            className='p-button gap-2 inventory__delete-nav w-full'
-                                            severity='danger'
-                                            onClick={() => setStepActiveIndex(deleteActiveIndex)}
-                                        >
-                                            Delete inventory
-                                        </Button>
-                                    )}
-                                </div>
-                                <div className='w-full flex flex-column p-0 card-content__wrapper'>
-                                    <div className='flex flex-grow-1'>
-                                        {inventorySections.map((section) =>
-                                            section.items.map((item: InventoryItem) => (
-                                                <div
-                                                    key={item.itemIndex}
-                                                    className={`${
-                                                        stepActiveIndex === item.itemIndex
-                                                            ? "block inventory-form"
-                                                            : "hidden"
-                                                    }`}
-                                                >
-                                                    <div className='inventory-form__title uppercase'>
-                                                        {item.itemLabel}
-                                                    </div>
-                                                    {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense fallback={<Loader />}>
-                                                            {item.component}
-                                                        </Suspense>
-                                                    )}
-                                                </div>
-                                            ))
-                                        )}
 
                                         {stepActiveIndex === printActiveIndex && (
                                             <div className='inventory-form'>
