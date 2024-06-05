@@ -35,7 +35,6 @@ export const VehicleGeneral = observer((): ReactElement => {
         Inventory & InventoryExtData
     >();
     const year = parseInt(inventory.Year, 10);
-    const mileage = (inventory?.mileage && parseFloat(inventory.mileage.replace(/,/g, "."))) || 0;
 
     const [user, setUser] = useState<AuthUser | null>(null);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
@@ -190,8 +189,11 @@ export const VehicleGeneral = observer((): ReactElement => {
                         optionValue='locationuid'
                         filter
                         options={locationList}
-                        value={inventory.locationuid}
-                        onChange={({ value }) => changeInventory({ key: "locationuid", value })}
+                        value={values.locationuid}
+                        onChange={({ value }) => {
+                            setFieldValue("locationuid", value);
+                            changeInventory({ key: "locationuid", value });
+                        }}
                         placeholder='Location name'
                         className={`w-full vehicle-general__dropdown ${
                             inventory.locationuid === "" && "p-inputwrapper-filled"
@@ -354,14 +356,12 @@ export const VehicleGeneral = observer((): ReactElement => {
                             errors.mileage ? "p-invalid" : ""
                         }`}
                         required
-                        value={mileage}
-                        minFractionDigits={2}
+                        value={parseFloat(inventory?.mileage) || 0}
                         min={0}
                         onChange={({ value }) => {
-                            value && setFieldValue("mileage", value);
                             changeInventory({
                                 key: "mileage",
-                                value: String(value).replace(".", ","),
+                                value: value ? String(value) : "0",
                             });
                         }}
                     />
