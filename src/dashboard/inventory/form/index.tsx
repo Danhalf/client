@@ -23,8 +23,13 @@ import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { PrintForms } from "./print-forms";
 import { Loader } from "dashboard/common/loader";
+import { Form, Formik, FormikProps } from "formik";
 
 const STEP = "step";
+
+//TODO: add validation
+const MIN_YEAR = 1970;
+const MAX_YEAR = new Date().getFullYear();
 
 export const InventoryForm = observer(() => {
     const { id } = useParams();
@@ -56,6 +61,9 @@ export const InventoryForm = observer(() => {
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
+
+    const year = parseInt(inventory.Year, 10);
+    const mileage = (inventory?.mileage && parseFloat(inventory.mileage.replace(/,/g, "."))) || 0;
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -143,6 +151,43 @@ export const InventoryForm = observer(() => {
             );
     };
 
+    // const formik = useFormik({
+    //     validate: (data) => {
+    //         let errors: any = {};
+
+    //         if (!data.VIN) {
+    //             errors.VIN = "Data is required.";
+    //         }
+
+    //         if (!data.Make) {
+    //             errors.Make = "Data is required.";
+    //         }
+
+    //         if (!data.Model) {
+    //             errors.Model = "Data is required.";
+    //         }
+    //         if (!data.Year || Number(data.Year) < MIN_YEAR || Number(data.Year) > MAX_YEAR) {
+    //             switch (true) {
+    //                 case Number(data.Year) < MIN_YEAR:
+    //                     errors.Year = `Must be greater than ${MIN_YEAR}`;
+    //                     break;
+    //                 case Number(data.Year) > MAX_YEAR:
+    //                     errors.Year = `Must be less than ${MAX_YEAR}`;
+    //                     break;
+    //                 default:
+    //                     errors.Year = "Data is required.";
+    //             }
+    //         }
+
+    //         if (!data.mileage) {
+    //             errors.mileage = "Data is required.";
+    //         }
+
+    //         return errors;
+    //     },
+    //     onSubmit: () => {},
+    // });
+
     return (
         <Suspense>
             <div className='grid relative'>
@@ -178,43 +223,64 @@ export const InventoryForm = observer(() => {
                                         className='inventory__accordion'
                                         multiple
                                     >
-                                        {inventorySections.map((section) => (
-                                            <AccordionTab
-                                                key={section.sectionId}
-                                                header={section.label}
-                                            >
-                                                <Steps
-                                                    readOnly={false}
-                                                    activeIndex={
-                                                        stepActiveIndex - section.startIndex
-                                                    }
-                                                    onSelect={(e) => {
-                                                        setStepActiveIndex(
-                                                            e.index + section.startIndex
-                                                        );
-                                                    }}
-                                                    model={section.items.map(
-                                                        ({ itemLabel, template }, idx) => ({
-                                                            label: itemLabel,
-                                                            template,
-                                                            command: () => {
-                                                                navigate(
-                                                                    getUrl(section.startIndex + idx)
+                                        <Formik
+                                            initialValues={
+                                                {
+                                                    VIN: inventory?.VIN || "",
+                                                    Make: inventory.Make,
+                                                    Model: inventory.Model,
+                                                    Year: String(year),
+                                                    mileage: inventory.mileage,
+                                                } as Partial<Inventory>
+                                            }
+                                            enableReinitialize
+                                            onSubmit={() => {}}
+                                        >
+                                            <Form name='inventoryForm'>
+                                                {inventorySections.map((section) => (
+                                                    <AccordionTab
+                                                        key={section.sectionId}
+                                                        header={section.label}
+                                                    >
+                                                        <Steps
+                                                            readOnly={false}
+                                                            activeIndex={
+                                                                stepActiveIndex - section.startIndex
+                                                            }
+                                                            onSelect={(e) => {
+                                                                setStepActiveIndex(
+                                                                    e.index + section.startIndex
                                                                 );
-                                                            },
-                                                        })
-                                                    )}
-                                                    className='vertical-step-menu'
-                                                    pt={{
-                                                        menu: { className: "flex-column w-full" },
-                                                        step: {
-                                                            className:
-                                                                "border-circle inventory-step",
-                                                        },
-                                                    }}
-                                                />
-                                            </AccordionTab>
-                                        ))}
+                                                            }}
+                                                            model={section.items.map(
+                                                                ({ itemLabel, template }, idx) => ({
+                                                                    label: itemLabel,
+                                                                    template,
+                                                                    command: () => {
+                                                                        navigate(
+                                                                            getUrl(
+                                                                                section.startIndex +
+                                                                                    idx
+                                                                            )
+                                                                        );
+                                                                    },
+                                                                })
+                                                            )}
+                                                            className='vertical-step-menu'
+                                                            pt={{
+                                                                menu: {
+                                                                    className: "flex-column w-full",
+                                                                },
+                                                                step: {
+                                                                    className:
+                                                                        "border-circle inventory-step",
+                                                                },
+                                                            }}
+                                                        />
+                                                    </AccordionTab>
+                                                ))}
+                                            </Form>
+                                        </Formik>
                                     </Accordion>
                                     {id && (
                                         <Button
