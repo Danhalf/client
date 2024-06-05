@@ -17,7 +17,7 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { Checkbox } from "primereact/checkbox";
-import { Audit, Inventory, InventoryExtData, InventoryLocations } from "common/models/inventory";
+import { Audit, Inventory, InventoryLocations } from "common/models/inventory";
 import { InputNumber } from "primereact/inputnumber";
 
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
@@ -31,9 +31,7 @@ import { VINDecoder } from "dashboard/common/form/vin-decoder";
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
-    const { values, errors, setFieldValue, getFieldProps } = useFormikContext<
-        Inventory & InventoryExtData
-    >();
+    const { values, errors, setFieldValue, getFieldProps } = useFormikContext<Inventory>();
     const year = parseInt(inventory.Year, 10);
 
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -182,7 +180,7 @@ export const VehicleGeneral = observer((): ReactElement => {
 
     return (
         <div className='grid vehicle-general row-gap-2'>
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='locName'
@@ -197,30 +195,35 @@ export const VehicleGeneral = observer((): ReactElement => {
                         placeholder='Location name'
                         className={`w-full vehicle-general__dropdown ${
                             inventory.locationuid === "" && "p-inputwrapper-filled"
-                        }`}
+                        } ${errors.locationuid ? "p-invalid" : ""}`}
                     />
                     <label className='float-label'>Location name</label>
                 </span>
+                <small className='p-error'>{errors.locationuid}</small>
             </div>
-            <div className='col-3'>
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='description'
                         optionValue='description'
                         filter
                         options={groupClassList}
-                        value={inventory?.GroupClassName}
-                        onChange={({ value }) =>
+                        value={values?.GroupClassName}
+                        onChange={({ value }) => {
+                            setFieldValue("GroupClassName", value);
                             changeInventory({
                                 key: "GroupClassName",
                                 value,
-                            })
-                        }
+                            });
+                        }}
                         placeholder='Group class'
-                        className='w-full vehicle-general__dropdown'
+                        className={`w-full vehicle-general__dropdown ${
+                            errors.GroupClassName ? "p-invalid" : ""
+                        }`}
                     />
                     <label className='float-label'>Inventory group</label>
                 </span>
+                <small className='p-error'>{errors.GroupClass}</small>
             </div>
 
             <div className='col-12'>
@@ -243,25 +246,30 @@ export const VehicleGeneral = observer((): ReactElement => {
             <div className='col-6 relative'>
                 <VINDecoder
                     value={values.VIN}
-                    onChange={({ target: { value } }) => changeInventory({ key: "VIN", value })}
+                    onChange={({ target: { value } }) => {
+                        setFieldValue("VIN", value);
+                        changeInventory({ key: "VIN", value });
+                    }}
                     onAction={handleVINchange}
                     disabled={inventory.GroupClassName === "equipment"}
                     className={`w-full ${errors.VIN ? "p-invalid" : ""}`}
                 />
-                <small className='p-error'>{errors.VIN || ""}</small>
+                <small className='p-error'>{errors.VIN}</small>
             </div>
 
-            <div className='col-6'>
+            <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InputText
                         className='vehicle-general__text-input w-full'
-                        value={inventory?.StockNo || ""}
-                        onChange={({ target: { value } }) =>
-                            changeInventory({ key: "StockNo", value })
-                        }
+                        value={values.StockNo}
+                        onChange={({ target: { value } }) => {
+                            setFieldValue("StockNo", value);
+                            changeInventory({ key: "StockNo", value });
+                        }}
                     />
                     <label className='float-label'>Stock#</label>
                 </span>
+                <small className='p-error'>{errors.StockNo}</small>
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
@@ -367,7 +375,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                     />
                     <label className='float-label'>Mileage (required)</label>
                 </span>
-
                 <small className='p-error'>{errors.mileage}</small>
             </div>
             <div className='col-3'>
