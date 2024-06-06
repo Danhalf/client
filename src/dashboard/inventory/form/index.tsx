@@ -85,8 +85,6 @@ export const InventoryForm = observer(() => {
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
     const formikRef = useRef<FormikProps<InventoryModel>>(null);
 
-    const year = parseInt(inventory.Year, 10);
-
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
@@ -298,7 +296,7 @@ export const InventoryForm = observer(() => {
                                                     VIN: inventory?.VIN || "",
                                                     Make: inventory.Make,
                                                     Model: inventory.Model,
-                                                    Year: String(year),
+                                                    Year: inventory.Year || MIN_YEAR,
                                                     StockNo: inventory?.StockNo || "",
                                                     locationuid: inventory?.locationuid || "",
                                                     GroupClass: inventory?.GroupClass || 0,

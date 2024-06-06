@@ -32,7 +32,6 @@ export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, inventoryAudit, changeInventoryAudit } = store;
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<Inventory>();
-    const year = parseInt(inventory.Year, 10);
 
     const [user, setUser] = useState<AuthUser | null>(null);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
@@ -343,9 +342,8 @@ export const VehicleGeneral = observer((): ReactElement => {
                             errors.Year ? "p-invalid" : ""
                         }`}
                         required
-                        min={0}
-                        value={year}
                         useGrouping={false}
+                        value={parseInt(values.Year)}
                         onChange={({ value }) => {
                             setFieldValue("Year", value);
                             changeInventory({ key: "Year", value: String(value) });
