@@ -172,11 +172,6 @@ export const VehicleGeneral = observer((): ReactElement => {
         "JustArrived",
     ];
 
-    useEffect(() => {
-        const isValid = Object.keys(errors).length === 0;
-        store.isFormValid = isValid;
-    }, [errors, store]);
-
     return (
         <div className='grid vehicle-general row-gap-2'>
             <div className='col-6 relative'>
@@ -196,7 +191,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             inventory.locationuid === "" && "p-inputwrapper-filled"
                         } ${errors.locationuid ? "p-invalid" : ""}`}
                     />
-                    <label className='float-label'>Location name</label>
+                    <label className='float-label'>Location name (required)</label>
                 </span>
                 <small className='p-error'>{errors.locationuid}</small>
             </div>
@@ -204,7 +199,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='description'
-                        optionValue='description'
+                        optionValue='itemuid'
                         filter
                         options={groupClassList}
                         value={values?.GroupClassName}
@@ -220,7 +215,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             errors.GroupClassName ? "p-invalid" : ""
                         }`}
                     />
-                    <label className='float-label'>Inventory group</label>
+                    <label className='float-label'>Inventory group (required)</label>
                 </span>
                 <small className='p-error'>{errors.GroupClass}</small>
             </div>
@@ -363,6 +358,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         }`}
                         required
                         value={parseFloat(inventory?.mileage) || 0}
+                        useGrouping={false}
                         min={0}
                         onChange={({ value }) => {
                             changeInventory({
@@ -371,7 +367,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             });
                         }}
                     />
-                    <label className='float-label'>Mileage (required)</label>
+                    <label className='float-label'>Mileage</label>
                 </span>
                 <small className='p-error'>{errors.mileage}</small>
             </div>

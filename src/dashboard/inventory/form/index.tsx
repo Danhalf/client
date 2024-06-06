@@ -33,7 +33,7 @@ const STEP = "step";
 
 type PartialInventory = Pick<
     InventoryModel,
-    "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClass" | "StockNo"
+    "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClass" | "StockNo" | "TypeOfFuel"
 >;
 
 const MIN_YEAR = 1970;
@@ -44,12 +44,27 @@ export const InventoryFormSchema: Yup.ObjectSchema<PartialInventory> = Yup.objec
     Make: Yup.string().trim().required("Data is required."),
     Model: Yup.string().trim().required("Data is required."),
     Year: Yup.string()
-        .min(MIN_YEAR, `Must be greater than ${MIN_YEAR}`)
-        .max(MAX_YEAR, `Must be less than ${MAX_YEAR}`)
+        .test("is-valid-year", `Must be between ${MIN_YEAR} and ${MAX_YEAR}`, function (value) {
+            if (!value) {
+                return this.createError({ message: "Data is required." });
+            }
+            const year = Number(value);
+            if (isNaN(year)) {
+                return this.createError({ message: "Year must be a number." });
+            }
+            if (year < MIN_YEAR) {
+                return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
+            }
+            if (year > MAX_YEAR) {
+                return this.createError({ message: `Must be less than ${MAX_YEAR}` });
+            }
+            return true;
+        })
         .required("Data is required."),
     locationuid: Yup.string().trim().required("Data is required."),
     GroupClass: Yup.number().required("Data is required."),
     StockNo: Yup.string().trim().required("Data is required."),
+    TypeOfFuel: Yup.string().trim().required("Data is required."),
 });
 
 export const InventoryForm = observer(() => {
@@ -74,7 +89,7 @@ export const InventoryForm = observer(() => {
         getInventoryExportWeb,
         getInventoryExportWebHistory,
         inventory,
-        isFormValid,
+        isFormChanged,
     } = store;
     const navigate = useNavigate();
     const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
@@ -209,7 +224,7 @@ export const InventoryForm = observer(() => {
                                     <span className='card-header-info__data'>
                                         {inventory?.Year}
                                     </span>
-                                    VIN{" "}
+                                    VIN
                                     <span className='card-header-info__data'>{inventory?.VIN}</span>
                                 </div>
                             )}
@@ -315,7 +330,7 @@ export const InventoryForm = observer(() => {
                                                 });
                                             }}
                                         >
-                                            <Form name='inventoryForm'>
+                                            <Form name='inventoryForm' className='w-full'>
                                                 {inventorySections.map((section) =>
                                                     section.items.map((item: InventoryItem) => (
                                                         <div
@@ -445,8 +460,9 @@ export const InventoryForm = observer(() => {
                                 ) : (
                                     <Button
                                         className='uppercase px-6 inventory__button'
-                                        disabled={!isFormValid}
                                         onClick={handleSaveInventoryForm}
+                                        severity={isFormChanged ? "success" : "secondary"}
+                                        disabled={!isFormChanged}
                                     >
                                         Save
                                     </Button>
