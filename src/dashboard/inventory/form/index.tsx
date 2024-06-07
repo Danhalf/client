@@ -35,7 +35,7 @@ type PartialInventory = Pick<
     InventoryModel,
     "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClassName" | "StockNo" | "TypeOfFuel"
 > &
-    Pick<InventoryExtData, "purPurchasedFrom" | "purPurchaseDate">;
+    Pick<InventoryExtData, "purPurchasedFrom">;
 
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
@@ -63,7 +63,6 @@ export const InventoryFormSchema: Yup.ObjectSchema<Partial<PartialInventory>> = 
     StockNo: Yup.string().trim().required("Data is required."),
     TypeOfFuel: Yup.string().trim().required("Data is required."),
     purPurchasedFrom: Yup.string().trim().required("Data is required."),
-    purPurchaseDate: Yup.number().required("Data is required."),
 });
 
 export const InventoryForm = observer(() => {
@@ -320,9 +319,6 @@ export const InventoryForm = observer(() => {
                                                     GroupClassName: inventory?.GroupClassName || "",
                                                     purPurchasedFrom:
                                                         inventoryExtData?.purPurchasedFrom || "",
-                                                    purPurchaseDate:
-                                                        inventoryExtData?.purPurchaseDate ||
-                                                        new Date().getMilliseconds(),
                                                 } as PartialInventory
                                             }
                                             enableReinitialize
