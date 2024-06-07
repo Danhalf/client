@@ -103,6 +103,7 @@ export const InventoryForm = observer(() => {
     const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
     const formikRef = useRef<FormikProps<PartialInventory>>(null);
+    const [validateOnMount, setValidateOnMount] = useState<boolean>(false);
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -187,6 +188,7 @@ export const InventoryForm = observer(() => {
             if (!Object.keys(errors).length) {
                 formikRef.current?.submitForm();
             } else {
+                setValidateOnMount(true);
                 toast.current?.show({
                     severity: "error",
                     summary: "Validation Error",
@@ -330,7 +332,9 @@ export const InventoryForm = observer(() => {
                                             enableReinitialize
                                             validateOnChange={false}
                                             validateOnBlur={false}
+                                            validateOnMount={validateOnMount}
                                             onSubmit={() => {
+                                                setValidateOnMount(false);
                                                 saveInventory();
                                                 navigate(`/dashboard/inventory`);
                                                 toast.current?.show({
