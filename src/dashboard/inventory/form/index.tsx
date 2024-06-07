@@ -40,19 +40,15 @@ type PartialInventory = Pick<
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
 
-export const InventoryFormSchema: Yup.ObjectSchema<PartialInventory> = Yup.object().shape({
+export const InventoryFormSchema: Yup.ObjectSchema<Partial<PartialInventory>> = Yup.object().shape({
     VIN: Yup.string().trim().required("Data is required."),
     Make: Yup.string().trim().required("Data is required."),
     Model: Yup.string().trim().required("Data is required."),
-    Year: Yup.string()
-        .test("is-valid-year", `Must be between ${MIN_YEAR} and ${MAX_YEAR}`, function (value) {
-            if (!value) {
-                return this.createError({ message: "Data is required." });
-            }
+    Year: Yup.string().test(
+        "is-valid-year",
+        `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
+        function (value) {
             const year = Number(value);
-            if (isNaN(year)) {
-                return this.createError({ message: "Year must be a number." });
-            }
             if (year < MIN_YEAR) {
                 return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
             }
@@ -60,8 +56,8 @@ export const InventoryFormSchema: Yup.ObjectSchema<PartialInventory> = Yup.objec
                 return this.createError({ message: `Must be less than ${MAX_YEAR}` });
             }
             return true;
-        })
-        .required("Data is required."),
+        }
+    ),
     locationuid: Yup.string().trim().required("Data is required."),
     GroupClassName: Yup.string().trim().required("Data is required."),
     StockNo: Yup.string().trim().required("Data is required."),
@@ -317,7 +313,7 @@ export const InventoryForm = observer(() => {
                                                     VIN: inventory?.VIN || "",
                                                     Make: inventory.Make,
                                                     Model: inventory.Model,
-                                                    Year: inventory.Year || MIN_YEAR,
+                                                    Year: inventory.Year,
                                                     TypeOfFuel: inventory?.TypeOfFuel || "",
                                                     StockNo: inventory?.StockNo || "",
                                                     locationuid: inventory?.locationuid || "",
