@@ -285,32 +285,20 @@ export const InventoryForm = observer(() => {
                                                         );
                                                     }}
                                                     model={section.items.map(
-                                                        ({ itemLabel, template }, idx) => {
-                                                            // eslint-disable-next-line no-console
-                                                            console.log(
-                                                                itemLabel,
-                                                                errorSections,
+                                                        ({ itemLabel, template }, idx) => ({
+                                                            label: itemLabel,
+                                                            template,
+                                                            command: () => {
+                                                                navigate(
+                                                                    getUrl(section.startIndex + idx)
+                                                                );
+                                                            },
+                                                            className: `${
                                                                 errorSections.includes(itemLabel)
-                                                            );
-                                                            return {
-                                                                label: itemLabel,
-                                                                template,
-                                                                command: () => {
-                                                                    navigate(
-                                                                        getUrl(
-                                                                            section.startIndex + idx
-                                                                        )
-                                                                    );
-                                                                },
-                                                                className: `${
-                                                                    errorSections.includes(
-                                                                        itemLabel
-                                                                    )
-                                                                        ? "section-invalid"
-                                                                        : ""
-                                                                }`,
-                                                            };
-                                                        }
+                                                                    ? "section-invalid"
+                                                                    : ""
+                                                            }`,
+                                                        })
                                                     )}
                                                     className='vertical-step-menu'
                                                     pt={{
