@@ -293,11 +293,11 @@ export const InventoryForm = observer(() => {
                                                                     getUrl(section.startIndex + idx)
                                                                 );
                                                             },
-                                                            className: `${
-                                                                errorSections.includes(itemLabel)
+                                                            className: errorSections.length
+                                                                ? errorSections.includes(itemLabel)
                                                                     ? "section-invalid"
-                                                                    : ""
-                                                            }`,
+                                                                    : "section-valid"
+                                                                : "",
                                                         })
                                                     )}
                                                     className='vertical-step-menu'
