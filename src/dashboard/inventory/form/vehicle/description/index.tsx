@@ -96,12 +96,11 @@ export const VehicleDescription = observer((): ReactElement => {
             <div className='col-3 relative'>
                 <span className='p-float-label'>
                     <Dropdown
-                        {...getFieldProps("TypeOfFuel")}
                         optionLabel='name'
                         optionValue='id'
                         filter
                         options={fuelList}
-                        value={values.TypeOfFuel}
+                        value={inventory.TypeOfFuel}
                         onChange={({ value }) => {
                             setFieldValue("TypeOfFuel", value);
                             changeInventory({ key: "TypeOfFuel", value });
