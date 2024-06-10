@@ -18,7 +18,7 @@ export const VehicleDescription = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { inventory, changeInventory, formErrorIndex } = store;
 
-    const { values, errors, setFieldValue, getFieldProps } = useFormikContext<Inventory>();
+    const { errors, setFieldValue } = useFormikContext<Inventory>();
     const [transmissionList, setTransmissionList] = useState<ListData[]>([]);
     const [fuelList, setFuelList] = useState<ListData[]>([]);
     const [driveLineList, setDriveLineList] = useState<ListData[]>([]);
