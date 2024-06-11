@@ -19,16 +19,25 @@ import * as Yup from "yup";
 import { useToast } from "dashboard/common/toast";
 const STEP = "step";
 
-type PartialContact = Pick<Contact, "firstName" | "lastName" | "type">;
+type PartialContact = Pick<Contact, "firstName" | "lastName" | "type" | "companyName">;
 
 const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>> = {
-    [ContactAccordionItems.GENERAL]: ["firstName", "lastName", "type"],
+    [ContactAccordionItems.GENERAL]: ["firstName", "lastName", "type", "companyName"],
 };
+
+export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
 
 export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.object().shape({
     firstName: Yup.string().trim().required("Data is required."),
     lastName: Yup.string().trim().required("Data is required."),
     type: Yup.number().required("Data is required."),
+    companyName: Yup.string()
+        .trim()
+        .when("type", ([type]) => {
+            return REQUIRED_COMPANY_TYPE_INDEXES.includes(type)
+                ? Yup.string().trim().required("Data is required.")
+                : Yup.string().trim();
+        }),
 });
 
 export const ContactForm = observer((): ReactElement => {
@@ -202,6 +211,7 @@ export const ContactForm = observer((): ReactElement => {
                                                     firstName: contact?.firstName || "",
                                                     lastName: contact?.lastName || "",
                                                     type: contact?.type || "",
+                                                    companyName: contact?.companyName || "",
                                                 } as PartialContact
                                             }
                                             enableReinitialize
