@@ -1,9 +1,27 @@
 import { observer } from "mobx-react-lite";
-import { InputText } from "primereact/inputtext";
+import { InputText, InputTextProps } from "primereact/inputtext";
 import { ReactElement, useEffect, useState } from "react";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import "./index.css";
+
+interface SocialInputProps extends InputTextProps {
+    social: "Skype" | "Facebook" | "WhatsApp" | "Slack";
+}
+
+const SocialInput = (props: SocialInputProps): ReactElement => {
+    const currentIcon = `pi pi-${props.social.toLowerCase()}`;
+    return (
+        <span className='p-float-label contact-social'>
+            <InputText
+                {...props}
+                className='contact-social__input contacts-social__text-input w-full'
+            />
+            <label className='float-label'>{props.social}</label>
+            <i className={`${currentIcon} contact-social__icon`} />
+        </span>
+    );
+};
 
 export const ContactsSocialInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
@@ -101,46 +119,34 @@ export const ContactsSocialInfo = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='contacts-social__text-input w-full'
-                        value={contact.messager1 || ""}
-                        onChange={(e) => changeContact("messager1", e.target.value)}
-                    />
-                    <label className='float-label'>Facebook</label>
-                </span>
+                <SocialInput
+                    social='Facebook'
+                    value={contact.messager1}
+                    onChange={({ target: { value } }) => changeContact("messager1", value)}
+                />
             </div>
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='contacts-social__text-input w-full'
-                        value={contact.messager2 || ""}
-                        onChange={(e) => changeContact("messager2", e.target.value)}
-                    />
-                    <label className='float-label'>WhatsApp</label>
-                </span>
+                <SocialInput
+                    social='WhatsApp'
+                    value={contact.messager2}
+                    onChange={({ target: { value } }) => changeContact("messager2", value)}
+                />
             </div>
 
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='contacts-social__text-input w-full'
-                        value={contact.messager3 || ""}
-                        onChange={(e) => changeContact("messager3", e.target.value)}
-                    />
-                    <label className='float-label'>Slack</label>
-                </span>
+                <SocialInput
+                    social='Slack'
+                    value={contact.messager3}
+                    onChange={({ target: { value } }) => changeContact("messager3", value)}
+                />
             </div>
 
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='contacts-social__text-input w-full'
-                        value={contact.messager4 || ""}
-                        onChange={(e) => changeContact("messager4", e.target.value)}
-                    />
-                    <label className='float-label'>Skype</label>
-                </span>
+                <SocialInput
+                    social='Skype'
+                    value={contact.messager4}
+                    onChange={({ target: { value } }) => changeContact("messager4", value)}
+                />
             </div>
         </div>
     );
