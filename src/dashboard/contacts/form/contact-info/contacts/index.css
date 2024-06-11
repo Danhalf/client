@@ -1,0 +1,9 @@
+.contacts__button.p-button-outlined {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--admss-app-light-green);
+    color: var(--admss-app-dark-green);
+    width: 100%;
+    font-weight: 700;
+}

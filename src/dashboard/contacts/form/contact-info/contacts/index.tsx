@@ -1,12 +1,20 @@
 import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
-import { Fragment, ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
+import "./index.css";
 
 export const ContactsSocialInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contact, changeContact } = store;
+    const [anotherEmail, setAnotherEmail] = useState<boolean>(false);
+    const [anotherPhone, setAnotherPhone] = useState<boolean>(false);
+
+    useEffect(() => {
+        setAnotherEmail(!!contact.email2?.length);
+        setAnotherPhone(!!contact.phone2?.length);
+    }, [contact.email2, contact.phone2]);
 
     return (
         <div className='grid contacts-social row-gap-2'>
@@ -19,69 +27,36 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                             changeContact("email1", value);
                         }}
                     />
-                    <label className='float-label'>E-mail</label>
+                    <label className='float-label'>E-mail address</label>
                 </span>
             </div>
-            <div className='col-6'>
-                <Button className='w-full' disabled>
-                    <i className='pi pi-plus mr-2 text-xs pt-1' />
-                    Add another email address
-                </Button>
-            </div>
-            <div className='col-6'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='contacts-social__text-input w-full'
-                        value={contact.email2 || ""}
-                        onChange={({ target: { value } }) => {
-                            changeContact("email2", value);
-                        }}
-                    />
-                    <label className='float-label'>E-mail</label>
-                </span>
-            </div>
-            <div className='col-6'>
-                <Button className='w-full' disabled>
-                    <i className='pi pi-plus mr-2 text-xs pt-1' />
-                    Add another email address
-                </Button>
-            </div>
-
-            {contact.emails &&
-                contact.emails.map((email, index) => {
-                    return (
-                        index > 0 && (
-                            <Fragment key={index}>
-                                <div className='col-6'>
-                                    <span className='p-float-label'>
-                                        <InputText
-                                            className='contacts-social__text-input w-full'
-                                            value={email}
-                                            onChange={(e) => {
-                                                const newEmails = [...contact?.emails];
-                                                newEmails[index] = e.target.value;
-                                                changeContact("emails", newEmails);
-                                            }}
-                                        />
-                                        <label className='float-label'>E-mail</label>
-                                    </span>
-                                </div>
-                                <div className='col-6'>
-                                    <Button
-                                        className='w-full'
-                                        disabled={!(contact?.emails[index]?.length - 1)}
-                                        onClick={() =>
-                                            changeContact("emails", [...contact?.emails, ""])
-                                        }
-                                    >
-                                        <i className='pi pi-plus mr-2 text-xs pt-1' />
-                                        Add another email address
-                                    </Button>
-                                </div>
-                            </Fragment>
-                        )
-                    );
-                })}
+            {anotherEmail ? (
+                <div className='col-6'>
+                    <span className='p-float-label'>
+                        <InputText
+                            className='contacts-social__text-input w-full'
+                            value={contact.email2 || ""}
+                            onChange={({ target: { value } }) => {
+                                if (!value?.length) setAnotherEmail(false);
+                                changeContact("email2", value);
+                            }}
+                        />
+                        <label className='float-label'>E-mail address</label>
+                    </span>
+                </div>
+            ) : (
+                <div className='col-6'>
+                    <Button
+                        type='button'
+                        className='contacts__button'
+                        onClick={() => setAnotherEmail(true)}
+                        outlined
+                    >
+                        <i className='pi pi-plus mr-2 text-xs pt-1' />
+                        Add another email address
+                    </Button>
+                </div>
+            )}
 
             <div className='col-6'>
                 <span className='p-float-label'>
@@ -95,66 +70,33 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                     <label className='float-label'>Phone Number</label>
                 </span>
             </div>
-            <div className='col-6'>
-                <Button className='w-full' disabled>
-                    <i className='pi pi-plus mr-2 text-xs pt-1' />
-                    Add another phone number
-                </Button>
-            </div>
-            <div className='col-6'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='contacts-social__text-input w-full'
-                        value={contact.phone2 || ""}
-                        onChange={({ target: { value } }) => {
-                            changeContact("phone2", value);
-                        }}
-                    />
-                    <label className='float-label'>Phone Number</label>
-                </span>
-            </div>
-            <div className='col-6'>
-                <Button className='w-full' disabled>
-                    <i className='pi pi-plus mr-2 text-xs pt-1' />
-                    Add another phone number
-                </Button>
-            </div>
-
-            {contact?.phones &&
-                contact.phones.map((phone, index) => {
-                    return (
-                        index > 0 && (
-                            <Fragment key={index}>
-                                <div className='col-6'>
-                                    <span className='p-float-label'>
-                                        <InputText
-                                            className='contacts-social__text-input w-full'
-                                            value={phone}
-                                            onChange={(e) => {
-                                                const newPhones = [...contact?.phones];
-                                                newPhones[index] = e.target.value;
-                                                changeContact("phones", newPhones);
-                                            }}
-                                        />
-                                        <label className='float-label'>Phone Number</label>
-                                    </span>
-                                </div>
-                                <div className='col-6'>
-                                    <Button
-                                        className='w-full'
-                                        disabled={!(contact?.phones[index]?.length - 1)}
-                                        onClick={() =>
-                                            changeContact("phones", [...contact?.phones, ""])
-                                        }
-                                    >
-                                        <i className='pi pi-plus mr-2 text-xs pt-1' />
-                                        Add another phone number
-                                    </Button>
-                                </div>
-                            </Fragment>
-                        )
-                    );
-                })}
+            {anotherPhone ? (
+                <div className='col-6'>
+                    <span className='p-float-label'>
+                        <InputText
+                            className='contacts-social__text-input w-full'
+                            value={contact.phone2 || ""}
+                            onChange={({ target: { value } }) => {
+                                if (!value?.length) setAnotherPhone(false);
+                                changeContact("phone2", value);
+                            }}
+                        />
+                        <label className='float-label'>Phone Number</label>
+                    </span>
+                </div>
+            ) : (
+                <div className='col-6'>
+                    <Button
+                        type='button'
+                        className='contacts__button'
+                        outlined
+                        onClick={() => setAnotherPhone(true)}
+                    >
+                        <i className='pi pi-plus mr-2 text-xs pt-1' />
+                        Add another phone number
+                    </Button>
+                </div>
+            )}
 
             <hr className='form-line' />
 

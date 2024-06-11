@@ -211,7 +211,7 @@ export const ContactForm = observer((): ReactElement => {
                                             onSubmit={() => {
                                                 setValidateOnMount(false);
                                                 saveContact();
-                                                navigate(`/dashboard/contact`);
+                                                navigate(`/dashboard/contacts`);
                                                 toast.current?.show({
                                                     severity: "success",
                                                     summary: "Success",
