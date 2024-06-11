@@ -3,7 +3,6 @@ import { InputText, InputTextProps } from "primereact/inputtext";
 import { ReactElement, useEffect, useState } from "react";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
-import "./index.css";
 
 interface SocialInputProps extends InputTextProps {
     social: "Skype" | "Facebook" | "WhatsApp" | "Slack";
