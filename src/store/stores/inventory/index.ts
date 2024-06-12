@@ -411,12 +411,9 @@ export class InventoryStore {
                                         type: mediaType,
                                     }).then((response) => {
                                         if (response?.status === Status.ERROR) {
-                                            const { error, messages } =
-                                                response as BaseResponseError & {
-                                                    messages: string;
-                                                };
+                                            const { error } = response as BaseResponseError;
                                             this._formErrorMessage =
-                                                error || messages || "Failed to upload file";
+                                                error || "Failed to upload file";
                                         }
                                     });
                                 }
@@ -591,10 +588,8 @@ export class InventoryStore {
                 this._isLoading = true;
                 await deleteMediaImage(imageuid).then((response) => {
                     if (response?.status === Status.ERROR) {
-                        const { error, messages } = response as BaseResponseError & {
-                            messages: string;
-                        };
-                        this._formErrorMessage = error || messages || "Failed to delete media";
+                        const { error } = response as BaseResponseError;
+                        this._formErrorMessage = error || "Failed to delete media";
                     }
                 });
                 await cb();

@@ -124,7 +124,7 @@ export const setMediaItemData = async (
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                messages: error.response?.data.error,
+                error: error.response?.data.error,
             };
         }
     }
@@ -162,7 +162,7 @@ export const deleteMediaImage = async (itemuid: string) => {
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                messages: error.response?.data.error,
+                error: error.response?.data.error,
             };
         }
     }
