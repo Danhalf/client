@@ -28,11 +28,12 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const { errors, setFieldValue } = useFormikContext<Contact>();
 
     useEffect(() => {
-        if (id) {
-            getContactsTypeList(id).then((response) => {
-                response && setTypeList(response);
-            });
-        }
+        getContactsTypeList(id || "0").then((response) => {
+            if (response) {
+                const types = response as ContactType[];
+                setTypeList(types);
+            }
+        });
     }, [id]);
 
     return (

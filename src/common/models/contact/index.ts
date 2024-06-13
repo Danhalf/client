@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { BaseResponse, Status } from "../base-response";
+import { BaseResponse, BaseResponseError, Status } from "../base-response";
 
 export interface ContactExtData {
     created: number;
@@ -265,8 +265,7 @@ export interface Contact {
     useruid: string;
 }
 
-export interface ContactsCategories {
-    status: Status;
+export interface ContactsCategories extends BaseResponseError {
     contact_types: ContactType[];
 }
 
