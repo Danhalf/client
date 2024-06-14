@@ -269,7 +269,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                             errors.Trade1_Mileage ? "p-invalid" : ""
                         }`}
                         required
-                        value={parseFloat(values.Trade1_Mileage) || 0}
+                        value={parseFloat(values?.Trade1_Mileage) || 0}
                         useGrouping={false}
                         min={0}
                         onChange={({ value }) => {
