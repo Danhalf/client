@@ -106,12 +106,12 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     <Dropdown
                         optionLabel='name'
                         optionValue='id'
-                        value={contact.type || ""}
+                        value={contact.type || 0}
                         filter
                         options={typeList}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("type", value);
-                            changeContact("type", value);
+                        onChange={(e) => {
+                            setFieldValue("type", e.value);
+                            changeContact("type", e.value);
                         }}
                         className={`w-full general-info__dropdown ${
                             errors.type ? "p-invalid" : ""
