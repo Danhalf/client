@@ -27,6 +27,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
     const {
         dealExtData: {
             Trade1_Color,
+            Trade1_Mileage,
             Trade1_Year,
             Trade1_BodyStyle,
             Trade1_Title_Num,
@@ -122,7 +123,6 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 changeDealExtData({ key: "Trade1_Make", value: vinInfo.Make });
                 changeDealExtData({ key: "Trade1_Model", value: vinInfo.Model });
                 changeDealExtData({ key: "Trade1_Year", value: vinInfo.Year });
-
                 changeDealExtData({
                     key: "Trade1_StockNum",
                     value: vinInfo.StockNo,
@@ -131,6 +131,11 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     key: "Trade1_BodyStyle",
                     value: vinInfo.BodyStyle,
                 });
+                changeDealExtData({
+                    key: "Trade1_Color",
+                    value: vinInfo.ExteriorColor,
+                });
+                changeDealExtData({ key: "Trade1_Mileage", value: vinInfo.mileage });
             } else {
                 changeDealExtData({
                     key: "Trade1_Make",
@@ -151,6 +156,14 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 changeDealExtData({
                     key: "Trade1_BodyStyle",
                     value: Trade1_BodyStyle || vinInfo.BodyStyle,
+                });
+                changeDealExtData({
+                    key: "Trade1_Color",
+                    value: Trade1_Color || vinInfo.ExteriorColor,
+                });
+                changeDealExtData({
+                    key: "Trade1_Mileage",
+                    value: Trade1_Mileage || vinInfo.mileage,
                 });
             }
         }
