@@ -27,6 +27,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
     const {
         dealExtData: {
             Trade1_Color,
+            Trade1_Year,
             Trade1_BodyStyle,
             Trade1_Title_Num,
             Trade1_StockNum,
@@ -131,11 +132,26 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     value: vinInfo.BodyStyle,
                 });
             } else {
-                setFieldValue("Trade1_Make", values.Trade1_Make || vinInfo.Make);
-                setFieldValue("Trade1_Model", values.Trade1_Model || vinInfo.Model);
-                setFieldValue("Trade1_Year", values.Trade1_Year || vinInfo.Year);
-                setFieldValue("Trade1_StockNum", Trade1_StockNum || vinInfo.StockNo);
-                setFieldValue("Trade1_BodyStyle", Trade1_BodyStyle || vinInfo.BodyStyle);
+                changeDealExtData({
+                    key: "Trade1_Make",
+                    value: values.Trade1_Make || vinInfo.Make,
+                });
+                changeDealExtData({
+                    key: "Trade1_Model",
+                    value: values.Trade1_Model || vinInfo.Model,
+                });
+                changeDealExtData({
+                    key: "Trade1_Year",
+                    value: values.Trade1_Year || vinInfo.Year,
+                });
+                changeDealExtData({
+                    key: "Trade1_StockNum",
+                    value: Trade1_StockNum || vinInfo.StockNo,
+                });
+                changeDealExtData({
+                    key: "Trade1_BodyStyle",
+                    value: Trade1_BodyStyle || vinInfo.BodyStyle,
+                });
             }
         }
     };
@@ -219,7 +235,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                         required
                         min={0}
                         useGrouping={false}
-                        value={parseInt(values.Trade1_Year) || null}
+                        value={parseInt(Trade1_Year) || null}
                         onChange={({ value }) => {
                             if (!value) {
                                 return changeDealExtData({ key: "Trade1_Year", value: "" });
@@ -240,7 +256,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                             errors.Trade1_Mileage ? "p-invalid" : ""
                         }`}
                         required
-                        value={parseFloat(values?.Trade1_Mileage) || 0}
+                        value={parseFloat(values.Trade1_Mileage) || 0}
                         useGrouping={false}
                         min={0}
                         onChange={({ value }) => {
