@@ -47,6 +47,7 @@ import {
 } from "common/helpers";
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
+import { useStore } from "store/hooks";
 
 interface InventoriesProps {
     onRowClick?: (companyName: string) => void;
@@ -76,6 +77,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     );
     const [inventoryType, setInventoryType] = useState<UserGroup[]>([]);
     const [selectedInventoryType, setSelectedInventoryType] = useState<string[]>([]);
+    const store = useStore().inventoryStore;
 
     const navigate = useNavigate();
 
@@ -157,12 +159,13 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                 (location) => location.locationuid === settings.currentLocation
                             );
                             setCurrentLocation(location || ({} as InventoryLocations));
+                            store.currentLocation = location?.locationuid || "";
                         }
                     }
                 })
                 .finally(() => setIsLoading(false));
         }
-    }, [authUser, locations]);
+    }, [authUser, locations, store]);
 
     const printTableData = async (print: boolean = false) => {
         setIsLoading(true);
@@ -470,7 +473,13 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         handleGetInventoryList(params, true);
         setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [lazyState, globalSearch, selectedFilterOptions, currentLocation, selectedInventoryType]);
+    }, [
+        serverSettings,
+        globalSearch,
+        selectedFilterOptions,
+        currentLocation,
+        selectedInventoryType,
+    ]);
 
     const searchFields: SearchField<AdvancedSearch>[] = [
         {
@@ -642,9 +651,9 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         </div>
     );
 
-    const handleOnRowClick = ({ data: { itemuid, name } }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({ data: { itemuid, Make } }: DataTableRowClickEvent) => {
         if (onRowClick) {
-            onRowClick(name);
+            onRowClick(Make);
         } else {
             navigate(itemuid);
         }
@@ -681,6 +690,8 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                                 ...serverSettings,
                                                 currentLocation: location.locationuid,
                                             });
+
+                                            store.currentLocation = location.locationuid;
                                         },
                                     })),
                                 ]}
@@ -697,7 +708,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                     <div className='card-content'>
                         <div className='grid'>
                             <div className='col-12'>
-                                {(!activeColumns.length && !inventories.length) || isLoading ? (
+                                {isLoading ? (
                                     <div className='dashboard-loader__wrapper'>
                                         <Loader overlay />
                                     </div>
