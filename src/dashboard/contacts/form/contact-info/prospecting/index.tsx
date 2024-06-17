@@ -74,6 +74,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                         optionValue='name'
                         options={prospectList}
                         filter
+                        editable
                         value={contactExtData.PROSPECT1_ID}
                         onChange={({ target: { value } }) =>
                             changeContactExtData("PROSPECT1_ID", value)
@@ -90,7 +91,9 @@ export const ContactsProspecting = observer((): ReactElement => {
                         <Dropdown
                             optionLabel='name'
                             optionValue='name'
+                            options={prospectList}
                             filter
+                            editable
                             value={contactExtData.PROSPECT2_ID}
                             onChange={({ target: { value } }) =>
                                 changeContactExtData("PROSPECT2_ID", value)
