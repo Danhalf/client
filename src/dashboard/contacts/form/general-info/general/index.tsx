@@ -62,7 +62,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                         className={`general-info__text-input w-full ${
                             errors.firstName ? "p-invalid" : ""
                         }`}
-                        value={contact.firstName}
+                        value={contact.firstName || ""}
                         onChange={({ target: { value } }) => {
                             setFieldValue("firstName", value);
                             changeContact("firstName", value);
