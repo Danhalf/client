@@ -49,10 +49,9 @@ export default function Reports(): ReactElement {
                     detail: error,
                     life: TOAST_LIFETIME,
                 });
-            } else {
-                const document = response as ReportDocument[];
-                setReports(document);
             }
+            const document = response as ReportDocument[];
+            setReports(document);
         });
 
     const handleGetUserReportCollections = (useruid: string) =>
@@ -65,10 +64,9 @@ export default function Reports(): ReactElement {
                     detail: error,
                     life: TOAST_LIFETIME,
                 });
-            } else {
-                const collections = response as ReportCollectionContent[];
-                setCollections(collections);
             }
+            const collections = response as ReportCollectionContent[];
+            setCollections(collections);
         });
 
     useEffect(() => {
