@@ -4,7 +4,7 @@ import { Steps } from "primereact/steps";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
-import { Deals, DealsItem, DealsSection } from "../common";
+import { AccordionDealItems, Deals, DealsItem, DealsSection } from "../common";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
@@ -13,17 +13,167 @@ import { DealRetail } from "./retail";
 import { useStore } from "store/hooks";
 import { Loader } from "dashboard/common/loader";
 import { PrintDealForms } from "./print-forms";
+import { Form, Formik, FormikProps } from "formik";
+import { Deal, DealExtData } from "common/models/deals";
+import * as Yup from "yup";
+import { useToast } from "dashboard/common/toast";
+import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 
 const STEP = "step";
+
+export type PartialDeal = Pick<
+    Deal,
+    | "contactuid"
+    | "inventoryuid"
+    | "dealtype"
+    | "dealstatus"
+    | "saletype"
+    | "datepurchase"
+    | "dateeffective"
+    | "inventorystatus"
+> &
+    Pick<
+        DealExtData,
+        | "HowFoundOut"
+        | "SaleID"
+        | "OdometerReading"
+        | "OdomDigits"
+        | "First_Lien_Phone_Num"
+        | "Trade1_Make"
+        | "Trade1_Model"
+        | "Trade1_VIN"
+        | "Trade1_Year"
+        | "Trade1_Mileage"
+        | "Trade1_Lien_Address"
+        | "Trade1_Lien_Phone"
+        | "Trade2_Make"
+        | "Trade2_Model"
+        | "Trade2_VIN"
+        | "Trade2_Year"
+        | "Trade2_Mileage"
+        | "Trade2_Lien_Address"
+        | "Trade2_Lien_Phone"
+    >;
+
+const tabFields: Partial<Record<AccordionDealItems, (keyof PartialDeal)[]>> = {
+    [AccordionDealItems.SALE]: [
+        "contactuid",
+        "inventoryuid",
+        "dealtype",
+        "dealstatus",
+        "saletype",
+        "datepurchase",
+        "dateeffective",
+        "inventorystatus",
+        "HowFoundOut",
+        "SaleID",
+    ],
+    [AccordionDealItems.ODOMETER]: ["OdometerReading", "OdomDigits"],
+    [AccordionDealItems.FIRST_TRADE]: [
+        "Trade1_Make",
+        "Trade1_Model",
+        "Trade1_VIN",
+        "Trade1_Year",
+        "Trade1_Mileage",
+        "Trade1_Lien_Address",
+        "Trade1_Lien_Phone",
+    ],
+    [AccordionDealItems.SECOND_TRADE]: [
+        "Trade2_Make",
+        "Trade2_Model",
+        "Trade2_VIN",
+        "Trade2_Year",
+        "Trade2_Mileage",
+        "Trade2_Lien_Address",
+        "Trade2_Lien_Phone",
+    ],
+};
+
+const MIN_YEAR = 1970;
+const MAX_YEAR = new Date().getFullYear();
+
+export const DealFormSchema: Yup.ObjectSchema<Partial<PartialDeal>> = Yup.object().shape({
+    contactuid: Yup.string().required("Data is required."),
+    inventoryuid: Yup.string().required("Data is required."),
+    dealtype: Yup.number().required("Data is required."),
+    dealstatus: Yup.number().required("Data is required."),
+    saletype: Yup.number().required("Data is required."),
+    datepurchase: Yup.string().required("Data is required."),
+    dateeffective: Yup.string().required("Data is required."),
+    inventorystatus: Yup.number().required("Data is required."),
+    HowFoundOut: Yup.string().required("Data is required."),
+    SaleID: Yup.string().required("Data is required."),
+    OdometerReading: Yup.string().required("Data is required."),
+    OdomDigits: Yup.number().required("Data is required."),
+    First_Lien_Phone_Num: Yup.string().matches(/^[\d]{10,13}$/, {
+        message: "Please enter a valid number.",
+        excludeEmptyString: false,
+    }),
+    Trade1_Make: Yup.string().required("Data is required."),
+    Trade1_Model: Yup.string().required("Data is required."),
+    Trade1_VIN: Yup.string()
+        .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
+        .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
+        .required("Data is required."),
+    Trade1_Year: Yup.string().test(
+        "is-valid-year",
+        `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
+        function (value) {
+            const year = Number(value);
+            if (year < MIN_YEAR) {
+                return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
+            }
+            if (year > MAX_YEAR) {
+                return this.createError({ message: `Must be less than ${MAX_YEAR}` });
+            }
+            return true;
+        }
+    ),
+    Trade1_Mileage: Yup.string().required("Data is required."),
+    Trade1_Lien_Address: Yup.string().email("Please enter a valid email address."),
+    Trade1_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
+        message: "Please enter a valid number.",
+        excludeEmptyString: false,
+    }),
+    Trade2_Make: Yup.string().required("Data is required."),
+    Trade2_Model: Yup.string().required("Data is required."),
+    Trade2_VIN: Yup.string()
+        .min(MIN_VIN_LENGTH, `VIN must be at least ${MIN_VIN_LENGTH} characters`)
+        .max(MAX_VIN_LENGTH, `VIN must be less than ${MAX_VIN_LENGTH} characters`)
+        .required("Data is required."),
+    Trade2_Year: Yup.string().test(
+        "is-valid-year",
+        `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
+        function (value) {
+            const year = Number(value);
+            if (year < MIN_YEAR) {
+                return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
+            }
+            if (year > MAX_YEAR) {
+                return this.createError({ message: `Must be less than ${MAX_YEAR}` });
+            }
+            return true;
+        }
+    ),
+    Trade2_Mileage: Yup.string().required("Data is required."),
+    Trade2_Lien_Address: Yup.string().email("Please enter a valid email address."),
+    Trade2_Lien_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
+        message: "Please enter a valid number.",
+        excludeEmptyString: false,
+    }),
+});
+
+const DATE_NOW = new Date().toISOString();
 
 export const DealsForm = observer(() => {
     const { id } = useParams();
     const location = useLocation();
+    const toast = useToast();
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { getDeal, saveDeal } = store;
+    const { deal, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -33,6 +183,8 @@ export const DealsForm = observer(() => {
     const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
+    const formikRef = useRef<FormikProps<Partial<Deal> & Partial<DealExtData>>>(null);
+    const [errorSections, setErrorSections] = useState<string[]>([]);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -66,17 +218,14 @@ export const DealsForm = observer(() => {
         id && getDeal(id);
         return () => {
             sections.forEach((section) => section.clearCount());
+            clearDeal();
         };
     }, [id]);
 
     useEffect(() => {
-        accordionSteps.forEach((step, index) => {
+        accordionSteps.forEach((step) => {
             if (step - 1 < stepActiveIndex) {
-                return setAccordionActiveIndex((prev) => {
-                    const updatedArray = Array.isArray(prev) ? [...prev] : [0];
-                    updatedArray[index] = index;
-                    return updatedArray;
-                });
+                if (stepActiveIndex === printActiveIndex) return setAccordionActiveIndex([]);
             }
         });
     }, [stepActiveIndex]);
@@ -84,6 +233,33 @@ export const DealsForm = observer(() => {
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
         setStepActiveIndex(printActiveIndex);
+    };
+
+    const handleSaveDealForm = () => {
+        formikRef.current?.validateForm().then((errors) => {
+            if (!Object.keys(errors).length) {
+                formikRef.current?.submitForm();
+            } else {
+                const sectionsWithErrors = Object.keys(errors);
+                const currentSectionsWithErrors: string[] = [];
+                Object.entries(tabFields).forEach(([key, value]) => {
+                    value.forEach((field) => {
+                        if (
+                            sectionsWithErrors.includes(field) &&
+                            !currentSectionsWithErrors.includes(key)
+                        ) {
+                            currentSectionsWithErrors.push(key);
+                        }
+                    });
+                });
+                setErrorSections(currentSectionsWithErrors);
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Validation Error",
+                    detail: "Please fill in all required fields.",
+                });
+            }
+        });
     };
 
     return (
@@ -137,6 +313,11 @@ export const DealsForm = observer(() => {
                                                                     getUrl(section.startIndex + idx)
                                                                 );
                                                             },
+                                                            className: errorSections.length
+                                                                ? errorSections.includes(itemLabel)
+                                                                    ? "section-invalid"
+                                                                    : "section-valid"
+                                                                : "",
                                                         })
                                                     )}
                                                     className='vertical-step-menu'
@@ -165,35 +346,94 @@ export const DealsForm = observer(() => {
                                 </div>
                                 <div className='w-full flex flex-column p-0 card-content__wrapper'>
                                     <div className='flex flex-grow-1'>
-                                        {dealsSections.map((section) =>
-                                            section.items.map((item: DealsItem) => (
-                                                <div
-                                                    key={item.itemIndex}
-                                                    className={`${
-                                                        stepActiveIndex === item.itemIndex
-                                                            ? "block deal-form"
-                                                            : "hidden"
-                                                    }`}
-                                                >
-                                                    <div className='deal-form__title uppercase'>
-                                                        {item.itemLabel}
+                                        <Formik
+                                            innerRef={formikRef}
+                                            initialValues={
+                                                {
+                                                    contactuid: deal.contactuid || "",
+                                                    inventoryuid: deal.inventoryuid || "",
+                                                    dealtype: deal.dealtype,
+                                                    dealstatus: deal.dealstatus,
+                                                    saletype: deal.saletype,
+                                                    datepurchase: deal.datepurchase || DATE_NOW,
+                                                    dateeffective: deal.dateeffective || DATE_NOW,
+                                                    inventorystatus: deal.inventorystatus || "",
+                                                    accountuid: deal.accountuid || "",
+                                                    HowFoundOut: dealExtData?.HowFoundOut || "",
+                                                    SaleID: dealExtData?.SaleID || "",
+                                                    OdometerReading:
+                                                        dealExtData?.OdometerReading || "",
+                                                    OdomDigits: dealExtData?.OdomDigits || "",
+                                                    First_Lien_Phone_Num:
+                                                        dealExtData?.First_Lien_Phone_Num || "",
+                                                    Trade1_Make: dealExtData?.Trade1_Make || "",
+                                                    Trade1_Model: dealExtData?.Trade1_Model || "",
+                                                    Trade1_VIN: dealExtData?.Trade1_VIN || "",
+                                                    Trade1_Year: dealExtData?.Trade1_Year || "",
+                                                    Trade1_Mileage:
+                                                        dealExtData?.Trade1_Mileage || "",
+                                                    Trade1_Lien_Address:
+                                                        dealExtData?.Trade1_Lien_Address || "",
+                                                    Trade1_Lien_Phone:
+                                                        dealExtData?.Trade1_Lien_Phone || "",
+                                                    Trade2_Make: dealExtData?.Trade2_Make || "",
+                                                    Trade2_Model: dealExtData?.Trade2_Model || "",
+                                                    Trade2_VIN: dealExtData?.Trade2_VIN || "",
+                                                    Trade2_Year: dealExtData?.Trade2_Year || "",
+                                                    Trade2_Mileage:
+                                                        dealExtData?.Trade2_Mileage || "",
+                                                    Trade2_Lien_Address:
+                                                        dealExtData?.Trade2_Lien_Address || "",
+                                                    Trade2_Lien_Phone:
+                                                        dealExtData?.Trade2_Lien_Phone || "",
+                                                } as Partial<Deal> & Partial<DealExtData>
+                                            }
+                                            enableReinitialize
+                                            validationSchema={DealFormSchema}
+                                            validateOnChange={false}
+                                            validateOnBlur={false}
+                                            onSubmit={() => {
+                                                saveDeal();
+                                                navigate(`/dashboard/deals`);
+                                                toast.current?.show({
+                                                    severity: "success",
+                                                    summary: "Success",
+                                                    detail: "Deal saved successfully",
+                                                });
+                                            }}
+                                        >
+                                            <Form name='dealForm' className='w-full'>
+                                                {dealsSections.map((section) =>
+                                                    section.items.map((item: DealsItem) => (
+                                                        <div
+                                                            key={item.itemIndex}
+                                                            className={`${
+                                                                stepActiveIndex === item.itemIndex
+                                                                    ? "block deal-form"
+                                                                    : "hidden"
+                                                            }`}
+                                                        >
+                                                            <div className='deal-form__title uppercase'>
+                                                                {item.itemLabel}
+                                                            </div>
+                                                            {stepActiveIndex === item.itemIndex && (
+                                                                <Suspense fallback={<Loader />}>
+                                                                    {item.component}
+                                                                </Suspense>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                )}
+                                                {stepActiveIndex === printActiveIndex && (
+                                                    <div className='deal-form'>
+                                                        <div className='deal-form__title uppercase'>
+                                                            Print forms
+                                                        </div>
+                                                        <PrintDealForms />
                                                     </div>
-                                                    {stepActiveIndex === item.itemIndex && (
-                                                        <Suspense fallback={<Loader />}>
-                                                            {item.component}
-                                                        </Suspense>
-                                                    )}
-                                                </div>
-                                            ))
-                                        )}
-                                        {stepActiveIndex === printActiveIndex && (
-                                            <div className='deal-form'>
-                                                <div className='deal-form__title uppercase'>
-                                                    Print forms
-                                                </div>
-                                                <PrintDealForms />
-                                            </div>
-                                        )}
+                                                )}
+                                            </Form>
+                                        </Formik>
                                     </div>
                                 </div>
                             </div>
@@ -232,8 +472,10 @@ export const DealsForm = observer(() => {
                                     Next
                                 </Button>
                                 <Button
-                                    onClick={saveDeal}
+                                    onClick={handleSaveDealForm}
                                     className='form-nav__button deal__button'
+                                    severity={isFormChanged ? "success" : "secondary"}
+                                    disabled={!isFormChanged}
                                 >
                                     Save
                                 </Button>

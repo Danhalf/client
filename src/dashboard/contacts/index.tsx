@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
     getContacts,
     getContactsAmount,
-    getContactsCategories,
+    getContactsTypeList,
 } from "http/services/contacts-service";
 import { AuthUser } from "http/services/auth.service";
 import {
@@ -30,7 +30,7 @@ import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 
 interface TableColumnProps extends ColumnProps {
-    field: keyof ContactUser;
+    field: keyof ContactUser | "fullName";
 }
 
 interface ContactsDataTableProps {
@@ -38,12 +38,8 @@ interface ContactsDataTableProps {
     contactCategory?: ContactTypeNameList | string;
 }
 
-interface TableColumnProps extends ColumnProps {
-    field: keyof ContactUser;
-}
-
 const renderColumnsData: TableColumnProps[] = [
-    { field: "userName", header: "Name" },
+    { field: "fullName", header: "Name" },
     { field: "phone1", header: "Work Phone" },
     { field: "phone2", header: "Home Phone" },
     { field: "streetAddress", header: "Address" },
@@ -127,19 +123,17 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
-            getContactsCategories().then((response) => {
-                if (response?.contact_types.length) {
-                    if (contactCategory) {
-                        const category = response?.contact_types.find(
-                            (item) => item.name === contactCategory
-                        );
-                        setSelectedCategory(category ?? null);
+            getContactsTypeList("0").then((response) => {
+                if (response) {
+                    const types = response as ContactType[];
+                    if (types?.length) {
+                        if (contactCategory) {
+                            const category = types?.find((item) => item.name === contactCategory);
+                            setSelectedCategory(category ?? null);
+                        }
+                        setCategories(types);
                     }
-                    setCategories(response?.contact_types);
                 }
-            });
-            getContactsAmount(authUser.useruid, { total: 1 }).then((response) => {
-                setTotalRecords(response?.total ?? 0);
             });
         }
     }, [contactCategory]);
@@ -155,6 +149,12 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
             top: lazyState.rows,
         };
         if (authUser) {
+            if (!selectedCategory && contactCategory) {
+                return;
+            }
+            getContactsAmount(authUser.useruid, { ...params, total: 1 }).then((response) => {
+                setTotalRecords(response?.total ?? 0);
+            });
             getContacts(authUser.useruid, params).then((response) => {
                 if (response?.length) {
                     setUserContacts(response);
@@ -163,13 +163,20 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
                 }
             });
         }
-    }, [selectedCategory, lazyState, authUser, globalSearch]);
+    }, [selectedCategory, lazyState, authUser, globalSearch, contactCategory]);
 
     useEffect(() => {
         if (authUser) {
             getUserSettings(authUser.useruid).then((response) => {
                 if (response?.profile.length) {
-                    const allSettings: ServerUserSettings = JSON.parse(response.profile);
+                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
+                    if (response.profile) {
+                        try {
+                            allSettings = JSON.parse(response.profile);
+                        } catch (error) {
+                            allSettings = {} as ServerUserSettings;
+                        }
+                    }
                     setServerSettings(allSettings);
                     const { contacts: settings } = allSettings;
                     settings?.activeColumns &&
@@ -201,11 +208,26 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
         }
     };
 
-    const handleOnRowClick = ({ data: { contactuid, companyName } }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({
+        data: { contactuid, firstName, lastName },
+    }: DataTableRowClickEvent) => {
         if (onRowClick) {
-            onRowClick(companyName);
+            onRowClick(`${firstName} ${lastName}`);
         } else {
             navigate(contactuid);
+        }
+    };
+
+    const renderFullName = (rowData: ContactUser) => {
+        return `${rowData.firstName} ${rowData.lastName}`;
+    };
+
+    const handleCreateContact = () => {
+        const CREATE_LINK = "/dashboard/contacts/create";
+        if (onRowClick) {
+            window.open(CREATE_LINK, "_blank");
+        } else {
+            navigate(CREATE_LINK);
         }
     };
 
@@ -243,7 +265,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
                             severity='success'
                             type='button'
                             tooltip='Add new contact'
-                            onClick={() => navigate("create")}
+                            onClick={handleCreateContact}
                         />
                         <Button
                             severity='success'
@@ -279,7 +301,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
             </div>
             <div className='grid'>
                 <div className='col-12'>
-                    {!contacts.length || isLoading ? (
+                    {isLoading ? (
                         <div className='dashboard-loader__wrapper'>
                             <Loader overlay />
                         </div>
@@ -350,6 +372,7 @@ export const ContactsDataTable = ({ onRowClick, contactCategory }: ContactsDataT
                                     key={field}
                                     sortable
                                     headerClassName='cursor-move'
+                                    body={field === "fullName" ? renderFullName : undefined}
                                     pt={{
                                         root: {
                                             style: {

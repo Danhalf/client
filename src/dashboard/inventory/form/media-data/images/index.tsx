@@ -21,6 +21,7 @@ import { useParams } from "react-router-dom";
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
+import { useToast } from "dashboard/common/toast";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -35,6 +36,7 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { id } = useParams();
+    const toast = useToast();
     const {
         getInventory,
         saveInventoryImages,
@@ -44,7 +46,9 @@ export const ImagesMedia = observer((): ReactElement => {
         removeMedia,
         fetchImages,
         changeInventoryMediaOrder,
-        clearInventory,
+        clearMedia,
+        isFormChanged,
+        formErrorMessage,
     } = store;
     const [checked, setChecked] = useState<boolean>(true);
     const [imagesChecked, setImagesChecked] = useState<boolean[]>([]);
@@ -52,15 +56,27 @@ export const ImagesMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
 
     useEffect(() => {
-        id && getInventory(id).then(() => fetchImages());
+        if (id) {
+            isFormChanged ? fetchImages() : getInventory(id).then(() => fetchImages());
+        }
         if (images.length) {
             setImagesChecked(new Array(images.length).fill(checked));
         }
         return () => {
-            clearInventory();
+            clearMedia();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchImages, checked, id]);
+
+    useEffect(() => {
+        if (formErrorMessage) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: formErrorMessage,
+            });
+        }
+    }, [formErrorMessage, toast]);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
         store.uploadFileImages = {
@@ -105,6 +121,13 @@ export const ImagesMedia = observer((): ReactElement => {
     };
 
     const handleUploadFiles = () => {
+        if (formErrorMessage) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: formErrorMessage,
+            });
+        }
         saveInventoryImages().then((res) => {
             if (res) {
                 fileUploadRef.current?.clear();

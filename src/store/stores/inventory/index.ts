@@ -1,5 +1,5 @@
 import { AccountPayment } from "common/models/accounts";
-import { Status } from "common/models/base-response";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { MediaType } from "common/models/enums";
 import {
     Inventory,
@@ -55,6 +55,13 @@ const initialMediaItem: UploadMediaItem = {
     },
 };
 
+const initialAuditState: Partial<Audit> = {
+    DataNeedsUpdate: 0,
+    NeedsCleaning: 0,
+    ReadyForSale: 0,
+    JustArrived: 0,
+};
+
 export class InventoryStore {
     public rootStore: RootStore;
     private _inventory: Inventory = {} as Inventory;
@@ -62,7 +69,7 @@ export class InventoryStore {
     private _inventoryOptions: InventoryOptionsInfo[] = [];
     private _inventoryExtData: InventoryExtData = {} as InventoryExtData;
     private _inventoryPayments: AccountPayment = {} as AccountPayment;
-    private _inventoryAudit: Audit = {} as Audit;
+    private _inventoryAudit: Audit = initialAuditState as Audit;
 
     private _exportWebActive: boolean = false;
     private _exportWeb: InventoryWebInfo = {} as InventoryWebInfo;
@@ -85,9 +92,12 @@ export class InventoryStore {
     private _documents: MediaItem[] = [];
 
     private _printList: InventoryPrintForm[] = [];
+    private _formErrorIndex: number[] = [];
+    private _currentLocation: string = "";
 
-    protected _isLoading = false;
-    protected _isFormValid = false;
+    protected _isLoading: boolean = false;
+    protected _isFormChanged: boolean = false;
+    protected _formErrorMessage: string = "";
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -151,16 +161,20 @@ export class InventoryStore {
         return this._isLoading;
     }
 
-    public get isFormValid() {
-        return this._isFormValid;
+    public get isFormChanged() {
+        return this._isFormChanged;
     }
 
-    public set exportWebActive(state: boolean) {
-        this._exportWebActive = state;
+    public get formErrorIndex(): number[] {
+        return this._formErrorIndex;
     }
 
-    public set isLoading(state: boolean) {
-        this._isLoading = state;
+    public get formErrorMessage() {
+        return this._formErrorMessage;
+    }
+
+    public get currentLocation() {
+        return this._currentLocation;
     }
 
     public getInventory = async (itemuid: string) => {
@@ -175,11 +189,12 @@ export class InventoryStore {
                 this._inventoryOptions = options_info || [];
 
                 this._inventoryExtData = extdata || ({} as InventoryExtData);
-                this._inventoryAudit = Audit || ({} as Audit);
+                this._inventoryAudit = Audit || (initialAuditState as Audit);
             }
         } catch (error) {
         } finally {
             this._isLoading = false;
+            this._isFormChanged = false;
         }
     };
 
@@ -279,6 +294,7 @@ export class InventoryStore {
     public changeInventory = action(
         ({ key, value }: { key: keyof Inventory; value: string | number }) => {
             if (this._inventory && key !== "extdata" && key !== "options_info" && key !== "Audit") {
+                this._isFormChanged = true;
                 (this._inventory as Record<typeof key, string | number>)[key] = value;
             }
         }
@@ -288,6 +304,7 @@ export class InventoryStore {
         ({ key, value }: { key: keyof InventoryExtData; value: string | number }) => {
             const inventoryStore = this.rootStore.inventoryStore;
             if (inventoryStore) {
+                this._isFormChanged = true;
                 const { inventoryExtData } = inventoryStore;
                 (inventoryExtData as Record<typeof key, string | number>)[key] = value;
             }
@@ -297,6 +314,7 @@ export class InventoryStore {
     public changeInventoryOptions = action((optionName: InventoryOptionsInfo) => {
         const inventoryStore = this.rootStore.inventoryStore;
         if (inventoryStore) {
+            this._isFormChanged = true;
             const { inventoryOptions } = inventoryStore;
 
             if (inventoryOptions.includes(optionName)) {
@@ -312,6 +330,7 @@ export class InventoryStore {
         const inventoryStore = this.rootStore.inventoryStore;
         if (inventoryStore) {
             const { inventoryAudit } = inventoryStore;
+            this._isFormChanged = true;
             const newValue = !!inventoryAudit[key] ? 0 : 1;
             (inventoryAudit as Record<typeof key, string | number>)[key] = newValue;
         }
@@ -322,6 +341,7 @@ export class InventoryStore {
             const inventoryStore = this.rootStore.inventoryStore;
             if (inventoryStore) {
                 const { inventoryExportWeb } = inventoryStore;
+                this._isFormChanged = true;
                 (inventoryExportWeb as Record<typeof key, string | number>)[key] = value;
             }
         }
@@ -394,11 +414,18 @@ export class InventoryStore {
                                         notes: (currentMt.get(mediaType) as UploadMediaItem).data
                                             .notes,
                                         type: mediaType,
+                                    }).then((response) => {
+                                        if (response?.status === Status.ERROR) {
+                                            const { error } = response as BaseResponseError;
+                                            this._formErrorMessage =
+                                                error || "Failed to upload file";
+                                        }
                                     });
                                 }
                             }
-                        } catch (error) {
-                            // TODO: add error handler
+                        } finally {
+                            this._isLoading = false;
+                            this._formErrorMessage = "";
                         }
                     }
                 );
@@ -564,16 +591,16 @@ export class InventoryStore {
         async (imageuid: string, cb: () => void): Promise<Status | undefined> => {
             try {
                 this._isLoading = true;
-                try {
-                    await deleteMediaImage(imageuid);
-                    await cb();
-                } catch (error) {
-                    // TODO: add error handler
-                }
+                await deleteMediaImage(imageuid).then((response) => {
+                    if (response?.status === Status.ERROR) {
+                        const { error } = response as BaseResponseError;
+                        this._formErrorMessage = error || "Failed to delete media";
+                    }
+                });
+                await cb();
 
                 return Status.OK;
             } catch (error) {
-                // TODO: add error handler
                 return undefined;
             } finally {
                 this._isLoading = false;
@@ -596,15 +623,27 @@ export class InventoryStore {
     public set uploadFileDocuments(files: UploadMediaItem) {
         this._uploadFileDocuments = files;
     }
-
-    public set isFormValid(state: boolean) {
-        this._isFormValid = state;
+    public set exportWebActive(state: boolean) {
+        this._exportWebActive = state;
     }
 
-    public clearInventory = () => {
-        this._inventory = {} as Inventory;
-        this._inventoryOptions = [];
-        this._inventoryExtData = {} as InventoryExtData;
+    public set isLoading(state: boolean) {
+        this._isLoading = state;
+    }
+
+    public set formErrorIndex(state: number[]) {
+        this._formErrorIndex = state;
+    }
+
+    public set formErrorMessage(state: string) {
+        this._formErrorMessage = state;
+    }
+
+    public set currentLocation(state: string) {
+        this._currentLocation = state;
+    }
+
+    public clearMedia = () => {
         this._inventoryImagesID = [];
         this._images = [];
         this._inventoryVideoID = [];
@@ -613,8 +652,17 @@ export class InventoryStore {
         this._audios = [];
         this._inventoryDocumentsID = [];
         this._documents = [];
+    };
+
+    public clearInventory = () => {
+        this._inventory = {} as Inventory;
+        this._inventoryAudit = initialAuditState as Audit;
+        this._inventoryOptions = [];
+        this._inventoryExtData = {} as InventoryExtData;
         this._exportWeb = {} as InventoryWebInfo;
         this._exportWebHistory = [] as InventoryExportWebHistory[];
         this._printList = [] as InventoryPrintForm[];
+        this._formErrorMessage = "";
+        this.clearMedia();
     };
 }
