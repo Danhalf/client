@@ -12,7 +12,7 @@ import {
     InventoryExportWebHistory,
     InventoryPrintForm,
     InventoryLocations,
-    InventoryStockValidation,
+    InventoryStockNumber,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -238,7 +238,7 @@ export const getInventoryLocations = async (useruid: string) => {
 
 export const checkStockNoAvailability = async (stockno: string) => {
     try {
-        const request = await authorizedUserApiInstance.post<InventoryStockValidation>(
+        const request = await authorizedUserApiInstance.post<InventoryStockNumber>(
             `inventory/stocknumber`,
             {
                 stockno,
@@ -252,6 +252,24 @@ export const checkStockNoAvailability = async (stockno: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error on check stock no availability",
+            };
+        }
+    }
+};
+
+export const getStockNo = async () => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryStockNumber>(
+            `inventory/stocknumber`
+        );
+        if (request.data.status === Status.OK) {
+            return request.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error on get stock",
             };
         }
     }

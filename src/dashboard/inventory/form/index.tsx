@@ -30,7 +30,11 @@ import { Loader } from "dashboard/common/loader";
 import { Form, Formik, FormikProps } from "formik";
 import * as Yup from "yup";
 
-import { InventoryExtData, Inventory as InventoryModel } from "common/models/inventory";
+import {
+    InventoryExtData,
+    Inventory as InventoryModel,
+    InventoryStockNumber,
+} from "common/models/inventory";
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { BaseResponseError, Status } from "common/models/base-response";
@@ -90,8 +94,8 @@ export const InventoryFormSchema: Yup.ObjectSchema<Partial<PartialInventory>> = 
             if (!value) return true;
             const res = await checkStockNoAvailability(value);
             if (res && res.status === Status.OK) {
-                //@ts-ignore
-                return res.exists!;
+                const { exists } = res as InventoryStockNumber;
+                return !exists;
             }
             return false;
         }),

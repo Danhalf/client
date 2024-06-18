@@ -363,7 +363,7 @@ export interface InventoryLocations {
     useruid: string;
 }
 
-export interface InventoryStockValidation {
+export interface InventoryStockNumber {
     exists: 0 | 1;
     status: Status;
     stockno: string;

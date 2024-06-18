@@ -12,6 +12,7 @@ import {
     Audit,
     InventoryMediaPostData,
     InventoryMedia,
+    InventoryStockNumber,
 } from "common/models/inventory";
 import { getAccountPayment } from "http/services/accounts.service";
 import {
@@ -21,6 +22,7 @@ import {
     getInventoryWebInfoHistory,
     getInventoryPrintForms,
     setInventoryExportWeb,
+    getStockNo,
 } from "http/services/inventory-service";
 import {
     getInventoryMediaItemList,
@@ -350,6 +352,12 @@ export class InventoryStore {
     public saveInventory = action(async (): Promise<string | undefined> => {
         try {
             this._isLoading = true;
+            const StockNo =
+                this._inventory.StockNo ||
+                (await getStockNo().then((response) => {
+                    const { stockno } = response as InventoryStockNumber;
+                    return stockno;
+                }));
             const inventoryData: Inventory = {
                 ...this.inventory,
                 extdata: {
@@ -365,6 +373,7 @@ export class InventoryStore {
                     purPurchaseAmount: this.inventoryExtData?.purPurchaseAmount * 100,
                 },
                 options_info: this.inventoryOptions,
+                StockNo,
                 Audit: this.inventoryAudit,
             };
             const inventoryResponse = await setInventory(this._inventoryID, inventoryData);
