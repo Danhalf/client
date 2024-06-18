@@ -318,7 +318,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             changeInventory({ key: "StockNo", value });
                         }}
                     />
-                    <label className='float-label'>Stock# (required)</label>
+                    <label className='float-label'>Stock#</label>
                 </span>
                 <small className='p-error'>{errors.StockNo}</small>
             </div>

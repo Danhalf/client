@@ -11,7 +11,11 @@ import { InventoryMediaData } from "./media-data";
 import { useNavigate, useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { deleteInventory, getInventoryDeleteReasonsList } from "http/services/inventory-service";
+import {
+    checkStockNoAvailability,
+    deleteInventory,
+    getInventoryDeleteReasonsList,
+} from "http/services/inventory-service";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InventoryExportWebData } from "./export-web";
@@ -80,7 +84,17 @@ export const InventoryFormSchema: Yup.ObjectSchema<Partial<PartialInventory>> = 
     ),
     locationuid: Yup.string().trim().required("Data is required."),
     GroupClassName: Yup.string().trim().required("Data is required."),
-    StockNo: Yup.string().trim().required("Data is required."),
+    StockNo: Yup.string()
+        .trim()
+        .test("is-stockno-available", "Stock number is already in use", async function (value) {
+            if (!value) return true;
+            const res = await checkStockNoAvailability(value);
+            if (res && res.status === Status.OK) {
+                //@ts-ignore
+                return res.exists!;
+            }
+            return false;
+        }),
     TypeOfFuel: Yup.string().trim().required("Data is required."),
     purPurchasedFrom: Yup.string().trim().required("Data is required."),
 });

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import { AxiosResponse, isAxiosError } from "axios";
-import { BaseResponse, Status } from "common/models/base-response";
+import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import {
     Inventory,
     TotalInventoryList,
@@ -12,6 +12,7 @@ import {
     InventoryExportWebHistory,
     InventoryPrintForm,
     InventoryLocations,
+    InventoryStockValidation,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -232,5 +233,26 @@ export const getInventoryLocations = async (useruid: string) => {
         }
     } catch (error) {
         // TODO: add error handler
+    }
+};
+
+export const checkStockNoAvailability = async (stockno: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<InventoryStockValidation>(
+            `inventory/stocknumber`,
+            {
+                stockno,
+            }
+        );
+        if (request.data.status === Status.OK) {
+            return request.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error on check stock no availability",
+            };
+        }
     }
 };
