@@ -256,21 +256,3 @@ export const checkStockNoAvailability = async (stockno: string) => {
         }
     }
 };
-
-export const getStockNo = async () => {
-    try {
-        const request = await authorizedUserApiInstance.get<InventoryStockNumber>(
-            `inventory/stocknumber`
-        );
-        if (request.data.status === Status.OK) {
-            return request.data;
-        }
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error on get stock",
-            };
-        }
-    }
-};
