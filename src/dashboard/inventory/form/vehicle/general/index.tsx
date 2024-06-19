@@ -313,18 +313,17 @@ export const VehicleGeneral = observer((): ReactElement => {
                             "vehicle-general__text-input w-full" +
                             (errors.StockNo ? " p-invalid" : "")
                         }
+                        name='StockNo'
                         value={values.StockNo}
                         onBlur={async (e) => {
                             handleBlur(e);
                             const { value } = e.target;
                             await setFieldValue("StockNo", value);
-                            const isValid = await validateField("StockNo");
-                            if (isValid) {
-                                changeInventory({ key: "StockNo", value });
-                            }
+                            await validateField("StockNo");
                         }}
                         onChange={async ({ target: { value } }) => {
                             await setFieldValue("StockNo", value);
+                            changeInventory({ key: "StockNo", value });
                         }}
                     />
                     <label className='float-label'>Stock#</label>
