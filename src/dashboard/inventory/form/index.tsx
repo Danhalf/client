@@ -29,6 +29,7 @@ import {
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { DeleteForm } from "./delete-form";
+import { Status } from "common/models/base-response";
 
 const STEP = "step";
 
