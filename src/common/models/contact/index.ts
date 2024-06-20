@@ -265,6 +265,7 @@ export interface Contact {
     phone1: string;
     phone2: string;
     phones: string[];
+    prospect: string[];
     sex: string;
     state: string;
     status: string;

@@ -15,7 +15,7 @@ import { useParams } from "react-router-dom";
 export const ContactsProspecting = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
-    const { contactExtData, changeContactExtData } = store;
+    const { contactExtData, changeContactExtData, changeContact, contact } = store;
     const [salespersonsList, setSalespersonsList] = useState<unknown[]>([]);
     const [anotherVehicle, setAnotherVehicle] = useState<boolean>(false);
     const [prospectList, setProspectList] = useState<any>([]);
@@ -77,7 +77,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                         editable
                         value={contactExtData.PROSPECT1_ID}
                         onChange={({ target: { value } }) =>
-                            changeContactExtData("PROSPECT1_ID", value)
+                            changeContact("prospect", [...contact.prospect, value])
                         }
                         placeholder='Choose a Vehicle'
                         className='w-full contacts-prospecting__dropdown'
@@ -96,7 +96,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                             editable
                             value={contactExtData.PROSPECT2_ID}
                             onChange={({ target: { value } }) =>
-                                changeContactExtData("PROSPECT2_ID", value)
+                                changeContact("prospect", [...contact.prospect, value])
                             }
                             placeholder='Choose a Vehicle'
                             className='w-full contacts-prospecting__dropdown'
