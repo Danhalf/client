@@ -77,7 +77,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                         editable
                         value={contactExtData.PROSPECT1_ID}
                         onChange={({ target: { value } }) =>
-                            changeContact("prospect", [...contact.prospect, value])
+                            changeContact("prospect", [...contact.prospect, value].filter(Boolean))
                         }
                         placeholder='Choose a Vehicle'
                         className='w-full contacts-prospecting__dropdown'
@@ -96,7 +96,10 @@ export const ContactsProspecting = observer((): ReactElement => {
                             editable
                             value={contactExtData.PROSPECT2_ID}
                             onChange={({ target: { value } }) =>
-                                changeContact("prospect", [...contact.prospect, value])
+                                changeContact(
+                                    "prospect",
+                                    [...contact.prospect, value].filter(Boolean)
+                                )
                             }
                             placeholder='Choose a Vehicle'
                             className='w-full contacts-prospecting__dropdown'
