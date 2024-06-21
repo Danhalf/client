@@ -2,7 +2,6 @@ import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import {
     createReportCollection,
-    getReportsList,
     getUserReportCollectionsContent,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
@@ -16,7 +15,7 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { MultiSelect } from "primereact/multiselect";
-import { ReportCollectionContent, ReportDocument } from "common/models/reports";
+import { ReportCollection, ReportDocument } from "common/models/reports";
 
 interface Report {
     id: string;
@@ -28,7 +27,7 @@ export default function Reports(): ReactElement {
     const [reportSearch, setReportSearch] = useState<string>("");
     // eslint-disable-next-line
     const [reports, setReports] = useState<ReportDocument[]>([]);
-    const [collections, setCollections] = useState<ReportCollectionContent[]>([]);
+    const [collections, setCollections] = useState<ReportCollection>();
     const [collectionName, setCollectionName] = useState<string>("");
     const [selectedReports, setSelectedReports] = useState<Report[]>([]);
 
@@ -38,21 +37,6 @@ export default function Reports(): ReactElement {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         setUser(authUser);
     }, []);
-
-    const handleGetReportList = (useruid: string) =>
-        getReportsList(useruid).then((response) => {
-            const { error } = response as BaseResponseError;
-            if (error && toast.current) {
-                return toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                    life: TOAST_LIFETIME,
-                });
-            }
-            const document = response as ReportDocument[];
-            setReports(document);
-        });
 
     const handleGetUserReportCollections = (useruid: string) =>
         getUserReportCollectionsContent(useruid).then((response) => {
@@ -65,13 +49,12 @@ export default function Reports(): ReactElement {
                     life: TOAST_LIFETIME,
                 });
             }
-            const collections = response as ReportCollectionContent[];
+            const collections = response as ReportCollection;
             setCollections(collections);
         });
 
     useEffect(() => {
         if (user) {
-            handleGetReportList(user.useruid);
             handleGetUserReportCollections(user.useruid);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -232,18 +215,22 @@ export default function Reports(): ReactElement {
                             <div className='col-12'>
                                 <Accordion multiple className='reports__accordion'>
                                     {collections &&
-                                        collections.map(({ itemUID, name }) => (
-                                            <AccordionTab
-                                                key={itemUID}
-                                                header={
-                                                    <ReportsAccordionHeader
-                                                        title={name}
-                                                        info={`(0 reports)`}
-                                                    />
-                                                }
-                                                className='reports__accordion-tab'
-                                            ></AccordionTab>
-                                        ))}
+                                        Object.values(collections).map(
+                                            ({ itemUID, name, documents }: ReportCollection) => (
+                                                <AccordionTab
+                                                    key={itemUID}
+                                                    header={
+                                                        <ReportsAccordionHeader
+                                                            title={name}
+                                                            info={`(${
+                                                                documents?.length || 0
+                                                            } reports)`}
+                                                        />
+                                                    }
+                                                    className='reports__accordion-tab'
+                                                ></AccordionTab>
+                                            )
+                                        )}
                                 </Accordion>
                             </div>
                         </div>
