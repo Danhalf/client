@@ -11,6 +11,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { useParams } from "react-router-dom";
+import { ContactProspect } from "common/models/contact";
 
 export const ContactsProspecting = observer((): ReactElement => {
     const { id } = useParams();
@@ -70,15 +71,15 @@ export const ContactsProspecting = observer((): ReactElement => {
             <div className='col-6'>
                 <span className='p-float-label'>
                     <Dropdown
-                        optionLabel='name'
-                        optionValue='name'
+                        optionLabel='notes'
+                        optionValue='notes'
                         options={prospectList}
                         filter
                         editable
                         value={contactExtData.PROSPECT1_ID}
-                        onChange={({ target: { value } }) =>
-                            changeContact("prospect", [...contact.prospect, value].filter(Boolean))
-                        }
+                        onChange={({ target: { value } }) => {
+                            changeContactExtData("PROSPECT1_ID", value);
+                        }}
                         placeholder='Choose a Vehicle'
                         className='w-full contacts-prospecting__dropdown'
                     />
@@ -89,18 +90,15 @@ export const ContactsProspecting = observer((): ReactElement => {
                 <div className='col-6'>
                     <span className='p-float-label'>
                         <Dropdown
-                            optionLabel='name'
-                            optionValue='name'
+                            optionLabel='notes'
+                            optionValue='notes'
                             options={prospectList}
                             filter
                             editable
                             value={contactExtData.PROSPECT2_ID}
-                            onChange={({ target: { value } }) =>
-                                changeContact(
-                                    "prospect",
-                                    [...contact.prospect, value].filter(Boolean)
-                                )
-                            }
+                            onChange={({ target: { value } }) => {
+                                changeContactExtData("PROSPECT2_ID", value);
+                            }}
                             placeholder='Choose a Vehicle'
                             className='w-full contacts-prospecting__dropdown'
                         />
