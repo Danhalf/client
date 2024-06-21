@@ -2,6 +2,7 @@ import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import {
     createReportCollection,
+    getReportById,
     getUserReportCollectionsContent,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
@@ -15,7 +16,7 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
 import { MultiSelect } from "primereact/multiselect";
-import { ReportCollection, ReportDocument } from "common/models/reports";
+import { ReportCollection } from "common/models/reports";
 
 interface Report {
     id: string;
@@ -25,9 +26,7 @@ interface Report {
 export default function Reports(): ReactElement {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [reportSearch, setReportSearch] = useState<string>("");
-    // eslint-disable-next-line
-    const [reports, setReports] = useState<ReportDocument[]>([]);
-    const [collections, setCollections] = useState<ReportCollection>();
+    const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
     const [selectedReports, setSelectedReports] = useState<Report[]>([]);
 
@@ -49,7 +48,7 @@ export default function Reports(): ReactElement {
                     life: TOAST_LIFETIME,
                 });
             }
-            const collections = response as ReportCollection;
+            const collections = response as any;
             setCollections(collections);
         });
 
@@ -66,10 +65,18 @@ export default function Reports(): ReactElement {
             <div className='reports-actions flex gap-3'>
                 <Button className='p-button' icon='pi pi-plus' outlined />
                 <Button className='p-button' icon='pi pi-heart' outlined />
-                <Button className='p-button reports-actions__button' outlined>
+                <Button
+                    className='p-button reports-actions__button'
+                    outlined
+                    onClick={() => getReportById(reportuid)}
+                >
                     Preview
                 </Button>
-                <Button className='p-button reports-actions__button' outlined>
+                <Button
+                    className='p-button reports-actions__button'
+                    outlined
+                    onClick={() => getReportById(reportuid)}
+                >
                     Download
                 </Button>
             </div>
@@ -185,12 +192,16 @@ export default function Reports(): ReactElement {
                                             <MultiSelect
                                                 filter
                                                 optionLabel='name'
-                                                options={reports}
+                                                optionValue='name'
+                                                options={collections.filter(
+                                                    (collection) => collection.documents
+                                                )}
+                                                optionGroupChildren='documents'
+                                                optionGroupLabel='name'
                                                 className='w-full new-collection__multiselect'
                                                 placeholder='Select reports'
                                                 showSelectAll={false}
-                                                value={selectedReports}
-                                                display='chip'
+                                                value={selectedReports || []}
                                                 onChange={(e) => {
                                                     e.stopPropagation();
                                                     setSelectedReports(e.value);
@@ -215,7 +226,7 @@ export default function Reports(): ReactElement {
                             <div className='col-12'>
                                 <Accordion multiple className='reports__accordion'>
                                     {collections &&
-                                        Object.values(collections).map(
+                                        collections.map(
                                             ({ itemUID, name, documents }: ReportCollection) => (
                                                 <AccordionTab
                                                     key={itemUID}
@@ -228,7 +239,20 @@ export default function Reports(): ReactElement {
                                                         />
                                                     }
                                                     className='reports__accordion-tab'
-                                                ></AccordionTab>
+                                                >
+                                                    {documents &&
+                                                        documents.map((report) => (
+                                                            <div
+                                                                className='reports__list-item'
+                                                                key={report.itemUID}
+                                                            >
+                                                                <p>{report.name}</p>
+                                                                <ActionButtons
+                                                                    reportuid={report.itemUID}
+                                                                />
+                                                            </div>
+                                                        ))}
+                                                </AccordionTab>
                                             )
                                         )}
                                 </Accordion>
