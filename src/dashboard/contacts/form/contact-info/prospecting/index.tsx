@@ -11,12 +11,11 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { useParams } from "react-router-dom";
-import { ContactProspect } from "common/models/contact";
 
 export const ContactsProspecting = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
-    const { contactExtData, changeContactExtData, changeContact, contact } = store;
+    const { contactExtData, changeContactExtData } = store;
     const [salespersonsList, setSalespersonsList] = useState<unknown[]>([]);
     const [anotherVehicle, setAnotherVehicle] = useState<boolean>(false);
     const [prospectList, setProspectList] = useState<any>([]);
