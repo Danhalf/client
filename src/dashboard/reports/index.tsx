@@ -48,8 +48,11 @@ export default function Reports(): ReactElement {
                     life: TOAST_LIFETIME,
                 });
             }
-            const collections = response as any;
-            setCollections(collections);
+            if (Array.isArray(response)) {
+                setCollections(response);
+            } else {
+                setCollections([]);
+            }
         });
 
     useEffect(() => {
