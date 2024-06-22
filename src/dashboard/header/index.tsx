@@ -6,7 +6,7 @@ import logo from "assets/images/logo.svg";
 import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import { AuthUser, logout } from "http/services/auth.service";
 import { useNavigate } from "react-router-dom";
-import { localStorageClear } from "services/local-storage.service";
+import { getKeyValue, localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
@@ -31,9 +31,12 @@ export const Header = observer((): ReactElement => {
     const [userProfile, setUserProfile] = useState<boolean>(false);
     const [location, setLocation] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [userName, setUserName] = useState<string>("");
 
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
+        const { loginname }: AuthUser = getKeyValue(LS_APP_USER);
+        setUserName(loginname);
         if (authUser && Object.keys(authUser.permissions).length) {
             const { permissions } = authUser;
             const { uaSalesPerson, ...otherPermissions } = permissions;
@@ -143,9 +146,7 @@ export const Header = observer((): ReactElement => {
                         ) : (
                             <>
                                 <div className='header-dealer-info'>
-                                    <p className='header-dealer-info__name font-bold'>
-                                        {authUser?.loginname}
-                                    </p>
+                                    <p className='header-dealer-info__name font-bold'>{userName}</p>
                                     <span className='header-dealer-location'>{location}</span>
                                 </div>
                                 <div className='header-user-menu ml-auto'>
@@ -172,6 +173,7 @@ export const Header = observer((): ReactElement => {
                             onHide={() => setUserProfile(false)}
                             visible={userProfile}
                             authUser={authUser}
+                            userName={userName}
                         />
                         <SupportContactDialog
                             onHide={() => setSupportContact(false)}

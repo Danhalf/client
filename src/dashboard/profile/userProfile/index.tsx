@@ -8,12 +8,14 @@ import { Password } from "primereact/password";
 
 interface UserProfileDialogProps extends DialogProps {
     authUser: AuthUser;
+    userName: string;
 }
 
 export const UserProfileDialog = ({
     visible,
     onHide,
     authUser,
+    userName,
 }: UserProfileDialogProps): JSX.Element => {
     const [user, setUser] = useState<AuthUser>(authUser);
     const [newPassword, setNewPassword] = useState<boolean>(false);
@@ -38,7 +40,7 @@ export const UserProfileDialog = ({
         >
             <div className='user-profile__row profile-row'>
                 <div className='profile-row__label'>User name</div>
-                <div className='profile-row__value'>{user.loginname}</div>
+                <div className='profile-row__value'>{userName}</div>
             </div>
             <div className='user-profile__row profile-row'>
                 <div className='profile-row__label'>Company name</div>
