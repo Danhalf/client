@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
@@ -6,37 +6,34 @@ import logo from "assets/images/logo.svg";
 import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import { AuthUser, logout } from "http/services/auth.service";
 import { useNavigate } from "react-router-dom";
-import { getKeyValue, localStorageClear } from "services/local-storage.service";
+import { localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { UserProfileDialog } from "dashboard/profile/userProfile";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { getUserSettings } from "http/services/auth-user.service";
-import { ServerUserSettings } from "common/models/user";
-
-const DEFAULT_LOCATION = "Default";
+import { getExtendedData } from "http/services/auth-user.service";
+import { HELP_PAGE } from "common/constants/links";
 
 export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
-    const inventoryStore = useStore().inventoryStore;
     const { authUser } = store;
-    const { currentLocation } = inventoryStore;
     const menuRight = useRef<Menu>(null);
     const navigate = useNavigate();
     const [supportContact, setSupportContact] = useState<boolean>(false);
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
     const [userProfile, setUserProfile] = useState<boolean>(false);
-    const [userName, setUserName] = useState<string>("");
-    const [currentLocationName, setCurrentLocationName] = useState<string>("");
+    const [showChangeLocation, setShowChangeLocation] = useState<boolean>(false);
 
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
-        const { loginname, locationname }: AuthUser = getKeyValue(LS_APP_USER);
-        setUserName(loginname);
-        setCurrentLocationName(locationname);
         if (authUser && Object.keys(authUser.permissions).length) {
+            getExtendedData(authUser.useruid).then((response) => {
+                if (response && response.locations && response.locations.length > 1) {
+                    setShowChangeLocation(true);
+                }
+            });
             const { permissions } = authUser;
             const { uaSalesPerson, ...otherPermissions } = permissions;
             if (Object.values(otherPermissions).some((permission) => permission === 1)) {
@@ -46,29 +43,6 @@ export const Header = observer((): ReactElement => {
         }
     }, [authUser, authUser?.permissions]);
 
-    useEffect(() => {
-        if (authUser) {
-            if (!currentLocation) {
-                getUserSettings(authUser.useruid).then((response) => {
-                    if (response?.profile.length) {
-                        if (response.profile) {
-                            try {
-                                const parsedSettings = JSON.parse(
-                                    response.profile
-                                ) as ServerUserSettings;
-                                inventoryStore.currentLocation =
-                                    parsedSettings.inventory.currentLocation || DEFAULT_LOCATION;
-                            } catch (error) {
-                                inventoryStore.currentLocation = DEFAULT_LOCATION;
-                            }
-                        }
-                    }
-                });
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const signOut = ({ useruid }: AuthUser) => {
         logout(useruid).finally(() => {
             localStorageClear(LS_APP_USER);
@@ -76,47 +50,51 @@ export const Header = observer((): ReactElement => {
         });
     };
 
-    const items: MenuItem[] = [
-        {
-            label: "My Profile",
-            command() {
-                setUserProfile(true);
-            },
-        },
-        { separator: true },
-        { label: "Change location" },
-        { label: "Users" },
-        { separator: true },
-        {
-            label: "Contact support",
-            command() {
-                setSupportContact(true);
-            },
-        },
-        {
-            label: "Support history",
-            command() {
-                setSupportHistory(true);
-            },
-        },
-        { label: "Help" },
-        { separator: true },
-        {
-            label: "Logout",
-            command() {
-                authUser && signOut(authUser);
-            },
-        },
-    ];
-
-    if (authUser && !isSalesPerson) {
-        items.splice(1, 0, {
-            label: "General Settings",
-            command() {
-                navigate("settings");
-            },
-        });
-    }
+    const menuItems = useMemo(
+        () =>
+            [
+                {
+                    label: "My Profile",
+                    command() {
+                        setUserProfile(true);
+                    },
+                },
+                !isSalesPerson
+                    ? { label: "General Settings", command: () => navigate("settings") }
+                    : null,
+                { separator: true },
+                showChangeLocation ? { label: "Change Location" } : null,
+                { label: "Users" },
+                { separator: true },
+                {
+                    label: "Contact support",
+                    command() {
+                        setSupportContact(true);
+                    },
+                },
+                {
+                    label: "Support history",
+                    command() {
+                        setSupportHistory(true);
+                    },
+                },
+                {
+                    label: "Help",
+                    command() {
+                        window.open(HELP_PAGE, "_blank");
+                    },
+                },
+                { separator: true },
+                {
+                    label: "Logout",
+                    command() {
+                        authUser && signOut(authUser);
+                    },
+                },
+            ].filter(Boolean) as MenuItem[],
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [authUser, isSalesPerson, showChangeLocation]
+    );
 
     if (menuRight) {
         return (
@@ -127,11 +105,13 @@ export const Header = observer((): ReactElement => {
                     </div>
                     <div className='grid m-0 head-container justify-content-between'>
                         <div className='header-dealer-info'>
-                            <p className='header-dealer-info__name font-bold'>{userName}</p>
-                            <span className='header-dealer-location'>{currentLocationName}</span>
+                            <p className='header-dealer-info__name font-bold'>
+                                {authUser?.loginname}
+                            </p>
+                            <span className='header-dealer-location'>{authUser?.locationname}</span>
                         </div>
                         <div className='header-user-menu ml-auto'>
-                            <Menu model={items} popup ref={menuRight} popupAlignment='right' />
+                            <Menu model={menuItems} popup ref={menuRight} popupAlignment='right' />
                             <img
                                 className='header-user-menu__toggle'
                                 onClick={(event) => menuRight?.current?.toggle(event)}
@@ -147,7 +127,6 @@ export const Header = observer((): ReactElement => {
                             onHide={() => setUserProfile(false)}
                             visible={userProfile}
                             authUser={authUser}
-                            userName={userName}
                         />
                         <SupportContactDialog
                             onHide={() => setSupportContact(false)}
