@@ -151,11 +151,14 @@ export const getReportById = async (reportId: string) => {
     }
 };
 
-export const createReportCollection = async (useruid: string, name: string) => {
+export const createReportCollection = async (
+    useruid: string,
+    { name, documents }: Partial<ReportCollection>
+) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `reports/${useruid}/collection`,
-            { name }
+            { name, documents }
         );
         return request.data;
     } catch (error) {
