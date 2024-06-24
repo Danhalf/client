@@ -13,9 +13,8 @@ import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { UserProfileDialog } from "dashboard/profile/userProfile";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { getExtendedData, getUserSettings } from "http/services/auth-user.service";
+import { getUserSettings } from "http/services/auth-user.service";
 import { ServerUserSettings } from "common/models/user";
-import { Loader } from "dashboard/common/loader";
 
 const DEFAULT_LOCATION = "Default";
 
@@ -29,14 +28,14 @@ export const Header = observer((): ReactElement => {
     const [supportContact, setSupportContact] = useState<boolean>(false);
     const [supportHistory, setSupportHistory] = useState<boolean>(false);
     const [userProfile, setUserProfile] = useState<boolean>(false);
-    const [location, setLocation] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [userName, setUserName] = useState<string>("");
+    const [currentLocationName, setCurrentLocationName] = useState<string>("");
 
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     useEffect(() => {
-        const { loginname }: AuthUser = getKeyValue(LS_APP_USER);
+        const { loginname, locationname }: AuthUser = getKeyValue(LS_APP_USER);
         setUserName(loginname);
+        setCurrentLocationName(locationname);
         if (authUser && Object.keys(authUser.permissions).length) {
             const { permissions } = authUser;
             const { uaSalesPerson, ...otherPermissions } = permissions;
@@ -69,20 +68,6 @@ export const Header = observer((): ReactElement => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    useEffect(() => {
-        if (authUser && currentLocation) {
-            getExtendedData(authUser.useruid).then((response) => {
-                if (response) {
-                    const currentLocationName = response.locations.find(
-                        (location) => location.locationuid === currentLocation
-                    );
-                    setLocation(currentLocationName?.locName || null);
-                }
-                setIsLoading(false);
-            });
-        }
-    }, [authUser, currentLocation]);
 
     const signOut = ({ useruid }: AuthUser) => {
         logout(useruid).finally(() => {
@@ -141,30 +126,19 @@ export const Header = observer((): ReactElement => {
                         <img src={logo} alt='ADMSS' />
                     </div>
                     <div className='grid m-0 head-container justify-content-between'>
-                        {isLoading ? (
-                            <Loader overlay />
-                        ) : (
-                            <>
-                                <div className='header-dealer-info'>
-                                    <p className='header-dealer-info__name font-bold'>{userName}</p>
-                                    <span className='header-dealer-location'>{location}</span>
-                                </div>
-                                <div className='header-user-menu ml-auto'>
-                                    <Menu
-                                        model={items}
-                                        popup
-                                        ref={menuRight}
-                                        popupAlignment='right'
-                                    />
-                                    <img
-                                        className='header-user-menu__toggle'
-                                        onClick={(event) => menuRight?.current?.toggle(event)}
-                                        src={userCabinet}
-                                        alt='User cabinet'
-                                    />
-                                </div>
-                            </>
-                        )}
+                        <div className='header-dealer-info'>
+                            <p className='header-dealer-info__name font-bold'>{userName}</p>
+                            <span className='header-dealer-location'>{currentLocationName}</span>
+                        </div>
+                        <div className='header-user-menu ml-auto'>
+                            <Menu model={items} popup ref={menuRight} popupAlignment='right' />
+                            <img
+                                className='header-user-menu__toggle'
+                                onClick={(event) => menuRight?.current?.toggle(event)}
+                                src={userCabinet}
+                                alt='User cabinet'
+                            />
+                        </div>
                     </div>
                 </div>
                 {authUser && (
