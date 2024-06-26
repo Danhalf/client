@@ -14,11 +14,7 @@ import { InputText } from "primereact/inputtext";
 import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { ROWS_PER_PAGE } from "common/settings";
-import {
-    addExportTask,
-    addExportTaskToSchedule,
-    getExportToWebList,
-} from "http/services/export-to-web.service";
+import { getExportToWebList } from "http/services/export-to-web.service";
 import { ExportWebList } from "common/models/export-web";
 import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
@@ -325,39 +321,37 @@ export const ExportWeb = (): ReactElement => {
     };
 
     const handleExport = (schedule?: boolean) => {
-        const columns: ReportsColumn[] = activeColumns.map((column) => ({
-            name: column.header as string,
-            data: column.field,
-        }));
-
-        const data = exportsToWeb
-            .map((item, index) => {
-                let filteredItem: Record<string, any> | null = {};
-                columns.forEach((column) => {
-                    if (item.hasOwnProperty(column.data)) {
-                        if (selectedInventories[index] && filteredItem) {
-                            filteredItem[column.data] = item[column.data as keyof typeof item];
-                            filteredItem["itemuid"] = item["itemuid"];
-                        } else {
-                            filteredItem = null;
-                        }
-                    }
-                });
-                return filteredItem;
-            })
-            .filter(Boolean);
-        const JSONreport = !!data.length && {
-            data,
-            columns,
-        };
-
-        if (JSONreport && authUser) {
-            if (schedule) {
-                addExportTaskToSchedule(authUser.useruid, JSONreport);
-            } else {
-                addExportTask(authUser?.useruid, JSONreport);
-            }
-        }
+        //   const columns: ReportsColumn[] = activeColumns.map((column) => ({
+        //       name: column.header as string,
+        //       data: column.field,
+        //   }));
+        //   const data = exportsToWeb
+        //       .map((item, index) => {
+        //           let filteredItem: Record<string, any> | null = {};
+        //           columns.forEach((column) => {
+        //               if (item.hasOwnProperty(column.data)) {
+        //                   if (selectedInventories[index] && filteredItem) {
+        //                       filteredItem[column.data] = item[column.data as keyof typeof item];
+        //                       filteredItem["itemuid"] = item["itemuid"];
+        //                   } else {
+        //                       filteredItem = null;
+        //                   }
+        //               }
+        //           });
+        //           return filteredItem;
+        //       })
+        //       .filter(Boolean);
+        //   const JSONreport = !!data.length && {
+        //       data,
+        //       columns,
+        //   };
+        //   if (JSONreport && authUser) {
+        //       if (schedule) {
+        //           addExportTaskToSchedule(authUser.useruid, JSONreport);
+        //       } else {
+        //           addExportTask(authUser?.useruid, JSONreport);
+        //       }
+        //   }
     };
 
     const allowedEditableFields: Partial<keyof ExportWebList>[] = [

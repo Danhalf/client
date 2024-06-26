@@ -79,6 +79,7 @@
 
 .export-web .p-tabview .p-tabview-nav {
     margin: 0 1.25rem;
+    border-color: var(--admss-app-light-grey);
 }
 
 .p-tabview .p-tabview-nav li.export-web__header .p-tabview-nav-link {
@@ -97,7 +98,6 @@
     li.export-web__header:not(.p-highlight):not(.p-disabled):hover
     .p-tabview-nav-link {
     color: var(--admss-app-main-blue);
-    /* border: 1px solid var(----admss-app-primary); */
     border-color: transparent;
-    border-bottom-color: var(----admss-app-primary);
+    border-bottom-color: var(--admss-app-light-grey);
 }
