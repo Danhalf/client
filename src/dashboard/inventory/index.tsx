@@ -47,6 +47,7 @@ import {
 } from "common/helpers";
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
+import { useStore } from "store/hooks";
 
 interface InventoriesProps {
     onRowClick?: (companyName: string) => void;
@@ -76,6 +77,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
     );
     const [inventoryType, setInventoryType] = useState<UserGroup[]>([]);
     const [selectedInventoryType, setSelectedInventoryType] = useState<string[]>([]);
+    const store = useStore().inventoryStore;
 
     const navigate = useNavigate();
 
@@ -94,84 +96,83 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             setUser(authUser);
-            getInventoryList(authUser.useruid, { total: 1 }).then((response) => {
-                response && !Array.isArray(response) && setTotalRecords(response.total ?? 0);
-            });
-            getInventoryLocations(authUser.useruid).then((response) => {
-                response && setLocations(response);
-            });
-            getUserGroupList(authUser.useruid).then((response) => {
-                response && setInventoryType(response);
-            });
+            Promise.all([
+                getInventoryLocations(authUser.useruid),
+                getUserGroupList(authUser.useruid),
+            ])
+                .then(([locationsResponse, userGroupsResponse]) => {
+                    if (locationsResponse) {
+                        setLocations(locationsResponse);
+                    }
+                    if (userGroupsResponse) {
+                        setInventoryType(userGroupsResponse);
+                    }
+                })
+                .finally(() => setIsLoading(false));
         }
-        setIsLoading(false);
     }, []);
 
     useEffect(() => {
-        setIsLoading(true);
-        changeSettings({ activeColumns: activeColumns.map(({ field }) => field) });
-        setIsLoading(false);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeColumns]);
-
-    useEffect(() => {
-        setIsLoading(true);
-        if (authUser) {
-            getUserSettings(authUser.useruid).then((response) => {
-                if (response?.profile.length) {
-                    let allSettings: ServerUserSettings = {} as ServerUserSettings;
-                    if (response.profile) {
-                        try {
-                            allSettings = JSON.parse(response.profile);
-                        } catch (error) {
-                            allSettings = {} as ServerUserSettings;
+        if (authUser && locations.length > 0) {
+            setIsLoading(true);
+            getUserSettings(authUser.useruid)
+                .then((response) => {
+                    if (response?.profile.length) {
+                        let allSettings: ServerUserSettings = {} as ServerUserSettings;
+                        if (response.profile) {
+                            try {
+                                allSettings = JSON.parse(response.profile);
+                            } catch (error) {
+                                allSettings = {} as ServerUserSettings;
+                            }
+                        }
+                        setServerSettings(allSettings);
+                        const { inventory: settings } = allSettings;
+                        if (settings?.activeColumns?.length) {
+                            const uniqueColumns = Array.from(new Set(settings?.activeColumns));
+                            const serverColumns = columns.filter((column) =>
+                                uniqueColumns.find((col) => col === column.field)
+                            );
+                            setActiveColumns(serverColumns);
+                        } else {
+                            setActiveColumns(columns.filter(({ checked }) => checked));
+                        }
+                        settings?.table &&
+                            setLazyState({
+                                first: settings.table.first || initialDataTableQueries.first,
+                                rows: settings.table.rows || initialDataTableQueries.rows,
+                                page: settings.table.page || initialDataTableQueries.page,
+                                column: settings.table.column || initialDataTableQueries.column,
+                                sortField:
+                                    settings.table.sortField || initialDataTableQueries.sortField,
+                                sortOrder:
+                                    settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                            });
+                        if (settings?.selectedFilterOptions) {
+                            setSelectedFilterOptions(settings.selectedFilterOptions);
+                        }
+                        if (settings?.selectedInventoryType) {
+                            setSelectedInventoryType(settings.selectedInventoryType);
+                        }
+                        if (settings?.currentLocation) {
+                            const location = locations.find(
+                                (location) => location.locationuid === settings.currentLocation
+                            );
+                            setCurrentLocation(location || ({} as InventoryLocations));
+                            store.currentLocation = location?.locationuid || "";
                         }
                     }
-                    setServerSettings(allSettings);
-                    const { inventory: settings } = allSettings;
-                    if (settings?.activeColumns?.length) {
-                        const uniqueColumns = Array.from(new Set(settings?.activeColumns));
-                        const serverColumns = columns.filter((column) =>
-                            uniqueColumns.find((col) => col === column.field)
-                        );
-                        setActiveColumns(serverColumns);
-                    } else {
-                        setActiveColumns(columns.filter(({ checked }) => checked));
-                    }
-                    settings?.table &&
-                        setLazyState({
-                            first: settings.table.first || initialDataTableQueries.first,
-                            rows: settings.table.rows || initialDataTableQueries.rows,
-                            page: settings.table.page || initialDataTableQueries.page,
-                            column: settings.table.column || initialDataTableQueries.column,
-                            sortField:
-                                settings.table.sortField || initialDataTableQueries.sortField,
-                            sortOrder:
-                                settings.table.sortOrder || initialDataTableQueries.sortOrder,
-                        });
-                    if (settings?.selectedFilterOptions) {
-                        setSelectedFilterOptions(settings.selectedFilterOptions);
-                    }
-                    if (settings?.selectedInventoryType) {
-                        setSelectedInventoryType(settings.selectedInventoryType);
-                    }
-                    if (settings?.currentLocation) {
-                        const location = locations.find(
-                            (location) => location.locationuid === settings.currentLocation
-                        );
-                        setCurrentLocation(location || ({} as InventoryLocations));
-                    }
-                }
-            });
+                })
+                .finally(() => setIsLoading(false));
         }
-        setIsLoading(false);
-    }, [authUser, locations]);
+    }, [authUser, locations, store]);
 
     const printTableData = async (print: boolean = false) => {
         setIsLoading(true);
         const columns: ReportsColumn[] = activeColumns.map((column) => ({
             name: column.header as string,
             data: column.field as string,
+            width: serverSettings?.inventory?.columnWidth?.[column.field as string],
         }));
         const date = new Date();
         const name = `inventory_${
@@ -304,8 +305,12 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                         onChange={() => {
                             if (columns.length === activeColumns.length) {
                                 setActiveColumns(columns.filter(({ checked }) => checked));
+                                changeSettings({ activeColumns: [] });
                             } else {
                                 setActiveColumns(columns);
+                                changeSettings({
+                                    activeColumns: columns.map(({ field }) => field),
+                                });
                             }
                         }}
                         checked={columns.length === activeColumns.length}
@@ -317,6 +322,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                     className='p-multiselect-close p-link'
                     onClick={(e) => {
                         setActiveColumns(columns.filter(({ checked }) => checked));
+                        changeSettings({ activeColumns: [] });
                         onCloseClick(e);
                     }}
                 >
@@ -451,7 +457,6 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         if (Object.values(currentLocation).some((value) => value.trim().length)) {
             if (!!qry.length) qry += "+";
             qry += `${currentLocation.locationuid}.locationuid`;
-            changeSettings({ currentLocation: currentLocation.locationuid });
         }
 
         const params: QueryParams = {
@@ -470,9 +475,8 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         setIsLoading(false);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        lazyState,
+        serverSettings,
         globalSearch,
-        authUser,
         selectedFilterOptions,
         currentLocation,
         selectedInventoryType,
@@ -545,7 +549,23 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                     optionLabel='header'
                     onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
                         stopPropagation();
-                        setActiveColumns(value);
+                        const sortedValue = value.sort(
+                            (a: TableColumnsList, b: TableColumnsList) => {
+                                const firstIndex = columns.findIndex(
+                                    (col) => col.field === a.field
+                                );
+                                const secondIndex = columns.findIndex(
+                                    (col) => col.field === b.field
+                                );
+                                return firstIndex - secondIndex;
+                            }
+                        );
+
+                        setActiveColumns(sortedValue);
+
+                        changeSettings({
+                            activeColumns: value.map(({ field }: { field: string }) => field),
+                        });
                     }}
                     panelHeaderTemplate={dropdownHeaderPanel}
                     className='w-full pb-0 h-full flex align-items-center column-picker'
@@ -645,9 +665,9 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         </div>
     );
 
-    const handleOnRowClick = ({ data: { itemuid, name } }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({ data: { itemuid, Make } }: DataTableRowClickEvent) => {
         if (onRowClick) {
-            onRowClick(name);
+            onRowClick(Make);
         } else {
             navigate(itemuid);
         }
@@ -678,7 +698,15 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                                     },
                                     ...locations.map((location) => ({
                                         label: location.locName,
-                                        command: () => setCurrentLocation(location),
+                                        command: () => {
+                                            setCurrentLocation(location);
+                                            changeSettings({
+                                                ...serverSettings,
+                                                currentLocation: location.locationuid,
+                                            });
+
+                                            store.currentLocation = location.locationuid;
+                                        },
                                     })),
                                 ]}
                                 rounded
@@ -694,7 +722,7 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
                     <div className='card-content'>
                         <div className='grid'>
                             <div className='col-12'>
-                                {(!activeColumns.length && !inventories.length) || isLoading ? (
+                                {isLoading ? (
                                     <div className='dashboard-loader__wrapper'>
                                         <Loader overlay />
                                     </div>

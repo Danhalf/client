@@ -1,6 +1,6 @@
 import { getInventoryMediaItem } from "./../../../http/services/media.service";
 import { Status } from "common/models/base-response";
-import { Contact, ContactExtData } from "common/models/contact";
+import { Contact, ContactExtData, ContactProspect } from "common/models/contact";
 import { MediaType } from "common/models/enums";
 import {
     deleteContactDL,
@@ -18,6 +18,7 @@ export class ContactStore {
     public rootStore: RootStore;
     private _contact: Contact = {} as Contact;
     private _contactExtData: ContactExtData = {} as ContactExtData;
+    private _contactProspect: Partial<ContactProspect>[] = [];
     private _contactID: string = "";
     protected _isLoading = false;
     private _frontSiteDLurl: string = "";
@@ -73,6 +74,7 @@ export class ContactStore {
 
                 this._contact = contact || ({} as Contact);
                 this._contactExtData = extdata || ({} as ContactExtData);
+                this._contactProspect = this._contact?.prospect || [];
             }
         } catch (error) {
         } finally {
@@ -139,15 +141,39 @@ export class ContactStore {
     public saveContact = action(async (): Promise<string | undefined> => {
         try {
             this._isLoading = true;
+            let newProspect: Partial<ContactProspect>[] = [];
+            if (this._contactProspect.length) {
+                const prospectFirst = this._contactProspect.find(
+                    (pros) => pros && pros.notes === this._contactExtData.PROSPECT1_ID
+                ) || { notes: this._contactExtData.PROSPECT1_ID };
+                const prospectSecond = this._contactProspect.find(
+                    (pros) => pros && pros.notes === this._contactExtData.PROSPECT2_ID
+                ) || { notes: this._contactExtData.PROSPECT2_ID };
+                const prevProspects = this._contactProspect;
+
+                newProspect = [...prevProspects, prospectFirst, prospectSecond].filter(Boolean);
+            }
+
             const contactData: Contact = {
                 ...this.contact,
                 extdata: this.contactExtData,
+                prospect: newProspect as ContactProspect[],
             };
-            const contactDataResponse = await setContact(this._contactID, contactData);
-            const imagesResponse = await this.setImagesDL();
-            await Promise.all([contactDataResponse, imagesResponse]).then((response) =>
-                response.every((item) => item?.status === Status.OK) ? this._contactID : undefined
-            );
+
+            const [contactDataResponse, imagesResponse] = await Promise.all([
+                setContact(this._contactID, contactData),
+                this.setImagesDL(),
+            ]);
+
+            if (
+                contactDataResponse &&
+                contactDataResponse.status === Status.OK &&
+                imagesResponse.status === Status.OK
+            ) {
+                return Status.OK;
+            }
+
+            return Status.ERROR;
         } catch (error) {
             // TODO: add error handlers
             return undefined;
