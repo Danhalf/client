@@ -251,6 +251,7 @@ export const ExportHistory = (): ReactElement => {
                             return (
                                 <Column
                                     field={field}
+                                    key={field}
                                     sortable
                                     header={header}
                                     reorderable={false}
