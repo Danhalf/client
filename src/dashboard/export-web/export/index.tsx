@@ -65,6 +65,7 @@ const columns: TableColumnsList[] = [
     { field: "mileage", header: "Mileage", checked: false },
     { field: "Status", header: "Status", checked: false },
     { field: "Price", header: "Price", checked: false },
+    { field: "lastexportdate", header: "Last Export Date", checked: false },
 ];
 
 interface GroupedColumn {
@@ -79,7 +80,11 @@ const groupedColumns: GroupedColumn[] = [
     },
 ];
 
-export const ExportWeb = (): ReactElement => {
+interface ExportWebProps {
+    countCb: (selected: number) => void;
+}
+
+export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
     const userStore = store.userStore;
     const { authUser } = userStore;
@@ -97,6 +102,10 @@ export const ExportWeb = (): ReactElement => {
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        countCb(selectedInventories.filter((item) => item).length);
+    }, [selectedInventories, countCb]);
 
     const rowExpansionTemplate = (data: ExportWebList) => {
         return (
@@ -128,6 +137,7 @@ export const ExportWeb = (): ReactElement => {
 
             if (Array.isArray(dataResponse)) {
                 setExportsToWeb(dataResponse);
+                setSelectedInventories(Array(dataResponse.length).fill(false));
             } else {
                 setExportsToWeb([]);
             }
@@ -223,7 +233,7 @@ export const ExportWeb = (): ReactElement => {
 
         handleGetExportWebList(params);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [globalSearch, selectedFilterOptions, lazyState, authUser]);
+    }, [globalSearch, lazyState, selectedFilterOptions, settingsLoaded]);
 
     const handleCheckboxChange = () => {
         if (columns.length === activeColumns.length) {
