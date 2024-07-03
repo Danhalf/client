@@ -5,6 +5,7 @@ import { Button } from "primereact/button";
 import { ReactElement, Suspense, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
 import "./index.css";
+import { InputText } from "primereact/inputtext";
 
 export const ReportForm = (): ReactElement => {
     const userStore = useStore().userStore;
@@ -59,6 +60,36 @@ export const ReportForm = (): ReactElement => {
                                             )
                                         )}
                                 </Accordion>
+                            </div>
+                            <div className='col-8 report-form'>
+                                <div className='report-form__header uppercase'>New report</div>
+                                <div className='report-form__body grid'>
+                                    <div className='col-6'>
+                                        <span className='p-float-label'>
+                                            <InputText />
+                                            <label className='float-label w-full'>name</label>
+                                        </span>
+                                    </div>
+                                    <div className='col-3'>
+                                        <Button className='uppercase px-6 report__button' outlined>
+                                            Preview
+                                        </Button>
+                                    </div>
+                                    <div className='col-3'>
+                                        <Button className='uppercase px-6 report__button' outlined>
+                                            Download
+                                        </Button>
+                                    </div>
+                                    <div className='grid'>
+                                        <div className='col-1'>
+                                            <Button
+                                                className='report__control-button'
+                                                icon='pi pi-plus'
+                                                outlined
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div className='flex justify-content-end gap-3 mt-8 mr-3'>
