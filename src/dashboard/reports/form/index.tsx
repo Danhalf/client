@@ -6,6 +6,8 @@ import { ReactElement, Suspense, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
+import { Dropdown } from "primereact/dropdown";
+import { Checkbox } from "primereact/checkbox";
 
 export const ReportForm = (): ReactElement => {
     const userStore = useStore().userStore;
@@ -27,6 +29,27 @@ export const ReportForm = (): ReactElement => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authUser]);
+
+    const ReportSelect = ({
+        header,
+        values,
+    }: {
+        header: string;
+        values: string[];
+    }): ReactElement => {
+        return (
+            <div className='report-select'>
+                <span className='report-select__header'>{header}</span>
+                <ul className='report-select__list'>
+                    {values.map((value) => (
+                        <li className='report-select__item' key={value}>
+                            {value}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        );
+    };
 
     return (
         <Suspense>
@@ -61,34 +84,157 @@ export const ReportForm = (): ReactElement => {
                                         )}
                                 </Accordion>
                             </div>
-                            <div className='col-8 report-form'>
+                            <div className='col-8 grid report-form'>
                                 <div className='report-form__header uppercase'>New report</div>
                                 <div className='report-form__body grid'>
                                     <div className='col-6'>
                                         <span className='p-float-label'>
-                                            <InputText />
-                                            <label className='float-label w-full'>name</label>
+                                            <InputText className='w-full' />
+                                            <label className='float-label w-full'>Name</label>
                                         </span>
                                     </div>
                                     <div className='col-3'>
-                                        <Button className='uppercase px-6 report__button' outlined>
+                                        <Button
+                                            className='uppercase w-full px-6 report__button'
+                                            outlined
+                                        >
                                             Preview
                                         </Button>
                                     </div>
                                     <div className='col-3'>
-                                        <Button className='uppercase px-6 report__button' outlined>
+                                        <Button
+                                            className='uppercase w-full px-6 report__button'
+                                            outlined
+                                        >
                                             Download
                                         </Button>
                                     </div>
-                                    <div className='grid'>
-                                        <div className='col-1'>
+                                    <div className='col-12 report-controls'>
+                                        <div className='report-controls__top'>
+                                            <span className='p-float-label'>
+                                                <Dropdown className='report-controls__dropdown' />
+                                                <label className='float-label'>Data Set</label>
+                                            </span>
+                                        </div>
+                                        <div className='report-control'>
                                             <Button
-                                                className='report__control-button'
-                                                icon='pi pi-plus'
+                                                className='report-control__button'
+                                                icon='pi pi-angle-up'
+                                                outlined
+                                            />
+                                            <Button
+                                                className='report-control__button'
+                                                icon='pi pi-angle-double-up'
+                                                outlined
+                                            />
+                                            <Button
+                                                className='report-control__button'
+                                                icon='pi pi-angle-down'
+                                                outlined
+                                            />
+                                            <Button
+                                                className='report-control__button'
+                                                icon='pi pi-angle-double-down'
+                                                outlined
+                                            />
+                                        </div>
+                                        <ReportSelect
+                                            header='Available'
+                                            values={[
+                                                "Account",
+                                                "Buyer Name",
+                                                "Type",
+                                                "Info (value)",
+                                                "Stock#",
+                                                "VIN",
+                                                "Date",
+                                            ]}
+                                        />
+                                        <div className='report-control'>
+                                            <Button
+                                                className='report-control__button'
+                                                icon='pi pi-angle-right'
+                                                outlined
+                                            />
+                                            <Button
+                                                className='report-control__button'
+                                                icon='pi pi-angle-double-right'
+                                                outlined
+                                            />
+                                            <Button
+                                                className='report-control__button'
+                                                icon='pi pi-angle-left'
+                                                outlined
+                                            />
+                                            <Button
+                                                className='report-control__button'
+                                                icon='pi pi-angle-double-left'
+                                                outlined
+                                            />
+                                        </div>
+                                        <ReportSelect
+                                            header='Selected'
+                                            values={["Account", "Buyer Name", "Type"]}
+                                        />
+                                        <div className='report-control'>
+                                            <Button
+                                                className='report-control__button'
+                                                icon='pi pi-angle-up'
+                                                outlined
+                                            />
+                                            <Button
+                                                className='report-control__button'
+                                                icon='pi pi-angle-double-up'
+                                                outlined
+                                            />
+                                            <Button
+                                                className='report-control__button'
+                                                icon='pi pi-angle-down'
+                                                outlined
+                                            />
+                                            <Button
+                                                className='report-control__button'
+                                                icon='pi pi-angle-double-down'
                                                 outlined
                                             />
                                         </div>
                                     </div>
+                                </div>
+
+                                <div className='flex col-12'>
+                                    <h3 className='hr__title m-0 pr-3'>Report options</h3>
+                                    <hr className='hr__line flex-1' />
+                                </div>
+
+                                <div className='col-3'>
+                                    <label className='cursor-pointer report-control__checkbox'>
+                                        <Checkbox checked={false} onChange={() => {}} />
+                                        Show Totals
+                                    </label>
+                                </div>
+                                <div className='col-3'>
+                                    <label className='cursor-pointer report-control__checkbox'>
+                                        <Checkbox checked={false} onChange={() => {}} />
+                                        Show Averages
+                                    </label>
+                                </div>
+                                <div className='col-3'>
+                                    <label className='cursor-pointer report-control__checkbox'>
+                                        <Checkbox checked={false} onChange={() => {}} />
+                                        Show Line Count
+                                    </label>
+                                </div>
+
+                                <div className='flex col-12'>
+                                    <h3 className='hr__title m-0 pr-3'>Report parameters</h3>
+                                    <hr className='hr__line flex-1' />
+                                </div>
+
+                                <div className='col-4'>
+                                    <label className='cursor-pointer report-control__checkbox'>
+                                        <Checkbox checked={false} onChange={() => {}} />
+                                        Ask for Start and End Dates
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -96,9 +242,7 @@ export const ReportForm = (): ReactElement => {
                             <Button className='uppercase px-6 report__button' outlined>
                                 Cancel
                             </Button>
-                            <Button className='uppercase px-6 report__button' outlined>
-                                Create
-                            </Button>
+                            <Button className='uppercase px-6 report__button'>Create</Button>
                         </div>
                     </div>
                 </div>
