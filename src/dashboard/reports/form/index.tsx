@@ -63,29 +63,43 @@ export const ReportForm = (): ReactElement => {
         setFrom([]);
     };
 
-    const moveItemUp = (
-        item: string,
-        list: string[],
-        setList: React.Dispatch<React.SetStateAction<string[]>>
-    ) => {
-        const index = list.indexOf(item);
-        if (index > 0) {
-            const newList = [...list];
-            [newList[index - 1], newList[index]] = [newList[index], newList[index - 1]];
-            setList(newList);
+    const changeAvailableOrder = (item: string, direction: "up" | "down" | "top" | "bottom") => {
+        if (direction === "up") {
+            const index = availableValues.indexOf(item);
+            const newItems = [...availableValues];
+            newItems.splice(index - 1, 0, newItems.splice(index, 1)[0]);
+            setAvailableValues(newItems);
+        } else if (direction === "down") {
+            const index = availableValues.indexOf(item);
+            const newItems = [...availableValues];
+            newItems.splice(index + 1, 0, newItems.splice(index, 1)[0]);
+            setAvailableValues(newItems);
+        } else if (direction === "top") {
+            const valuesWithoutItem = availableValues.filter((i) => i !== item);
+            setAvailableValues([item, ...valuesWithoutItem]);
+        } else if (direction === "bottom") {
+            const valuesWithoutItem = availableValues.filter((i) => i !== item);
+            setAvailableValues([...valuesWithoutItem, item]);
         }
     };
 
-    const moveItemDown = (
-        item: string,
-        list: string[],
-        setList: React.Dispatch<React.SetStateAction<string[]>>
-    ) => {
-        const index = list.indexOf(item);
-        if (index < list.length - 1) {
-            const newList = [...list];
-            [newList[index + 1], newList[index]] = [newList[index], newList[index + 1]];
-            setList(newList);
+    const changeSelectedOrder = (item: string, direction: "up" | "down" | "top" | "bottom") => {
+        if (direction === "up") {
+            const index = selectedValues.indexOf(item);
+            const newItems = [...selectedValues];
+            newItems.splice(index - 1, 0, newItems.splice(index, 1)[0]);
+            setSelectedValues(newItems);
+        } else if (direction === "down") {
+            const index = selectedValues.indexOf(item);
+            const newItems = [...selectedValues];
+            newItems.splice(index + 1, 0, newItems.splice(index, 1)[0]);
+            setSelectedValues(newItems);
+        } else if (direction === "top") {
+            const valuesWithoutItem = selectedValues.filter((i) => i !== item);
+            setSelectedValues([item, ...valuesWithoutItem]);
+        } else if (direction === "bottom") {
+            const valuesWithoutItem = selectedValues.filter((i) => i !== item);
+            setSelectedValues([...valuesWithoutItem, item]);
         }
     };
 
@@ -192,11 +206,7 @@ export const ReportForm = (): ReactElement => {
                                                 outlined
                                                 onClick={() =>
                                                     currentItem &&
-                                                    moveItemUp(
-                                                        currentItem,
-                                                        selectedValues,
-                                                        setSelectedValues
-                                                    )
+                                                    changeAvailableOrder(currentItem, "up")
                                                 }
                                             />
                                             <Button
@@ -205,11 +215,7 @@ export const ReportForm = (): ReactElement => {
                                                 outlined
                                                 onClick={() =>
                                                     currentItem &&
-                                                    moveItemUp(
-                                                        currentItem,
-                                                        selectedValues,
-                                                        setSelectedValues
-                                                    )
+                                                    changeAvailableOrder(currentItem, "top")
                                                 }
                                             />
                                             <Button
@@ -218,11 +224,7 @@ export const ReportForm = (): ReactElement => {
                                                 outlined
                                                 onClick={() =>
                                                     currentItem &&
-                                                    moveItemDown(
-                                                        currentItem,
-                                                        selectedValues,
-                                                        setSelectedValues
-                                                    )
+                                                    changeAvailableOrder(currentItem, "down")
                                                 }
                                             />
                                             <Button
@@ -231,11 +233,7 @@ export const ReportForm = (): ReactElement => {
                                                 outlined
                                                 onClick={() =>
                                                     currentItem &&
-                                                    moveItemDown(
-                                                        currentItem,
-                                                        selectedValues,
-                                                        setSelectedValues
-                                                    )
+                                                    changeAvailableOrder(currentItem, "bottom")
                                                 }
                                             />
                                         </div>
@@ -314,11 +312,7 @@ export const ReportForm = (): ReactElement => {
                                                 outlined
                                                 onClick={() =>
                                                     currentItem &&
-                                                    moveItemUp(
-                                                        currentItem,
-                                                        selectedValues,
-                                                        setSelectedValues
-                                                    )
+                                                    changeSelectedOrder(currentItem, "up")
                                                 }
                                             />
                                             <Button
@@ -327,11 +321,7 @@ export const ReportForm = (): ReactElement => {
                                                 outlined
                                                 onClick={() =>
                                                     currentItem &&
-                                                    moveItemUp(
-                                                        currentItem,
-                                                        selectedValues,
-                                                        setSelectedValues
-                                                    )
+                                                    changeSelectedOrder(currentItem, "top")
                                                 }
                                             />
                                             <Button
@@ -340,11 +330,7 @@ export const ReportForm = (): ReactElement => {
                                                 outlined
                                                 onClick={() =>
                                                     currentItem &&
-                                                    moveItemDown(
-                                                        currentItem,
-                                                        selectedValues,
-                                                        setSelectedValues
-                                                    )
+                                                    changeSelectedOrder(currentItem, "down")
                                                 }
                                             />
                                             <Button
@@ -353,11 +339,7 @@ export const ReportForm = (): ReactElement => {
                                                 outlined
                                                 onClick={() =>
                                                     currentItem &&
-                                                    moveItemDown(
-                                                        currentItem,
-                                                        selectedValues,
-                                                        setSelectedValues
-                                                    )
+                                                    changeSelectedOrder(currentItem, "bottom")
                                                 }
                                             />
                                         </div>
@@ -413,4 +395,3 @@ export const ReportForm = (): ReactElement => {
         </Suspense>
     );
 };
-export default ReportForm;
