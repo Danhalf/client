@@ -3,6 +3,7 @@ import { AuthUser } from "http/services/auth.service";
 import {
     createReportCollection,
     getReportTemplate,
+    getUserFavoriteReportList,
     getUserReportCollectionsContent,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
@@ -55,6 +56,7 @@ export default function Reports(): ReactElement {
     useEffect(() => {
         if (user) {
             handleGetUserReportCollections(user.useruid);
+            getUserFavoriteReportList(user.useruid);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [toast, user]);

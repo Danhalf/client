@@ -1,5 +1,8 @@
 import { ReportCollection } from "common/models/reports";
-import { getUserReportCollectionsContent } from "http/services/reports.service";
+import {
+    getUserFavoriteReportList,
+    getUserReportCollectionsContent,
+} from "http/services/reports.service";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { ReactElement, Suspense, useEffect, useState } from "react";
@@ -8,9 +11,12 @@ import "./index.css";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Checkbox } from "primereact/checkbox";
+import { ReportSelect } from "./common";
+import { useNavigate } from "react-router-dom";
 
 export const ReportForm = (): ReactElement => {
     const userStore = useStore().userStore;
+    const navigate = useNavigate();
     const { authUser } = userStore;
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [availableValues, setAvailableValues] = useState<string[]>([
@@ -37,6 +43,7 @@ export const ReportForm = (): ReactElement => {
     useEffect(() => {
         if (authUser) {
             handleGetUserReportCollections(authUser.useruid);
+            getUserFavoriteReportList(authUser.useruid);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authUser]);
@@ -103,40 +110,14 @@ export const ReportForm = (): ReactElement => {
         }
     };
 
-    const ReportSelect = ({
-        header,
-        values,
-        onItemClick,
-    }: {
-        header: string;
-        values: string[];
-        onItemClick: (item: string) => void;
-    }): ReactElement => {
-        return (
-            <div className='report-select'>
-                <span className='report-select__header'>{header}</span>
-                <ul className='report-select__list'>
-                    {values.map((value) => (
-                        <li
-                            className={`report-select__item ${
-                                currentItem === value ? "selected" : ""
-                            }`}
-                            key={value}
-                            onClick={() => {
-                                onItemClick(value);
-                            }}
-                        >
-                            {value}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        );
-    };
-
     return (
         <Suspense>
             <div className='grid relative'>
+                <Button
+                    icon='pi pi-times'
+                    className='p-button close-button'
+                    onClick={() => navigate("/dashboard/reports")}
+                />
                 <div className='col-12'>
                     <div className='card report'>
                         <div className='card-header flex'>
@@ -240,6 +221,7 @@ export const ReportForm = (): ReactElement => {
                                         <ReportSelect
                                             header='Available'
                                             values={availableValues}
+                                            currentItem={currentItem}
                                             onItemClick={(item) => setCurrentItem(item)}
                                         />
                                         <div className='report-control'>
@@ -303,6 +285,7 @@ export const ReportForm = (): ReactElement => {
                                         <ReportSelect
                                             header='Selected'
                                             values={selectedValues}
+                                            currentItem={currentItem}
                                             onItemClick={(item) => setCurrentItem(item)}
                                         />
                                         <div className='report-control'>
@@ -383,8 +366,26 @@ export const ReportForm = (): ReactElement => {
                                 </div>
                             </div>
                         </div>
-                        <div className='flex justify-content-end gap-3 mt-8 mr-3'>
-                            <Button className='uppercase px-6 report__button' outlined>
+                        <div className='report__footer gap-3 mt-8 mr-3'>
+                            <Button
+                                className='report__icon-button'
+                                icon='icon adms-password'
+                                severity='secondary'
+                                disabled
+                            />
+                            <Button
+                                className='report__icon-button'
+                                icon='icon adms-blank'
+                                severity='secondary'
+                                disabled
+                            />
+                            <Button
+                                className='report__icon-button'
+                                icon='icon adms-trash-can'
+                                severity='secondary'
+                                disabled
+                            />
+                            <Button className='ml-auto uppercase px-6 report__button' outlined>
                                 Cancel
                             </Button>
                             <Button className='uppercase px-6 report__button'>Create</Button>
