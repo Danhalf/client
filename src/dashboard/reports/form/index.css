@@ -139,3 +139,11 @@
     justify-content: center;
     font-weight: 700;
 }
+
+.report-select__item {
+    cursor: pointer;
+}
+
+.report-select__item.selected {
+    background-color: var(--admss-app-medium-grey);
+}

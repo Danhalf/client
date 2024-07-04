@@ -13,6 +13,17 @@ export const ReportForm = (): ReactElement => {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [collections, setCollections] = useState<ReportCollection[]>([]);
+    const [availableValues, setAvailableValues] = useState<string[]>([
+        "Account",
+        "Buyer Name",
+        "Type",
+        "Info (value)",
+        "Stock#",
+        "VIN",
+        "Date",
+    ]);
+    const [selectedValues, setSelectedValues] = useState<string[]>([]);
+    const [currentItem, setCurrentItem] = useState<string | null>(null);
 
     const handleGetUserReportCollections = (useruid: string) =>
         getUserReportCollectionsContent(useruid).then((response) => {
@@ -30,19 +41,91 @@ export const ReportForm = (): ReactElement => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authUser]);
 
+    const moveItem = (
+        item: string,
+        from: string[],
+        to: string[],
+        setFrom: React.Dispatch<React.SetStateAction<string[]>>,
+        setTo: React.Dispatch<React.SetStateAction<string[]>>
+    ) => {
+        setFrom(from.filter((i) => i !== item));
+        setTo([...to, item]);
+        setCurrentItem(null);
+    };
+
+    const moveAllItems = (
+        from: string[],
+        to: string[],
+        setFrom: React.Dispatch<React.SetStateAction<string[]>>,
+        setTo: React.Dispatch<React.SetStateAction<string[]>>
+    ) => {
+        setTo([...to, ...from]);
+        setFrom([]);
+    };
+
+    const changeAvailableOrder = (item: string, direction: "up" | "down" | "top" | "bottom") => {
+        if (direction === "up") {
+            const index = availableValues.indexOf(item);
+            const newItems = [...availableValues];
+            newItems.splice(index - 1, 0, newItems.splice(index, 1)[0]);
+            setAvailableValues(newItems);
+        } else if (direction === "down") {
+            const index = availableValues.indexOf(item);
+            const newItems = [...availableValues];
+            newItems.splice(index + 1, 0, newItems.splice(index, 1)[0]);
+            setAvailableValues(newItems);
+        } else if (direction === "top") {
+            const valuesWithoutItem = availableValues.filter((i) => i !== item);
+            setAvailableValues([item, ...valuesWithoutItem]);
+        } else if (direction === "bottom") {
+            const valuesWithoutItem = availableValues.filter((i) => i !== item);
+            setAvailableValues([...valuesWithoutItem, item]);
+        }
+    };
+
+    const changeSelectedOrder = (item: string, direction: "up" | "down" | "top" | "bottom") => {
+        if (direction === "up") {
+            const index = selectedValues.indexOf(item);
+            const newItems = [...selectedValues];
+            newItems.splice(index - 1, 0, newItems.splice(index, 1)[0]);
+            setSelectedValues(newItems);
+        } else if (direction === "down") {
+            const index = selectedValues.indexOf(item);
+            const newItems = [...selectedValues];
+            newItems.splice(index + 1, 0, newItems.splice(index, 1)[0]);
+            setSelectedValues(newItems);
+        } else if (direction === "top") {
+            const valuesWithoutItem = selectedValues.filter((i) => i !== item);
+            setSelectedValues([item, ...valuesWithoutItem]);
+        } else if (direction === "bottom") {
+            const valuesWithoutItem = selectedValues.filter((i) => i !== item);
+            setSelectedValues([...valuesWithoutItem, item]);
+        }
+    };
+
     const ReportSelect = ({
         header,
         values,
+        onItemClick,
     }: {
         header: string;
         values: string[];
+        onItemClick: (item: string) => void;
     }): ReactElement => {
         return (
             <div className='report-select'>
                 <span className='report-select__header'>{header}</span>
                 <ul className='report-select__list'>
                     {values.map((value) => (
-                        <li className='report-select__item' key={value}>
+                        <li
+                            className={`report-select__item ${
+                                currentItem === value ? "selected" : ""
+                            }`}
+                            key={value}
+                            onClick={() => {
+                                onItemClick(value);
+                            }}
+                        >
                             {value}
                         </li>
                     ))}
@@ -121,120 +204,182 @@ export const ReportForm = (): ReactElement => {
                                                 className='report-control__button'
                                                 icon='pi pi-angle-up'
                                                 outlined
+                                                onClick={() =>
+                                                    currentItem &&
+                                                    changeAvailableOrder(currentItem, "up")
+                                                }
                                             />
                                             <Button
                                                 className='report-control__button'
                                                 icon='pi pi-angle-double-up'
                                                 outlined
+                                                onClick={() =>
+                                                    currentItem &&
+                                                    changeAvailableOrder(currentItem, "top")
+                                                }
                                             />
                                             <Button
                                                 className='report-control__button'
                                                 icon='pi pi-angle-down'
                                                 outlined
+                                                onClick={() =>
+                                                    currentItem &&
+                                                    changeAvailableOrder(currentItem, "down")
+                                                }
                                             />
                                             <Button
                                                 className='report-control__button'
                                                 icon='pi pi-angle-double-down'
                                                 outlined
+                                                onClick={() =>
+                                                    currentItem &&
+                                                    changeAvailableOrder(currentItem, "bottom")
+                                                }
                                             />
                                         </div>
                                         <ReportSelect
                                             header='Available'
-                                            values={[
-                                                "Account",
-                                                "Buyer Name",
-                                                "Type",
-                                                "Info (value)",
-                                                "Stock#",
-                                                "VIN",
-                                                "Date",
-                                            ]}
+                                            values={availableValues}
+                                            onItemClick={(item) => setCurrentItem(item)}
                                         />
                                         <div className='report-control'>
                                             <Button
                                                 className='report-control__button'
                                                 icon='pi pi-angle-right'
                                                 outlined
+                                                onClick={() =>
+                                                    currentItem &&
+                                                    moveItem(
+                                                        currentItem,
+                                                        availableValues,
+                                                        selectedValues,
+                                                        setAvailableValues,
+                                                        setSelectedValues
+                                                    )
+                                                }
                                             />
                                             <Button
                                                 className='report-control__button'
                                                 icon='pi pi-angle-double-right'
                                                 outlined
+                                                onClick={() =>
+                                                    moveAllItems(
+                                                        availableValues,
+                                                        selectedValues,
+                                                        setAvailableValues,
+                                                        setSelectedValues
+                                                    )
+                                                }
                                             />
                                             <Button
                                                 className='report-control__button'
                                                 icon='pi pi-angle-left'
                                                 outlined
+                                                onClick={() =>
+                                                    currentItem &&
+                                                    moveItem(
+                                                        currentItem,
+                                                        selectedValues,
+                                                        availableValues,
+                                                        setSelectedValues,
+                                                        setAvailableValues
+                                                    )
+                                                }
                                             />
                                             <Button
                                                 className='report-control__button'
                                                 icon='pi pi-angle-double-left'
                                                 outlined
+                                                onClick={() =>
+                                                    moveAllItems(
+                                                        selectedValues,
+                                                        availableValues,
+                                                        setSelectedValues,
+                                                        setAvailableValues
+                                                    )
+                                                }
                                             />
                                         </div>
                                         <ReportSelect
                                             header='Selected'
-                                            values={["Account", "Buyer Name", "Type"]}
+                                            values={selectedValues}
+                                            onItemClick={(item) => setCurrentItem(item)}
                                         />
                                         <div className='report-control'>
                                             <Button
                                                 className='report-control__button'
                                                 icon='pi pi-angle-up'
                                                 outlined
+                                                onClick={() =>
+                                                    currentItem &&
+                                                    changeSelectedOrder(currentItem, "up")
+                                                }
                                             />
                                             <Button
                                                 className='report-control__button'
                                                 icon='pi pi-angle-double-up'
                                                 outlined
+                                                onClick={() =>
+                                                    currentItem &&
+                                                    changeSelectedOrder(currentItem, "top")
+                                                }
                                             />
                                             <Button
                                                 className='report-control__button'
                                                 icon='pi pi-angle-down'
                                                 outlined
+                                                onClick={() =>
+                                                    currentItem &&
+                                                    changeSelectedOrder(currentItem, "down")
+                                                }
                                             />
                                             <Button
                                                 className='report-control__button'
                                                 icon='pi pi-angle-double-down'
                                                 outlined
+                                                onClick={() =>
+                                                    currentItem &&
+                                                    changeSelectedOrder(currentItem, "bottom")
+                                                }
                                             />
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className='hr col-12'>
-                                    <h3 className='hr__title m-0 pr-3'>Report options</h3>
-                                    <hr className='hr__line flex-1' />
-                                </div>
+                                    <div className='flex col-12'>
+                                        <h3 className='hr__title m-0 pr-3'>Report options</h3>
+                                        <hr className='hr__line flex-1' />
+                                    </div>
 
-                                <div className='col-3'>
-                                    <label className='cursor-pointer report-control__checkbox'>
-                                        <Checkbox checked={false} onChange={() => {}} />
-                                        Show Totals
-                                    </label>
-                                </div>
-                                <div className='col-3'>
-                                    <label className='cursor-pointer report-control__checkbox'>
-                                        <Checkbox checked={false} onChange={() => {}} />
-                                        Show Averages
-                                    </label>
-                                </div>
-                                <div className='col-3'>
-                                    <label className='cursor-pointer report-control__checkbox'>
-                                        <Checkbox checked={false} onChange={() => {}} />
-                                        Show Line Count
-                                    </label>
-                                </div>
+                                    <div className='col-3'>
+                                        <label className='cursor-pointer report-control__checkbox'>
+                                            <Checkbox checked={false} onChange={() => {}} />
+                                            Show Totals
+                                        </label>
+                                    </div>
+                                    <div className='col-3'>
+                                        <label className='cursor-pointer report-control__checkbox'>
+                                            <Checkbox checked={false} onChange={() => {}} />
+                                            Show Averages
+                                        </label>
+                                    </div>
+                                    <div className='col-3'>
+                                        <label className='cursor-pointer report-control__checkbox'>
+                                            <Checkbox checked={false} onChange={() => {}} />
+                                            Show Line Count
+                                        </label>
+                                    </div>
 
-                                <div className='hr col-12'>
-                                    <h3 className='hr__title m-0 pr-3'>Report parameters</h3>
-                                    <hr className='hr__line flex-1' />
-                                </div>
+                                    <div className='flex col-12'>
+                                        <h3 className='hr__title m-0 pr-3'>Report parameters</h3>
+                                        <hr className='hr__line flex-1' />
+                                    </div>
 
-                                <div className='col-4'>
-                                    <label className='cursor-pointer report-control__checkbox'>
-                                        <Checkbox checked={false} onChange={() => {}} />
-                                        Ask for Start and End Dates
-                                    </label>
+                                    <div className='col-4'>
+                                        <label className='cursor-pointer report-control__checkbox'>
+                                            <Checkbox checked={false} onChange={() => {}} />
+                                            Ask for Start and End Dates
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -250,4 +395,3 @@ export const ReportForm = (): ReactElement => {
         </Suspense>
     );
 };
-export default ReportForm;
