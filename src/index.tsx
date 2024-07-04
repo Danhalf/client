@@ -20,7 +20,7 @@ import ProtectedRoute from "http/routes/ProtectedRoute";
 import { GeneralSettings } from "dashboard/profile/generalSettings";
 import Reports from "dashboard/reports";
 import { ExportToWeb } from "dashboard/export-web";
-import ReportForm from "dashboard/reports/form";
+import { ReportForm } from "dashboard/reports/form";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
