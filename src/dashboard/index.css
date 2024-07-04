@@ -306,6 +306,10 @@
     background-color: var(--admss-app-green);
 }
 
+.hr {
+    display: flex;
+}
+
 .hr__line {
     border: none;
     border-top: 1px solid var(--admss-app-light-grey);
