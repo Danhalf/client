@@ -42,6 +42,7 @@ export const SettingsInventoryGroups = (): ReactElement => {
 
     const handleMoveItem = (currentItem: UserGroup, direction: "up" | "down") => {
         if (currentItem) {
+            setIsLoading(true);
             const order = direction === "up" ? --currentItem.order : ++currentItem.order;
             addUserGroupList(authUser!.useruid, {
                 ...currentItem,
@@ -90,14 +91,12 @@ export const SettingsInventoryGroups = (): ReactElement => {
     };
 
     const handleToggleGroupVisible = (item: UserGroup) => {
-        if (authUser) {
-            setIsLoading(true);
-            addUserGroupList(authUser.useruid, {
-                enabled: !item.enabled ? 1 : 0,
-                itemuid: item.itemuid,
-                description: item.description,
-            }).then(handleGetUserGroupList);
-        }
+        setIsLoading(true);
+        addUserGroupList(authUser!.useruid, {
+            enabled: !item.enabled ? 1 : 0,
+            itemuid: item.itemuid,
+            description: item.description,
+        }).then(handleGetUserGroupList);
     };
 
     const handleDeleteGroup = (item: UserGroup) => {
