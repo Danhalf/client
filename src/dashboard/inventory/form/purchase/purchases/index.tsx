@@ -14,10 +14,11 @@ import { InputNumber } from "primereact/inputnumber";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { useFormikContext } from "formik";
 import { Inventory, InventoryExtData } from "common/models/inventory";
+import { useLocation } from "react-router-dom";
 
 export const PurchasePurchases = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-
+    const location = useLocation();
     const { values, errors, setFieldValue } = useFormikContext<Inventory & InventoryExtData>();
     const {
         inventoryExtData: {
@@ -56,6 +57,7 @@ export const PurchasePurchases = observer((): ReactElement => {
                         });
                     }}
                     className={errors.purPurchasedFrom ? "p-invalid" : ""}
+                    originalPath={location.pathname}
                 />
                 <small className='p-error'>{errors.purPurchasedFrom}</small>
             </div>
