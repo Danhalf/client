@@ -19,6 +19,7 @@ import { useLocation } from "react-router-dom";
 export const PurchasePurchases = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const location = useLocation();
+    const currentPath = location.pathname + location.search;
     const { values, errors, setFieldValue } = useFormikContext<Inventory & InventoryExtData>();
     const {
         inventoryExtData: {
@@ -57,7 +58,7 @@ export const PurchasePurchases = observer((): ReactElement => {
                         });
                     }}
                     className={errors.purPurchasedFrom ? "p-invalid" : ""}
-                    originalPath={location.pathname}
+                    originalPath={currentPath}
                 />
                 <small className='p-error'>{errors.purPurchasedFrom}</small>
             </div>
@@ -156,6 +157,7 @@ export const PurchasePurchases = observer((): ReactElement => {
                             value: companyName,
                         })
                     }
+                    originalPath={currentPath}
                 />
             </div>
             <div className='col-6'>
@@ -174,6 +176,7 @@ export const PurchasePurchases = observer((): ReactElement => {
                             value: companyName,
                         })
                     }
+                    originalPath={currentPath}
                 />
             </div>
             <div className='col-3'>
