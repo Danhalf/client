@@ -31,6 +31,7 @@ export class DealStore {
     private _dealFinances: DealFinance = {} as DealFinance;
     private _dealPickupPayments: (DealPickupPayment & { changed?: boolean })[] = [];
     private _dealID: string = "";
+    private _dealType: number = 0;
     private _printList: DealPrintCollection = {};
     private _dealErrorMessage: string = "";
     protected _isLoading = false;
@@ -50,6 +51,10 @@ export class DealStore {
 
     public get dealFinances() {
         return this._dealFinances;
+    }
+
+    public get dealType() {
+        return this._dealType;
     }
 
     public get printList() {
@@ -84,6 +89,7 @@ export class DealStore {
             if (response?.status === Status.OK) {
                 const { extdata, ...deal } = response as Deal;
                 this._deal = deal;
+                this._dealType = deal.dealtype;
                 this._dealID = extdata.dealUID;
                 this._dealExtData = extdata || ({} as DealExtData);
             } else {
@@ -212,6 +218,10 @@ export class DealStore {
             this._isLoading = false;
         }
     });
+
+    public set dealType(type: number) {
+        this._dealType = type;
+    }
 
     public clearDeal = () => {
         this._deal = {} as DealItem;
