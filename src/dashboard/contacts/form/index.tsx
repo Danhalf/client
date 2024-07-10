@@ -253,6 +253,7 @@ export const ContactForm = observer((): ReactElement => {
                                                 saveContact();
                                                 if (memoRoute) {
                                                     navigate(memoRoute);
+                                                    store.memoRoute = "";
                                                 } else {
                                                     navigate(`/dashboard/contacts`);
                                                 }
