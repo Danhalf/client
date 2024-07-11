@@ -2,11 +2,17 @@ import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
-import { CurrencyInput, DateInput, PercentInput } from "dashboard/common/form/inputs";
+import {
+    BorderedCheckbox,
+    CurrencyInput,
+    DateInput,
+    PercentInput,
+} from "dashboard/common/form/inputs";
 import { Dropdown } from "primereact/dropdown";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
 import { PAYMENT_FREQUENCY_LIST, TERM_MONTH_LIST } from "common/constants/contract-options";
+import { Checkbox } from "primereact/checkbox";
 
 export const DealBuyHerePayHere = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -180,6 +186,27 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                     />
                     <label className='float-label'>Grace Period</label>
                 </span>
+            </div>
+            <div className='col-3'>
+                <span className='p-float-label'>
+                    <Dropdown />
+                    <label className='float-label'>Interest Method</label>
+                </span>
+            </div>
+            <div className='col-3'>
+                <BorderedCheckbox checked name='Use PassTime Box' />
+            </div>
+            <div className='col-3'>
+                <BorderedCheckbox checked name='Use OnTime Box' />
+            </div>
+            <div className='col-3'>
+                <DateInput name='Effective Date' />
+            </div>
+            <div className='col-3 flex align-items-center'>
+                <Checkbox inputId='buy-here-report' name='buy-here-report' checked={false} />
+                <label htmlFor='buy-here-report' className='ml-2'>
+                    Don’t report to Credit Bureau
+                </label>
             </div>
         </div>
     );

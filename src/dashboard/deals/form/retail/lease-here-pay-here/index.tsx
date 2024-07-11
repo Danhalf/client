@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
-import "./index.css";
 import { InputText } from "primereact/inputtext";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { Dropdown } from "primereact/dropdown";
@@ -99,7 +98,7 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
                 <DateInput name='Final Payment Due' />
             </div>
 
-            <div className='col-4 deal-trade__checkbox flex align-items-center'>
+            <div className='col-4 flex align-items-center'>
                 <Checkbox
                     inputId='lease-first-payment'
                     name='lease-first-payment'
