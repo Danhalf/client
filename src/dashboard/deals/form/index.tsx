@@ -207,8 +207,6 @@ export const DealsForm = observer(() => {
     };
 
     useEffect(() => {
-        // const dealsSections: Pick<Deals, "label" | "items">[] = [DealGeneralInfo, DealRetail];
-
         id && getDeal(id);
     }, [id]);
 
