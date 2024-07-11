@@ -37,19 +37,26 @@ const DealLeaseHerePayHere = lazy(() =>
 const DealDismantle = lazy(() =>
     import("./dismantle").then((module) => ({ default: module.DealDismantle }))
 );
+const DealBuyHerePayHere = lazy(() =>
+    import("./buy-here-pay-here").then((module) => ({ default: module.DealBuyHerePayHere }))
+);
+
+const baseForm = [
+    { itemLabel: AccordionDealItems.LIENS, component: <DealRetailLiens /> },
+    { itemLabel: AccordionDealItems.FIRST_TRADE, component: <DealRetailTradeFirst /> },
+    { itemLabel: AccordionDealItems.SECOND_TRADE, component: <DealRetailTradeSecond /> },
+    { itemLabel: AccordionDealItems.TAG, component: <DealRetailTag /> },
+    { itemLabel: AccordionDealItems.INSURANCE, component: <DealRetailInsurance /> },
+    { itemLabel: AccordionDealItems.CHARGES, component: <DealRetailCharges /> },
+    { itemLabel: AccordionDealItems.PRODUCTS, component: <DealRetailProducts /> },
+    { itemLabel: AccordionDealItems.FINANCES, component: <DealRetailFinances /> },
+    { itemLabel: AccordionDealItems.PICKUP, component: <DealRetailPickup /> },
+];
 
 export const DealRetail: Pick<Deals, "label" | "items"> = {
     label: "Retail (Cash)",
     items: [
-        { itemLabel: AccordionDealItems.LIENS, component: <DealRetailLiens /> },
-        { itemLabel: AccordionDealItems.FIRST_TRADE, component: <DealRetailTradeFirst /> },
-        { itemLabel: AccordionDealItems.SECOND_TRADE, component: <DealRetailTradeSecond /> },
-        { itemLabel: AccordionDealItems.TAG, component: <DealRetailTag /> },
-        { itemLabel: AccordionDealItems.INSURANCE, component: <DealRetailInsurance /> },
-        { itemLabel: AccordionDealItems.CHARGES, component: <DealRetailCharges /> },
-        { itemLabel: AccordionDealItems.PRODUCTS, component: <DealRetailProducts /> },
-        { itemLabel: AccordionDealItems.FINANCES, component: <DealRetailFinances /> },
-        { itemLabel: AccordionDealItems.PICKUP, component: <DealRetailPickup /> },
+        ...baseForm,
         { itemLabel: AccordionDealItems.CONTRACT, component: <DealRetailContract /> },
     ],
 };
@@ -57,17 +64,14 @@ export const DealRetail: Pick<Deals, "label" | "items"> = {
 export const DealLHPH: Pick<Deals, "label" | "items"> = {
     label: "Lease Here Pay Here",
     items: [
-        { itemLabel: AccordionDealItems.LIENS, component: <DealRetailLiens /> },
-        { itemLabel: AccordionDealItems.FIRST_TRADE, component: <DealRetailTradeFirst /> },
-        { itemLabel: AccordionDealItems.SECOND_TRADE, component: <DealRetailTradeSecond /> },
-        { itemLabel: AccordionDealItems.TAG, component: <DealRetailTag /> },
-        { itemLabel: AccordionDealItems.INSURANCE, component: <DealRetailInsurance /> },
-        { itemLabel: AccordionDealItems.CHARGES, component: <DealRetailCharges /> },
-        { itemLabel: AccordionDealItems.PRODUCTS, component: <DealRetailProducts /> },
-        { itemLabel: AccordionDealItems.FINANCES, component: <DealRetailFinances /> },
-        { itemLabel: AccordionDealItems.PICKUP, component: <DealRetailPickup /> },
+        ...baseForm,
         { itemLabel: AccordionDealItems.LHPH, component: <DealLeaseHerePayHere /> },
     ],
+};
+
+export const DealBHPH: Pick<Deals, "label" | "items"> = {
+    label: "Buy Here Pay Here",
+    items: [...baseForm, { itemLabel: AccordionDealItems.BHPH, component: <DealBuyHerePayHere /> }],
 };
 
 export const DealDismantleForm: Pick<Deals, "label" | "items"> = {
@@ -75,5 +79,13 @@ export const DealDismantleForm: Pick<Deals, "label" | "items"> = {
     items: [
         { itemLabel: AccordionDealItems.PICKUP, component: <DealRetailPickup /> },
         { itemLabel: AccordionDealItems.DISMANTLE, component: <DealDismantle /> },
+    ],
+};
+
+export const DealWholeSale: Pick<Deals, "label" | "items"> = {
+    label: "Wholesale",
+    items: [
+        { itemLabel: AccordionDealItems.FINANCES, component: <DealRetailFinances /> },
+        { itemLabel: AccordionDealItems.PICKUP, component: <DealRetailPickup /> },
     ],
 };

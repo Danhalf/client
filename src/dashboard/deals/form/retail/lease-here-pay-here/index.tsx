@@ -2,36 +2,21 @@ import { observer } from "mobx-react-lite";
 import { ReactElement } from "react";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
-import { CurrencyInput, DateInput, PercentInput } from "dashboard/common/form/inputs";
+import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { Dropdown } from "primereact/dropdown";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
 import { PAYMENT_FREQUENCY_LIST, TERM_MONTH_LIST } from "common/constants/contract-options";
+import { Checkbox } from "primereact/checkbox";
 
 export const DealLeaseHerePayHere = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
-        dealExtData: {
-            Con_Acct_Num,
-            Con_Amt_To_Finance,
-            Con_Pmt_Freq,
-            Con_Term,
-            Con_Int_Rate,
-            Con_Pmt_Amt,
-            Con_Final_Pmt,
-            Con_Total_Interest,
-            Con_Total_of_Pmts,
-            Con_First_Pmt_Date,
-            Con_Late_Fee,
-            Con_Late_Fee_Max,
-            Con_Late_Percent,
-            Con_Grace_Period,
-            Days_to_First_Payment,
-        },
+        dealExtData: { Con_Acct_Num, Con_Pmt_Freq, Con_Term },
         changeDealExtData,
     } = store;
     return (
-        <div className='grid deal-retail-contract row-gap-2'>
+        <div className='grid deal-lease row-gap-2'>
             <div className='col-3'>
                 <span className='p-float-label'>
                     <InputText
@@ -39,7 +24,7 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
                         onChange={({ target: { value } }) =>
                             changeDealExtData({ key: "Con_Acct_Num", value })
                         }
-                        className='deal-contract__text-input w-full'
+                        className='deal-lease__text-input w-full'
                     />
                     <label className='float-label'>Account Number</label>
                 </span>
@@ -48,14 +33,7 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-3'>
-                <CurrencyInput
-                    value={Con_Amt_To_Finance}
-                    onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Amt_To_Finance", value: value || 0 })
-                    }
-                    labelPosition='top'
-                    title='Amount of Finance'
-                />
+                <CurrencyInput labelPosition='top' title='Depreciation' />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -69,7 +47,7 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
                         options={PAYMENT_FREQUENCY_LIST}
                         filter
                         required
-                        className='w-full deal-sale__dropdown'
+                        className='w-full deal-lease__dropdown'
                     />
                     <label className='float-label'>Payment Frequency</label>
                 </span>
@@ -85,143 +63,78 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
                         editable
                         filter
                         required
-                        className='w-full deal-sale__dropdown'
+                        className='w-full deal-lease__dropdown'
                     />
                     <label className='float-label'>Term (months)</label>
                 </span>
             </div>
             <div className='col-3'>
-                <PercentInput
-                    value={Con_Int_Rate}
-                    onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Int_Rate", value: value || 0 })
-                    }
-                    labelPosition='top'
-                    title='Interest Rate'
-                />
-            </div>
-            <div className='col-3'>
-                <CurrencyInput
-                    labelPosition='top'
-                    value={Con_Pmt_Amt}
-                    onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Pmt_Amt", value: value || 0 })
-                    }
-                    title='Payment Amount'
-                />
-            </div>
-            <div className='col-3'>
-                <CurrencyInput
-                    labelPosition='top'
-                    value={Con_Final_Pmt}
-                    onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Final_Pmt", value: value || 0 })
-                    }
-                    title='Final Payment'
-                />
-            </div>
-
-            <hr className='form-line' />
-
-            <div className='col-3'>
-                <CurrencyInput
-                    labelPosition='top'
-                    value={Con_Total_Interest}
-                    onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Total_Interest", value: value || 0 })
-                    }
-                    title='Total Interest'
-                />
-            </div>
-            <div className='col-3'>
-                <CurrencyInput
-                    labelPosition='top'
-                    value={Con_Total_of_Pmts}
-                    onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Total_of_Pmts", value: value || 0 })
-                    }
-                    title='Total of Payments'
-                />
-            </div>
-            <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputNumber
-                        min={1}
-                        value={Days_to_First_Payment}
-                        onChange={({ value }) =>
-                            changeDealExtData({
-                                key: "Days_to_First_Payment",
-                                value: Number(value),
-                            })
-                        }
-                        className='deal-contract__text-input w-full'
-                    />
-                    <label className='float-label'>Days to First Payment</label>
+                    <InputNumber min={1} className='deal-lease__text-input w-full' />
+                    <label className='float-label'>Money Factor</label>
                 </span>
             </div>
             <div className='col-3'>
-                <DateInput
-                    name='First Payment Due'
-                    date={Con_First_Pmt_Date}
-                    onChange={({ value }) =>
-                        value &&
-                        changeDealExtData({ key: "Con_First_Pmt_Date", value: Number(value) })
-                    }
-                />
+                <CurrencyInput labelPosition='top' title='Payment' />
             </div>
             <div className='col-3'>
-                <DateInput
-                    name='Final Payment Due'
-                    date={Con_Final_Pmt}
-                    onChange={({ value }) =>
-                        value && changeDealExtData({ key: "Con_Final_Pmt", value: Number(value) })
-                    }
+                <CurrencyInput labelPosition='top' title='Monthly Prop. Tax' />
+            </div>
+            <div className='col-3'>
+                <CurrencyInput labelPosition='top' title='Total Payment' />
+            </div>
+            <div className='col-3'>
+                <CurrencyInput labelPosition='top' title='Purchase Option' />
+            </div>
+            <div className='col-3'>
+                <CurrencyInput labelPosition='top' title='Expected Taxes and Fees' />
+            </div>
+            <div className='col-3'>
+                <DateInput name='Sale Date' />
+            </div>
+            <div className='col-3'>
+                <DateInput name='Second Payment Due' />
+            </div>
+            <div className='col-3'>
+                <DateInput name='Final Payment Due' />
+            </div>
+
+            <div className='col-4 deal-trade__checkbox flex align-items-center'>
+                <Checkbox
+                    inputId='lease-first-payment'
+                    name='lease-first-payment'
+                    checked={false}
                 />
+                <label htmlFor='lease-first-payment' className='ml-2'>
+                    First Payment Due on Delivery
+                </label>
             </div>
 
             <hr className='form-line' />
 
             <div className='col-3'>
-                <PercentInput
-                    labelPosition='top'
-                    value={Con_Late_Percent}
-                    onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Late_Percent", value: value || 0 })
-                    }
-                    title='Late Fee'
-                />
-            </div>
-            <div className='col-3'>
-                <CurrencyInput
-                    labelPosition='top'
-                    value={Con_Late_Fee_Max}
-                    onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Late_Fee_Max", value: value || 0 })
-                    }
-                    title='Flat/ Min Late Fee'
-                />
-            </div>
-            <div className='col-3'>
-                <CurrencyInput
-                    labelPosition='top'
-                    value={Con_Late_Fee}
-                    onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Late_Fee", value: value || 0 })
-                    }
-                    title='Late Fee Cap'
-                />
+                <CurrencyInput labelPosition='top' title='Late Fee' />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputNumber
-                        value={Con_Grace_Period}
-                        onChange={({ value }) =>
-                            changeDealExtData({ key: "Con_Grace_Period", value: value || 0 })
-                        }
-                        className='deal-contract__text-input w-full'
-                    />
+                    <InputNumber min={1} className='deal-lease__text-input w-full' />
                     <label className='float-label'>Grace Period</label>
                 </span>
+            </div>
+            <div className='col-3'>
+                <DateInput name='Effective Date' />
+            </div>
+            <div className='col-3'>
+                <span className='p-float-label'>
+                    <InputNumber min={1} className='deal-lease__text-input w-full' />
+                    <label className='float-label'>Miles per Year</label>
+                </span>
+            </div>
+            <div className='col-3'>
+                <CurrencyInput labelPosition='top' title='Overage Cost' />
+            </div>
+            <div className='col-3'>
+                <CurrencyInput labelPosition='top' title='Termination Fee' />
             </div>
         </div>
     );

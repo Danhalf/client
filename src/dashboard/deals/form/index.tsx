@@ -9,7 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { DealGeneralInfo } from "./general-info";
-import { DealDismantleForm, DealLHPH, DealRetail } from "./retail";
+import { DealBHPH, DealDismantleForm, DealLHPH, DealRetail, DealWholeSale } from "./retail";
 import { useStore } from "store/hooks";
 import { Loader } from "dashboard/common/loader";
 import { PrintDealForms } from "./print-forms";
@@ -218,6 +218,10 @@ export const DealsForm = observer(() => {
             dealsSections = [...dealsSections, DealLHPH];
         } else if (dealType === 6) {
             dealsSections = [...dealsSections, DealDismantleForm];
+        } else if (dealType === 5) {
+            dealsSections = [...dealsSections, DealWholeSale];
+        } else if (dealType === 0) {
+            dealsSections = [...dealsSections, DealBHPH];
         } else {
             dealsSections = [...dealsSections, DealRetail];
         }
