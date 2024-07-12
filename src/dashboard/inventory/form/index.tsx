@@ -400,16 +400,17 @@ export const InventoryForm = observer(() => {
                                             validateOnChange={false}
                                             validateOnBlur={false}
                                             validateOnMount={validateOnMount}
-                                            onSubmit={() => {
+                                            onSubmit={async () => {
                                                 setValidateOnMount(false);
-                                                saveInventory(id);
-                                                navigate(`/dashboard/inventory`);
-                                                clearInventory();
-                                                clearCachedInventory();
-                                                toast.current?.show({
-                                                    severity: "success",
-                                                    summary: "Success",
-                                                    detail: "Inventory saved successfully",
+                                                await saveInventory(id).then(() => {
+                                                    navigate(`/dashboard/inventory`);
+                                                    clearInventory();
+                                                    clearCachedInventory();
+                                                    toast.current?.show({
+                                                        severity: "success",
+                                                        summary: "Success",
+                                                        detail: "Inventory saved successfully",
+                                                    });
                                                 });
                                             }}
                                         >
