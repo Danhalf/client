@@ -30,6 +30,11 @@
     white-space: nowrap;
 }
 
+.export-web .p-button.p-button-icon-only,
+.export-web .p-button.p-button-icon-only .pi {
+    font-size: 22px;
+}
+
 .export-web-controls__button-icon {
     margin-left: 10px;
     line-height: 1;
@@ -119,4 +124,9 @@
 
 .export-web__header-count--active {
     color: var(--admss-app-main-blue);
+}
+
+.export-web__search,
+.export-web__search .p-inputtext {
+    width: 180px;
 }
