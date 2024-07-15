@@ -18,7 +18,7 @@ import {
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 
-interface DealItem extends Omit<Deal, "extdata"> {}
+interface DealItem extends Omit<Deal, "extdata" | "finance"> {}
 
 interface DealPrintCollection {
     [key: string]: DealPrintForm[];
@@ -28,6 +28,7 @@ export class DealStore {
     public rootStore: RootStore;
     private _deal: DealItem = {} as DealItem;
     private _dealExtData: DealExtData = {} as DealExtData;
+    private _dealFinance = {} as DealFinance;
     private _dealFinances: DealFinance = {} as DealFinance;
     private _dealPickupPayments: (DealPickupPayment & { changed?: boolean })[] = [];
     private _dealID: string = "";
@@ -47,6 +48,10 @@ export class DealStore {
     }
     public get dealExtData() {
         return this._dealExtData;
+    }
+
+    public get dealFinance() {
+        return this._dealFinance;
     }
 
     public get dealFinances() {
@@ -87,11 +92,12 @@ export class DealStore {
         try {
             const response = await getDealInfo(itemuid);
             if (response?.status === Status.OK) {
-                const { extdata, ...deal } = response as Deal;
+                const { extdata, finance, ...deal } = response as Deal;
                 this._deal = deal;
                 this._dealType = deal.dealtype;
                 this._dealID = extdata.dealUID;
                 this._dealExtData = extdata || ({} as DealExtData);
+                this._dealFinance = finance || ({} as DealFinance);
             } else {
                 const { error } = response as BaseResponseError;
                 this._dealErrorMessage = error!;
@@ -120,7 +126,7 @@ export class DealStore {
     };
 
     public changeDeal = action(({ key, value }: { key: keyof Deal; value: string | number }) => {
-        if (this._deal && key !== "extdata") {
+        if (this._deal && key !== "extdata" && key !== "finance") {
             this._isFormChanged = true;
             (this._deal as Record<typeof key, string | number>)[key] = value;
         }
@@ -133,6 +139,16 @@ export class DealStore {
                 this._isFormChanged = true;
                 const { dealExtData } = dealStore;
                 (dealExtData as Record<typeof key, string | number>)[key] = value;
+            }
+        }
+    );
+
+    public changeDealFinance = action(
+        ({ key, value }: { key: keyof DealFinance; value: string | number }) => {
+            const dealStore = this.rootStore.dealStore;
+            if (dealStore) {
+                const { dealFinance } = dealStore;
+                (dealFinance as Record<typeof key, string | number>)[key] = value;
             }
         }
     );
@@ -171,6 +187,7 @@ export class DealStore {
             const dealData: Deal = {
                 ...this._deal,
                 extdata: this._dealExtData,
+                finance: this._dealFinances,
             };
             const dealResponse = await setDeal(this._dealID, dealData);
             const financesResponse = await setDealFinance(this._dealID, this._dealFinances);
@@ -228,6 +245,7 @@ export class DealStore {
         this._dealErrorMessage = "";
         this._dealID = "";
         this._dealExtData = {} as DealExtData;
+        this._dealFinance = {} as DealFinance;
         this._dealFinances = {} as DealFinance;
         this._printList = {} as DealPrintCollection;
         this._dealPickupPayments = [] as DealPickupPayment[];

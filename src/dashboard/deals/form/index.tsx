@@ -208,6 +208,7 @@ export const DealsForm = observer(() => {
 
     useEffect(() => {
         id && getDeal(id);
+        return () => clearDeal();
     }, [id]);
 
     useEffect(() => {
@@ -233,7 +234,6 @@ export const DealsForm = observer(() => {
 
         return () => {
             sections.forEach((section) => section.clearCount());
-            clearDeal();
         };
     }, [dealType]);
 

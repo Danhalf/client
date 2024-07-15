@@ -11,17 +11,34 @@ import { Checkbox } from "primereact/checkbox";
 export const DealLeaseHerePayHere = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
-        dealExtData: { Con_Acct_Num, Con_Pmt_Freq, Con_Term },
+        deal: { accountInfo, dateeffective, datepurchase },
+        dealExtData: {
+            Con_Pmt_Freq,
+            Con_Term,
+            Con_Pmt_Amt,
+            Con_Lease_Prop_Tax,
+            Con_Total_of_Pmts,
+            Con_Lease_Purch_Option,
+            Con_Lease_Taxes,
+            Con_Late_Fee,
+            Con_Grace_Period,
+            Con_Lease_Miles,
+            Con_Lease_Overage,
+            Con_Lease_Termination_Fee,
+        },
+        dealFinance: { Depreciation },
+        changeDeal,
         changeDealExtData,
+        changeDealFinance,
     } = store;
     return (
         <div className='grid deal-lease row-gap-2'>
             <div className='col-3'>
                 <span className='p-float-label'>
                     <InputText
-                        value={Con_Acct_Num}
+                        value={accountInfo}
                         onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "Con_Acct_Num", value })
+                            changeDeal({ key: "accountInfo", value })
                         }
                         className='deal-lease__text-input w-full'
                     />
@@ -32,7 +49,14 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Depreciation' />
+                <CurrencyInput
+                    labelPosition='top'
+                    title='Depreciation'
+                    value={parseInt(Depreciation)}
+                    onChange={({ value }) =>
+                        changeDealFinance({ key: "Depreciation", value: value || 0 })
+                    }
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -74,22 +98,63 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Payment' />
+                <CurrencyInput
+                    labelPosition='top'
+                    value={Con_Pmt_Amt}
+                    onChange={({ value }) =>
+                        changeDealExtData({ key: "Con_Pmt_Amt", value: value || 0 })
+                    }
+                    title='Payment'
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Monthly Prop. Tax' />
+                <CurrencyInput
+                    labelPosition='top'
+                    value={Con_Lease_Prop_Tax}
+                    onChange={({ value }) =>
+                        changeDealExtData({ key: "Con_Lease_Prop_Tax", value: value || 0 })
+                    }
+                    title='Monthly Prop. Tax'
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Total Payment' />
+                <CurrencyInput
+                    labelPosition='top'
+                    value={Con_Total_of_Pmts}
+                    onChange={({ value }) =>
+                        changeDealExtData({ key: "Con_Total_of_Pmts", value: value || 0 })
+                    }
+                    title='Total Payment'
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Purchase Option' />
+                <CurrencyInput
+                    labelPosition='top'
+                    value={Con_Lease_Purch_Option}
+                    onChange={({ value }) =>
+                        changeDealExtData({ key: "Con_Lease_Purch_Option", value: value || 0 })
+                    }
+                    title='Purchase Option'
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Expected Taxes and Fees' />
+                <CurrencyInput
+                    labelPosition='top'
+                    value={Con_Lease_Taxes}
+                    onChange={({ value }) =>
+                        changeDealExtData({ key: "Con_Lease_Taxes", value: value || 0 })
+                    }
+                    title='Expected Taxes and Fees'
+                />
             </div>
             <div className='col-3'>
-                <DateInput name='Sale Date' />
+                <DateInput
+                    name='Sale Date'
+                    date={parseInt(datepurchase)}
+                    onChange={({ value }) =>
+                        changeDeal({ key: "datepurchase", value: String(value) })
+                    }
+                />
             </div>
             <div className='col-3'>
                 <DateInput name='Second Payment Due' />
@@ -112,28 +177,69 @@ export const DealLeaseHerePayHere = observer((): ReactElement => {
             <hr className='form-line' />
 
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Late Fee' />
+                <CurrencyInput
+                    labelPosition='top'
+                    value={Con_Late_Fee}
+                    onChange={({ value }) =>
+                        changeDealExtData({ key: "Con_Late_Fee", value: value || 0 })
+                    }
+                    title='Late Fee'
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputNumber min={1} className='deal-lease__text-input w-full' />
+                    <InputNumber
+                        min={1}
+                        className='deal-lease__text-input w-full'
+                        value={Con_Grace_Period}
+                        onChange={({ value }) =>
+                            changeDealExtData({ key: "Con_Grace_Period", value: value || 0 })
+                        }
+                    />
                     <label className='float-label'>Grace Period</label>
                 </span>
             </div>
             <div className='col-3'>
-                <DateInput name='Effective Date' />
+                <DateInput
+                    name='Effective Date'
+                    date={parseInt(dateeffective)}
+                    onChange={({ value }) =>
+                        changeDeal({ key: "dateeffective", value: String(value) })
+                    }
+                />
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
-                    <InputNumber min={1} className='deal-lease__text-input w-full' />
+                    <InputNumber
+                        min={1}
+                        className='deal-lease__text-input w-full'
+                        value={Con_Lease_Miles}
+                        onChange={({ value }) =>
+                            changeDealExtData({ key: "Con_Lease_Miles", value: value || 0 })
+                        }
+                    />
                     <label className='float-label'>Miles per Year</label>
                 </span>
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Overage Cost' />
+                <CurrencyInput
+                    labelPosition='top'
+                    title='Overage Cost'
+                    value={Con_Lease_Overage}
+                    onChange={({ value }) =>
+                        changeDealExtData({ key: "Con_Lease_Overage", value: value || 0 })
+                    }
+                />
             </div>
             <div className='col-3'>
-                <CurrencyInput labelPosition='top' title='Termination Fee' />
+                <CurrencyInput
+                    labelPosition='top'
+                    title='Termination Fee'
+                    value={Con_Lease_Termination_Fee}
+                    onChange={({ value }) =>
+                        changeDealExtData({ key: "Con_Lease_Termination_Fee", value: value || 0 })
+                    }
+                />
             </div>
         </div>
     );

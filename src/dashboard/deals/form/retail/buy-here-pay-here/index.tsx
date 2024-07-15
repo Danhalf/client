@@ -17,12 +17,10 @@ import { Checkbox } from "primereact/checkbox";
 export const DealBuyHerePayHere = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
+        deal: { accountInfo, dateeffective },
         dealExtData: {
-            Con_Acct_Num,
-            Con_Amt_To_Finance,
             Con_Pmt_Freq,
             Con_Term,
-            Con_Int_Rate,
             Con_Pmt_Amt,
             Con_Final_Pmt,
             Con_First_Pmt_Date,
@@ -31,16 +29,19 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
             Con_Late_Percent,
             Con_Grace_Period,
         },
+        dealFinance: { TaxableAmount, BHPHCollectedInterest },
+        changeDeal,
         changeDealExtData,
+        changeDealFinance,
     } = store;
     return (
         <div className='grid deal-buy-here row-gap-2'>
             <div className='col-3'>
                 <span className='p-float-label'>
                     <InputText
-                        value={Con_Acct_Num}
+                        value={accountInfo}
                         onChange={({ target: { value } }) =>
-                            changeDealExtData({ key: "Con_Acct_Num", value })
+                            changeDeal({ key: "accountInfo", value })
                         }
                         className='deal-contract__text-input w-full'
                     />
@@ -52,9 +53,9 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
 
             <div className='col-3'>
                 <CurrencyInput
-                    value={Con_Amt_To_Finance}
+                    value={parseInt(TaxableAmount)}
                     onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Amt_To_Finance", value: value || 0 })
+                        changeDealFinance({ key: "TaxableAmount", value: value || 0 })
                     }
                     labelPosition='top'
                     title='Amount of Finance'
@@ -95,9 +96,9 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <PercentInput
-                    value={Con_Int_Rate}
+                    value={BHPHCollectedInterest}
                     onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Int_Rate", value: value || 0 })
+                        changeDealFinance({ key: "BHPHCollectedInterest", value: value || 0 })
                     }
                     labelPosition='top'
                     title='Interest Rate'
@@ -134,13 +135,7 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3'>
-                <DateInput
-                    name='Final Payment Due'
-                    date={Con_Final_Pmt}
-                    onChange={({ value }) =>
-                        value && changeDealExtData({ key: "Con_Final_Pmt", value: Number(value) })
-                    }
-                />
+                <DateInput name='Final Payment Due' />
             </div>
 
             <hr className='form-line' />
@@ -148,9 +143,9 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
             <div className='col-3'>
                 <PercentInput
                     labelPosition='top'
-                    value={Con_Late_Percent}
+                    value={Con_Late_Fee}
                     onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Late_Percent", value: value || 0 })
+                        changeDealExtData({ key: "Con_Late_Fee", value: value || 0 })
                     }
                     title='Late Fee'
                 />
@@ -168,9 +163,9 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
             <div className='col-3'>
                 <CurrencyInput
                     labelPosition='top'
-                    value={Con_Late_Fee}
+                    value={Con_Late_Percent}
                     onChange={({ value }) =>
-                        changeDealExtData({ key: "Con_Late_Fee", value: value || 0 })
+                        changeDealExtData({ key: "Con_Late_Percent", value: value || 0 })
                     }
                     title='Late Fee Cap'
                 />
@@ -200,7 +195,13 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
                 <BorderedCheckbox checked name='Use OnTime Box' />
             </div>
             <div className='col-3'>
-                <DateInput name='Effective Date' />
+                <DateInput
+                    name='Effective Date'
+                    date={Number(dateeffective)}
+                    onChange={({ value }) =>
+                        changeDeal({ key: "dateeffective", value: Number(value) })
+                    }
+                />
             </div>
             <div className='col-3 flex align-items-center'>
                 <Checkbox inputId='buy-here-report' name='buy-here-report' checked={false} />

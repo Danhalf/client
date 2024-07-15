@@ -17,6 +17,7 @@ export interface Deal {
     differentSellerInfo: string;
     differentSellerUID: string;
     extdata: DealExtData;
+    finance: DealFinance;
     inventoryinfo: string;
     inventorystatus: number;
     inventoryuid: string;
