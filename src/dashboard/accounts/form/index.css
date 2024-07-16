@@ -32,3 +32,21 @@
     background: var(--admss-app-light-blue);
     border-radius: 0;
 }
+
+.account__footer {
+    display: flex;
+    margin-left: auto;
+    margin-bottom: 60px;
+    align-items: center;
+    width: 65.5%;
+    justify-content: flex-end;
+}
+
+.account__footer .account__button.p-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+    font-weight: 700;
+    width: 200px;
+}
