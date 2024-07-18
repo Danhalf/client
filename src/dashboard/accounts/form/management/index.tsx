@@ -7,10 +7,10 @@ import { ReactElement } from "react";
 import "./index.css";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-    { field: "operationdate", header: "Date" },
-    { field: "type_name", header: "Description" },
-    { field: "amount_text", header: "Debit" },
-    { field: "notbillable", header: "Credit" },
+    { field: "date", header: "Date" },
+    { field: "description", header: "Description" },
+    { field: "debit", header: "Debit" },
+    { field: "credit", header: "Credit" },
 ];
 
 export const AccountManagement = (): ReactElement => {
@@ -25,7 +25,7 @@ export const AccountManagement = (): ReactElement => {
                         value='All Activity'
                     />
                 </div>
-                <div className='col-6 flex gap-3 ml-auto'>
+                <div className='col-9 flex gap-3 justify-content-end'>
                     <Button className='account-management__button' label='Take Payment' />
                     <Button className='account-management__button' label='Add Fee' />
                 </div>
@@ -65,16 +65,6 @@ export const AccountManagement = (): ReactElement => {
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
                             />
                         ))}
-
-                        <Column
-                            pt={{
-                                root: {
-                                    style: {
-                                        width: "20px",
-                                    },
-                                },
-                            }}
-                        />
                     </DataTable>
                 </div>
             </div>
