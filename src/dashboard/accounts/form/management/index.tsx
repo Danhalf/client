@@ -4,6 +4,7 @@ import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
 import { ReactElement } from "react";
+import "./index.css";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "operationdate", header: "Date" },
@@ -24,7 +25,7 @@ export const AccountManagement = (): ReactElement => {
                         value='All Activity'
                     />
                 </div>
-                <div className='col-9'>
+                <div className='col-6 flex gap-3 ml-auto'>
                     <Button className='account-management__button' label='Take Payment' />
                     <Button className='account-management__button' label='Add Fee' />
                 </div>
@@ -77,13 +78,9 @@ export const AccountManagement = (): ReactElement => {
                     </DataTable>
                 </div>
             </div>
-            <div className='col-6'>
-                <Button className='account-management__button' outlined>
-                    Print
-                </Button>
-                <Button className='account-management__button' outlined>
-                    Download
-                </Button>
+            <div className='col-12 flex gap-3'>
+                <Button className='account-management__button'>Print</Button>
+                <Button className='account-management__button'>Download</Button>
             </div>
         </div>
     );
