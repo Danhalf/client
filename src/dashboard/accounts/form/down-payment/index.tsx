@@ -31,15 +31,13 @@ export const AccountDownPayment = (): ReactElement => {
                     <span>$0.00</span>
                 </div>
             </div>
-            SCHEDULED DOWN PAYMENTS
-            <div className='details grid'>
-                <div className='col-3'>
-                    <Dropdown
-                        className='w-full'
-                        options={["All Payments", "Sold", "Unsold"]}
-                        value='All Payments'
-                    />
-                </div>
+
+            <div className='splitter my-4'>
+                <h3 className='splitter__title m-0 pr-3'>Scheduled down payments</h3>
+                <hr className='splitter__line flex-1' />
+            </div>
+
+            <div className='grid'>
                 <div className='col-3 ml-auto'>
                     <Dropdown className='w-full' options={["Take Payment"]} value='Take Payment' />
                 </div>
