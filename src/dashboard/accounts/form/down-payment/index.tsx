@@ -16,7 +16,7 @@ const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
 export const AccountDownPayment = (): ReactElement => {
     return (
         <div className='down-payment'>
-            <h2 className='down-payment__title'>Down Payment</h2>
+            <h3 className='down-payment__title account-title'>Down Payment</h3>
             <div className='down-payment__header grid'>
                 <div className='col-4'>
                     <span className='font-bold'>Contact Cash Down: </span>
