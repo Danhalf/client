@@ -3,13 +3,15 @@ import { InfoSection } from "./info-section";
 import "./index.css";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
-export const AccountInformation = (): ReactElement => {
-    // const { id } = useParams();
+export const AccountInformation = observer((): ReactElement => {
     const store = useStore().accountStore;
     const {
         account: { name },
+        accountExtData: { APR, Term, Payment_Amt, Curr_Due },
     } = store;
+
     return (
         <div className='account-info'>
             <h3 className='account-info__title account-title'>Account Information</h3>
@@ -49,16 +51,16 @@ export const AccountInformation = (): ReactElement => {
                         title='Contact Values'
                         details={[
                             "Atm Financed: $0.00",
-                            "APR (%): 0.00 %",
-                            "Term: 2 months",
-                            "Payment Amount: $0.00",
+                            `APR (%): ${APR?.toFixed(2)} %`,
+                            `Term: ${Term} months`,
+                            `Payment Amount: $ ${Payment_Amt?.toFixed(2)}`,
                             "Deal's Date: 06/09/2024",
                         ]}
                     />
                     <InfoSection
                         title='Account Standing'
                         details={[
-                            "Current Due: $0.00",
+                            `Current Due: $ ${Curr_Due}`,
                             "Down Pmt Balance: $0.00",
                             "Fees: $0.00",
                             "Due Date: 06/10/2024",
@@ -74,4 +76,4 @@ export const AccountInformation = (): ReactElement => {
             </div>
         </div>
     );
-};
+});
