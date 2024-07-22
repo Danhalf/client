@@ -2,8 +2,14 @@ import { ReactElement } from "react";
 import { InfoSection } from "./info-section";
 import "./index.css";
 import { Button } from "primereact/button";
+import { useStore } from "store/hooks";
 
 export const AccountInformation = (): ReactElement => {
+    // const { id } = useParams();
+    const store = useStore().accountStore;
+    const {
+        account: { name },
+    } = store;
     return (
         <div className='account-info'>
             <h3 className='account-info__title account-title'>Account Information</h3>
@@ -12,7 +18,7 @@ export const AccountInformation = (): ReactElement => {
                     <InfoSection
                         title='Contact Information'
                         details={[
-                            "Full Name: Johnny Walker",
+                            `Full Name: ${name}`,
                             "Work Phone: 631-429-6822",
                             "Mobile: 633-899-1958",
                             "Co-Buyer: Paul Anderson",

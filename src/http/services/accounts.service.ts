@@ -1,5 +1,5 @@
 import { isAxiosError } from "axios";
-import { AccountPayment } from "common/models/accounts";
+import { AccountInfo, AccountPayment } from "common/models/accounts";
 import { BaseResponse, BaseResponseError } from "common/models/base-response";
 import { InventoryExtData } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
@@ -83,7 +83,7 @@ export const setAccountPayment = async (
 
 export const getAccountInfo = async (itemid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.get<BaseResponseError | AccountInfo>(
             `accounts/${itemid}/info`
         );
         return request.data;
