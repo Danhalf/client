@@ -251,7 +251,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                                 accept='image/*'
                                 headerTemplate={(props) => chooseTemplate(props, DLSides.FRONT)}
                                 itemTemplate={(file) => itemTemplate(file as File, DLSides.FRONT)}
-                                emptyTemplate={() => emptyTemplate()}
+                                emptyTemplate={emptyTemplate}
                                 onSelect={(event) => onTemplateSelect(event, DLSides.FRONT)}
                                 progressBarTemplate={<></>}
                             />
