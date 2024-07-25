@@ -135,10 +135,9 @@ export const AccountPaymentHistory = (): ReactElement => {
                         value='Take Payment'
                     />
                 </div>
-                <div className='col-12'>
+                <div className='col-12 account__table'>
                     <DataTable
                         showGridlines
-                        className='account__table'
                         value={historyList}
                         emptyMessage='No activity yet.'
                         reorderableColumns
