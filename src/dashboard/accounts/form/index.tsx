@@ -79,7 +79,7 @@ export const AccountsForm = observer((): ReactElement => {
                                         header={tabName}
                                         children={component}
                                         key={tabName}
-                                        className='account__panel'
+                                        className='account__panel h-full'
                                     />
                                 );
                             })}
