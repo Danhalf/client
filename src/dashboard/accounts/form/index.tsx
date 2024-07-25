@@ -71,6 +71,7 @@ export const AccountsForm = observer((): ReactElement => {
                             className='account__tabs'
                             activeIndex={activeTab}
                             onTabChange={(e) => setActiveTab(e.index)}
+                            panelContainerClassName='card-content__wrapper'
                         >
                             {tabItems.map(({ tabName, component }) => {
                                 return (
