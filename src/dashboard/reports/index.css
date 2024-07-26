@@ -1,13 +1,75 @@
+.p-accordion.reports__accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.p-accordion.reports__accordion .p-accordion-content {
+    border: none;
+}
+
 .reports .p-accordion-content {
     border-left: none;
     border-right: none;
     padding-left: 3rem;
 }
 
+.p-accordion.reports__accordion
+    .p-accordion-header:not(.p-disabled):hover
+    .p-accordion-header-link {
+    background-color: var(--admss-app-light-green);
+    border: 1px solid var(--admss-app-primary-main-green);
+}
+
+.p-accordion.reports__accordion
+    .p-accordion-tab:not(:first-child)
+    .p-accordion-header:not(.p-disabled):hover
+    .p-accordion-header-link {
+    border-top: 1px solid var(--admss-app-primary-main-green);
+}
+
+.p-accordion .p-accordion-header.reports__accordion-tab .p-accordion-header-link {
+    background-color: var(--admss-app-white);
+    border-radius: 5px;
+}
+
+.p-accordion
+    .reports__accordion-tab.p-accordion-header:not(.p-disabled).p-highlight
+    .p-accordion-header-link {
+    border-radius: 5px;
+}
+
+.p-accordion.reports__accordion .p-accordion-tab .p-accordion-header .p-accordion-header-link {
+    border: 1px solid var(--admss-app-primary-main-green);
+}
+
+.p-accordion .p-accordion-header.reports__accordion-tab.p-highlight .p-accordion-header-link {
+    background-color: var(--admss-app-light-green);
+}
+
+.p-accordion
+    .p-accordion-header.reports__accordion-tab
+    .p-accordion-header-link
+    .p-accordion-toggle-icon {
+    rotate: 90deg;
+}
+
+.p-accordion
+    .p-accordion-header.reports__accordion-tab.p-highlight
+    .p-accordion-header-link
+    .p-accordion-toggle-icon {
+    rotate: 180deg;
+}
+
 .reports-header {
     display: flex;
     align-items: center;
     gap: 20px;
+}
+
+.reports-accordion-header__info {
+    color: var(--admss-app-medium-grey);
+    font-weight: 400;
 }
 
 .reports-header__button {
@@ -17,6 +79,11 @@
     width: 200px;
     height: 50px;
     gap: 10px;
+}
+.reports-header__button .p-button-icon,
+.reports-actions .p-button-icon-only .p-button-icon {
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .reports-header__search {
@@ -35,6 +102,22 @@
 
 .reports__list-item .reports-actions {
     margin-left: auto;
+    gap: 15px;
+}
+
+.reports-actions .p-button-icon-only {
+    width: 40px;
+    height: 40px;
+}
+
+.reports-actions .p-button-icon-only .p-button-icon {
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.reports-actions .p-button-icon-only.reports-actions__add-button .p-button-icon {
+    font-size: 0.5rem;
+    font-weight: 600;
 }
 
 .new-collection.p-panel .p-panel-content {

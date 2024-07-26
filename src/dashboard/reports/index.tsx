@@ -2,7 +2,6 @@ import { ReactElement, useEffect, useState } from "react";
 import { AuthUser } from "http/services/auth.service";
 import {
     createReportCollection,
-    getReportTemplate,
     getUserFavoriteReportList,
     getUserReportCollectionsContent,
 } from "http/services/reports.service";
@@ -12,7 +11,7 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { BaseResponseError, Status } from "common/models/base-response";
+import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Panel, PanelHeaderTemplateOptions } from "primereact/panel";
@@ -69,61 +68,27 @@ export default function Reports(): ReactElement {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [toast, user]);
 
-    const handleOpenReport = async (templateuid: string, preview: boolean = false) => {
-        try {
-            const response = await getReportTemplate(templateuid);
-            if (!response) {
-                throw new Error("Server not responding");
-            }
-            if (response.status === Status.ERROR) {
-                throw new Error(response.error);
-            }
-
-            setTimeout(() => {
-                const url = new Blob([response], { type: "application/pdf" });
-                let link = document.createElement("a");
-                link.href = window.URL.createObjectURL(url);
-                if (!preview) {
-                    link.download = `report_${templateuid}.pdf`;
-                    link.click();
-                } else {
-                    window.open(
-                        link.href,
-                        "_blank",
-                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                    );
-                }
-            }, 3000);
-        } catch (error) {
-            const err = error as BaseResponseError;
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: err.error || String(err),
-                life: TOAST_LIFETIME,
-            });
-        }
-    };
-
     const ActionButtons = ({ reportuid }: { reportuid: string }): ReactElement => {
         return (
-            <div className='reports-actions flex gap-3'>
-                <Button className='p-button' icon='pi pi-plus' outlined />
-                <Button className='p-button' icon='pi pi-heart' outlined />
+            <div className='reports-actions flex'>
+                <Button
+                    className='p-button reports-actions__button reports-actions__add-button'
+                    icon='pi pi-plus'
+                    tooltip='Add to Collection'
+                    outlined
+                />
                 <Button
                     className='p-button reports-actions__button'
+                    icon='pi pi-heart'
                     outlined
-                    onClick={() => handleOpenReport(reportuid, true)}
-                >
-                    Preview
-                </Button>
+                    tooltip='Add to Favorites'
+                />
                 <Button
                     className='p-button reports-actions__button'
+                    icon='icon adms-password'
                     outlined
-                    onClick={() => handleOpenReport(reportuid)}
-                >
-                    Download
-                </Button>
+                    tooltip='Lock Report'
+                />
             </div>
         );
     };
