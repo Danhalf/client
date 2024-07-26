@@ -87,7 +87,7 @@ export default function Reports(): ReactElement {
                     className='p-button reports-actions__button'
                     icon='icon adms-password'
                     outlined
-                    tooltip='Lock Report'
+                    tooltip='Edit Access'
                 />
             </div>
         );
