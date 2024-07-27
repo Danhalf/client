@@ -16,6 +16,7 @@ interface CompanySearchProps extends DropdownProps {
     onRowClick?: (companyName: string) => void;
     contactCategory?: ContactTypeNameList | string;
     originalPath?: string;
+    returnedField?: keyof ContactUser;
 }
 
 export const CompanySearch = ({
@@ -25,6 +26,7 @@ export const CompanySearch = ({
     contactCategory,
     onChange,
     originalPath,
+    returnedField,
     ...props
 }: CompanySearchProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -94,6 +96,7 @@ export const CompanySearch = ({
                     onRowClick={handleOnRowClick}
                     contactCategory={contactCategory}
                     originalPath={originalPath}
+                    returnedField={returnedField}
                 />
             </Dialog>
         </>

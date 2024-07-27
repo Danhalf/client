@@ -38,6 +38,7 @@ interface ContactsDataTableProps {
     onRowClick?: (companyName: string) => void;
     contactCategory?: ContactTypeNameList | string;
     originalPath?: string;
+    returnedField?: keyof ContactUser;
 }
 
 const renderColumnsData: TableColumnProps[] = [
@@ -53,6 +54,7 @@ export const ContactsDataTable = ({
     onRowClick,
     contactCategory,
     originalPath,
+    returnedField,
 }: ContactsDataTableProps) => {
     const [categories, setCategories] = useState<ContactType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
@@ -226,7 +228,7 @@ export const ContactsDataTable = ({
     };
 
     const renderFullName = (rowData: ContactUser) => {
-        return `${rowData.firstName} ${rowData.lastName}`;
+        return returnedField ? rowData[returnedField] : `${rowData.firstName} ${rowData.lastName}`;
     };
 
     const handleCreateContact = () => {

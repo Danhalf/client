@@ -1,6 +1,6 @@
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { Button } from "primereact/button";
-import { ReactElement, Suspense } from "react";
+import { ReactElement, Suspense, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import "./index.css";
@@ -9,6 +9,7 @@ import { InventorySearch } from "dashboard/inventory/common/inventory-search";
 import { InputTextarea } from "primereact/inputtextarea";
 
 export const PrintForTestDrive = (): ReactElement => {
+    const [firstName, setFirstName] = useState<string>("");
     const navigate = useNavigate();
     return (
         <Suspense>
@@ -30,7 +31,16 @@ export const PrintForTestDrive = (): ReactElement => {
                                 <div className='col-12 test-drive__subtitle'>Driver</div>
 
                                 <div className='col-6'>
-                                    <CompanySearch name='First Name' />
+                                    <CompanySearch
+                                        name='First Name'
+                                        value={firstName}
+                                        returnedField='firstName'
+                                        onRowClick={(value) => setFirstName(value)}
+                                        //  onChange={({ target: { value } }) => {
+                                        //      debugger;
+                                        //      return setFirstName(value);
+                                        //  }}
+                                    />
                                 </div>
                                 <div className='col-6'>
                                     <CompanySearch name='Last Name' />
