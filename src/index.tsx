@@ -21,6 +21,7 @@ import { GeneralSettings } from "dashboard/profile/generalSettings";
 import Reports from "dashboard/reports";
 import { ExportToWeb } from "dashboard/export-web";
 import { ReportForm } from "dashboard/reports/form";
+import { PrintForTestDrive } from "dashboard/test-drive";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -41,6 +42,14 @@ const AppRouter = (): ReactElement => {
                             element: (
                                 <ProtectedRoute>
                                     <Home />
+                                </ProtectedRoute>
+                            ),
+                        },
+                        {
+                            path: "test-drive",
+                            element: (
+                                <ProtectedRoute>
+                                    <PrintForTestDrive />
                                 </ProtectedRoute>
                             ),
                         },
