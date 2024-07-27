@@ -50,8 +50,9 @@ export const CompanySearch = ({
     }, []);
 
     const handleCompanyInputChange = (searchValue: string): void => {
+        const qry = returnedField ? `${searchValue}.${returnedField}` : `${searchValue}.${FIELD}`;
         const params: QueryParams = {
-            qry: `${searchValue}.${FIELD}`,
+            qry,
             param: currentCategory,
         };
         user &&
@@ -73,8 +74,8 @@ export const CompanySearch = ({
             <SearchInput
                 name={name}
                 title={name}
-                optionValue={FIELD}
-                optionLabel={FIELD}
+                optionValue={returnedField || FIELD}
+                optionLabel={returnedField || FIELD}
                 options={options}
                 onInputChange={handleCompanyInputChange}
                 value={value}

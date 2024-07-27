@@ -53,11 +53,12 @@ const DATA_FIELD = "data-field";
 
 interface InventoriesProps {
     onRowClick?: (companyName: string) => void;
+    returnedField?: keyof Inventory;
 }
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
 
-export default function Inventories({ onRowClick }: InventoriesProps): ReactElement {
+export default function Inventories({ onRowClick, returnedField }: InventoriesProps): ReactElement {
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [authUser, setUser] = useState<AuthUser | null>(null);
     const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -698,11 +699,12 @@ export default function Inventories({ onRowClick }: InventoriesProps): ReactElem
         </div>
     );
 
-    const handleOnRowClick = ({ data: { itemuid, Make } }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
         if (onRowClick) {
-            onRowClick(Make);
+            const value = returnedField ? data[returnedField] : data.Make;
+            onRowClick(value);
         } else {
-            navigate(itemuid);
+            navigate(data.itemuid);
         }
     };
 

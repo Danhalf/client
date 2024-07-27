@@ -217,18 +217,19 @@ export const ContactsDataTable = ({
         }
     };
 
-    const handleOnRowClick = ({
-        data: { contactuid, firstName, lastName },
-    }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
         if (onRowClick) {
-            onRowClick(`${firstName} ${lastName}`);
+            const value = returnedField
+                ? data[returnedField]
+                : `${data.firstName} ${data.lastName}`;
+            onRowClick(value);
         } else {
-            navigate(contactuid);
+            navigate(data.contactuid);
         }
     };
 
     const renderFullName = (rowData: ContactUser) => {
-        return returnedField ? rowData[returnedField] : `${rowData.firstName} ${rowData.lastName}`;
+        return `${rowData.firstName} ${rowData.lastName}`;
     };
 
     const handleCreateContact = () => {

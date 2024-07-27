@@ -14,6 +14,7 @@ const FIELD: keyof Inventory = "Make";
 
 interface InventorySearchProps extends DropdownProps {
     onRowClick?: (inventoryName: string) => void;
+    returnedField?: keyof Inventory;
 }
 
 export const InventorySearch = ({
@@ -21,6 +22,7 @@ export const InventorySearch = ({
     value,
     onRowClick,
     onChange,
+    returnedField,
     ...props
 }: InventorySearchProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -33,8 +35,9 @@ export const InventorySearch = ({
     }, []);
 
     const handleInventoryInputChange = (searchValue: string): void => {
+        const qry = returnedField ? `${searchValue}.${returnedField}` : `${searchValue}.${FIELD}`;
         const params: QueryParams = {
-            qry: `${searchValue}.${FIELD}`,
+            qry,
         };
         user &&
             getInventoryList(user.useruid, params).then((response) => {
@@ -55,8 +58,8 @@ export const InventorySearch = ({
             <SearchInput
                 name={name}
                 title={name}
-                optionValue={FIELD}
-                optionLabel={FIELD}
+                optionValue={returnedField || FIELD}
+                optionLabel={returnedField || FIELD}
                 options={options}
                 onInputChange={handleInventoryInputChange}
                 value={value}
@@ -74,7 +77,7 @@ export const InventorySearch = ({
                 modal
                 onHide={() => setDialogVisible(false)}
             >
-                <Inventories onRowClick={handleOnRowClick} />
+                <Inventories returnedField={returnedField} onRowClick={handleOnRowClick} />
             </Dialog>
         </>
     );
