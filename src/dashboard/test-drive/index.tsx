@@ -78,17 +78,17 @@ export const PrintForTestDrive = (): ReactElement => {
                                 </div>
                                 <TextInput
                                     name='Phone Number'
-                                    value={driver.phoneNumber}
+                                    value={driver.homePhone}
                                     onChange={({ target: { value } }) =>
-                                        setDriver({ ...driver, phoneNumber: value })
+                                        setDriver({ ...driver, homePhone: value })
                                     }
                                     colWidth={4}
                                 />
                                 <TextInput
                                     name='Driver License’s Number'
-                                    value={driver.dl_number}
+                                    value={driver.dlNumber}
                                     onChange={({ target: { value } }) =>
-                                        setDriver({ ...driver, dl_number: value })
+                                        setDriver({ ...driver, dlNumber: value })
                                     }
                                     colWidth={4}
                                 />
@@ -110,9 +110,9 @@ export const PrintForTestDrive = (): ReactElement => {
                                 />
                                 <DateInput
                                     name='DL’s Exp. Date'
-                                    value={driver.dl_expiration}
+                                    value={driver.dlExpirationDate}
                                     onChange={({ target: { value } }) =>
-                                        setDriver({ ...driver, dl_expiration: value as string })
+                                        setDriver({ ...driver, dlExpirationDate: value as string })
                                     }
                                     colWidth={6}
                                 />
@@ -122,41 +122,45 @@ export const PrintForTestDrive = (): ReactElement => {
                                 <div className='col-6'>
                                     <InventorySearch
                                         name='VIN'
-                                        value={vehicle.VIN}
+                                        value={vehicle.vclVIN}
                                         returnedField='VIN'
                                         onChange={({ target: { value } }) => {
-                                            setVehicle({ ...vehicle, VIN: value });
+                                            setVehicle({ ...vehicle, vclVIN: value });
                                         }}
-                                        onRowClick={(VIN) => setVehicle({ ...vehicle, VIN })}
+                                        onRowClick={(vclVIN) => setVehicle({ ...vehicle, vclVIN })}
                                     />
                                 </div>
                                 <div className='col-6'>
                                     <InventorySearch
                                         name='Make'
-                                        value={vehicle.Make}
+                                        value={vehicle.vclMake}
                                         returnedField='Make'
-                                        onRowClick={(Make) => setVehicle({ ...vehicle, Make })}
+                                        onRowClick={(vclMake) =>
+                                            setVehicle({ ...vehicle, vclMake })
+                                        }
                                         onChange={({ target: { value } }) => {
-                                            setVehicle({ ...vehicle, Make: value });
+                                            setVehicle({ ...vehicle, vclMake: value });
                                         }}
                                     />
                                 </div>
                                 <div className='col-6'>
                                     <InventorySearch
                                         name='Model'
-                                        value={vehicle.Model}
+                                        value={vehicle.vclModel}
                                         returnedField='Model'
-                                        onRowClick={(Model) => setVehicle({ ...vehicle, Model })}
+                                        onRowClick={(vclModel) =>
+                                            setVehicle({ ...vehicle, vclModel })
+                                        }
                                         onChange={({ target: { value } }) => {
-                                            setVehicle({ ...vehicle, Model: value });
+                                            setVehicle({ ...vehicle, vclModel: value });
                                         }}
                                     />
                                 </div>
                                 <TextInput
                                     name='Year'
-                                    value={vehicle.Year}
+                                    value={vehicle.vclYear}
                                     onChange={({ target: { value } }) =>
-                                        setVehicle({ ...vehicle, Year: value })
+                                        setVehicle({ ...vehicle, vclYear: value })
                                     }
                                     colWidth={6}
                                 />
@@ -166,10 +170,12 @@ export const PrintForTestDrive = (): ReactElement => {
                                 <div className='col-4'>
                                     <CompanySearch
                                         name='Manager'
-                                        value={dealer.manager}
-                                        onRowClick={(manager) => setDealer({ ...dealer, manager })}
+                                        value={dealer.dealersName}
+                                        onRowClick={(dealersName) =>
+                                            setDealer({ ...dealer, dealersName })
+                                        }
                                         onChange={({ target: { value } }) =>
-                                            setDealer({ ...dealer, manager: value })
+                                            setDealer({ ...dealer, dealersName: value })
                                         }
                                     />
                                 </div>
@@ -183,9 +189,9 @@ export const PrintForTestDrive = (): ReactElement => {
                                 />
                                 <TextInput
                                     name='Odometer'
-                                    value={dealer.odometer}
+                                    value={dealer.outOdometer}
                                     onChange={({ target: { value } }) =>
-                                        setDealer({ ...dealer, odometer: value })
+                                        setDealer({ ...dealer, outOdometer: value })
                                     }
                                     colWidth={4}
                                 />
@@ -193,9 +199,9 @@ export const PrintForTestDrive = (): ReactElement => {
                                     <span className='p-float-label'>
                                         <InputTextarea
                                             name='Comment'
-                                            value={dealer.comment}
+                                            value={dealer.comments}
                                             onChange={({ target: { value } }) => {
-                                                setDealer({ ...dealer, comment: value });
+                                                setDealer({ ...dealer, comments: value });
                                             }}
                                             className='test-drive__text-area'
                                         />

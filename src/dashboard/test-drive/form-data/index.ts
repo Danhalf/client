@@ -1,40 +1,40 @@
-import { Contact } from "common/models/contact";
-import { Inventory } from "./../../../common/models/inventory/index";
-export type TestDriver = Pick<Contact, "firstName" | "lastName" | "dl_number" | "dl_expiration"> & {
-    phoneNumber: string;
+import { TestDrive } from "common/models/test-drive";
+
+export type TestDriver = Pick<TestDrive, "dlNumber" | "dlExpirationDate" | "homePhone"> & {
+    firstName: string;
+    lastName: string;
     dlState: string;
     dlStartDate: string;
 };
 
-export type TestVehicle = Pick<Inventory, "VIN" | "Make" | "Model" | "Year">;
+export type TestVehicle = Pick<TestDrive, "vclVIN" | "vclMake" | "vclModel"> & {
+    vclYear: string;
+};
 
-export interface TestDealer {
-    manager: string;
+export type TestDealer = Pick<TestDrive, "dealersName" | "outOdometer" | "comments"> & {
     issueDateTime: string;
-    odometer: string;
-    comment: string;
-}
+};
 
 export const driverState: TestDriver = {
     firstName: "",
     lastName: "",
-    phoneNumber: "",
-    dl_number: "",
+    homePhone: "",
+    dlNumber: "",
     dlState: "",
     dlStartDate: "",
-    dl_expiration: "",
+    dlExpirationDate: "",
 };
 
 export const vehicleState: TestVehicle = {
-    VIN: "",
-    Make: "",
-    Model: "",
-    Year: "",
+    vclVIN: "",
+    vclMake: "",
+    vclModel: "",
+    vclYear: "",
 };
 
 export const dealerState: TestDealer = {
-    manager: "",
+    dealersName: "",
     issueDateTime: "",
-    odometer: "",
-    comment: "",
+    outOdometer: "",
+    comments: "",
 };
