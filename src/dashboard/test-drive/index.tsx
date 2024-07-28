@@ -15,12 +15,20 @@ import {
     vehicleState,
     dealerState,
 } from "./form-data";
+import { useStore } from "store/hooks";
+import { printTestDrive } from "http/services/print";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
 
 const isFormComplete = (obj: object): boolean => {
     return Object.values(obj).every((value) => value !== "");
 };
 
 export const PrintForTestDrive = (): ReactElement => {
+    const store = useStore().userStore;
+    const { authUser } = store;
+    const toast = useToast();
     const [driver, setDriver] = useState<TestDriver>(driverState);
     const [vehicle, setVehicle] = useState<TestVehicle>(vehicleState);
     const [dealer, setDealer] = useState<TestDealer>(dealerState);
@@ -28,8 +36,45 @@ export const PrintForTestDrive = (): ReactElement => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        setIsComplete(isFormComplete(driver) && isFormComplete(vehicle) && isFormComplete(dealer));
+        const isAllFormFilled =
+            isFormComplete(driver) && isFormComplete(vehicle) && isFormComplete(dealer);
+        setIsComplete(isAllFormFilled);
     }, [driver, vehicle, dealer]);
+
+    const handlePrintForm = async (print: boolean = false) => {
+        if (authUser && authUser.useruid) {
+            const response = await printTestDrive(authUser.useruid, {
+                ...driver,
+                ...vehicle,
+                ...dealer,
+            });
+            if (response.status === Status.ERROR) {
+                const { error } = response;
+                return toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    life: TOAST_LIFETIME,
+                    detail: error || "Error while print for test drive",
+                    sticky: true,
+                });
+            }
+            setTimeout(() => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                if (!print) {
+                    link.download = `test_drive_print_form_${authUser.username}.pdf`;
+                    link.click();
+                } else {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            }, 3000);
+        }
+    };
 
     return (
         <Suspense>
@@ -53,26 +98,26 @@ export const PrintForTestDrive = (): ReactElement => {
                                 <div className='col-6'>
                                     <CompanySearch
                                         name='First Name'
-                                        value={driver.firstName}
+                                        value={driver.customerName}
                                         returnedField='firstName'
-                                        onRowClick={(firstName) =>
-                                            setDriver({ ...driver, firstName })
+                                        onRowClick={(customerName) =>
+                                            setDriver({ ...driver, customerName })
                                         }
                                         onChange={({ target: { value } }) => {
-                                            return setDriver({ ...driver, firstName: value });
+                                            return setDriver({ ...driver, customerName: value });
                                         }}
                                     />
                                 </div>
                                 <div className='col-6'>
                                     <CompanySearch
                                         name='Last Name'
-                                        value={driver.lastName}
+                                        value={driver.customerLastName}
                                         returnedField='lastName'
-                                        onRowClick={(lastName) =>
-                                            setDriver({ ...driver, lastName })
+                                        onRowClick={(customerLastName) =>
+                                            setDriver({ ...driver, customerLastName })
                                         }
                                         onChange={({ target: { value } }) =>
-                                            setDriver({ ...driver, lastName: value })
+                                            setDriver({ ...driver, customerLastName: value })
                                         }
                                     />
                                 </div>
@@ -102,9 +147,9 @@ export const PrintForTestDrive = (): ReactElement => {
                                 />
                                 <DateInput
                                     name='DL’s Start Date'
-                                    value={driver.dlStartDate}
+                                    value={driver.dlIssuingDate}
                                     onChange={({ target: { value } }) =>
-                                        setDriver({ ...driver, dlStartDate: value as string })
+                                        setDriver({ ...driver, dlIssuingDate: value as string })
                                     }
                                     colWidth={6}
                                 />
@@ -181,9 +226,9 @@ export const PrintForTestDrive = (): ReactElement => {
                                 </div>
                                 <DateInput
                                     name='Issue Date/Time'
-                                    value={dealer.issueDateTime}
+                                    value={dealer.outDate}
                                     onChange={({ target: { value } }) =>
-                                        setDealer({ ...dealer, issueDateTime: value as string })
+                                        setDealer({ ...dealer, outDate: value as string })
                                     }
                                     colWidth={4}
                                 />
@@ -219,18 +264,21 @@ export const PrintForTestDrive = (): ReactElement => {
                                     className='test-drive__button'
                                     disabled={!isComplete}
                                     severity={!isComplete ? "secondary" : "success"}
+                                    onClick={() => handlePrintForm()}
                                     label='Preview'
                                 />
                                 <Button
                                     className='test-drive__button'
                                     disabled={!isComplete}
                                     severity={!isComplete ? "secondary" : "success"}
+                                    onClick={() => handlePrintForm(true)}
                                     label='Print'
                                 />
                                 <Button
                                     className='test-drive__button'
                                     disabled={!isComplete}
                                     severity={!isComplete ? "secondary" : "success"}
+                                    onClick={() => handlePrintForm()}
                                     label='Download'
                                 />
                             </div>

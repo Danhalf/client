@@ -1,27 +1,27 @@
 import { TestDrive } from "common/models/test-drive";
 
-export type TestDriver = Pick<TestDrive, "dlNumber" | "dlExpirationDate" | "homePhone"> & {
-    firstName: string;
-    lastName: string;
-    dlState: string;
-    dlStartDate: string;
-};
+export type TestDriver = Pick<
+    TestDrive,
+    | "dlNumber"
+    | "dlExpirationDate"
+    | "homePhone"
+    | "customerName"
+    | "customerLastName"
+    | "dlState"
+    | "dlIssuingDate"
+>;
 
-export type TestVehicle = Pick<TestDrive, "vclVIN" | "vclMake" | "vclModel"> & {
-    vclYear: string;
-};
+export type TestVehicle = Pick<TestDrive, "vclVIN" | "vclMake" | "vclModel" | "vclYear">;
 
-export type TestDealer = Pick<TestDrive, "dealersName" | "outOdometer" | "comments"> & {
-    issueDateTime: string;
-};
+export type TestDealer = Pick<TestDrive, "dealersName" | "outOdometer" | "comments" | "outDate">;
 
 export const driverState: TestDriver = {
-    firstName: "",
-    lastName: "",
+    customerName: "",
+    customerLastName: "",
     homePhone: "",
     dlNumber: "",
     dlState: "",
-    dlStartDate: "",
+    dlIssuingDate: "",
     dlExpirationDate: "",
 };
 
@@ -34,7 +34,7 @@ export const vehicleState: TestVehicle = {
 
 export const dealerState: TestDealer = {
     dealersName: "",
-    issueDateTime: "",
+    outDate: "",
     outOdometer: "",
     comments: "",
 };
