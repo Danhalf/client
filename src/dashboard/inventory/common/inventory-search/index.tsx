@@ -15,6 +15,7 @@ const FIELD: keyof Inventory = "Make";
 interface InventorySearchProps extends DropdownProps {
     onRowClick?: (inventoryName: string) => void;
     returnedField?: keyof Inventory;
+    getFullInfo?: (inventory: Inventory) => void;
 }
 
 export const InventorySearch = ({
@@ -23,6 +24,7 @@ export const InventorySearch = ({
     onRowClick,
     onChange,
     returnedField,
+    getFullInfo,
     ...props
 }: InventorySearchProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -53,6 +55,11 @@ export const InventorySearch = ({
         onRowClick && onRowClick(inventoryName);
         setDialogVisible(false);
     };
+    const handleGetFullInfo = (inventory: Inventory) => {
+        getFullInfo && getFullInfo(inventory);
+        setDialogVisible(false);
+    };
+
     return (
         <>
             <SearchInput
@@ -77,7 +84,11 @@ export const InventorySearch = ({
                 modal
                 onHide={() => setDialogVisible(false)}
             >
-                <Inventories returnedField={returnedField} onRowClick={handleOnRowClick} />
+                <Inventories
+                    returnedField={returnedField}
+                    getFullInfo={handleGetFullInfo}
+                    onRowClick={handleOnRowClick}
+                />
             </Dialog>
         </>
     );

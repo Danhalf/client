@@ -15,14 +15,16 @@ export type TestVehicle = Pick<TestDrive, "vclVIN" | "vclMake" | "vclModel" | "v
 
 export type TestDealer = Pick<TestDrive, "dealersName" | "outOdometer" | "comments" | "outDate">;
 
+const currentDate = new Date().getDate().toString();
+
 export const driverState: TestDriver = {
     customerName: "",
     customerLastName: "",
     homePhone: "",
     dlNumber: "",
     dlState: "",
-    dlIssuingDate: "",
-    dlExpirationDate: "",
+    dlIssuingDate: currentDate,
+    dlExpirationDate: currentDate,
 };
 
 export const vehicleState: TestVehicle = {
@@ -34,7 +36,7 @@ export const vehicleState: TestVehicle = {
 
 export const dealerState: TestDealer = {
     dealersName: "",
-    outDate: "",
+    outDate: currentDate,
     outOdometer: "",
     comments: "",
 };

@@ -163,16 +163,21 @@ export const ContactsDataTable = ({
             if (!selectedCategory && contactCategory) {
                 return;
             }
+            setIsLoading(true);
             getContactsAmount(authUser.useruid, { ...params, total: 1 }).then((response) => {
                 setTotalRecords(response?.total ?? 0);
             });
-            getContacts(authUser.useruid, params).then((response) => {
-                if (response?.length) {
-                    setUserContacts(response);
-                } else {
-                    setUserContacts([]);
-                }
-            });
+            getContacts(authUser.useruid, params)
+                .then((response) => {
+                    if (response?.length) {
+                        setUserContacts(response);
+                    } else {
+                        setUserContacts([]);
+                    }
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
         }
     }, [selectedCategory, lazyState, authUser, globalSearch, contactCategory]);
 

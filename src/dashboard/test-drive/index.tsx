@@ -182,7 +182,15 @@ export const PrintForTestDrive = (): ReactElement => {
                                         onChange={({ target: { value } }) => {
                                             setVehicle({ ...vehicle, vclVIN: value });
                                         }}
-                                        onRowClick={(vclVIN) => setVehicle({ ...vehicle, vclVIN })}
+                                        getFullInfo={({ VIN, Make, Model, Year }) => {
+                                            setVehicle({
+                                                ...vehicle,
+                                                vclVIN: VIN,
+                                                vclMake: Make,
+                                                vclModel: Model,
+                                                vclYear: Year,
+                                            });
+                                        }}
                                     />
                                 </div>
                                 <div className='col-6'>
@@ -190,9 +198,15 @@ export const PrintForTestDrive = (): ReactElement => {
                                         name='Make'
                                         value={vehicle.vclMake}
                                         returnedField='Make'
-                                        onRowClick={(vclMake) =>
-                                            setVehicle({ ...vehicle, vclMake })
-                                        }
+                                        getFullInfo={({ VIN, Make, Model, Year }) => {
+                                            setVehicle({
+                                                ...vehicle,
+                                                vclVIN: VIN,
+                                                vclMake: Make,
+                                                vclModel: Model,
+                                                vclYear: Year,
+                                            });
+                                        }}
                                         onChange={({ target: { value } }) => {
                                             setVehicle({ ...vehicle, vclMake: value });
                                         }}
@@ -203,9 +217,15 @@ export const PrintForTestDrive = (): ReactElement => {
                                         name='Model'
                                         value={vehicle.vclModel}
                                         returnedField='Model'
-                                        onRowClick={(vclModel) =>
-                                            setVehicle({ ...vehicle, vclModel })
-                                        }
+                                        getFullInfo={({ VIN, Make, Model, Year }) => {
+                                            setVehicle({
+                                                ...vehicle,
+                                                vclVIN: VIN,
+                                                vclMake: Make,
+                                                vclModel: Model,
+                                                vclYear: Year,
+                                            });
+                                        }}
                                         onChange={({ target: { value } }) => {
                                             setVehicle({ ...vehicle, vclModel: value });
                                         }}
