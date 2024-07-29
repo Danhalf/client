@@ -53,9 +53,8 @@ export const PrintForTestDrive = (): ReactElement => {
                 return toast.current?.show({
                     severity: "error",
                     summary: Status.ERROR,
-                    life: TOAST_LIFETIME,
                     detail: error || "Error while print for test drive",
-                    sticky: true,
+                    life: TOAST_LIFETIME,
                 });
             }
             setTimeout(() => {

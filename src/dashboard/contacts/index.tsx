@@ -226,7 +226,7 @@ export const ContactsDataTable = ({
 
     const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
         if (getFullInfo) {
-            return getFullInfo(data as ContactUser);
+            getFullInfo(data as ContactUser);
         }
         if (onRowClick) {
             const value = returnedField
@@ -321,7 +321,7 @@ export const ContactsDataTable = ({
                 <div className='col-12'>
                     {isLoading ? (
                         <div className='dashboard-loader__wrapper'>
-                            <Loader overlay />
+                            <Loader />
                         </div>
                     ) : (
                         <DataTable
