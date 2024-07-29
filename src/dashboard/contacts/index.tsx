@@ -39,6 +39,7 @@ interface ContactsDataTableProps {
     contactCategory?: ContactTypeNameList | string;
     originalPath?: string;
     returnedField?: keyof ContactUser;
+    getFullInfo?: (contact: ContactUser) => void;
 }
 
 const renderColumnsData: TableColumnProps[] = [
@@ -55,6 +56,7 @@ export const ContactsDataTable = ({
     contactCategory,
     originalPath,
     returnedField,
+    getFullInfo,
 }: ContactsDataTableProps) => {
     const [categories, setCategories] = useState<ContactType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
@@ -218,6 +220,9 @@ export const ContactsDataTable = ({
     };
 
     const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
+        if (getFullInfo) {
+            return getFullInfo(data as ContactUser);
+        }
         if (onRowClick) {
             const value = returnedField
                 ? data[returnedField]

@@ -100,8 +100,13 @@ export const PrintForTestDrive = (): ReactElement => {
                                         name='First Name'
                                         value={driver.customerName}
                                         returnedField='firstName'
-                                        onRowClick={(customerName) =>
-                                            setDriver({ ...driver, customerName })
+                                        getFullInfo={({ firstName, lastName, phone1 }) =>
+                                            setDriver({
+                                                ...driver,
+                                                customerName: firstName,
+                                                customerLastName: lastName,
+                                                homePhone: phone1,
+                                            })
                                         }
                                         onChange={({ target: { value } }) => {
                                             return setDriver({ ...driver, customerName: value });
@@ -113,8 +118,13 @@ export const PrintForTestDrive = (): ReactElement => {
                                         name='Last Name'
                                         value={driver.customerLastName}
                                         returnedField='lastName'
-                                        onRowClick={(customerLastName) =>
-                                            setDriver({ ...driver, customerLastName })
+                                        getFullInfo={({ firstName, lastName, phone1 }) =>
+                                            setDriver({
+                                                ...driver,
+                                                customerName: firstName,
+                                                customerLastName: lastName,
+                                                homePhone: phone1,
+                                            })
                                         }
                                         onChange={({ target: { value } }) =>
                                             setDriver({ ...driver, customerLastName: value })

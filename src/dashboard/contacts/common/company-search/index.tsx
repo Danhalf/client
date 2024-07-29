@@ -17,6 +17,7 @@ interface CompanySearchProps extends DropdownProps {
     contactCategory?: ContactTypeNameList | string;
     originalPath?: string;
     returnedField?: keyof ContactUser;
+    getFullInfo?: (contact: ContactUser) => void;
 }
 
 export const CompanySearch = ({
@@ -27,6 +28,7 @@ export const CompanySearch = ({
     onChange,
     originalPath,
     returnedField,
+    getFullInfo,
     ...props
 }: CompanySearchProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -69,6 +71,12 @@ export const CompanySearch = ({
         onRowClick && onRowClick(companyName);
         setDialogVisible(false);
     };
+
+    const handleGetFullInfo = (contact: ContactUser) => {
+        getFullInfo && getFullInfo(contact);
+        setDialogVisible(false);
+    };
+
     return (
         <>
             <SearchInput
@@ -98,6 +106,7 @@ export const CompanySearch = ({
                     contactCategory={contactCategory}
                     originalPath={originalPath}
                     returnedField={returnedField}
+                    getFullInfo={handleGetFullInfo}
                 />
             </Dialog>
         </>
