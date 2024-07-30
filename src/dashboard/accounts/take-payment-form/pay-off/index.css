@@ -21,11 +21,31 @@
     height: 32px;
 }
 
-.pay-off__item .currency-item__input .p-inputnumber-input {
-    height: 30px;
+.pay-off__item {
+    .currency-item__input .p-inputnumber-input,
+    .date-item__input .p-inputtext {
+        height: 30px;
+    }
+
+    .date-item__input {
+        margin-left: auto;
+        width: 80%;
+    }
+
+    .p-dropdown {
+        height: 30px;
+        width: 40%;
+    }
+    .p-inputtext {
+        height: 30px;
+        width: 40%;
+    }
 }
 
-.pay-off__item .currency-item__input .input-icon {
-    height: 30px;
-    width: 30px;
+.pay-off__item {
+    .currency-item__input .input-icon,
+    .date-item__icon {
+        height: 30px;
+        width: 30px;
+    }
 }

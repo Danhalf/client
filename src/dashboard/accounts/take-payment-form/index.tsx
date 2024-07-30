@@ -40,14 +40,14 @@ export const AccountTakePayment = (): ReactElement => {
                         )}
                     </div>
                     <div className='card-content account__card grid'>
-                        <TabView className='take-payment__tabs'>
-                            <TabPanel header='Quick Pay'>
+                        <TabView className='take-payment__tabs' activeIndex={1}>
+                            <TabPanel disabled header='Quick Pay'>
                                 <AccountQuickPay />
                             </TabPanel>
                             <TabPanel header='Pay Off'>
                                 <AccountPayOff />
                             </TabPanel>
-                            <TabPanel header='Balance Adjustment'>
+                            <TabPanel disabled header='Balance Adjustment'>
                                 <AccountBalanceAdjustment />
                             </TabPanel>
                         </TabView>
