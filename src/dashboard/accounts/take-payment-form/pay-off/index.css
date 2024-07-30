@@ -6,7 +6,7 @@
 
 .pay-off__label {
     padding-right: 1rem;
-    font-weight: 700;
+    font-weight: 600;
     font-size: 16px;
     display: flex;
     align-items: center;
@@ -14,7 +14,7 @@
 }
 
 .pay-off__item .currency-item {
-    flex: 0 0 184px;
+    flex: 0 0 40%;
 }
 
 .pay-off__item .currency-item__input {

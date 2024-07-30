@@ -2,11 +2,10 @@ import { ReactElement } from "react";
 import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
-import { Calendar } from "primereact/calendar";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import { CurrencyInput } from "dashboard/common/form/inputs";
+import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import "./index.css";
 
 const PayOffItem = observer(({ title, value }: InputNumberProps): ReactElement => {
@@ -60,8 +59,10 @@ export const AccountPayOff = observer((): ReactElement => {
                 <div className='take-payment__card'>
                     <h3 className='take-payment__title'>Pay Off Account</h3>
                     <div className='p-fluid'>
-                        <label className='pay-off__label'>Payment Date</label>
-                        <Calendar id='paymentDate' showIcon />
+                        <div className='pay-off__item'>
+                            <label className='pay-off__label'>Payment Date</label>
+                            <DateInput />
+                        </div>
 
                         <label className='pay-off__label'>Pmt Method</label>
                         <Dropdown id='pmtMethod' options={paymentMethods} />
