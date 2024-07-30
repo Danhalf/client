@@ -4,6 +4,7 @@ import "./index.css";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { useNavigate } from "react-router-dom";
 
 export const AccountInformation = observer((): ReactElement => {
     const store = useStore().accountStore;
@@ -33,6 +34,7 @@ export const AccountInformation = observer((): ReactElement => {
             Last_Paid_Date,
         },
     } = store;
+    const navigate = useNavigate();
 
     return (
         <div className='account-info'>
@@ -60,11 +62,11 @@ export const AccountInformation = observer((): ReactElement => {
                         title='Account Balance'
                         details={[
                             `Starting Balance: ${startingballance}`,
-                            `Principal Paid: $${Principal_Paid.toFixed(2)}`,
-                            `Interest Paid: $${Interest_Paid.toFixed(2)}`,
-                            `Total Paid: $${Total_Paid.toFixed(2)}`,
-                            `Total Adjustments: $${Total_Adjustments.toFixed(2)}`,
-                            `Current Balance: $${Balance.toFixed(2)}`,
+                            `Principal Paid: $${Principal_Paid?.toFixed(2)}`,
+                            `Interest Paid: $${Interest_Paid?.toFixed(2)}`,
+                            `Total Paid: $${Total_Paid?.toFixed(2)}`,
+                            `Total Adjustments: $${Total_Adjustments?.toFixed(2)}`,
+                            `Current Balance: $${Balance?.toFixed(2)}`,
                         ]}
                     />
                 </div>
@@ -72,7 +74,7 @@ export const AccountInformation = observer((): ReactElement => {
                     <InfoSection
                         title='Contact Values'
                         details={[
-                            `Atm Financed: $ ${Con_Amt_To_Finance.toFixed(2)}`,
+                            `Atm Financed: $ ${Con_Amt_To_Finance?.toFixed(2)}`,
                             `APR (%): ${APR?.toFixed(2)} %`,
                             `Term: ${Term} months`,
                             `Payment Amount: $ ${Con_Pmt_Amt?.toFixed(2)}`,
@@ -91,7 +93,11 @@ export const AccountInformation = observer((): ReactElement => {
                             `Last Paid Date: ${Last_Paid_Date}`,
                         ]}
                     />
-                    <Button className='account-info__button' outlined>
+                    <Button
+                        className='account-info__button'
+                        onClick={() => navigate(`take-payment`)}
+                        outlined
+                    >
                         Calculate Payoff
                     </Button>
                 </div>

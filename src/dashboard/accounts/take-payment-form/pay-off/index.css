@@ -1,0 +1,31 @@
+.pay-off__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pay-off__label {
+    padding-right: 1rem;
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    flex: 0 1 60%;
+}
+
+.pay-off__item .currency-item {
+    flex: 0 0 184px;
+}
+
+.pay-off__item .currency-item__input {
+    height: 32px;
+}
+
+.pay-off__item .currency-item__input .p-inputnumber-input {
+    height: 30px;
+}
+
+.pay-off__item .currency-item__input .input-icon {
+    height: 30px;
+    width: 30px;
+}
