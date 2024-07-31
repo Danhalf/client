@@ -6,18 +6,10 @@ import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { TakePaymentInfo } from "../take-payment-info";
 
-const paymentMethods = [
-    { label: "Method 1", value: "method1" },
-    { label: "Method 2", value: "method2" },
-];
-
 const cashDrawers = [
     { label: "Drawer 1", value: "drawer1" },
     { label: "Drawer 2", value: "drawer2" },
 ];
-
-const date = new Date();
-const currentDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
 
 export const AccountBalanceAdjustment = observer((): ReactElement => {
     return (
