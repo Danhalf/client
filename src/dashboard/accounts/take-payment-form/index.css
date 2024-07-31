@@ -84,6 +84,7 @@
 .take-payment__info {
     border-left: 1px solid var(--admss-app-light-grey);
     padding-left: 20px;
+    height: 100%;
 }
 
 .take-payment .form-line {
