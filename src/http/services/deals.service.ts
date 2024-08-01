@@ -9,6 +9,7 @@ import {
     HowToKnow,
     IndexedDealList,
 } from "common/models/deals";
+import { isAxiosError } from "axios";
 
 export interface TotalDealsList extends BaseResponse {
     total: number;
@@ -127,10 +128,12 @@ export const setDeal = async (
             return response.data;
         }
     } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while set deal",
-        };
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while set deal",
+            };
+        }
     }
 };
 
