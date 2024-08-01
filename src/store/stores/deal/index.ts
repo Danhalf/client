@@ -35,6 +35,8 @@ export class DealStore {
     private _dealType: number = 0;
     private _printList: DealPrintCollection = {};
     private _dealErrorMessage: string = "";
+    private _dealInventory: string = "";
+    private _dealBuyer: string = "";
     protected _isLoading = false;
     protected _isFormChanged = false;
 
@@ -72,6 +74,14 @@ export class DealStore {
 
     public get dealErrorMessage() {
         return this._dealErrorMessage;
+    }
+
+    public get dealInventory() {
+        return this._dealInventory;
+    }
+
+    public get dealBuyer() {
+        return this._dealBuyer;
     }
 
     public get isLoading() {
@@ -181,7 +191,7 @@ export class DealStore {
         }
     );
 
-    public saveDeal = action(async (): Promise<string | undefined> => {
+    public saveDeal = action(async (): Promise<string | undefined | BaseResponseError> => {
         try {
             this._isLoading = true;
             const dealData: Deal = {
@@ -189,7 +199,12 @@ export class DealStore {
                 extdata: this._dealExtData,
                 finance: this._dealFinances,
             };
-            const dealResponse = await setDeal(this._dealID, dealData);
+            const dealResponse = await setDeal(this._dealID, dealData).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    throw new Error(response.error);
+                }
+                return response;
+            });
             const financesResponse = await setDealFinance(this._dealID, this._dealFinances);
             const paymentsResponse = await this._dealPickupPayments
                 .filter((item) => item.changed)
@@ -201,8 +216,10 @@ export class DealStore {
                 (response) => (response ? this._dealID : undefined)
             );
         } catch (error) {
-            // TODO: add error handlers
-            return undefined;
+            return {
+                status: Status.ERROR,
+                error: error as string,
+            };
         } finally {
             this._isLoading = false;
         }
@@ -240,6 +257,14 @@ export class DealStore {
         this._dealType = type;
     }
 
+    public set dealInventory(name: string) {
+        this._dealInventory = name;
+    }
+
+    public set dealBuyer(name: string) {
+        this._dealBuyer = name;
+    }
+
     public clearDeal = () => {
         this._deal = {} as DealItem;
         this._dealErrorMessage = "";
@@ -248,6 +273,8 @@ export class DealStore {
         this._dealFinance = {} as DealFinance;
         this._dealFinances = {} as DealFinance;
         this._printList = {} as DealPrintCollection;
+        this._dealInventory = "";
+        this._dealBuyer = "";
         this._dealPickupPayments = [] as DealPickupPayment[];
     };
 }

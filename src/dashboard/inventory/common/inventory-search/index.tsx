@@ -16,6 +16,8 @@ interface InventorySearchProps extends DropdownProps {
     onRowClick?: (inventoryName: string) => void;
     returnedField?: keyof Inventory;
     getFullInfo?: (inventory: Inventory) => void;
+    returnedField?: keyof Inventory;
+    getFullInfo?: (inventory: Inventory) => void;
 }
 
 export const InventorySearch = ({
