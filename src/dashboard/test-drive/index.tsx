@@ -20,6 +20,8 @@ import { printTestDrive } from "http/services/print";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
+import { ContactUser } from "common/models/contact";
+import { setContact } from "http/services/contacts-service";
 
 const isFormComplete = (obj: object): boolean => {
     return Object.values(obj).every((value) => value !== "");
@@ -32,16 +34,33 @@ export const PrintForTestDrive = (): ReactElement => {
     const [driver, setDriver] = useState<TestDriver>(driverState);
     const [vehicle, setVehicle] = useState<TestVehicle>(vehicleState);
     const [dealer, setDealer] = useState<TestDealer>(dealerState);
+    const [addToContactDisable, setAddToContactDisable] = useState<boolean>(false);
     const [isComplete, setIsComplete] = useState<boolean>(false);
     const navigate = useNavigate();
 
     useEffect(() => {
+        const partialDriver = {
+            customerName: driver.customerName,
+            customerLastName: driver.customerLastName,
+            homePhone: driver.homePhone,
+        };
+        const isAddToContactDisable = isFormComplete(partialDriver);
+        setAddToContactDisable(isAddToContactDisable);
+        const { comments, ...dealerRequired } = dealer;
         const isAllFormFilled =
-            isFormComplete(driver) && isFormComplete(vehicle) && isFormComplete(dealer);
+            isFormComplete(driver) && isFormComplete(vehicle) && isFormComplete(dealerRequired);
         setIsComplete(isAllFormFilled);
     }, [driver, vehicle, dealer]);
 
     const handlePrintForm = async (print: boolean = false) => {
+        if (!isComplete) {
+            return toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Please fill all required fields",
+                life: TOAST_LIFETIME,
+            });
+        }
         if (authUser && authUser.useruid) {
             const response = await printTestDrive(authUser.useruid, {
                 ...driver,
@@ -75,6 +94,18 @@ export const PrintForTestDrive = (): ReactElement => {
         }
     };
 
+    const handleAddToContact = () => {
+        const newContact: Partial<ContactUser> = {
+            firstName: driver.customerName,
+            lastName: driver.customerLastName,
+            phone1: driver.homePhone,
+            dl_number: driver.dlNumber,
+            dl_issuedate: driver.dlIssuingDate,
+            dl_expiration: driver.dlExpirationDate,
+        };
+        setContact(null, newContact);
+    };
+
     return (
         <Suspense>
             <div className='grid relative'>
@@ -99,12 +130,22 @@ export const PrintForTestDrive = (): ReactElement => {
                                         name='First Name'
                                         value={driver.customerName}
                                         returnedField='firstName'
-                                        getFullInfo={({ firstName, lastName, phone1 }) =>
+                                        getFullInfo={({
+                                            firstName,
+                                            lastName,
+                                            phone1,
+                                            dl_number,
+                                            dl_issuedate,
+                                            dl_expiration,
+                                        }) =>
                                             setDriver({
                                                 ...driver,
                                                 customerName: firstName,
                                                 customerLastName: lastName,
                                                 homePhone: phone1,
+                                                dlNumber: dl_number,
+                                                dlIssuingDate: dl_issuedate,
+                                                dlExpirationDate: dl_expiration,
                                             })
                                         }
                                         onChange={({ target: { value } }) => {
@@ -117,12 +158,13 @@ export const PrintForTestDrive = (): ReactElement => {
                                         name='Last Name'
                                         value={driver.customerLastName}
                                         returnedField='lastName'
-                                        getFullInfo={({ firstName, lastName, phone1 }) =>
+                                        getFullInfo={({ firstName, lastName, phone1, dl_number }) =>
                                             setDriver({
                                                 ...driver,
                                                 customerName: firstName,
                                                 customerLastName: lastName,
                                                 homePhone: phone1,
+                                                dlNumber: dl_number,
                                             })
                                         }
                                         onChange={({ target: { value } }) =>
@@ -287,25 +329,25 @@ export const PrintForTestDrive = (): ReactElement => {
                                 <Button
                                     className='test-drive__button'
                                     label='Add to contacts'
+                                    onClick={handleAddToContact}
+                                    disabled={!addToContactDisable}
+                                    severity={!addToContactDisable ? "secondary" : "success"}
                                     outlined
                                 />
                                 <Button
                                     className='test-drive__button'
-                                    disabled={!isComplete}
                                     severity={!isComplete ? "secondary" : "success"}
                                     onClick={() => handlePrintForm()}
                                     label='Preview'
                                 />
                                 <Button
                                     className='test-drive__button'
-                                    disabled={!isComplete}
                                     severity={!isComplete ? "secondary" : "success"}
                                     onClick={() => handlePrintForm(true)}
                                     label='Print'
                                 />
                                 <Button
                                     className='test-drive__button'
-                                    disabled={!isComplete}
                                     severity={!isComplete ? "secondary" : "success"}
                                     onClick={() => handlePrintForm()}
                                     label='Download'
