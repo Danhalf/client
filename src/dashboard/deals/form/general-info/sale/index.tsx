@@ -105,7 +105,9 @@ export const DealGeneralSale = observer((): ReactElement => {
                     store.dealBuyer = `${res.firstName} ${res.lastName}`;
                 }
             });
+    }, [deal.contactuid, store]);
 
+    useEffect(() => {
         //TODO: temporary solution for getting inventory name
         deal.inventoryuid &&
             getInventoryInfo(deal.inventoryuid).then((res) => {
@@ -113,7 +115,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     store.dealInventory = res.name;
                 }
             });
-    }, [deal.contactuid, deal.inventoryuid, store]);
+    }, [deal.inventoryuid, store]);
 
     return (
         <section className='grid deal-general-sale row-gap-2'>
