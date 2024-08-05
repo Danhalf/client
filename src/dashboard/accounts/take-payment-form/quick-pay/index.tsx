@@ -8,11 +8,7 @@ import { TakePaymentInfo } from "../take-payment-info";
 
 import "./index.css";
 import { Button } from "primereact/button";
-
-const paymentMethods = [
-    { label: "Method 1", value: "method1" },
-    { label: "Method 2", value: "method2" },
-];
+import { ACCOUNT_PAYMENT_METHODS } from "common/constants/account-options";
 
 const cashDrawers = [
     { label: "Drawer 1", value: "drawer1" },
@@ -70,7 +66,12 @@ export const AccountQuickPay = observer((): ReactElement => {
 
                     <div className='take-payment__item'>
                         <label className='take-payment__label'>Pmt Method</label>
-                        <Dropdown id='pmtMethod' options={paymentMethods} />
+                        <Dropdown
+                            id='pmtMethod'
+                            options={ACCOUNT_PAYMENT_METHODS}
+                            optionValue='id'
+                            optionLabel='name'
+                        />
                     </div>
 
                     <div className='take-payment__item'>
