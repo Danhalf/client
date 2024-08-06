@@ -1,7 +1,7 @@
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
-import { DataTable } from "primereact/datatable";
+import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
@@ -46,11 +46,16 @@ export const AccountPaymentHistory = (): ReactElement => {
         ACCOUNT_PAYMENT_STATUS_LIST[0].name
     );
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
+    const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
+    const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
 
     useEffect(() => {
         if (id) {
             listAccountHistory(id).then((res) => {
-                if (Array.isArray(res) && res.length) setHistoryList(res);
+                if (Array.isArray(res) && res.length) {
+                    setHistoryList(res);
+                    setSelectedRows(Array(res.length).fill(false));
+                }
             });
         }
         setActiveColumns(renderColumnsData.filter(({ checked }) => checked));
@@ -86,6 +91,23 @@ export const AccountPaymentHistory = (): ReactElement => {
                 </button>
             </div>
         );
+    };
+
+    const rowExpansionTemplate = (data: AccountHistory) => {
+        return (
+            <div className='expanded-row'>
+                <div className='expanded-row__label'>Payment comment: </div>
+                <div className='expanded-row__text'>{data.Comment || ""}</div>
+            </div>
+        );
+    };
+
+    const handleRowExpansionClick = (data: AccountHistory) => {
+        if (expandedRows.includes(data)) {
+            setExpandedRows(expandedRows.filter((item) => item !== data));
+            return;
+        }
+        setExpandedRows([...expandedRows, data]);
     };
 
     return (
@@ -163,20 +185,48 @@ export const AccountPaymentHistory = (): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         scrollable
+                        rowExpansionTemplate={rowExpansionTemplate}
+                        expandedRows={expandedRows}
+                        onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={(options) => {
+                            header={
+                                <Checkbox
+                                    checked={selectedRows.every((checkbox) => !!checkbox)}
+                                    onClick={({ checked }) => {
+                                        setSelectedRows(selectedRows.map(() => !!checked));
+                                    }}
+                                />
+                            }
+                            reorderable={false}
+                            resizeable={false}
+                            body={(options, { rowIndex }) => {
                                 return (
-                                    <div className='flex gap-3 align-items-center'>
-                                        <Checkbox checked={false} />
+                                    <div className={`flex gap-3 align-items-center`}>
+                                        <Checkbox
+                                            checked={selectedRows[rowIndex]}
+                                            onClick={() => {
+                                                setSelectedRows(
+                                                    selectedRows.map((state, index) =>
+                                                        index === rowIndex ? !state : state
+                                                    )
+                                                );
+                                            }}
+                                        />
+
+                                        <Button
+                                            className='text export-web__icon-button'
+                                            icon='pi pi-angle-down'
+                                            onClick={() => handleRowExpansionClick(options)}
+                                        />
                                     </div>
                                 );
                             }}
                             pt={{
                                 root: {
                                     style: {
-                                        width: "60px",
+                                        width: "100px",
                                     },
                                 },
                             }}
