@@ -7,7 +7,7 @@ import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import "./index.css";
-import { TakePaymentInfo } from "../take-payment-info";
+import { TakePaymentInfo } from "dashboard/accounts/take-payment-form/take-payment-info";
 import { ACCOUNT_PAYMENT_METHODS } from "common/constants/account-options";
 
 const PayOffItem = observer(({ title, value }: InputNumberProps): ReactElement => {

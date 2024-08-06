@@ -14,6 +14,7 @@ import {
     MultiSelectChangeEvent,
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
+import { Menubar } from "primereact/menubar";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -22,7 +23,6 @@ interface TableColumnProps extends ColumnProps {
 export type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & { checked: boolean };
 
 const renderColumnsData: TableColumnsList[] = [
-    { field: "", header: "Status", checked: true },
     { field: "RECEIPT_NUM", header: "Receipt#", checked: true },
     { field: "Type", header: "Type", checked: true },
     { field: "Pmt_Date", header: "Date", checked: true },
@@ -30,6 +30,13 @@ const renderColumnsData: TableColumnsList[] = [
     { field: "", header: "Method", checked: true },
     { field: "Balance", header: "Bal.Increase", checked: true },
     { field: "", header: "Payment", checked: true },
+    { field: "New_Balance", header: "New Balance", checked: false },
+    { field: "Principal_Paid", checked: false },
+    { field: "Interest_Paid", header: "Interest", checked: false },
+    { field: "", header: "Add’l", checked: false },
+    { field: "Down_Pmt_Paid", header: "Down", checked: false },
+    { field: "Taxes_Memo", header: "Taxes", checked: false },
+    { field: "Fees_Memo", header: "Misc/Fees", checked: false },
 ];
 
 export const AccountPaymentHistory = (): ReactElement => {
@@ -129,10 +136,23 @@ export const AccountPaymentHistory = (): ReactElement => {
                             },
                         }}
                     />
-                    <Dropdown
-                        className='account__dropdown ml-auto'
-                        options={["Take Payment"]}
-                        value='Take Payment'
+                    <Menubar
+                        className='account__menubar ml-auto'
+                        model={[
+                            {
+                                label: "Take Payment",
+                                items: [
+                                    {
+                                        label: "Add Note",
+                                        icon: "icon adms-calendar",
+                                    },
+                                    {
+                                        label: "Delete Payment",
+                                        icon: "icon adms-close",
+                                    },
+                                ],
+                            },
+                        ]}
                     />
                 </div>
                 <div className='col-12 account__table'>

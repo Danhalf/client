@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
-import { TakePaymentInfo } from "../take-payment-info";
+import { TakePaymentInfo } from "dashboard/accounts/take-payment-form/take-payment-info";
 
 import "./index.css";
 import { Button } from "primereact/button";
