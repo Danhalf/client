@@ -85,6 +85,9 @@ export interface AccountExtData {
     CR_Balance: number;
     CR_Override: number;
     CalcAPR: number;
+    CashDown: number;
+    CashDownBalance: number;
+    CashDownPayment: number;
     CashOnly: number;
     Closed_Balance: number;
     Closed_Charged_Off: number;
@@ -92,11 +95,16 @@ export interface AccountExtData {
     Closed_Int_Refund: number;
     Closed_Written_Off: number;
     ClosingNotes: string;
+    Con_Amt_To_Finance: number;
+    Con_Pmt_Amt: number;
+    Con_Pmt_Freq: number;
     ConsumerFin: number;
     Curr_Due: number;
+    DaysOverdue: number;
     Deferred_Days: number;
     DoNotReport: number;
     Down_Pmt_Amt_Due: number;
+    Down_Pmt_Balance: number;
     Down_Pmt_Date_Due: number;
     Down_Pmt_Paid: number;
     Effective_Volume_Interest: number;
@@ -136,6 +144,8 @@ export interface AccountExtData {
     LT_WarrantyRefund: number;
     LT_Wholesale: number;
     LastCalc: number;
+    Last_Paid: number;
+    Last_Paid_Date: string;
     Last_Pmt: number;
     LateFee_Amt: number;
     LateFee_Max: number;
@@ -238,12 +248,22 @@ export interface AccountExtData {
     Termination_Fees: number;
     Title_Num: string;
     Title_Received: 0 | 1;
+    Total_Adjustments: number;
     Total_Paid: number;
     Update_Periods: number;
     UseQF: number;
     Vehicle: string;
     accountuid: string;
+    buyerMobile: string;
+    buyerName: string;
+    buyerWorkPhone: string;
+    cobuyerMobile: string;
+    cobuyerName: string;
+    cobuyerWorkPhone: string;
     created: string;
+    dateeffective: string;
+    differentSeller: string;
+    differentSellerInfo: string;
     index: number;
     itemuid: string;
     updated: string;
@@ -380,4 +400,99 @@ export interface AccountInsurance {
     Insurance_Agent_Name: string;
     Insurance_Agent_Address: string;
     Insurance_Agent_Phone_No: string;
+}
+
+export interface AccountDetails {
+    status: string;
+    error: string;
+    info: string;
+    message: string;
+    accountuid: string;
+    CurrentStatus: AccountCurrentStatus;
+    CollectionDetails: AccountCollectionDetails;
+    OriginalAmounts: AccountOriginalAmounts;
+    NewAmounts: AccountNewAmounts;
+    QuickPay: AccountQuickPay;
+    PaymentDistribution: AccountPaymentDistribution;
+    CashDealPayoff: AccountCashDealPayoff;
+    WriteOff: AccountWriteOff;
+}
+
+export interface AccountCurrentStatus {
+    PastDueAmount: string;
+    CurrentDue: string;
+    DownPickupDue: string;
+    Fees: string;
+    TotalDue: string;
+    CurrentBalance: string;
+}
+
+export interface AccountCollectionDetails {
+    RegularPayment: string;
+    NextPmtDue: string;
+    DaysOverdue: string;
+    LastPaid: string;
+    LastPaidDays: string;
+    LastLate: string;
+}
+
+export interface AccountOriginalAmounts {
+    AmountFinanced: string;
+    ExpectedInterest: string;
+    PrincipalPaid: string;
+    InterestPaid: string;
+    ExtraPrincipalPmts: string;
+    DownPaymentPaid: string;
+    TotalPaid: string;
+    CurrentBalance: string;
+    NextPmtDue: string;
+}
+
+export interface AccountNewAmounts {
+    PrincipalPaid: string;
+    InterestPaid: string;
+    ExtraPrincipalPmts: string;
+    DownPaymentPaid: string;
+    TotalPaid: string;
+    NewBalance: string;
+    NextPmtDue: string;
+}
+
+export interface AccountQuickPay {
+    DownPaymentBalance: string;
+    FeesBalance: string;
+    NewLateFeesDate: string;
+    NewLateFeesDue: string;
+    InterestDate: string;
+    InterestDue: string;
+    PrincipalBalance: string;
+}
+
+export interface AccountPaymentDistribution {
+    DownPickupPayment: string;
+    Fees: string;
+    Principal: string;
+    AdditionalPrincipal: string;
+    Interest: string;
+    TaxesPaid: string;
+    TotalPaid: string;
+    NextPmtDue: string;
+    RemainingPastDue: string;
+    NewAccountBalance: string;
+    NewDownPaymentBalance: string;
+    NewFeesAdded: string;
+    NewFeesBalance: string;
+    NewTotalBalance: string;
+}
+
+export interface AccountCashDealPayoff {
+    DownPaymentBalance: string;
+    AmountFinancedBalance: string;
+    UnearnedInterest: string;
+}
+
+export interface AccountWriteOff {
+    PrincipalWriteOff: string;
+    InterestWriteOff: string;
+    LateChargeWriteOff: string;
 }

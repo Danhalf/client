@@ -19,6 +19,8 @@ import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
+import { ContactUser } from "common/models/contact";
+import { Inventory } from "common/models/inventory";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
@@ -95,43 +97,65 @@ export const DealGeneralSale = observer((): ReactElement => {
         }
     }, [authUser, toast]);
 
+    const handleGetCompanyInfo = (contact: ContactUser) => {
+        setFieldValue(
+            "contactinfo",
+            contact.companyName || `${contact.firstName} ${contact.lastName}`
+        );
+        changeDeal({
+            key: "contactinfo",
+            value: contact.companyName || `${contact.firstName} ${contact.lastName}`,
+        });
+        changeDeal({
+            key: "contactuid",
+            value: contact.contactuid,
+        });
+    };
+
+    const handleGetInventoryInfo = (inventory: Inventory) => {
+        setFieldValue("inventoryinfo", inventory.name || inventory.Make);
+        changeDeal({
+            key: "inventoryinfo",
+            value: inventory.name || inventory.Make,
+        });
+        changeDeal({
+            key: "inventoryuid",
+            value: inventory.itemuid,
+        });
+    };
+
     return (
         <section className='grid deal-general-sale row-gap-2'>
             <div className='col-6 relative'>
                 <CompanySearch
-                    {...getFieldProps("contactuid")}
-                    value={values.contactuid}
+                    {...getFieldProps("contactinfo")}
                     onChange={({ target: { value } }) => {
-                        setFieldValue("contactuid", value);
-                        changeDeal({ key: "contactuid", value });
+                        setFieldValue("contactinfo", value);
+                        changeDeal({ key: "contactinfo", value });
                     }}
-                    onRowClick={(value) => {
-                        setFieldValue("contactuid", value);
-                        changeDeal({ key: "contactuid", value });
-                    }}
+                    value={values?.contactinfo}
+                    getFullInfo={handleGetCompanyInfo}
                     name='Buyer Name (required)'
-                    className={`${errors.contactuid && "p-invalid"}`}
+                    className={`${errors.contactinfo && "p-invalid"}`}
                 />
-                <small className='p-error'>{errors.contactuid}</small>
+                <small className='p-error'>{errors.contactinfo}</small>
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
                     <InventorySearch
-                        {...getFieldProps("inventoryuid")}
-                        className={`${errors.inventoryuid && "p-invalid"}`}
+                        {...getFieldProps("inventoryinfo")}
+                        className={`${errors.inventoryinfo && "p-invalid"}`}
                         onChange={({ target: { value } }) => {
-                            setFieldValue("inventoryuid", value);
-                            changeDeal({ key: "inventoryuid", value });
+                            setFieldValue("inventoryinfo", value);
+                            changeDeal({ key: "inventoryinfo", value });
                         }}
-                        onRowClick={(value) => {
-                            setFieldValue("inventoryuid", value);
-                            changeDeal({ key: "inventoryuid", value });
-                        }}
+                        value={values?.inventoryinfo}
+                        getFullInfo={handleGetInventoryInfo}
                         name='Vehicle (required)'
                     />
                     <label className='float-label'></label>
                 </span>
-                <small className='p-error'>{errors.inventoryuid}</small>
+                <small className='p-error'>{errors.inventoryinfo}</small>
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>

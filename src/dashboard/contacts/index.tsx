@@ -38,6 +38,8 @@ interface ContactsDataTableProps {
     onRowClick?: (companyName: string) => void;
     contactCategory?: ContactTypeNameList | string;
     originalPath?: string;
+    returnedField?: keyof ContactUser;
+    getFullInfo?: (contact: ContactUser) => void;
 }
 
 const renderColumnsData: TableColumnProps[] = [
@@ -53,6 +55,8 @@ export const ContactsDataTable = ({
     onRowClick,
     contactCategory,
     originalPath,
+    returnedField,
+    getFullInfo,
 }: ContactsDataTableProps) => {
     const [categories, setCategories] = useState<ContactType[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ContactType | null>(null);
@@ -159,16 +163,21 @@ export const ContactsDataTable = ({
             if (!selectedCategory && contactCategory) {
                 return;
             }
+            setIsLoading(true);
             getContactsAmount(authUser.useruid, { ...params, total: 1 }).then((response) => {
                 setTotalRecords(response?.total ?? 0);
             });
-            getContacts(authUser.useruid, params).then((response) => {
-                if (response?.length) {
-                    setUserContacts(response);
-                } else {
-                    setUserContacts([]);
-                }
-            });
+            getContacts(authUser.useruid, params)
+                .then((response) => {
+                    if (response?.length) {
+                        setUserContacts(response);
+                    } else {
+                        setUserContacts([]);
+                    }
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
         }
     }, [selectedCategory, lazyState, authUser, globalSearch, contactCategory]);
 
@@ -215,13 +224,17 @@ export const ContactsDataTable = ({
         }
     };
 
-    const handleOnRowClick = ({
-        data: { contactuid, firstName, lastName },
-    }: DataTableRowClickEvent) => {
+    const handleOnRowClick = ({ data }: DataTableRowClickEvent) => {
+        if (getFullInfo) {
+            getFullInfo(data as ContactUser);
+        }
         if (onRowClick) {
-            onRowClick(`${firstName} ${lastName}`);
+            const value = returnedField
+                ? data[returnedField]
+                : `${data.firstName} ${data.lastName}`;
+            onRowClick(value);
         } else {
-            navigate(contactuid);
+            navigate(data.contactuid);
         }
     };
 
@@ -308,7 +321,7 @@ export const ContactsDataTable = ({
                 <div className='col-12'>
                     {isLoading ? (
                         <div className='dashboard-loader__wrapper'>
-                            <Loader overlay />
+                            <Loader />
                         </div>
                     ) : (
                         <DataTable

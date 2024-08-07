@@ -16,6 +16,8 @@ interface CompanySearchProps extends DropdownProps {
     onRowClick?: (companyName: string) => void;
     contactCategory?: ContactTypeNameList | string;
     originalPath?: string;
+    returnedField?: keyof ContactUser;
+    getFullInfo?: (contact: ContactUser) => void;
 }
 
 export const CompanySearch = ({
@@ -25,6 +27,8 @@ export const CompanySearch = ({
     contactCategory,
     onChange,
     originalPath,
+    returnedField,
+    getFullInfo,
     ...props
 }: CompanySearchProps) => {
     const [user, setUser] = useState<AuthUser | null>(null);
@@ -48,8 +52,9 @@ export const CompanySearch = ({
     }, []);
 
     const handleCompanyInputChange = (searchValue: string): void => {
+        const qry = returnedField ? `${searchValue}.${returnedField}` : `${searchValue}.${FIELD}`;
         const params: QueryParams = {
-            qry: `${searchValue}.${FIELD}`,
+            qry,
             param: currentCategory,
         };
         user &&
@@ -66,12 +71,18 @@ export const CompanySearch = ({
         onRowClick && onRowClick(companyName);
         setDialogVisible(false);
     };
+
+    const handleGetFullInfo = (contact: ContactUser) => {
+        getFullInfo && getFullInfo(contact);
+        setDialogVisible(false);
+    };
+
     return (
         <>
             <SearchInput
                 name={name}
                 title={name}
-                optionValue={FIELD}
+                optionValue={returnedField || FIELD}
                 optionLabel={FIELD}
                 options={options}
                 onInputChange={handleCompanyInputChange}
@@ -94,6 +105,8 @@ export const CompanySearch = ({
                     onRowClick={handleOnRowClick}
                     contactCategory={contactCategory}
                     originalPath={originalPath}
+                    returnedField={returnedField}
+                    getFullInfo={handleGetFullInfo}
                 />
             </Dialog>
         </>
