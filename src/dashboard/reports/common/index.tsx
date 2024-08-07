@@ -1,31 +1,81 @@
+import { ReportACL } from "common/models/reports";
+import { DashboardDialog } from "dashboard/common/dialog";
+import { getReportAccessList } from "http/services/reports.service";
 import { Button, ButtonProps } from "primereact/button";
+import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
 import { PanelHeaderTemplateOptions } from "primereact/panel";
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export const ActionButtons = ({ reportuid }: { reportuid: string }): ReactElement => {
+interface EditAccessDialogProps {
+    visible: boolean;
+    onHide: () => void;
+    reportuid: string;
+}
+
+const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps): ReactElement => {
+    const [accessList, setAccessList] = useState<ReportACL[]>([]);
+
+    useEffect(() => {
+        if (visible) {
+            getReportAccessList(reportuid).then((response) => {
+                if (Array.isArray(response)) {
+                    setAccessList(response);
+                }
+            });
+        }
+    }, [visible, reportuid]);
+
     return (
-        <div className='reports-actions flex'>
-            <Button
-                className='p-button reports-actions__button reports-actions__add-button'
-                icon='pi pi-plus'
-                tooltip='Add to Collection'
-                outlined
+        <DashboardDialog
+            className='edit-access'
+            footer='Update'
+            header='Edit Access'
+            visible={visible}
+            onHide={onHide}
+        >
+            <DataTable showGridlines value={accessList}></DataTable>
+        </DashboardDialog>
+    );
+};
+
+export const ActionButtons = ({ reportuid }: { reportuid: string }): ReactElement => {
+    const [editAccessActive, setEditAccessActive] = useState(false);
+
+    const handleEditAccess = () => {
+        setEditAccessActive(true);
+    };
+
+    return (
+        <>
+            <div className='reports-actions flex'>
+                <Button
+                    className='p-button reports-actions__button reports-actions__add-button'
+                    icon='pi pi-plus'
+                    tooltip='Add to Collection'
+                    outlined
+                />
+                <Button
+                    className='p-button reports-actions__button'
+                    icon='pi pi-heart'
+                    outlined
+                    tooltip='Add to Favorites'
+                />
+                <Button
+                    className='p-button reports-actions__button'
+                    icon='icon adms-password'
+                    outlined
+                    tooltip='Edit Access'
+                    onClick={handleEditAccess}
+                />
+            </div>
+            <EditAccessDialog
+                visible={editAccessActive}
+                onHide={() => setEditAccessActive(false)}
+                reportuid={reportuid}
             />
-            <Button
-                className='p-button reports-actions__button'
-                icon='pi pi-heart'
-                outlined
-                tooltip='Add to Favorites'
-            />
-            <Button
-                className='p-button reports-actions__button'
-                icon='icon adms-password'
-                outlined
-                tooltip='Edit Access'
-            />
-        </div>
+        </>
     );
 };
 
