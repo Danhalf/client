@@ -34,3 +34,24 @@ export interface ReportCollection {
     updated: string;
     userUID: string;
 }
+
+export interface ReportAccess {
+    granted: 0 | 1;
+    created: string;
+    updated: string;
+    enabled: 0 | 1;
+    itemuid: string;
+    useruid: string;
+    username: string;
+}
+
+export interface ReportACL {
+    status: string;
+    error: string;
+    info: string;
+    message: string;
+    useruid: string;
+    username: string;
+    reportuid: string;
+    acl: ReportAccess;
+}
