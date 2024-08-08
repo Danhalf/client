@@ -5,9 +5,12 @@ import { ReactElement, useState } from "react";
 import "./index.css";
 import { Button } from "primereact/button";
 import { ACCOUNT_STATUS_LIST } from "common/constants/account-options";
+import { TotalPaidDialog } from "./total-paid-dialog";
 
 export const AccountSettings = (): ReactElement => {
     const [accountStatus, setAccountStatus] = useState<string>("");
+    const [isDialogActive, setIsDialogActive] = useState<boolean>(false);
+
     return (
         <div className='account-settings'>
             <h3 className='account-settings__title account-title'>Account Settings</h3>
@@ -55,9 +58,15 @@ export const AccountSettings = (): ReactElement => {
                     </Button>
                 </div>
                 <div className='col-6'>
-                    <Button className='account-settings__button'>Update Total Amount Paid</Button>
+                    <Button
+                        className='account-settings__button'
+                        onClick={() => setIsDialogActive(true)}
+                    >
+                        Update Total Amount Paid
+                    </Button>
                 </div>
             </div>
+            <TotalPaidDialog visible={isDialogActive} onHide={() => setIsDialogActive(false)} />
         </div>
     );
 };
