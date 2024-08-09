@@ -159,7 +159,7 @@ export const AccountPaymentHistory = (): ReactElement => {
                         }}
                     />
                     <Menubar
-                        className='account__menubar ml-auto'
+                        className='account-menubar ml-auto'
                         model={[
                             {
                                 label: "Take Payment",
