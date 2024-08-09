@@ -96,6 +96,7 @@
     display: flex;
     align-items: center;
     gap: 20px;
+    position: relative;
 }
 
 .reports-accordion-header__info {
@@ -152,8 +153,16 @@
 }
 
 .new-collection.p-panel .p-panel-content {
-    border: none;
-    background-color: var(--admss-app-lightest-grey);
+    border: 1px solid var(--admss-app-focus-green);
+    border-radius: 5px;
+    background-color: var(--admss-app-lightest-green);
+}
+
+.new-collection__title {
+    color: var(--admss-app-primary-main-green);
+    font-size: 18px;
+    font-weight: 700;
+    font-family: "Open Sans";
 }
 
 .new-collection__multiselect {
@@ -200,4 +209,10 @@
 
 .access-field--green {
     color: var(--admss-app-primary-main-green);
+}
+
+.reports-header .close-button {
+    color: var(--admss-app-blue-text);
+    right: 20px;
+    top: 90px;
 }

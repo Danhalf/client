@@ -1,5 +1,6 @@
 import { ReportACL } from "common/models/reports";
 import { DashboardDialog } from "dashboard/common/dialog";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { getReportAccessList } from "http/services/reports.service";
 import { Button, ButtonProps } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
@@ -244,8 +245,20 @@ export const ReportsPanelHeader = ({
     setStateAction,
 }: ReportsPanelHeaderProps): ReactElement => {
     const navigate = useNavigate();
+    const [isConfirmVisible, setIsConfirmVisible] =
+        useState<React.MouseEvent<HTMLButtonElement> | null>(null);
+
+    const handleClosePanel = () => {
+        options.onTogglerClick(isConfirmVisible as React.MouseEvent<HTMLButtonElement>);
+    };
+
     return (
         <div className='reports-header col-12 px-0 pb-3'>
+            <Button
+                icon='pi pi-times'
+                className='p-button close-button'
+                onClick={setIsConfirmVisible}
+            />
             <Button
                 icon='pi pi-plus'
                 className='reports-header__button'
@@ -267,6 +280,20 @@ export const ReportsPanelHeader = ({
                     onChange={(e) => setStateAction(e.target.value)}
                 />
             </span>
+            <ConfirmModal
+                visible={!!isConfirmVisible}
+                title='Quit Editing?'
+                icon='pi-exclamation-triangle'
+                bodyMessage='
+                Are you sure you want to cancel creating a new collection?
+                All unsaved data will be lost.'
+                confirmAction={handleClosePanel}
+                draggable={false}
+                rejectLabel='Cancel'
+                acceptLabel='Confirm'
+                className='schedule-confirm-dialog'
+                onHide={() => setIsConfirmVisible(null)}
+            />
         </div>
     );
 };
