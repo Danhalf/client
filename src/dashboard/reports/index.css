@@ -161,6 +161,10 @@
     display: inline-flex;
     align-items: center;
 }
+.edit-access .p-multiselect .p-multiselect-token {
+    background: var(--admss-app-primary-main-green);
+    color: var(--admss-app-white);
+}
 
 .reports-actions__button.p-button.p-button-outlined {
     height: 40px;
@@ -176,4 +180,24 @@
     color: var(--admss-app-warning-blue);
     background-color: var(--admss-app-white);
     border: 1px solid var(--admss-app-warning-blue);
+}
+
+.p-dialog.edit-access {
+    width: 690px;
+}
+
+.access-field {
+    width: 100px;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 10px;
+}
+
+.edit-access__dropdown {
+    width: 236px;
+}
+
+.access-field--green {
+    color: var(--admss-app-primary-main-green);
 }
