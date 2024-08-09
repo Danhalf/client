@@ -69,6 +69,12 @@
 }
 
 .p-accordion .p-accordion-header.reports__accordion-tab.p-highlight .p-accordion-header-link {
+    background-color: var(--admss-app-white);
+}
+
+.p-accordion:not(:has(.reports__accordion--inner))
+    .p-accordion-header.reports__accordion-tab.p-highlight
+    .p-accordion-header-link {
     background-color: var(--admss-app-light-green);
 }
 
