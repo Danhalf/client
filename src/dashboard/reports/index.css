@@ -163,6 +163,7 @@
     font-size: 18px;
     font-weight: 700;
     font-family: "Open Sans";
+    text-transform: uppercase;
 }
 
 .new-collection__multiselect {
@@ -211,8 +212,18 @@
     color: var(--admss-app-primary-main-green);
 }
 
-.reports-header .close-button {
+.p-panel .close-button {
+    color: var(--admss-app-blue-text);
+}
+
+.p-panel .close-button {
     color: var(--admss-app-blue-text);
     right: 20px;
+}
+
+.p-panel-content .close-button {
+    top: 10px;
+}
+.reports-header .close-button {
     top: 90px;
 }
