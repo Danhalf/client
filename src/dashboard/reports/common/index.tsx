@@ -323,7 +323,7 @@ export const CollectionPanelContent = ({
     const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
     return (
         <>
-            <h3 className='new-collection__title'>Add new collection</h3>
+            <h3 className='edit-collection__title'>Add new collection</h3>
             {handleClosePanel && (
                 <Button
                     icon='pi pi-times'
@@ -331,7 +331,7 @@ export const CollectionPanelContent = ({
                     onClick={() => setIsConfirmVisible(true)}
                 />
             )}
-            <div className='grid new-collection__form mt-3'>
+            <div className='grid edit-collection__form mt-3'>
                 <TextInput
                     name='Collection name'
                     colWidth={4}
@@ -347,7 +347,7 @@ export const CollectionPanelContent = ({
                             options={collections.filter((collection) => collection.documents)}
                             optionGroupChildren='documents'
                             optionGroupLabel='name'
-                            className='w-full new-collection__multiselect'
+                            className='w-full edit-collection__multiselect'
                             placeholder='Select reports'
                             showSelectAll={false}
                             value={selectedReports || []}
@@ -366,14 +366,25 @@ export const CollectionPanelContent = ({
                         <label className='float-label'>Select reports</label>
                     </span>
                 </div>
-                <div className='col-12 flex justify-content-end'>
+                <div className='col-12 flex justify-content-end gap-3'>
                     {collectionuid && (
-                        <Button type='button' outlined onClick={handleClosePanel}>
+                        <Button
+                            className='edit-collection__button'
+                            type='button'
+                            severity='danger'
+                            outlined
+                            onClick={handleClosePanel}
+                        >
                             Delete
                         </Button>
                     )}
-                    <Button type='button' onClick={handleCreateCollection} outlined>
-                        Create collection
+                    <Button
+                        className='edit-collection__button'
+                        type='button'
+                        onClick={handleCreateCollection}
+                        outlined
+                    >
+                        {collectionuid ? "Update" : "Create"}
                     </Button>
                 </div>
             </div>

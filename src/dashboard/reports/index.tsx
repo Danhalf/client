@@ -132,7 +132,7 @@ export default function Reports(): ReactElement {
                                             setStateAction: setReportSearch,
                                         })
                                     }
-                                    className='new-collection w-full'
+                                    className='edit-collection w-full'
                                     collapsed
                                     toggleable
                                 >
@@ -210,7 +210,7 @@ export default function Reports(): ReactElement {
                                                                 className='reports__accordion-tab'
                                                             >
                                                                 {isCollectionEditing === itemUID ? (
-                                                                    <div className='new-collection p-panel'>
+                                                                    <div className='edit-collection p-panel'>
                                                                         <div className='p-panel-content relative'>
                                                                             <CollectionPanelContent
                                                                                 handleClosePanel={() =>
