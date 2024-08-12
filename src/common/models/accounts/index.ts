@@ -46,6 +46,46 @@ export interface AccountPayment {
     accountuid: string;
 }
 
+export interface AccountDownPayments {
+    status: "string";
+    error: "string";
+    info: "string";
+    message: "string";
+    index: number;
+    created: number;
+    updated: number;
+    deleted: 0 | 1;
+    itemuid: "string";
+    useruid: "string";
+    Receipt: "string";
+    Date: "string";
+    Amount: "string";
+    Paid: "string";
+}
+
+export interface AccountListActivity {
+    ACCT_NUM: string;
+    ActType: number;
+    Balance: number;
+    Cost: number;
+    Credit: number;
+    Date: number;
+    Debit: number;
+    Demo: number;
+    Description: string;
+    Effective_Date: number;
+    Standing: number;
+    User: string;
+    accountuid: string;
+    created: number;
+    deleted: number;
+    extindex: number;
+    index: number;
+    itemuid: string;
+    updated: number;
+    useruid: string;
+}
+
 export interface AccountInfo {
     accountnumber: string;
     accountstatus: string;

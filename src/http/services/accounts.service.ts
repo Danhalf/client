@@ -1,8 +1,10 @@
 import { isAxiosError } from "axios";
 import {
+    AccountDownPayments,
     AccountHistory,
     AccountInfo,
     AccountInsurance,
+    AccountListActivity,
     AccountNote,
     AccountPayment,
 } from "common/models/accounts";
@@ -201,9 +203,9 @@ export const listAccountHistory = async (accountuid: string) => {
 
 export const listAccountActivity = async (accountuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
-            `accounts/${accountuid}/listactivity`
-        );
+        const request = await authorizedUserApiInstance.get<
+            BaseResponseError | AccountListActivity[]
+        >(`accounts/${accountuid}/listactivity`);
         return request.data;
     } catch (error) {
         if (isAxiosError(error)) {
@@ -226,6 +228,22 @@ export const listAccountPayments = async (accountuid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while listing account payments",
+            };
+        }
+    }
+};
+
+export const listAccountDownPayments = async (accountuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<
+            BaseResponseError | AccountDownPayments[]
+        >(`accounts/${accountuid}/listdownpayments`);
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while listing account down payments",
             };
         }
     }
