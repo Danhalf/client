@@ -128,7 +128,7 @@ export interface AccountExtData {
     CashDown: number;
     CashDownBalance: number;
     CashDownPayment: number;
-    CashOnly: number;
+    CashOnly: 0 | 1;
     Closed_Balance: number;
     Closed_Charged_Off: number;
     Closed_FMV: number;
@@ -142,7 +142,7 @@ export interface AccountExtData {
     Curr_Due: number;
     DaysOverdue: number;
     Deferred_Days: number;
-    DoNotReport: number;
+    DoNotReport: 0 | 1;
     Down_Pmt_Amt_Due: number;
     Down_Pmt_Balance: number;
     Down_Pmt_Date_Due: number;
@@ -458,6 +458,18 @@ export interface AccountDetails {
     WriteOff: AccountWriteOff;
 }
 
+export interface AccountOriginalAmount {
+    AmountFinanced: string;
+    ExpectedInterest: string;
+    PrincipalPaid: string;
+    InterestPaid: string;
+    ExtraPrincipalPmts: string;
+    DownPaymentPaid: string;
+    TotalPaid: string;
+    CurrentBalance: string;
+    NextPmtDue: string;
+}
+
 export interface AccountCurrentStatus {
     PastDueAmount: string;
     CurrentDue: string;
@@ -535,4 +547,35 @@ export interface AccountWriteOff {
     PrincipalWriteOff: string;
     InterestWriteOff: string;
     LateChargeWriteOff: string;
+}
+
+export interface AccountUpdateTotalInfo {
+    status: string;
+    error: string;
+    info: string;
+    message: string;
+    accountuid: string;
+    PrincipalPaid: number;
+    InterestPaid: number;
+    ExtraPrincipalPayments: number;
+    TotalPaid: number;
+}
+
+export interface AccountPromise {
+    status: string;
+    error: string;
+    info: string;
+    message: string;
+    index: number;
+    created: number;
+    updated: number;
+    deleted: number;
+    itemuid: string;
+    useruid: string;
+    username: string;
+    amount: number;
+    paydate: number;
+    pstatus: number;
+    pstatusname: string;
+    notes: string;
 }

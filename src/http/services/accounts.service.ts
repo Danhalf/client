@@ -7,6 +7,8 @@ import {
     AccountListActivity,
     AccountNote,
     AccountPayment,
+    AccountPromise,
+    AccountUpdateTotalInfo,
 } from "common/models/accounts";
 import { BaseResponse, BaseResponseError } from "common/models/base-response";
 import { InventoryExtData } from "common/models/inventory";
@@ -185,6 +187,22 @@ export const getAccountNotes = async (accountuid: string) => {
     }
 };
 
+export const getAccountOriginalAmount = async (accountuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<
+            BaseResponseError | AccountUpdateTotalInfo
+        >(`accounts/${accountuid}/originalamount`);
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting account original amount",
+            };
+        }
+    }
+};
+
 export const listAccountHistory = async (accountuid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<BaseResponseError | AccountHistory[]>(
@@ -244,6 +262,22 @@ export const listAccountDownPayments = async (accountuid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while listing account down payments",
+            };
+        }
+    }
+};
+
+export const listAccountPromises = async (accountuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | AccountPromise[]>(
+            `accounts/${accountuid}/listpromises`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while listing account promises",
             };
         }
     }
@@ -356,6 +390,22 @@ export const getAccountInsurance = async (accountuid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while getting insurance",
+            };
+        }
+    }
+};
+
+export const calcAccountFromHistory = async (accountuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<
+            BaseResponseError | AccountUpdateTotalInfo
+        >(`accounts/${accountuid}/calcfromhistory`);
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while calculating account from history",
             };
         }
     }
@@ -689,6 +739,23 @@ export const updateAccountInsurance = async (
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while updating insurance",
+            };
+        }
+    }
+};
+
+export const updateAccountTotal = async (accountuid: string, totalInfo: AccountUpdateTotalInfo) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `accounts/${accountuid}/updatetotal`,
+            totalInfo
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while updating total info",
             };
         }
     }
