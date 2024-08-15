@@ -42,6 +42,11 @@
     border: 1px solid var(--admss-app-light-grey);
     display: flex;
     flex-wrap: wrap;
+
+    :has(.loader) {
+        min-height: 15vh;
+        align-items: center;
+    }
 }
 
 .insurance-info__item {
