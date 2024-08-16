@@ -60,9 +60,8 @@
     margin: 30px auto;
     justify-content: center;
     border-radius: 5px;
-    box-shadow: 0px 5px 5px 0 var(--admss-app-light-blue);
+    box-shadow: 1px 1px 5px var(--admss-app-light-blue);
     border: var(--admss-app-light-blue) solid 1px;
-
     flex-wrap: wrap;
 }
 
@@ -98,22 +97,27 @@
     justify-content: center;
     border: none;
     color: var(--admss-app-primary);
-    background: var(--admss-app-light-grey);
+    background: var(--admss-app-light-blue);
 }
 
 .report-select {
-    border: var(--admss-app-light-grey) solid 1px;
+    border: var(--admss-app-medium-blue) solid 1px;
     border-radius: 5px;
     width: 370px;
     margin-bottom: 30px;
 }
 
 .report-select__header {
-    background: var(--admss-app-lightest-grey);
-    border-bottom: var(--admss-app-light-grey) solid 1px;
+    border-bottom: var(--admss-app-medium-blue) solid 1px;
     padding: 5px 10px;
     display: flex;
     align-items: center;
+    font-family: Open Sans;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 19px;
+    text-align: left;
+    padding: 15px;
 }
 
 .report-control__button.p-button.p-button-outlined:enabled:hover,
@@ -121,7 +125,7 @@
     box-shadow: none;
     border: none;
     color: var(--admss-app-primary);
-    background: var(--admss-app-medium-grey);
+    background: var(--admss-app-medium-blue);
 }
 
 .report-select__list {
@@ -130,7 +134,7 @@
     max-height: 200px;
     overflow-y: scroll;
     list-style: none;
-    padding: 10px;
+    padding: 0;
     margin: 0;
 }
 
@@ -149,10 +153,17 @@
 
 .report-select__item {
     cursor: pointer;
+    padding: 10px;
+    font-family: Open Sans;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 19px;
+    text-align: left;
+    border-top: 0.5px solid var(--admss-app-white);
 }
 
 .report-select__item.selected {
-    background-color: var(--admss-app-medium-grey);
+    background-color: var(--admss-app-medium-light-blue);
 }
 
 .report__footer {
@@ -176,4 +187,12 @@
     justify-content: center;
     padding: 0;
     font-size: 1.4rem;
+}
+
+.report-control__title {
+    font-family: Open Sans;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24.51px;
+    text-align: left;
 }

@@ -10,14 +10,16 @@ import { useStore } from "store/hooks";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import { ReportEditForm } from "./edit";
+import { observer } from "mobx-react-lite";
 
-export const ReportForm = (): ReactElement => {
+export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
+    const reportStore = useStore().reportStore;
+    const { setReport, report } = reportStore;
     const navigate = useNavigate();
     const { authUser } = userStore;
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
-    const [currentReport, setCurrentReport] = useState<ReportDocument | null>(null);
 
     const handleGetUserReportCollections = (useruid: string) =>
         getUserReportCollectionsContent(useruid).then((response) => {
@@ -44,7 +46,7 @@ export const ReportForm = (): ReactElement => {
     }, [authUser]);
 
     const handleAccordionTabChange = (report: ReportDocument) => {
-        setCurrentReport(report);
+        setReport(report);
         navigate(`/dashboard/reports/${report.itemUID}`);
     };
 
@@ -89,7 +91,7 @@ export const ReportForm = (): ReactElement => {
                                     )}
                             </Accordion>
                         </div>
-                        <ReportEditForm report={currentReport} />
+                        <ReportEditForm />
                     </div>
                     <div className='report__footer gap-3 mt-8 mr-3'>
                         <Button
@@ -117,12 +119,16 @@ export const ReportForm = (): ReactElement => {
                         >
                             Cancel
                         </Button>
-                        <Button className='uppercase px-6 report__button'>
-                            {currentReport ? "Update" : "Create"}
+                        <Button
+                            className='uppercase px-6 report__button'
+                            disabled={!report.name}
+                            severity={!report.name ? "secondary" : "success"}
+                        >
+                            {report ? "Update" : "Create"}
                         </Button>
                     </div>
                 </div>
             </div>
         </div>
     );
-};
+});
