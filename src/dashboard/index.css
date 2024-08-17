@@ -352,6 +352,12 @@
     position: relative;
 }
 
+.p-dialog {
+    .p-confirm-dialog-accept.p-button:focus-within {
+        background-color: var(--admss-app-primary-main-green);
+    }
+}
+
 .searched-item::after {
     content: "";
     position: absolute;
