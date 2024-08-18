@@ -7,6 +7,9 @@ import { ReportSelect } from "../common";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
 
 const dataSetValues = ["Inventory", "Contacts", "Deals", "Account"];
 
@@ -14,6 +17,7 @@ export const ReportEditForm = observer((): ReactElement => {
     const store = useStore().reportStore;
     const { id } = useParams();
     const { report, reportName, getReport, changeReport } = store;
+    const toast = useToast();
     const [availableValues, setAvailableValues] = useState<string[]>([
         "Account",
         "Buyer Name",
@@ -28,7 +32,17 @@ export const ReportEditForm = observer((): ReactElement => {
     const [dataSet, setDataSet] = useState<string | null>(null);
 
     useEffect(() => {
-        id && getReport(id);
+        id &&
+            getReport(id).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response?.error || "Error while fetching report",
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 

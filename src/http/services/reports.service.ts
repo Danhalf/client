@@ -122,7 +122,7 @@ export const getReportAccessList = async (reportuid: string) => {
     }
 };
 
-export const upddateReportInfo = async (uid: string, body: Partial<ReportInfo>) => {
+export const updateReportInfo = async (uid: string, body: Partial<ReportInfo>) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `reports/${uid}/reportinfo`,
