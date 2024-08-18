@@ -33,6 +33,25 @@ export const getReportInfo = async (uid: string) => {
     }
 };
 
+export const getReportTaskResult = async (taskuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any>(`reports/${taskuid}/report`, {
+            headers: {
+                Accept: "application/pdf",
+            },
+            responseType: "blob",
+        });
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting report task result",
+            };
+        }
+    }
+};
+
 export const makeShortReports = async (uid: string | undefined, body?: ReportsPostData) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(
@@ -128,6 +147,22 @@ export const updateReportInfo = async (uid: string, body: Partial<ReportInfo>) =
             `reports/${uid}/reportinfo`,
             body
         );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while updating report info",
+            };
+        }
+    }
+};
+
+export const printReportInfo = async (useruid: string, itemUID: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<
+            BaseResponseError & { taskuid: string }
+        >(`reports/${useruid}/report`, { itemUID });
         return request.data;
     } catch (error) {
         if (isAxiosError(error)) {
