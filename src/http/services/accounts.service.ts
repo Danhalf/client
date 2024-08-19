@@ -513,9 +513,9 @@ export const setOrUpdateActivityInfo = async (itemuid: string, activityData: any
     }
 };
 
-export const setOrUpdateNotesInfo = async (itemuid: string, notesData: any) => {
+export const addAccountNote = async (itemuid: string, notesData: Partial<AccountNote>) => {
     try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `accounts/${itemuid}/notes`,
             notesData
         );
@@ -524,7 +524,7 @@ export const setOrUpdateNotesInfo = async (itemuid: string, notesData: any) => {
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error || "Error while setting or updating notes info",
+                error: error.response?.data.error || "Error while updating notes info",
             };
         }
     }

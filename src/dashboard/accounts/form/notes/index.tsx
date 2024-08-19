@@ -42,11 +42,15 @@ export const AccountNotes = (): ReactElement => {
     const [dialogShow, setDialogShow] = useState<boolean>(false);
     const [note, setNote] = useState<Note>(initialNote);
 
+    const handleGetNotes = () => {
+        listAccountNotes(id!).then((res) => {
+            if (Array.isArray(res) && res.length) setNotesList(res);
+        });
+    };
+
     useEffect(() => {
         if (id) {
-            listAccountNotes(id).then((res) => {
-                if (Array.isArray(res) && res.length) setNotesList(res);
-            });
+            handleGetNotes();
             handleGetNote();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -224,7 +228,12 @@ export const AccountNotes = (): ReactElement => {
                     </div>
                 )}
             </div>
-            <AddNoteDialog visible={dialogShow} onHide={() => setDialogShow(false)} />
+            <AddNoteDialog
+                action={handleGetNotes}
+                visible={dialogShow}
+                accountuid={id}
+                onHide={() => setDialogShow(false)}
+            />
         </div>
     );
 };
