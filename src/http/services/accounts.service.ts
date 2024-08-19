@@ -744,7 +744,10 @@ export const updateAccountInsurance = async (
     }
 };
 
-export const updateAccountTotal = async (accountuid: string, totalInfo: AccountUpdateTotalInfo) => {
+export const updateAccountTotal = async (
+    accountuid: string,
+    totalInfo: Partial<AccountUpdateTotalInfo>
+) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
             `accounts/${accountuid}/updatetotal`,
