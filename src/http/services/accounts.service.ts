@@ -5,6 +5,7 @@ import {
     AccountInfo,
     AccountInsurance,
     AccountListActivity,
+    AccountMemoNote,
     AccountNote,
     AccountPayment,
     AccountPromise,
@@ -141,7 +142,7 @@ export const getAccountActivity = async (itemuid: string) => {
 
 export const getAccountNote = async (accountuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.get<BaseResponseError | AccountMemoNote>(
             `accounts/${accountuid}/note`
         );
         return request.data;
@@ -529,9 +530,9 @@ export const setOrUpdateNotesInfo = async (itemuid: string, notesData: any) => {
     }
 };
 
-export const setOrUpdateNote = async (itemuid: string, noteData: any) => {
+export const updateAccountNote = async (itemuid: string, noteData: Partial<AccountMemoNote>) => {
     try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
             `accounts/${itemuid}/note`,
             noteData
         );
