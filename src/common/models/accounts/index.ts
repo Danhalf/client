@@ -1,4 +1,4 @@
-import { Status } from "../base-response";
+import { BaseResponseError, Status } from "../base-response";
 
 export interface Account {
     accountnumber: string;
@@ -578,4 +578,10 @@ export interface AccountPromise {
     pstatus: number;
     pstatusname: string;
     notes: string;
+}
+
+export interface AccountMemoNote extends BaseResponseError {
+    accountuid: string;
+    alert: string;
+    note: string;
 }
