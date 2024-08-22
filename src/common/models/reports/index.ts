@@ -64,6 +64,8 @@ export interface ReportInfo extends BaseResponseError {
     updated: string;
     itemuid: string;
     useruid: string;
+    name: string;
+    isfavorite: 0 | 1;
     ShowTotals: 0 | 1;
     ShowAverages: 0 | 1;
     ShowLineCount: 0 | 1;
