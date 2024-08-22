@@ -3,6 +3,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import {
     ReportACL,
     ReportCollection,
+    ReportCreate,
     ReportDocument,
     ReportInfo,
     ReportsPostData,
@@ -160,6 +161,23 @@ export const getReportDocumentTemplate = async (documentuid: string) => {
                 error:
                     error.response?.data.error ||
                     "Error while getting user report document template",
+            };
+        }
+    }
+};
+
+export const createCustomReport = async (templateuid: string, body: Partial<ReportCreate>) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `reports/${templateuid}/set`,
+            body
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while creating custom report",
             };
         }
     }
