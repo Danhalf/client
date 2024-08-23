@@ -22,7 +22,7 @@ import {
 } from "http/services/export-to-web.service";
 import { ExportWebList, ExportWebPostData } from "common/models/export-web";
 import { Checkbox } from "primereact/checkbox";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
     MultiSelect,
     MultiSelectChangeEvent,
@@ -109,6 +109,7 @@ interface ExportWebProps {
 export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [exportsToWeb, setExportsToWeb] = useState<ExportWebList[]>([]);
     const userStore = store.userStore;
+    const inventoryStore = store.inventoryStore;
     const { authUser } = userStore;
     const toast = useToast();
     const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -127,6 +128,8 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const location = useLocation();
+    const currentPath = location.pathname + location.search;
 
     const navigate = useNavigate();
 
@@ -253,6 +256,8 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     };
 
     const changeSettings = (settings: Partial<ExportWebUserSettings>) => {
+        // eslint-disable-next-line no-console
+        console.log(settings);
         if (!authUser) return;
         const newSettings = {
             ...serverSettings,
@@ -282,7 +287,13 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                     const serverColumns = columns.filter((column) =>
                         uniqueColumns.find((col) => col === column.field)
                     );
-                    setActiveColumns(serverColumns);
+                    const serverServiceColumns = serviceColumns.filter((column) =>
+                        uniqueColumns.find((col) => col === column.field)
+                    );
+                    setActiveColumns([
+                        ...serverColumns,
+                        ...(serverServiceColumns as TableColumnsList[]),
+                    ]);
                 } else {
                     setActiveColumns(columns.filter(({ checked }) => checked));
                 }
@@ -738,6 +749,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                             className='text export-web__icon-button'
                                             icon='icon adms-edit-item'
                                             onClick={() => {
+                                                inventoryStore.memoRoute = currentPath;
                                                 navigate(`/dashboard/inventory/${options.itemuid}`);
                                             }}
                                         />
@@ -814,6 +826,36 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                     header={header}
                                     key={field}
                                     sortable
+                                    editor={(options) => {
+                                        const field: keyof ExportWebList | string = options.field;
+                                        if (field === "Price") {
+                                            return (
+                                                <InputNumber
+                                                    className='export-web__edit-input'
+                                                    {...options}
+                                                    value={options.value.replace(/[^\d.]/g, "")}
+                                                    onChange={(e) => {
+                                                        setExportsToWeb(
+                                                            exportsToWeb.map((item) => {
+                                                                if (
+                                                                    item.itemuid ===
+                                                                    options.rowData.itemuid
+                                                                ) {
+                                                                    return {
+                                                                        ...item,
+                                                                        [field]: e.value || 0,
+                                                                    };
+                                                                }
+                                                                return item;
+                                                            })
+                                                        );
+                                                    }}
+                                                />
+                                            );
+                                        } else {
+                                            return options.value;
+                                        }
+                                    }}
                                     body={(data, { rowIndex }) => {
                                         return (
                                             <div
