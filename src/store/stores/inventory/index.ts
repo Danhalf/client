@@ -23,6 +23,7 @@ import {
     getInventoryPrintForms,
     setInventoryExportWeb,
     getInventoryWebCheck,
+    setInventoryWebCheck,
 } from "http/services/inventory-service";
 import {
     getInventoryMediaItemList,
@@ -412,8 +413,14 @@ export class InventoryStore {
                 };
                 const webResponse = await setInventoryExportWeb(inventoryuid, this._exportWeb);
                 const inventoryResponse = await setInventory(inventoryuid, inventoryData);
-                await Promise.all([inventoryResponse, webResponse]).then((response) =>
-                    response.every((item) => item?.status === Status.OK) ? inventoryuid : undefined
+                const InventoryWebCheck = await setInventoryWebCheck(inventoryuid, {
+                    enabled: !!this._exportWebActive ? 1 : 0,
+                });
+                await Promise.all([inventoryResponse, webResponse, InventoryWebCheck]).then(
+                    (response) =>
+                        response.every((item) => item?.status === Status.OK)
+                            ? inventoryuid
+                            : undefined
                 );
             } catch (error) {
                 // TODO: add error handlers

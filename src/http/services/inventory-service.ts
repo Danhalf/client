@@ -273,3 +273,25 @@ export const checkStockNoAvailability = async (stockno: string) => {
         }
     }
 };
+
+export const setInventoryWebCheck = async (
+    inventoryuid: string,
+    { enabled }: Pick<InventoryWebCheck, "enabled">
+) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `inventory/${inventoryuid}/webcheck`,
+            { enabled }
+        );
+        if (response.data.status === Status.OK) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error,
+            };
+        }
+    }
+};
