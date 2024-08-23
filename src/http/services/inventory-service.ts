@@ -13,6 +13,7 @@ import {
     InventoryPrintForm,
     InventoryLocations,
     InventoryStockNumber,
+    InventoryWebCheck,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -110,6 +111,22 @@ export const getInventoryDeleteReasonsList = async (
         } else throw new Error();
     } catch (error) {
         return error;
+    }
+};
+
+export const getInventoryWebCheck = async (inventoryuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<InventoryWebCheck>(
+            `inventory/${inventoryuid}/webcheck`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting inventory web check",
+            };
+        }
     }
 };
 

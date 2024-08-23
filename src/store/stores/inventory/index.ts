@@ -12,6 +12,7 @@ import {
     Audit,
     InventoryMediaPostData,
     InventoryMedia,
+    InventoryWebCheck,
 } from "common/models/inventory";
 import { getAccountPayment } from "http/services/accounts.service";
 import {
@@ -21,6 +22,7 @@ import {
     getInventoryWebInfoHistory,
     getInventoryPrintForms,
     setInventoryExportWeb,
+    getInventoryWebCheck,
 } from "http/services/inventory-service";
 import {
     getInventoryMediaItemList,
@@ -351,6 +353,30 @@ export class InventoryStore {
             (inventoryAudit as Record<typeof key, string | number>)[key] = newValue;
         }
     });
+
+    public getWebCheckStatus = async (id = this._inventoryID) => {
+        this._isLoading = true;
+        try {
+            const response = await getInventoryWebCheck(id);
+            if (response?.status === Status.OK) {
+                const { enabled } = response as InventoryWebCheck;
+                this._exportWebActive = !!enabled;
+            } else {
+                const { error } = response as BaseResponseError;
+                throw new Error(error);
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                return {
+                    status: Status.ERROR,
+                    error: error.message,
+                };
+            }
+            return undefined;
+        } finally {
+            this._isLoading = false;
+        }
+    };
 
     public changeExportWeb = action(
         ({ key, value }: { key: keyof InventoryWebInfo; value: string | number }) => {
