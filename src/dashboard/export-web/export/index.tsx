@@ -596,7 +596,6 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
             return (
                 <InputText
                     className='export-web__edit-input'
-                    {...options}
                     value={exportsToWeb[options.rowIndex!].ListPrice}
                     onChange={({ target }) => {
                         const value = target.value.replace(/[^0-9.]/g, "");
@@ -621,7 +620,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                 }) || null;
                             value &&
                                 setInventoryExportWeb(options.rowData.itemuid, {
-                                    ListPrice: parseFloat(value.ListPrice) * 100,
+                                    ListPrice: value.ListPrice,
                                 }).then(() => handleGetExportWebList());
                         }
                     }}
@@ -878,6 +877,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                     selectedInventories[rowIndex] && "row--selected"
                                                 }`}
                                             >
+                                                {field === "ListPrice" ? "$" : ""}
                                                 {data[field]}
                                             </div>
                                         );

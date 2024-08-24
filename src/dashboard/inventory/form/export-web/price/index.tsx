@@ -56,7 +56,7 @@ export const ExportWebPrice = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <CurrencyInput
-                    value={ListPrice}
+                    value={parseFloat(ListPrice)}
                     labelPosition='top'
                     title='List price'
                     onChange={({ value }) => value && changeExportWeb({ key: "ListPrice", value })}
