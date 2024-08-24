@@ -13,7 +13,7 @@ import {
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column, ColumnProps } from "primereact/column";
+import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
 import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
 import {
     addExportTask,
@@ -256,8 +256,6 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     };
 
     const changeSettings = (settings: Partial<ExportWebUserSettings>) => {
-        // eslint-disable-next-line no-console
-        console.log(settings);
         if (!authUser) return;
         const newSettings = {
             ...serverSettings,
@@ -588,6 +586,34 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         });
     };
 
+    const handlePriceEdit = (options: ColumnEditorOptions) => {
+        const field: keyof ExportWebList | string = options.field;
+        if (field === "Price") {
+            return (
+                <InputNumber
+                    className='export-web__edit-input'
+                    {...options}
+                    value={options.value.replace(/[^\d.]/g, "")}
+                    onChange={(e) => {
+                        setExportsToWeb(
+                            exportsToWeb.map((item) => {
+                                if (item.itemuid === options.rowData.itemuid) {
+                                    return {
+                                        ...item,
+                                        [field]: e.value || 0,
+                                    };
+                                }
+                                return item;
+                            })
+                        );
+                    }}
+                />
+            );
+        } else {
+            return options.value;
+        }
+    };
+
     return (
         <div className='card-content'>
             <div className='grid datatable-controls'>
@@ -826,36 +852,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                     header={header}
                                     key={field}
                                     sortable
-                                    editor={(options) => {
-                                        const field: keyof ExportWebList | string = options.field;
-                                        if (field === "Price") {
-                                            return (
-                                                <InputNumber
-                                                    className='export-web__edit-input'
-                                                    {...options}
-                                                    value={options.value.replace(/[^\d.]/g, "")}
-                                                    onChange={(e) => {
-                                                        setExportsToWeb(
-                                                            exportsToWeb.map((item) => {
-                                                                if (
-                                                                    item.itemuid ===
-                                                                    options.rowData.itemuid
-                                                                ) {
-                                                                    return {
-                                                                        ...item,
-                                                                        [field]: e.value || 0,
-                                                                    };
-                                                                }
-                                                                return item;
-                                                            })
-                                                        );
-                                                    }}
-                                                />
-                                            );
-                                        } else {
-                                            return options.value;
-                                        }
-                                    }}
+                                    editor={handlePriceEdit}
                                     body={(data, { rowIndex }) => {
                                         return (
                                             <div
