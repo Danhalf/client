@@ -142,7 +142,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const rowExpansionTemplate = (data: ExportWebList) => {
         return (
             <div className='expanded-row'>
-                <div className='expanded-row__label'>Dealer comment: </div>
+                <div className='expanded-row__label'>Dealer comment:</div>
                 <div className='expanded-row__text'>{data.DealerComments || ""}</div>
             </div>
         );
@@ -828,7 +828,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                         </div>
                                     )}
                                     headerTooltip={field}
-                                    body={({ ListPrice }: ExportWebList, { rowIndex }) => {
+                                    body={({ rowIndex }) => {
                                         return (
                                             <div
                                                 className={`export-web-service ${
@@ -871,14 +871,20 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                     sortable
                                     editor={handlePriceEdit}
                                     body={(data, { rowIndex }) => {
+                                        let value: string | number;
+                                        if (field === "VIN") {
+                                            value = data[field].toUpperCase();
+                                        } else {
+                                            value = data[field];
+                                        }
+
                                         return (
                                             <div
                                                 className={`${
                                                     selectedInventories[rowIndex] && "row--selected"
                                                 }`}
                                             >
-                                                {field === "ListPrice" ? "$" : ""}
-                                                {data[field]}
+                                                {field === "ListPrice" ? "$" : null} {value}
                                             </div>
                                         );
                                     }}

@@ -48,7 +48,7 @@ export const VINDecoder = ({
             <InputText
                 {...props}
                 className={`vin-decoder__text-input ${props.className}`}
-                value={value}
+                value={value?.toUpperCase()}
                 onChange={handleInputChange}
             />
             <Button
