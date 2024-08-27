@@ -73,6 +73,7 @@
 }
 .report-controls__dropdown {
     width: 370px;
+    text-transform: capitalize;
 }
 
 .report-control {
