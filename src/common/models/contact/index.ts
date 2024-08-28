@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { BaseResponse, BaseResponseError } from "../base-response";
 
 export interface ContactExtData {

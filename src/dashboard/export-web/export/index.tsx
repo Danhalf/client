@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { ReactElement, useEffect, useState } from "react";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import {
