@@ -342,7 +342,6 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         setCurrentParams(params);
 
         handleGetExportWebList(params);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [globalSearch, lazyState, selectedFilterOptions, settingsLoaded]);
 
     const dropdownHeaderPanel = (

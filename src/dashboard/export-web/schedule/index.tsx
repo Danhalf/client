@@ -155,7 +155,6 @@ export const ExportSchedule = (): ReactElement => {
 
             handleGetExportScheduleList(params);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lazyState, settingsLoaded]);
 
     const handleCheckboxChange = () => {
