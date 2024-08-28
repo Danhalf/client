@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { AxiosResponse, isAxiosError } from "axios";
-import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
+import { BaseResponse, Status } from "common/models/base-response";
 import {
     Inventory,
     TotalInventoryList,
