@@ -101,7 +101,7 @@ export const ReportForm = observer((): ReactElement => {
                                                 {documents &&
                                                     documents.map((report) => (
                                                         <Button
-                                                            className='report__list-item'
+                                                            className='report__list-item w-full'
                                                             key={report.itemUID}
                                                             text
                                                             onClick={() =>
