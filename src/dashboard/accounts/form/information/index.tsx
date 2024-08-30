@@ -6,6 +6,7 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { AppColors } from "common/models/css-variables";
+import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
 
 export const AccountInformation = observer((): ReactElement => {
     const store = useStore().accountStore;
@@ -123,7 +124,9 @@ export const AccountInformation = observer((): ReactElement => {
                     />
                     <Button
                         className='account-info__button'
-                        onClick={() => navigate(`take-payment`)}
+                        onClick={() =>
+                            navigate(`take-payment?tab=${AccountTakePaymentTabs.PAY_OFF}`)
+                        }
                         outlined
                     >
                         Calculate Payoff
