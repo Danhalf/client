@@ -115,7 +115,7 @@ export const AccountPayOff = observer((): ReactElement => {
                 </div>
 
                 <div className='take-payment__card mt-3'>
-                    <h3 className='take-payment__title'>White Offs</h3>
+                    <h3 className='take-payment__title'>White Offs:</h3>
                     <div className='take-payment__item'>
                         <Checkbox checked inputId='whiteOffs' />
                         <label className='take-payment__label'>
