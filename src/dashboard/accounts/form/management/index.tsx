@@ -5,10 +5,14 @@ import { DataTable } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { listAccountActivity } from "http/services/accounts.service";
 import { ACCOUNT_ACTIVITY_LIST } from "common/constants/account-options";
 import { AccountListActivity } from "common/models/accounts";
+import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
+import { useToast } from "dashboard/common/toast";
+import { SplitButton } from "primereact/splitbutton";
+import { AddFeeDialog } from "./add-fee-dialog";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountListActivity;
@@ -21,10 +25,43 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
     { field: "Credit", header: "Credit" },
 ];
 
+const quickPayPath = `take-payment?tab=${AccountTakePaymentTabs.QUICK_PAY}`;
+
 export const AccountManagement = (): ReactElement => {
     const { id } = useParams();
+    const toast = useToast();
+    const navigate = useNavigate();
     const [activityList, setActivityList] = useState<AccountListActivity[]>([]);
+    const [isDialogActive, setIsDialogActive] = useState<boolean>(false);
     const [selectedActivity, setSelectedActivity] = useState<string>(ACCOUNT_ACTIVITY_LIST[0].name);
+
+    const printItems = [
+        {
+            label: "Print receipt",
+            icon: "icon adms-blank",
+            command: () => {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Updated",
+                    detail: "Data Updated",
+                });
+            },
+        },
+    ];
+
+    const downloadItems = [
+        {
+            label: "Download receipt",
+            icon: "icon adms-blank",
+            command: () => {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Updated",
+                    detail: "Data Updated",
+                });
+            },
+        },
+    ];
 
     useEffect(() => {
         if (id) {
@@ -46,8 +83,18 @@ export const AccountManagement = (): ReactElement => {
                         optionValue='name'
                         optionLabel='name'
                     />
-                    <Button className='account-management__button ml-auto' label='Take Payment' />
-                    <Button className='account-management__button' label='Add Fee' />
+                    <Button
+                        className='account-management__button ml-auto'
+                        label='Add Fee'
+                        onClick={() => setIsDialogActive(true)}
+                        outlined
+                    />
+                    <Button
+                        className='account-management__button'
+                        label='Take Payment'
+                        outlined
+                        onClick={() => navigate(quickPayPath)}
+                    />
                 </div>
                 <div className='col-12 account__table'>
                     <DataTable
@@ -60,7 +107,7 @@ export const AccountManagement = (): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={(options) => {
+                            body={() => {
                                 return (
                                     <div className='flex gap-3 align-items-center'>
                                         <Checkbox checked={false} />
@@ -89,11 +136,32 @@ export const AccountManagement = (): ReactElement => {
                 </div>
                 {!!activityList.length && (
                     <div className='col-12 flex gap-3 align-items-end justify-content-start account-management__actions'>
-                        <Button className='account-management__button'>Print</Button>
-                        <Button className='account-management__button'>Download</Button>
+                        <SplitButton
+                            model={printItems}
+                            className='account-management__button'
+                            label='Print'
+                            icon='pi pi-table'
+                            tooltip='Print table'
+                            tooltipOptions={{
+                                position: "bottom",
+                            }}
+                            outlined
+                        />
+                        <SplitButton
+                            model={downloadItems}
+                            className='account-management__button'
+                            label='Download'
+                            icon='pi pi-table'
+                            tooltip='Download table'
+                            tooltipOptions={{
+                                position: "bottom",
+                            }}
+                            outlined
+                        />
                     </div>
                 )}
             </div>
+            <AddFeeDialog visible={isDialogActive} onHide={() => setIsDialogActive(false)} />
         </div>
     );
 };

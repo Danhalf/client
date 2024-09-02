@@ -1,8 +1,18 @@
 .account-management__button {
+    width: 245px;
+    font-weight: 700;
+}
+
+.account-management__button .p-button {
     display: inline-flex;
+    flex-direction: row-reverse;
     align-items: center;
     justify-content: center;
     height: 54px;
-    width: 210px;
     font-weight: 700;
+}
+
+.account-management__button.p-splitbutton .p-splitbutton-defaultbutton .p-button-label {
+    flex: 0;
+    padding-right: 15px;
 }
