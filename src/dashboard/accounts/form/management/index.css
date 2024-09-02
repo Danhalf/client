@@ -1,6 +1,7 @@
 .account-management__button {
     width: 245px;
     font-weight: 700;
+    font-size: 22px;
 }
 
 .account-management__button .p-button {
@@ -10,9 +11,4 @@
     justify-content: center;
     height: 54px;
     font-weight: 700;
-}
-
-.account-management__button.p-splitbutton .p-splitbutton-defaultbutton .p-button-label {
-    flex: 0;
-    padding-right: 15px;
 }

@@ -138,7 +138,7 @@ export const AccountManagement = (): ReactElement => {
                     <div className='col-12 flex gap-3 align-items-end justify-content-start account-management__actions'>
                         <SplitButton
                             model={printItems}
-                            className='account-management__button'
+                            className='account__split-button'
                             label='Print'
                             icon='pi pi-table'
                             tooltip='Print table'
@@ -149,7 +149,7 @@ export const AccountManagement = (): ReactElement => {
                         />
                         <SplitButton
                             model={downloadItems}
-                            className='account-management__button'
+                            className='account__split-button'
                             label='Download'
                             icon='pi pi-table'
                             tooltip='Download table'

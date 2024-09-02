@@ -14,7 +14,8 @@ import {
     MultiSelectChangeEvent,
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
-import { Menubar } from "primereact/menubar";
+import { SplitButton } from "primereact/splitbutton";
+import { useToast } from "dashboard/common/toast";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -41,6 +42,7 @@ const renderColumnsData: TableColumnsList[] = [
 
 export const AccountPaymentHistory = (): ReactElement => {
     const { id } = useParams();
+    const toast = useToast();
     const [historyList, setHistoryList] = useState<AccountHistory[]>([]);
     const [selectedPayment, setSelectedPayment] = useState<string>(
         ACCOUNT_PAYMENT_STATUS_LIST[0].name
@@ -60,6 +62,58 @@ export const AccountPaymentHistory = (): ReactElement => {
         }
         setActiveColumns(renderColumnsData.filter(({ checked }) => checked));
     }, [id]);
+
+    const printItems = [
+        {
+            label: "Print receipt",
+            icon: "icon adms-blank",
+            command: () => {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Updated",
+                    detail: "Data Updated",
+                });
+            },
+        },
+    ];
+
+    const downloadItems = [
+        {
+            label: "Download receipt",
+            icon: "icon adms-blank",
+            command: () => {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Updated",
+                    detail: "Data Updated",
+                });
+            },
+        },
+    ];
+    const takePaymentItems = [
+        {
+            label: "Add Note",
+            icon: "icon adms-calendar",
+            command: () => {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Updated",
+                    detail: "Data Updated",
+                });
+            },
+        },
+        {
+            label: "Delete Payment",
+            icon: "icon adms-close",
+            command: () => {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Updated",
+                    detail: "Data Updated",
+                });
+            },
+        },
+    ];
 
     const dropdownHeaderPanel = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
         return (
@@ -158,23 +212,15 @@ export const AccountPaymentHistory = (): ReactElement => {
                             },
                         }}
                     />
-                    <Menubar
-                        className='account-menubar ml-auto'
-                        model={[
-                            {
-                                label: "Take Payment",
-                                items: [
-                                    {
-                                        label: "Add Note",
-                                        icon: "icon adms-calendar",
-                                    },
-                                    {
-                                        label: "Delete Payment",
-                                        icon: "icon adms-close",
-                                    },
-                                ],
-                            },
-                        ]}
+                    <SplitButton
+                        model={takePaymentItems}
+                        className='account__split-button ml-auto'
+                        label='Take Payment'
+                        tooltip='Take Payment'
+                        tooltipOptions={{
+                            position: "bottom",
+                        }}
+                        outlined
                     />
                 </div>
                 <div className='col-12 account__table'>
@@ -246,8 +292,28 @@ export const AccountPaymentHistory = (): ReactElement => {
                 </div>
                 {!!historyList.length && (
                     <div className='col-12 flex gap-3'>
-                        <Button className='account-history__button'>Print</Button>
-                        <Button className='account-history__button'>Download</Button>
+                        <SplitButton
+                            model={printItems}
+                            className='account__split-button'
+                            label='Print'
+                            icon='pi pi-table'
+                            tooltip='Print table'
+                            tooltipOptions={{
+                                position: "bottom",
+                            }}
+                            outlined
+                        />
+                        <SplitButton
+                            model={downloadItems}
+                            className='account__split-button'
+                            label='Download'
+                            icon='pi pi-table'
+                            tooltip='Download table'
+                            tooltipOptions={{
+                                position: "bottom",
+                            }}
+                            outlined
+                        />
                     </div>
                 )}
             </div>

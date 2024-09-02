@@ -6,8 +6,9 @@ import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { listAccountDownPayments } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
-import { Menubar } from "primereact/menubar";
 import { AccountDownPayments } from "common/models/accounts";
+import { useToast } from "dashboard/common/toast";
+import { SplitButton } from "primereact/splitbutton";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountDownPayments;
@@ -22,6 +23,7 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
 
 export const AccountDownPayment = (): ReactElement => {
     const { id } = useParams();
+    const toast = useToast();
     const [paymentList, setPaymentList] = useState<AccountDownPayments[]>([]);
 
     useEffect(() => {
@@ -31,6 +33,20 @@ export const AccountDownPayment = (): ReactElement => {
             });
         }
     }, [id]);
+
+    const takePaymentItems = [
+        {
+            label: "Delete Payment",
+            icon: "icon adms-close",
+            command: () => {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Updated",
+                    detail: "Data Updated",
+                });
+            },
+        },
+    ];
 
     return (
         <div className='down-payment account-card'>
@@ -57,19 +73,15 @@ export const AccountDownPayment = (): ReactElement => {
 
             <div className='grid account__body'>
                 <div className='col-3 ml-auto'>
-                    <Menubar
-                        className='account-menubar ml-auto'
-                        model={[
-                            {
-                                label: "Take Payment",
-                                items: [
-                                    {
-                                        label: "Delete Payment",
-                                        icon: "icon adms-close",
-                                    },
-                                ],
-                            },
-                        ]}
+                    <SplitButton
+                        model={takePaymentItems}
+                        className='account__split-button ml-auto'
+                        label='Take Payment'
+                        tooltip='Take Payment'
+                        tooltipOptions={{
+                            position: "bottom",
+                        }}
+                        outlined
                     />
                 </div>
                 <div className='col-12'>
