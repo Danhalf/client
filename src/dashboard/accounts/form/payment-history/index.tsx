@@ -5,7 +5,7 @@ import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/da
 import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { listAccountHistory } from "http/services/accounts.service";
 import { AccountHistory } from "common/models/accounts";
 import { ACCOUNT_PAYMENT_STATUS_LIST } from "common/constants/account-options";
@@ -15,7 +15,8 @@ import {
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
 import { SplitButton } from "primereact/splitbutton";
-import { useToast } from "dashboard/common/toast";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -40,16 +41,27 @@ const renderColumnsData: TableColumnsList[] = [
     { field: "Fees_Memo", header: "Misc/Fees", checked: false },
 ];
 
+enum ModalErrors {
+    TITLE_NO_RECEIPT = "Receipt is not Selected!",
+    TEXT_NO_PRINT_RECEIPT = "No receipt has been selected for printing. Please select a receipt and try again.",
+    TEXT_NO_DOWNLOAD_RECEIPT = "No receipt has been selected for downloading. Please select a receipt and try again.",
+    TITLE_NO_PAYMENT = "Payment is not Selected!",
+    TEXT_NO_PAYMENT_DELETE = "No payment has been selected for deleting. Please select a payment and try again.",
+}
+
 export const AccountPaymentHistory = (): ReactElement => {
     const { id } = useParams();
-    const toast = useToast();
     const [historyList, setHistoryList] = useState<AccountHistory[]>([]);
     const [selectedPayment, setSelectedPayment] = useState<string>(
         ACCOUNT_PAYMENT_STATUS_LIST[0].name
     );
+    const navigate = useNavigate();
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [modalTitle, setModalTitle] = useState<string>("");
+    const [modalText, setModalText] = useState<string>("");
 
     useEffect(() => {
         if (id) {
@@ -68,11 +80,9 @@ export const AccountPaymentHistory = (): ReactElement => {
             label: "Print receipt",
             icon: "icon adms-blank",
             command: () => {
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Updated",
-                    detail: "Data Updated",
-                });
+                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                setModalVisible(true);
             },
         },
     ];
@@ -82,35 +92,28 @@ export const AccountPaymentHistory = (): ReactElement => {
             label: "Download receipt",
             icon: "icon adms-blank",
             command: () => {
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Updated",
-                    detail: "Data Updated",
-                });
+                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                setModalVisible(true);
             },
         },
     ];
+
     const takePaymentItems = [
         {
             label: "Add Note",
             icon: "icon adms-calendar",
             command: () => {
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Updated",
-                    detail: "Data Updated",
-                });
+                navigate(`take-payment?tab=${AccountTakePaymentTabs.QUICK_PAY}`);
             },
         },
         {
             label: "Delete Payment",
             icon: "icon adms-close",
             command: () => {
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Updated",
-                    detail: "Data Updated",
-                });
+                setModalTitle(ModalErrors.TITLE_NO_PAYMENT);
+                setModalText(ModalErrors.TEXT_NO_PAYMENT_DELETE);
+                setModalVisible(true);
             },
         },
     ];
@@ -220,6 +223,9 @@ export const AccountPaymentHistory = (): ReactElement => {
                         tooltipOptions={{
                             position: "bottom",
                         }}
+                        onClick={() =>
+                            navigate(`take-payment?tab=${AccountTakePaymentTabs.QUICK_PAY}`)
+                        }
                         outlined
                     />
                 </div>
@@ -301,6 +307,11 @@ export const AccountPaymentHistory = (): ReactElement => {
                             tooltipOptions={{
                                 position: "bottom",
                             }}
+                            onClick={() => {
+                                setModalVisible(true);
+                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                            }}
                             outlined
                         />
                         <SplitButton
@@ -312,11 +323,27 @@ export const AccountPaymentHistory = (): ReactElement => {
                             tooltipOptions={{
                                 position: "bottom",
                             }}
+                            onClick={() => {
+                                setModalVisible(true);
+                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                            }}
                             outlined
                         />
                     </div>
                 )}
             </div>
+            <ConfirmModal
+                visible={!!modalVisible}
+                title={modalTitle}
+                icon='pi-exclamation-triangle'
+                bodyMessage={modalText}
+                confirmAction={() => setModalVisible(false)}
+                draggable={false}
+                acceptLabel='Got It'
+                className='account-warning'
+                onHide={() => setModalVisible(false)}
+            />
         </div>
     );
 };

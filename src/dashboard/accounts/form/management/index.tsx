@@ -10,9 +10,9 @@ import { listAccountActivity } from "http/services/accounts.service";
 import { ACCOUNT_ACTIVITY_LIST } from "common/constants/account-options";
 import { AccountListActivity } from "common/models/accounts";
 import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
-import { useToast } from "dashboard/common/toast";
 import { SplitButton } from "primereact/splitbutton";
 import { AddFeeDialog } from "./add-fee-dialog";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountListActivity;
@@ -25,26 +25,32 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
     { field: "Credit", header: "Credit" },
 ];
 
+enum ModalErrors {
+    TITLE_NO_RECEIPT = "Receipt is not Selected!",
+    TEXT_NO_PRINT_RECEIPT = "No receipt has been selected for printing. Please select a receipt and try again.",
+    TEXT_NO_DOWNLOAD_RECEIPT = "No receipt has been selected for downloading. Please select a receipt and try again.",
+}
+
 const quickPayPath = `take-payment?tab=${AccountTakePaymentTabs.QUICK_PAY}`;
 
 export const AccountManagement = (): ReactElement => {
     const { id } = useParams();
-    const toast = useToast();
     const navigate = useNavigate();
     const [activityList, setActivityList] = useState<AccountListActivity[]>([]);
     const [isDialogActive, setIsDialogActive] = useState<boolean>(false);
     const [selectedActivity, setSelectedActivity] = useState<string>(ACCOUNT_ACTIVITY_LIST[0].name);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [modalTitle, setModalTitle] = useState<string>("");
+    const [modalText, setModalText] = useState<string>("");
 
     const printItems = [
         {
             label: "Print receipt",
             icon: "icon adms-blank",
             command: () => {
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Updated",
-                    detail: "Data Updated",
-                });
+                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                setModalVisible(true);
             },
         },
     ];
@@ -54,11 +60,9 @@ export const AccountManagement = (): ReactElement => {
             label: "Download receipt",
             icon: "icon adms-blank",
             command: () => {
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Updated",
-                    detail: "Data Updated",
-                });
+                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                setModalVisible(true);
             },
         },
     ];
@@ -145,6 +149,11 @@ export const AccountManagement = (): ReactElement => {
                             tooltipOptions={{
                                 position: "bottom",
                             }}
+                            onClick={() => {
+                                setModalVisible(true);
+                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                            }}
                             outlined
                         />
                         <SplitButton
@@ -156,11 +165,27 @@ export const AccountManagement = (): ReactElement => {
                             tooltipOptions={{
                                 position: "bottom",
                             }}
+                            onClick={() => {
+                                setModalVisible(true);
+                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                            }}
                             outlined
                         />
                     </div>
                 )}
             </div>
+            <ConfirmModal
+                visible={!!modalVisible}
+                title={modalTitle}
+                icon='pi-exclamation-triangle'
+                bodyMessage={modalText}
+                confirmAction={() => setModalVisible(false)}
+                draggable={false}
+                acceptLabel='Got It'
+                className='account-warning'
+                onHide={() => setModalVisible(false)}
+            />
             <AddFeeDialog visible={isDialogActive} onHide={() => setIsDialogActive(false)} />
         </div>
     );
