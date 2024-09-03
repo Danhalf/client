@@ -27,23 +27,23 @@ export const AccountQuickPay = observer((): ReactElement => {
                         <label className='take-payment__label'>Down Payment Balance:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item'>
+                    <div className='take-payment__item take-payment__item--red'>
                         <label className='take-payment__label'>Fees Balance:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item'>
+                    <div className='take-payment__item take-payment__item--red'>
                         <label className='take-payment__label flex-1'>
                             New late fees due as of ${currentDate}:
                         </label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item'>
+                    <div className='take-payment__item  take-payment__item--green'>
                         <label className='take-payment__label'>
                             Interest Due as of ${currentDate}:
                         </label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item'>
+                    <div className='take-payment__item  take-payment__item--green'>
                         <label className='take-payment__label'>Principal Balance:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
