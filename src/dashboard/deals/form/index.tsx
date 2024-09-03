@@ -388,7 +388,7 @@ export const DealsForm = observer(() => {
                                                     datepurchase: deal.datepurchase || DATE_NOW,
                                                     dateeffective: deal.dateeffective || DATE_NOW,
                                                     inventorystatus: deal.inventorystatus || "",
-                                                    accountuid: deal.accountuid || "",
+                                                    accountInfo: deal.accountInfo || "",
                                                     HowFoundOut: dealExtData?.HowFoundOut || "",
                                                     SaleID: dealExtData?.SaleID || "",
                                                     OdometerReading:
