@@ -27,30 +27,30 @@ export const AccountQuickPay = observer((): ReactElement => {
                         <label className='take-payment__label'>Down Payment Balance:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item take-payment__item--red'>
+                    <div className='take-payment__item color-red'>
                         <label className='take-payment__label'>Fees Balance:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item take-payment__item--red'>
+                    <div className='take-payment__item color-red'>
                         <label className='take-payment__label flex-1'>
                             New late fees due as of ${currentDate}:
                         </label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item  take-payment__item--green'>
+                    <div className='take-payment__item color-green'>
                         <label className='take-payment__label'>
                             Interest Due as of ${currentDate}:
                         </label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item  take-payment__item--green'>
+                    <div className='take-payment__item color-green'>
                         <label className='take-payment__label'>Principal Balance:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
 
                     <hr className='form-line' />
 
-                    <div className='take-payment__item take-payment__item--bold'>
+                    <div className='take-payment__item color-bold'>
                         <label className='take-payment__label flex-1'>
                             Total Payoff as of ${currentDate}:
                         </label>
@@ -93,19 +93,19 @@ export const AccountQuickPay = observer((): ReactElement => {
 
                     <h3 className='take-payment__title'>Breakdown of Total Paid</h3>
 
-                    <div className='take-payment__item'>
+                    <div className='take-payment__item color-dusty-blue'>
                         <label className='take-payment__label'>Down/ Pickup:</label>
                         <CurrencyInput value={0} />
                     </div>
-                    <div className='take-payment__item'>
+                    <div className='take-payment__item color-red'>
                         <label className='take-payment__label'>Fees:</label>
                         <CurrencyInput value={0} />
                     </div>
-                    <div className='take-payment__item'>
+                    <div className='take-payment__item color-green'>
                         <label className='take-payment__label'>Direct to Principal:</label>
                         <CurrencyInput value={0} />
                     </div>
-                    <div className='take-payment__item'>
+                    <div className='take-payment__item color-green'>
                         <label className='take-payment__label'>Contract Payment:</label>
                         <CurrencyInput value={0} />
                     </div>
@@ -140,31 +140,33 @@ export const AccountQuickPay = observer((): ReactElement => {
                 <div className='take-payment__card mt-3'>
                     <h3 className='take-payment__title'>Payment Distribution</h3>
                     <div className='take-payment__item'>
-                        <label className='take-payment__label'>Down/ Pickup Pmt:</label>
+                        <label className='take-payment__label color-dusty-blue'>
+                            Down/ Pickup Pmt:
+                        </label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item'>
+                    <div className='take-payment__item color-red'>
                         <label className='take-payment__label'>Fees:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item take-payment__item--opacity'>
+                    <div className='take-payment__item color-green'>
                         <label className='take-payment__label'>Principal:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item take-payment__item--opacity'>
+                    <div className='take-payment__item color-green'>
                         <label className='take-payment__label'>Additional Principal:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item take-payment__item--opacity'>
+                    <div className='take-payment__item color-green'>
                         <label className='take-payment__label'>Interest:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item'>
+                    <div className='take-payment__item color-purple'>
                         <label className='take-payment__label'>Taxes Paid:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
                     <div className='take-payment__item'>
-                        <label className='take-payment__label'>Total Paid:</label>
+                        <label className='take-payment__label color-deep-blue'>Total Paid:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
 
@@ -182,18 +184,20 @@ export const AccountQuickPay = observer((): ReactElement => {
                     <hr className='form-line' />
 
                     <div className='take-payment__item'>
-                        <label className='take-payment__label'>New Acct Balance:</label>
+                        <label className='take-payment__label color-green'>New Acct Balance:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
                     <div className='take-payment__item'>
-                        <label className='take-payment__label'>New Down Pmt Balance:</label>
+                        <label className='take-payment__label color-violet'>
+                            New Down Pmt Balance:
+                        </label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
                     <div className='take-payment__item'>
-                        <label className='take-payment__label'>New Fees Added:</label>
+                        <label className='take-payment__label color-red'>New Fees Added:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
-                    <div className='take-payment__item'>
+                    <div className='take-payment__item color-red'>
                         <label className='take-payment__label'>New Fees Balance:</label>
                         <span className='take-payment__value'>$ 0.00</span>
                     </div>
