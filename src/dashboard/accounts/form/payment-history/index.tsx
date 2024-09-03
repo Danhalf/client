@@ -17,6 +17,8 @@ import {
 import { SplitButton } from "primereact/splitbutton";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
+import { AddPaymentNoteDialog } from "./add-payment-note";
+import { AddNoteDialog } from "../notes/add-note-dialog";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -59,6 +61,8 @@ export const AccountPaymentHistory = (): ReactElement => {
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
+    const [paymentDialogVisible, setPaymentDialogVisible] = useState<boolean>(false);
+    const [noteDialogVisible, setNoteDialogVisible] = useState<boolean>(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalTitle, setModalTitle] = useState<string>("");
     const [modalText, setModalText] = useState<string>("");
@@ -104,7 +108,11 @@ export const AccountPaymentHistory = (): ReactElement => {
             label: "Add Note",
             icon: "icon adms-calendar",
             command: () => {
-                navigate(`take-payment?tab=${AccountTakePaymentTabs.QUICK_PAY}`);
+                if (!!selectedRows.length) {
+                    setPaymentDialogVisible(true);
+                } else {
+                    setNoteDialogVisible(true);
+                }
             },
         },
         {
@@ -333,6 +341,18 @@ export const AccountPaymentHistory = (): ReactElement => {
                     </div>
                 )}
             </div>
+            <AddPaymentNoteDialog
+                action={() => setPaymentDialogVisible(false)}
+                onHide={() => setPaymentDialogVisible(false)}
+                visible={paymentDialogVisible}
+                accountuid={id}
+            />
+            <AddNoteDialog
+                action={() => setNoteDialogVisible(false)}
+                onHide={() => setNoteDialogVisible(false)}
+                visible={noteDialogVisible}
+                accountuid={id}
+            />
             <ConfirmModal
                 visible={!!modalVisible}
                 title={modalTitle}
