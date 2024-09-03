@@ -359,7 +359,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                     : newColumns.filter(({ checked }) => checked)
                             );
                             changeSettings({
-                                activeColumns: !isChecked
+                                activeColumns: isChecked
                                     ? []
                                     : newColumns.map(({ field }) => field),
                             });
