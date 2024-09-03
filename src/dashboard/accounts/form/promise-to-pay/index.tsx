@@ -10,6 +10,7 @@ import { listAccountPromises } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { AccountPromise } from "common/models/accounts";
 import { Menubar } from "primereact/menubar";
+import { SplitButton } from "primereact/splitbutton";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -42,6 +43,54 @@ export const AccountPromiseToPay = (): ReactElement => {
             });
     }, [id]);
 
+    const promiseItems = [
+        {
+            label: "Set Paid Late",
+            icon: `pi pi-circle${selectedPaid === PAID_STATUS.LATE ? "-fill" : ""}`,
+            command: () => {
+                setSelectedPaid(PAID_STATUS.LATE);
+            },
+        },
+        {
+            label: "Set Promise Broken",
+            icon: `pi pi-circle${selectedPaid === PAID_STATUS.BROKEN ? "-fill" : ""}`,
+            command: () => {
+                setSelectedPaid(PAID_STATUS.BROKEN);
+            },
+        },
+        {
+            label: "Set Outstanding",
+            icon: `pi pi-circle${selectedPaid === PAID_STATUS.OUTSTANDING ? "-fill" : ""}`,
+            command: () => {
+                setSelectedPaid(PAID_STATUS.OUTSTANDING);
+            },
+        },
+    ];
+
+    const paymentItems = [
+        {
+            label: "Set Paid Late",
+            icon: `pi pi-circle${selectedPaid === PAID_STATUS.LATE ? "-fill" : ""}`,
+            command: () => {
+                setSelectedPaid(PAID_STATUS.LATE);
+            },
+        },
+        {
+            label: "Set Promise Broken",
+            icon: `pi pi-circle${selectedPaid === PAID_STATUS.BROKEN ? "-fill" : ""}`,
+            command: () => {
+                setSelectedPaid(PAID_STATUS.BROKEN);
+            },
+        },
+        {
+            label: "Set Outstanding",
+            icon: `pi pi-circle${selectedPaid === PAID_STATUS.OUTSTANDING ? "-fill" : ""}`,
+            command: () => {
+                setSelectedPaid(PAID_STATUS.OUTSTANDING);
+            },
+        },
+    ];
+
     return (
         <div className='account-promise account-card'>
             <h3 className='account-promise__title account-title'>Promise to pay</h3>
@@ -53,42 +102,19 @@ export const AccountPromiseToPay = (): ReactElement => {
                         value={promiseStatus}
                         onChange={(e) => setPromiseStatus(e.value)}
                     />
-                    <Menubar
-                        className='account-menubar ml-auto account-promise__menubar'
-                        model={[
-                            {
-                                label: "Set Paid As Promised",
-                                items: [
-                                    {
-                                        label: "Set Paid Late",
-                                        icon: `pi pi-circle${
-                                            selectedPaid === PAID_STATUS.LATE ? "-fill" : ""
-                                        }`,
-                                        command: () => {
-                                            setSelectedPaid(PAID_STATUS.LATE);
-                                        },
-                                    },
-                                    {
-                                        label: "Set Promise Broken",
-                                        icon: `pi pi-circle${
-                                            selectedPaid === PAID_STATUS.BROKEN ? "-fill" : ""
-                                        }`,
-                                        command: () => {
-                                            setSelectedPaid(PAID_STATUS.BROKEN);
-                                        },
-                                    },
-                                    {
-                                        label: "Set Outstanding",
-                                        icon: `pi pi-circle${
-                                            selectedPaid === PAID_STATUS.OUTSTANDING ? "-fill" : ""
-                                        }`,
-                                        command: () => {
-                                            setSelectedPaid(PAID_STATUS.OUTSTANDING);
-                                        },
-                                    },
-                                ],
-                            },
-                        ]}
+                    <SplitButton
+                        model={paymentItems}
+                        className='account__split-button ml-auto'
+                        label='Set Paid As Promised'
+                        tooltip='Set Paid As Promised'
+                        tooltipOptions={{
+                            position: "bottom",
+                        }}
+                        onClick={
+                            () => {}
+                            // navigate(`take-payment?tab=${AccountTakePaymentTabs.QUICK_PAY}`)
+                        }
+                        outlined
                     />
                 </div>
                 <div className='col-12 account__table'>
@@ -103,7 +129,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={(options) => {
+                            body={() => {
                                 return (
                                     <div className='flex gap-3 align-items-center'>
                                         <Checkbox checked={false} />
