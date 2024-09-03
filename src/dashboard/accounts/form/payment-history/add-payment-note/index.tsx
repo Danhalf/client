@@ -1,9 +1,10 @@
+import { AccountHistory } from "common/models/accounts";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { TextInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
-import { addAccountNote } from "http/services/accounts.service";
+import { setOrUpdateHistoryInfo } from "http/services/accounts.service";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { useStore } from "store/hooks";
@@ -13,6 +14,7 @@ interface AddNoteDialogProps {
     accountuid?: string;
     action: () => void;
     onHide: () => void;
+    payments: AccountHistory[];
 }
 
 export const AddPaymentNoteDialog = ({
@@ -20,13 +22,14 @@ export const AddPaymentNoteDialog = ({
     onHide,
     action,
     accountuid,
+    payments,
 }: AddNoteDialogProps): ReactElement => {
     const toast = useToast();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [noteTaker, setNoteTaker] = useState<string>(authUser?.loginname || "");
-    const [note, setNote] = useState<string>("");
+    const [note, setNote] = useState<string>(payments[0]?.Comment || "");
     const currentTime = useMemo(
         () => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
         []
@@ -39,30 +42,32 @@ export const AddPaymentNoteDialog = ({
     }, [note, noteTaker]);
 
     const handleAddNote = () => {
-        accountuid &&
-            addAccountNote(accountuid, {
-                NoteBy: noteTaker,
-                Note: note,
-            }).then((res) => {
-                if (res && res.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: res.error,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    toast.current?.show({
-                        severity: "success",
-                        summary: "Success",
-                        detail: "Note added successfully",
-                        life: TOAST_LIFETIME,
-                    });
-                    setNote("");
-                    action();
-                    onHide();
-                }
-            });
+        payments.forEach((payment) => {
+            accountuid &&
+                setOrUpdateHistoryInfo(accountuid, {
+                    ...payment,
+                    Comment: note,
+                }).then((res) => {
+                    if (res && res.status === Status.ERROR) {
+                        toast.current?.show({
+                            severity: "error",
+                            summary: Status.ERROR,
+                            detail: res.error,
+                            life: TOAST_LIFETIME,
+                        });
+                    } else {
+                        toast.current?.show({
+                            severity: "success",
+                            summary: "Success",
+                            detail: "Note added successfully",
+                            life: TOAST_LIFETIME,
+                        });
+                        setNote("");
+                        action();
+                        onHide();
+                    }
+                });
+        });
     };
 
     return (

@@ -108,10 +108,12 @@ export const AccountPaymentHistory = (): ReactElement => {
             label: "Add Note",
             icon: "icon adms-calendar",
             command: () => {
-                if (!!selectedRows.length) {
+                if (!!selectedRows.filter(Boolean).length) {
                     setPaymentDialogVisible(true);
+                    setNoteDialogVisible(false);
                 } else {
                     setNoteDialogVisible(true);
+                    setPaymentDialogVisible(false);
                 }
             },
         },
@@ -344,6 +346,7 @@ export const AccountPaymentHistory = (): ReactElement => {
             <AddPaymentNoteDialog
                 action={() => setPaymentDialogVisible(false)}
                 onHide={() => setPaymentDialogVisible(false)}
+                payments={historyList.filter((_, index) => selectedRows[index])}
                 visible={paymentDialogVisible}
                 accountuid={id}
             />
