@@ -117,5 +117,21 @@
 }
 
 .take-payment .form-line {
-    margin: 20px 0;
+    margin: 12px 0;
+}
+
+.take-payment .account-note__input {
+    height: 114px;
+}
+
+.take-payment__info .info-section {
+    margin-bottom: 30px;
+}
+
+.take-payment__info .info-section__details {
+    row-gap: 0.66rem;
+}
+
+.take-payment__info .account-note:first-child {
+    margin-bottom: 30px;
 }

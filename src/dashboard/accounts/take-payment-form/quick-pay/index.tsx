@@ -20,8 +20,8 @@ const currentDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear
 
 export const AccountQuickPay = observer((): ReactElement => {
     return (
-        <div className='grid quick-pay'>
-            <div className='col-12 md:col-4'>
+        <div className='quick-pay'>
+            <div className='quick-pay__column'>
                 <div className='take-payment__card'>
                     <div className='take-payment__item'>
                         <label className='take-payment__label'>Down Payment Balance:</label>
@@ -58,7 +58,7 @@ export const AccountQuickPay = observer((): ReactElement => {
                     </div>
                 </div>
 
-                <div className='take-payment__card mt-3'>
+                <div className='take-payment__card'>
                     <div className='take-payment__item'>
                         <label className='take-payment__label'>Payment Date</label>
                         <DateInput className='take-payment__input' />
@@ -112,7 +112,7 @@ export const AccountQuickPay = observer((): ReactElement => {
                 </div>
             </div>
 
-            <div className='col-12 md:col-4'>
+            <div className='quick-pay__column'>
                 <div className='take-payment__card'>
                     <h3 className='take-payment__title'>Audit Information</h3>
                     <div className='take-payment__item'>
@@ -141,7 +141,7 @@ export const AccountQuickPay = observer((): ReactElement => {
                     </div>
                 </div>
 
-                <div className='take-payment__card mt-3'>
+                <div className='take-payment__card'>
                     <h3 className='take-payment__title'>Payment Distribution</h3>
                     <div className='take-payment__item'>
                         <label className='take-payment__label color-dusty-blue'>
@@ -215,7 +215,7 @@ export const AccountQuickPay = observer((): ReactElement => {
                 </div>
             </div>
 
-            <div className='col-12 md:col-4'>
+            <div className='take-payment__column'>
                 <TakePaymentInfo />
             </div>
         </div>
