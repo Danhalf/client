@@ -156,6 +156,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     };
 
     const handleCheckboxCheck = (field: string, index: number | "all"): boolean => {
+        if (!exportsToWeb.length) {
+            return false;
+        }
         const selectedItem = selectedServices.find((item) => item.field === field);
 
         if (selectedItem) {
@@ -343,36 +346,43 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         handleGetExportWebList(params);
     }, [globalSearch, lazyState, selectedFilterOptions, settingsLoaded]);
 
-    const dropdownHeaderPanel = (
-        <div className='dropdown-header flex pb-1'>
-            <label className='cursor-pointer dropdown-header__label'>
-                <Checkbox
-                    checked={columns.length === activeColumns.length}
-                    onChange={({ stopPropagation }) => {
-                        stopPropagation();
-                        const isChecked = activeColumns.length !== columns.length;
-                        setActiveColumns(
-                            isChecked ? columns : columns.filter(({ checked }) => checked)
-                        );
-                        changeSettings({
-                            activeColumns: isChecked ? [] : columns.map(({ field }) => field),
-                        });
+    const dropdownHeaderPanel = (): ReactElement => {
+        const isChecked = activeColumns.length === [...columns, ...serviceColumns].length;
+        const newColumns = [...columns, ...serviceColumns] as TableColumnsList[];
+        return (
+            <div className='dropdown-header flex pb-1'>
+                <label className='cursor-pointer dropdown-header__label'>
+                    <Checkbox
+                        checked={isChecked}
+                        onChange={({ stopPropagation }) => {
+                            stopPropagation();
+                            setActiveColumns(
+                                !isChecked
+                                    ? newColumns
+                                    : newColumns.filter(({ checked }) => checked)
+                            );
+                            changeSettings({
+                                activeColumns: isChecked
+                                    ? []
+                                    : newColumns.map(({ field }) => field),
+                            });
+                        }}
+                        className='dropdown-header__checkbox mr-2'
+                    />
+                    Select All
+                </label>
+                <button
+                    className='p-multiselect-close p-link'
+                    onClick={() => {
+                        changeSettings({ activeColumns: [] });
+                        return setActiveColumns(columns.filter(({ checked }) => checked));
                     }}
-                    className='dropdown-header__checkbox mr-2'
-                />
-                Select All
-            </label>
-            <button
-                className='p-multiselect-close p-link'
-                onClick={() => {
-                    changeSettings({ activeColumns: [] });
-                    return setActiveColumns(columns.filter(({ checked }) => checked));
-                }}
-            >
-                <i className='pi pi-times' />
-            </button>
-        </div>
-    );
+                >
+                    <i className='pi pi-times' />
+                </button>
+            </div>
+        );
+    };
 
     const dropdownFilterHeaderPanel = (evt: MultiSelectPanelHeaderTemplateEvent) => {
         return (
