@@ -53,15 +53,15 @@ export const AccountDownPayment = (): ReactElement => {
             <h3 className='down-payment__title account-title'>Down Payment</h3>
             <div className='down-payment__header grid'>
                 <div className='col-4'>
-                    <span className='font-bold'>Contact Cash Down: </span>
+                    <span className='font-bold down-payment__label'>Contact Cash Down: </span>
                     <span>$ 0.00</span>
                 </div>
                 <div className='col-4'>
-                    <span className='font-bold'>Cash Down Payment: </span>
+                    <span className='font-bold down-payment__label'>Cash Down Payment: </span>
                     <span>$ 0.00</span>
                 </div>
                 <div className='col-4'>
-                    <span className='font-bold'>Cash Dow Balance: </span>
+                    <span className='font-bold down-payment__label'>Cash Dow Balance: </span>
                     <span>$ 0.00</span>
                 </div>
             </div>
@@ -89,14 +89,14 @@ export const AccountDownPayment = (): ReactElement => {
                         showGridlines
                         className='account__table'
                         value={paymentList}
-                        emptyMessage='No activity yet.'
+                        emptyMessage='No payments yet.'
                         reorderableColumns
                         resizableColumns
                         scrollable
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={(options) => {
+                            body={() => {
                                 return (
                                     <div className='flex gap-3 align-items-center'>
                                         <Checkbox checked={false} />
