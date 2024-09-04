@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import { Column, ColumnProps } from "primereact/column";
+import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
@@ -38,6 +38,7 @@ export const AccountManagement = (): ReactElement => {
     const navigate = useNavigate();
     const [activityList, setActivityList] = useState<AccountListActivity[]>([]);
     const [isDialogActive, setIsDialogActive] = useState<boolean>(false);
+    const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
     const [selectedActivity, setSelectedActivity] = useState<string>(ACCOUNT_ACTIVITY_LIST[0].name);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalTitle, setModalTitle] = useState<string>("");
@@ -70,10 +71,43 @@ export const AccountManagement = (): ReactElement => {
     useEffect(() => {
         if (id) {
             listAccountActivity(id).then((res) => {
-                if (Array.isArray(res) && res.length) setActivityList(res);
+                if (Array.isArray(res) && res.length) {
+                    setActivityList(res);
+                    setSelectedRows(Array(res.length).fill(false));
+                }
             });
         }
     }, [id]);
+
+    const controlColumnHeader = (): ReactElement => (
+        <Checkbox
+            checked={selectedRows.every((checkbox) => !!checkbox)}
+            onClick={({ checked }) => {
+                setSelectedRows(selectedRows.map(() => !!checked));
+            }}
+        />
+    );
+
+    const controlColumnBody = (
+        _: AccountListActivity,
+        { rowIndex }: ColumnBodyOptions
+    ): ReactElement => {
+        return (
+            <div className={`flex gap-3 align-items-center`}>
+                <Checkbox
+                    checked={selectedRows[rowIndex]}
+                    onClick={() => {
+                        setSelectedRows(
+                            selectedRows.map((state, index) =>
+                                index === rowIndex ? !state : state
+                            )
+                        );
+                    }}
+                />
+            </div>
+        );
+    };
+
     return (
         <div className='account-management account-card'>
             <h3 className='account-management__title account-title'>Account Management</h3>
@@ -111,13 +145,10 @@ export const AccountManagement = (): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={() => {
-                                return (
-                                    <div className='flex gap-3 align-items-center'>
-                                        <Checkbox checked={false} />
-                                    </div>
-                                );
-                            }}
+                            header={controlColumnHeader}
+                            reorderable={false}
+                            resizeable={false}
+                            body={controlColumnBody}
                             pt={{
                                 root: {
                                     style: {
@@ -133,6 +164,17 @@ export const AccountManagement = (): ReactElement => {
                                 alignHeader={"left"}
                                 key={field}
                                 headerClassName='cursor-move'
+                                body={(data, { rowIndex }) => {
+                                    return (
+                                        <div
+                                            className={`${
+                                                selectedRows[rowIndex] && "row--selected"
+                                            }`}
+                                        >
+                                            {data[field]}
+                                        </div>
+                                    );
+                                }}
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
                             />
                         ))}

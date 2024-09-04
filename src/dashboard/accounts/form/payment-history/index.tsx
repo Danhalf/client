@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import { Column, ColumnProps } from "primereact/column";
+import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
@@ -177,6 +177,41 @@ export const AccountPaymentHistory = (): ReactElement => {
         setExpandedRows([...expandedRows, data]);
     };
 
+    const controlColumnHeader = (): ReactElement => (
+        <Checkbox
+            checked={selectedRows.every((checkbox) => !!checkbox)}
+            onClick={({ checked }) => {
+                setSelectedRows(selectedRows.map(() => !!checked));
+            }}
+        />
+    );
+
+    const controlColumnBody = (
+        options: AccountHistory,
+        { rowIndex }: ColumnBodyOptions
+    ): ReactElement => {
+        return (
+            <div className={`flex gap-3 align-items-center`}>
+                <Checkbox
+                    checked={selectedRows[rowIndex]}
+                    onClick={() => {
+                        setSelectedRows(
+                            selectedRows.map((state, index) =>
+                                index === rowIndex ? !state : state
+                            )
+                        );
+                    }}
+                />
+
+                <Button
+                    className='text export-web__icon-button'
+                    icon='pi pi-angle-down'
+                    onClick={() => handleRowExpansionClick(options)}
+                />
+            </div>
+        );
+    };
+
     return (
         <div className='account-history account-card'>
             <h3 className='account-history__title account-title'>Payment History</h3>
@@ -253,38 +288,10 @@ export const AccountPaymentHistory = (): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            header={
-                                <Checkbox
-                                    checked={selectedRows.every((checkbox) => !!checkbox)}
-                                    onClick={({ checked }) => {
-                                        setSelectedRows(selectedRows.map(() => !!checked));
-                                    }}
-                                />
-                            }
+                            header={controlColumnHeader}
                             reorderable={false}
                             resizeable={false}
-                            body={(options, { rowIndex }) => {
-                                return (
-                                    <div className={`flex gap-3 align-items-center`}>
-                                        <Checkbox
-                                            checked={selectedRows[rowIndex]}
-                                            onClick={() => {
-                                                setSelectedRows(
-                                                    selectedRows.map((state, index) =>
-                                                        index === rowIndex ? !state : state
-                                                    )
-                                                );
-                                            }}
-                                        />
-
-                                        <Button
-                                            className='text export-web__icon-button'
-                                            icon='pi pi-angle-down'
-                                            onClick={() => handleRowExpansionClick(options)}
-                                        />
-                                    </div>
-                                );
-                            }}
+                            body={controlColumnBody}
                             pt={{
                                 root: {
                                     style: {
@@ -298,7 +305,11 @@ export const AccountPaymentHistory = (): ReactElement => {
                                 field={field}
                                 header={header}
                                 alignHeader={"left"}
-                                body={({ [field]: value }) => value || "-"}
+                                body={({ [field]: value }, { rowIndex }) => (
+                                    <div className={`${selectedRows[rowIndex] && "row--selected"}`}>
+                                        {value || "-"}
+                                    </div>
+                                )}
                                 key={field}
                                 headerClassName='cursor-move'
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
