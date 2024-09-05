@@ -183,7 +183,13 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
     );
 };
 
-export const ActionButtons = ({ report }: { report: ReportDocument }): ReactElement => {
+export const ActionButtons = ({
+    report,
+    refetchAction,
+}: {
+    report: ReportDocument;
+    refetchAction: () => void;
+}): ReactElement => {
     const [editAccessActive, setEditAccessActive] = useState(false);
     const toast = useToast();
 
@@ -203,6 +209,17 @@ export const ActionButtons = ({ report }: { report: ReportDocument }): ReactElem
                     detail: response.error || "Error while changing report favorite status",
                     life: TOAST_LIFETIME,
                 });
+            } else {
+                const detail = !!report.isfavorite
+                    ? "Report is successfully removed from Favorites!"
+                    : "Report is successfully added to Favorites!";
+                refetchAction && refetchAction();
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail,
+                    life: TOAST_LIFETIME,
+                });
             }
         });
     };
@@ -218,10 +235,10 @@ export const ActionButtons = ({ report }: { report: ReportDocument }): ReactElem
                 />
                 <Button
                     className='p-button reports-actions__button'
-                    icon='pi pi-heart'
+                    icon={`pi pi-${!!report.isfavorite ? "heart-fill" : "heart"}`}
                     outlined
                     onClick={handleChangeIsFavorite}
-                    tooltip='Add to Favorites'
+                    tooltip={!!report.isfavorite ? "Remove from Favorites" : "Add to Favorites"}
                 />
                 <Button
                     className='p-button reports-actions__button'
