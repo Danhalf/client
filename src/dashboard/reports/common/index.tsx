@@ -11,9 +11,11 @@ import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
+import { Menu } from "primereact/menu";
+import { MenuItem } from "primereact/menuitem";
 import { MultiSelect } from "primereact/multiselect";
 import { PanelHeaderTemplateOptions } from "primereact/panel";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface TableColumnProps extends ColumnProps {
@@ -183,19 +185,32 @@ const EditAccessDialog = ({ visible, onHide, reportuid }: EditAccessDialogProps)
     );
 };
 
+interface ActionButtonsProps {
+    report: ReportDocument;
+    collectionList?: ReportCollection[];
+    refetchAction: () => void;
+}
+
 export const ActionButtons = ({
     report,
     refetchAction,
-}: {
-    report: ReportDocument;
-    refetchAction: () => void;
-}): ReactElement => {
+    collectionList,
+}: ActionButtonsProps): ReactElement => {
     const [editAccessActive, setEditAccessActive] = useState(false);
     const toast = useToast();
+    const menu = useRef<Menu>(null!);
 
     const handleEditAccess = () => {
         setEditAccessActive(true);
     };
+
+    const items: MenuItem[] = [
+        {
+            items: collectionList?.map((collection) => ({
+                label: collection.name,
+            })),
+        },
+    ];
 
     const handleChangeIsFavorite = () => {
         updateReportInfo(report.documentUID, {
@@ -227,11 +242,34 @@ export const ActionButtons = ({
     return (
         <>
             <div className='reports-actions flex'>
+                <Menu
+                    model={items}
+                    popup
+                    ref={menu}
+                    pt={{
+                        root: {
+                            style: {
+                                width: "240px",
+                                maxHeight: "240px",
+                                overflowY: "auto",
+                                overflowX: "hidden",
+                                paddingTop: 0,
+                            },
+                        },
+                        submenuHeader: {
+                            className: "reports-actions__submenu-header",
+                            style: {
+                                padding: 0,
+                            },
+                        },
+                    }}
+                />
                 <Button
                     className='p-button reports-actions__button reports-actions__add-button'
                     icon='pi pi-plus'
                     tooltip='Add to Collection'
                     outlined
+                    onClick={(event) => menu.current.toggle(event)}
                 />
                 <Button
                     className='p-button reports-actions__button'

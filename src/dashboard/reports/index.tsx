@@ -296,6 +296,9 @@ export default function Reports(): ReactElement {
                                                                             </p>
                                                                             <ActionButtons
                                                                                 report={report}
+                                                                                collectionList={
+                                                                                    collections
+                                                                                }
                                                                                 refetchAction={() => {
                                                                                     user?.useruid &&
                                                                                         handleGetUserReportCollections(
@@ -365,6 +368,7 @@ export default function Reports(): ReactElement {
                                                                     </p>
                                                                     <ActionButtons
                                                                         report={report}
+                                                                        collectionList={collections}
                                                                         refetchAction={() => {
                                                                             user?.useruid &&
                                                                                 handleGetUserReportCollections(
