@@ -264,7 +264,7 @@ export default function Reports(): ReactElement {
                                                                                     collections
                                                                                 }
                                                                                 selectedReports={
-                                                                                    documents
+                                                                                    selectedReports
                                                                                 }
                                                                                 setCollectionName={
                                                                                     setCollectionName

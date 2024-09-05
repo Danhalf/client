@@ -453,6 +453,7 @@ export const CollectionPanelContent = ({
                             selectedItemTemplate={(item) => {
                                 return selectedItemTemplate(item);
                             }}
+                            maxSelectedLabels={4}
                             placeholder='Select reports'
                             showSelectAll={false}
                             value={selectedReports || []}
