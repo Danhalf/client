@@ -1,5 +1,6 @@
 import { isAxiosError } from "axios";
 import {
+    AccountDetails,
     AccountDownPayments,
     AccountHistory,
     AccountInfo,
@@ -665,7 +666,7 @@ export const undeleteNote = async (itemuid: string) => {
 
 export const getPaymentInfo = async (accountuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | undefined>(
+        const request = await authorizedUserApiInstance.get<AccountDetails>(
             `accounts/${accountuid}/paymentinfo`
         );
         return request.data;
