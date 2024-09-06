@@ -16,9 +16,9 @@ import {
     listPaymentDrawers,
 } from "http/services/accounts.service";
 
-type Note = Pick<AccountMemoNote, "alert" | "note">;
+export type AccountNoteData = Pick<AccountMemoNote, "alert" | "note">;
 
-const initialNote: Note = {
+const initialNote: AccountNoteData = {
     alert: "",
     note: "",
 };
@@ -30,7 +30,7 @@ export class AccountStore {
     private _accountExtData: AccountExtData = {} as AccountExtData;
     private _accountDrawers: AccountDrawer[] = [];
     private _accountID: string = "";
-    private _accountNote: Note = initialNote;
+    private _accountNote: AccountNoteData = initialNote;
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -146,7 +146,7 @@ export class AccountStore {
         }
     });
 
-    public set accountNote(note: Note) {
+    public set accountNote(note: AccountNoteData) {
         this._accountNote = note;
     }
 

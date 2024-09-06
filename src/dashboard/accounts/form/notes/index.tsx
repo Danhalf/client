@@ -5,18 +5,15 @@ import "./index.css";
 import { Button } from "primereact/button";
 import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
-import {
-    getAccountNote,
-    listAccountNotes,
-    updateAccountNote,
-} from "http/services/accounts.service";
+import { listAccountNotes, updateAccountNote } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
-import { AccountMemoNote, AccountNote } from "common/models/accounts";
+import { AccountNote } from "common/models/accounts";
 import { AddNoteDialog } from "./add-note-dialog";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { useStore } from "store/hooks";
+import { AccountNoteData } from "store/stores/account";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountNote;
@@ -71,18 +68,18 @@ export const AccountNotes = (): ReactElement => {
         setExpandedRows([...expandedRows, data]);
     };
 
-    const handleSaveNote = (saveItem: any) => {
-        // id &&
-        //     updateAccountNote(id, { [saveItem]: note[saveItem] }).then((res) => {
-        //         if (res?.status === Status.ERROR) {
-        //             toast.current?.show({
-        //                 severity: "error",
-        //                 summary: Status.ERROR,
-        //                 detail: res.error,
-        //                 life: TOAST_LIFETIME,
-        //             });
-        //         }
-        //     });
+    const handleSaveNote = (saveItem: keyof AccountNoteData) => {
+        id &&
+            updateAccountNote(id, { [saveItem]: accountNote[saveItem] }).then((res) => {
+                if (res?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: res.error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
     };
 
     return (
@@ -95,7 +92,9 @@ export const AccountNotes = (): ReactElement => {
                             <InputTextarea
                                 id='account-memo'
                                 value={accountNote.note}
-                                // onChange={(e) => setNote({ ...note, note: e.target.value })}
+                                onChange={(e) =>
+                                    (store.accountNote = { ...accountNote, note: e.target.value })
+                                }
                                 className='account-note__input'
                             />
                             <label htmlFor='account-memo'>Account Memo</label>
@@ -113,7 +112,9 @@ export const AccountNotes = (): ReactElement => {
                             <InputTextarea
                                 id='account-payment'
                                 value={accountNote.alert}
-                                // onChange={(e) => setNote({ ...note, alert: e.target.value })}
+                                onChange={(e) =>
+                                    (store.accountNote = { ...accountNote, alert: e.target.value })
+                                }
                                 className='account-note__input'
                             />
                             <label htmlFor='account-payment'>Payment Alert</label>
