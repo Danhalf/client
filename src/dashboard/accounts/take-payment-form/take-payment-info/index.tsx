@@ -1,42 +1,57 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement } from "react";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { InfoSection } from "dashboard/accounts/form/information/info-section";
 import { InputTextarea } from "primereact/inputtextarea";
-import { getPaymentInfo } from "http/services/accounts.service";
-import { useParams } from "react-router-dom";
+import { useStore } from "store/hooks";
 
 export const TakePaymentInfo = observer((): ReactElement => {
-    const { id } = useParams();
-    const [, setPaymentInfo] = useState<any>({});
-
-    useEffect(() => {
-        id && getPaymentInfo(id).then((res) => setPaymentInfo(res));
-    }, [id]);
+    const store = useStore().accountStore;
+    const {
+        accountPaymentsInfo: { CurrentStatus, CollectionDetails },
+    } = store;
 
     return (
         <div className='take-payment__info'>
             <InfoSection
                 sectionTitle='Current Status'
                 info={[
-                    { title: "Past Due Amt", value: "$0.00" },
-                    { title: "Current Due", value: "$0.00" },
-                    { title: "Down/Pickup Due", value: "$0.00" },
-                    { title: "Fees", value: "$0.00" },
-                    { title: "Total Due", value: "$0.00" },
-                    { title: "Current Balance", value: "$0.00" },
+                    { title: "Past Due Amt", value: `$ ${CurrentStatus?.PastDueAmount || "0.00"}` },
+                    { title: "Current Due", value: `$ ${CurrentStatus?.CurrentDue || "0.00"}` },
+                    {
+                        title: "Down/Pickup Due",
+                        value: `$ ${CurrentStatus?.DownPickupDue || "0.00"}`,
+                    },
+                    { title: "Fees", value: `$ ${CurrentStatus?.Fees || "0.00"}` },
+                    { title: "Total Due", value: `$ ${CurrentStatus?.TotalDue || "0.00"}` },
+                    {
+                        title: "Current Balance",
+                        value: `$ ${CurrentStatus?.CurrentBalance || "0.00"}`,
+                    },
                 ]}
             />
 
             <InfoSection
                 sectionTitle='Collection Details'
                 info={[
-                    { title: "Regular Pmt", value: "$0.00 Monthly" },
-                    { title: "Next Pmt. due", value: "07/07/2024" },
-                    { title: "Days Overdue", value: "3" },
-                    { title: "Last Paid", value: "Never" },
-                    { title: "Last Paid Days", value: "n/a" },
-                    { title: "Last Late", value: "Never" },
+                    {
+                        title: "Regular Pmt",
+                        value: `$ ${CollectionDetails?.RegularPayment || "0.00"}`,
+                    },
+                    {
+                        title: "Next Pmt. due",
+                        value: `$ ${CollectionDetails?.NextPmtDue || "0.00"}`,
+                    },
+                    {
+                        title: "Days Overdue",
+                        value: `$ ${CollectionDetails?.DaysOverdue || "0.00"}`,
+                    },
+                    { title: "Last Paid", value: `$ ${CollectionDetails?.LastPaid || "0.00"}` },
+                    {
+                        title: "Last Paid Days",
+                        value: `$ ${CollectionDetails?.LastPaidDays || "0.00"}`,
+                    },
+                    { title: "Last Late", value: `$ ${CollectionDetails?.LastLate || "0.00"}` },
                 ]}
             />
 

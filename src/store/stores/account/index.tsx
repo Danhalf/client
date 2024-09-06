@@ -1,13 +1,27 @@
 import { Status } from "common/models/base-response";
-import { AccountInfo, AccountExtData, AccountDetails, AccountDrawer } from "common/models/accounts";
+import {
+    AccountInfo,
+    AccountExtData,
+    AccountDetails,
+    AccountDrawer,
+    AccountMemoNote,
+} from "common/models/accounts";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 import {
     createOrUpdateAccount,
     getAccountInfo,
+    getAccountNote,
     getPaymentInfo,
     listPaymentDrawers,
 } from "http/services/accounts.service";
+
+type Note = Pick<AccountMemoNote, "alert" | "note">;
+
+const initialNote: Note = {
+    alert: "",
+    note: "",
+};
 
 export class AccountStore {
     public rootStore: RootStore;
@@ -16,6 +30,7 @@ export class AccountStore {
     private _accountExtData: AccountExtData = {} as AccountExtData;
     private _accountDrawers: AccountDrawer[] = [];
     private _accountID: string = "";
+    private _accountNote: Note = initialNote;
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
@@ -37,6 +52,10 @@ export class AccountStore {
 
     public get accountDrawers() {
         return this._accountDrawers;
+    }
+
+    public get accountNote() {
+        return this._accountNote;
     }
 
     public get isLoading() {
@@ -61,9 +80,16 @@ export class AccountStore {
         }
     };
 
+    public getNotes = (id: string) => {
+        getAccountNote(id).then((res) => {
+            if (res?.status !== Status.ERROR) this._accountNote = res as AccountMemoNote;
+        });
+    };
+
     public getAccountPaymentsInfo = async (accountuid: string) => {
         this._isLoading = true;
         try {
+            this.getNotes(accountuid);
             const response = await getPaymentInfo(accountuid);
             if (response) {
                 this._accountPaymentsInfo = response || ({} as AccountDetails);
@@ -119,6 +145,10 @@ export class AccountStore {
             this._isLoading = false;
         }
     });
+
+    public set accountNote(note: Note) {
+        this._accountNote = note;
+    }
 
     public set isLoading(state: boolean) {
         this._isLoading = state;

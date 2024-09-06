@@ -16,6 +16,7 @@ import { AddNoteDialog } from "./add-note-dialog";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
+import { useStore } from "store/hooks";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountNote;
@@ -26,21 +27,14 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
     { field: "NoteBy", header: "Note Taker" },
     { field: "ContactMethod", header: "Contact Type" },
 ];
-
-type Note = Pick<AccountMemoNote, "alert" | "note">;
-
-const initialNote: Note = {
-    alert: "",
-    note: "",
-};
-
 export const AccountNotes = (): ReactElement => {
     const { id } = useParams();
     const toast = useToast();
+    const store = useStore().accountStore;
+    const { getNotes, accountNote } = store;
     const [notesList, setNotesList] = useState<AccountNote[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [dialogShow, setDialogShow] = useState<boolean>(false);
-    const [note, setNote] = useState<Note>(initialNote);
 
     const handleGetNotes = () => {
         listAccountNotes(id!).then((res) => {
@@ -51,7 +45,7 @@ export const AccountNotes = (): ReactElement => {
     useEffect(() => {
         if (id) {
             handleGetNotes();
-            handleGetNote();
+            getNotes(id);
         }
     }, [id]);
 
@@ -77,24 +71,18 @@ export const AccountNotes = (): ReactElement => {
         setExpandedRows([...expandedRows, data]);
     };
 
-    const handleGetNote = () => {
-        getAccountNote(id!).then((res) => {
-            setNote(res as AccountMemoNote);
-        });
-    };
-
-    const handleSaveNote = (saveItem: keyof Note) => {
-        id &&
-            updateAccountNote(id, { [saveItem]: note[saveItem] }).then((res) => {
-                if (res?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: res.error,
-                        life: TOAST_LIFETIME,
-                    });
-                }
-            });
+    const handleSaveNote = (saveItem: any) => {
+        // id &&
+        //     updateAccountNote(id, { [saveItem]: note[saveItem] }).then((res) => {
+        //         if (res?.status === Status.ERROR) {
+        //             toast.current?.show({
+        //                 severity: "error",
+        //                 summary: Status.ERROR,
+        //                 detail: res.error,
+        //                 life: TOAST_LIFETIME,
+        //             });
+        //         }
+        //     });
     };
 
     return (
@@ -106,17 +94,17 @@ export const AccountNotes = (): ReactElement => {
                         <span className='p-float-label'>
                             <InputTextarea
                                 id='account-memo'
-                                value={note.note}
-                                onChange={(e) => setNote({ ...note, note: e.target.value })}
+                                value={accountNote.note}
+                                // onChange={(e) => setNote({ ...note, note: e.target.value })}
                                 className='account-note__input'
                             />
                             <label htmlFor='account-memo'>Account Memo</label>
                         </span>
                         <Button
-                            severity={!!note.note ? "success" : "secondary"}
+                            severity={!!accountNote.note ? "success" : "secondary"}
                             className='account-note__button'
                             label='Save'
-                            disabled={!note.note}
+                            disabled={!accountNote.note}
                             onClick={() => handleSaveNote("note")}
                         />
                     </div>
@@ -124,16 +112,16 @@ export const AccountNotes = (): ReactElement => {
                         <span className='p-float-label'>
                             <InputTextarea
                                 id='account-payment'
-                                value={note.alert}
-                                onChange={(e) => setNote({ ...note, alert: e.target.value })}
+                                value={accountNote.alert}
+                                // onChange={(e) => setNote({ ...note, alert: e.target.value })}
                                 className='account-note__input'
                             />
                             <label htmlFor='account-payment'>Payment Alert</label>
                         </span>
                         <Button
-                            severity={!!note.alert ? "success" : "secondary"}
+                            severity={!!accountNote.alert ? "success" : "secondary"}
                             className='account-note__button'
-                            disabled={!note.alert}
+                            disabled={!accountNote.alert}
                             label='Save'
                             onClick={() => handleSaveNote("alert")}
                         />
