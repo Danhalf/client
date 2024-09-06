@@ -1,11 +1,12 @@
 import { Status } from "common/models/base-response";
-import { AccountInfo, AccountExtData, AccountDetails } from "common/models/accounts";
+import { AccountInfo, AccountExtData, AccountDetails, AccountDrawer } from "common/models/accounts";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 import {
     createOrUpdateAccount,
     getAccountInfo,
     getPaymentInfo,
+    listPaymentDrawers,
 } from "http/services/accounts.service";
 
 export class AccountStore {
@@ -13,6 +14,7 @@ export class AccountStore {
     private _account: Partial<AccountInfo> = {} as AccountInfo;
     private _accountPaymentsInfo: Partial<AccountDetails> = {} as AccountDetails;
     private _accountExtData: AccountExtData = {} as AccountExtData;
+    private _accountDrawers: AccountDrawer[] = [];
     private _accountID: string = "";
     protected _isLoading = false;
 
@@ -31,6 +33,10 @@ export class AccountStore {
 
     public get accountPaymentsInfo() {
         return this._accountPaymentsInfo;
+    }
+
+    public get accountDrawers() {
+        return this._accountDrawers;
     }
 
     public get isLoading() {
@@ -61,6 +67,19 @@ export class AccountStore {
             const response = await getPaymentInfo(accountuid);
             if (response) {
                 this._accountPaymentsInfo = response || ({} as AccountDetails);
+            }
+        } catch (error) {
+        } finally {
+            this._isLoading = false;
+        }
+    };
+
+    public getDrawers = async (useruid: string) => {
+        this._isLoading = true;
+        try {
+            const response = await listPaymentDrawers(useruid);
+            if (Array.isArray(response)) {
+                this._accountDrawers = response as AccountDrawer[];
             }
         } catch (error) {
         } finally {

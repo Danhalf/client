@@ -2,6 +2,7 @@ import { isAxiosError } from "axios";
 import {
     AccountDetails,
     AccountDownPayments,
+    AccountDrawer,
     AccountHistory,
     AccountInfo,
     AccountInsurance,
@@ -328,6 +329,22 @@ export const listDeletionReasons = async (useruid: string) => {
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while listing deletion reasons",
+            };
+        }
+    }
+};
+
+export const listPaymentDrawers = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<BaseResponseError | AccountDrawer>(
+            `accounts/${useruid}/drawers`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while listing payment drawers",
             };
         }
     }

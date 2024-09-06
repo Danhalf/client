@@ -67,7 +67,7 @@ export const AccountQuickPay = observer((): ReactElement => {
 
                     <div className='take-payment__item color-bold'>
                         <label className='take-payment__label flex-1'>
-                            Total Payoff as of ${currentDate}:
+                            Total Payoff as of {currentDate}:
                         </label>
                         <span className='take-payment__value'>$0.00</span>
                     </div>

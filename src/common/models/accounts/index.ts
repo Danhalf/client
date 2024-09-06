@@ -582,3 +582,10 @@ export interface AccountMemoNote extends BaseResponseError {
     alert: string;
     note: string;
 }
+
+export interface AccountDrawer {
+    created: string;
+    drawer: string;
+    itemuid: string;
+    useruid: string;
+}
