@@ -32,15 +32,21 @@ export const VINDecoder = ({
     const handleGetVinInfo = () => {
         if (!buttonDisabled && value && validateVin(value)) {
             inventoryDecodeVIN(value).then((response) => {
-                if (response?.status === Status.ERROR) {
+                if (response && response?.status === Status.ERROR) {
                     toast.current?.show({
                         severity: "error",
                         summary: Status.ERROR,
-                        detail: "VIN decoding failed",
+                        detail: response.error,
                         life: TOAST_LIFETIME,
                     });
                 } else {
-                    response && onAction(response as VehicleDecodeInfo);
+                    onAction(response as VehicleDecodeInfo);
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "VIN decoded successfully",
+                        life: TOAST_LIFETIME,
+                    });
                 }
             });
         }
