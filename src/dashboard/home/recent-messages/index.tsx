@@ -8,6 +8,7 @@ import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { ReactElement, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
+import "./index.css";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof SupportHistory;
@@ -34,19 +35,15 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
         if (authUser) {
             getSupportMessages(authUser.useruid, { top: messagesShowCount, type: "desc" }).then(
                 (response) => {
-                    if ("status" in response!) {
-                        if (response.status === Status.ERROR) {
-                            return toast.current?.show({
-                                severity: "error",
-                                summary: Status.ERROR,
-                                detail: response.error,
-                                life: TOAST_LIFETIME,
-                            });
-                        }
-                    }
-
                     if (Array.isArray(response)) {
                         setSupportHistoryData(response);
+                    } else {
+                        toast.current?.show({
+                            severity: "error",
+                            summary: Status.ERROR,
+                            detail: response?.error,
+                            life: TOAST_LIFETIME,
+                        });
                     }
                 }
             );
@@ -54,21 +51,36 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
     }, [authUser]);
 
     return (
-        <div className='card'>
+        <div className='card h-full'>
             <div className='card-header'>
                 <h2 className='card-header__title uppercase m-0'>Recent messages</h2>
             </div>
             <div className='card-content'>
                 <DataTable
-                    className='table-message'
                     value={supportHistoryData}
                     emptyMessage='No messages found'
+                    className='table-message'
                 >
                     {renderColumnsData.map(({ field, header }) => (
                         <Column
                             field={field}
                             header={header}
                             key={field}
+                            body={(data: SupportHistory) => {
+                                if (field === "topic") {
+                                    return (
+                                        <div
+                                            className='white-space-nowrap 
+                                            overflow-hidden 
+                                            text-overflow-ellipsis 
+                                            max-w-8rem'
+                                        >
+                                            {data[field]}
+                                        </div>
+                                    );
+                                }
+                                return data[field];
+                            }}
                             headerClassName='cursor-default'
                         />
                     ))}

@@ -30,19 +30,15 @@ export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): ReactEle
     useEffect(() => {
         if (authUser && visible) {
             getSupportMessages(authUser.useruid).then((response) => {
-                if ("status" in response!) {
-                    if (response.status === Status.ERROR) {
-                        return toast.current?.show({
-                            severity: "error",
-                            summary: Status.ERROR,
-                            detail: response.error,
-                            life: TOAST_LIFETIME,
-                        });
-                    }
-                }
-
                 if (Array.isArray(response)) {
                     setSupportHistoryData(response);
+                } else {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response?.error,
+                        life: TOAST_LIFETIME,
+                    });
                 }
             });
         }
