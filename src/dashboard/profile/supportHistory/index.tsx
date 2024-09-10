@@ -10,15 +10,17 @@ import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { useStore } from "store/hooks";
 
-interface SupportContactDialogProps extends DialogProps {
-    useruid: string;
+interface TableColumnProps extends ColumnProps {
+    field: keyof SupportHistory;
 }
 
-export const SupportHistoryDialog = ({
-    visible,
-    onHide,
-    useruid,
-}: SupportContactDialogProps): ReactElement => {
+const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
+    { field: "username", header: "From" },
+    { field: "topic", header: "Theme" },
+    { field: "created", header: "Date" },
+];
+
+export const SupportHistoryDialog = ({ visible, onHide }: DialogProps): ReactElement => {
     const toast = useToast();
     const store = useStore().userStore;
     const { authUser } = store;
@@ -27,7 +29,7 @@ export const SupportHistoryDialog = ({
 
     useEffect(() => {
         if (authUser && visible) {
-            getSupportMessages(useruid).then((response) => {
+            getSupportMessages(authUser.useruid).then((response) => {
                 if ("status" in response!) {
                     if (response.status === Status.ERROR) {
                         return toast.current?.show({
@@ -44,7 +46,7 @@ export const SupportHistoryDialog = ({
                 }
             });
         }
-    }, [useruid, visible]);
+    }, [authUser, visible]);
 
     const rowExpansionTemplate = (data: SupportHistory) => {
         return <div className='datatable-hidden'>{data.message}</div>;
@@ -53,15 +55,6 @@ export const SupportHistoryDialog = ({
     const handleRowClick = (e: DataTableRowClickEvent) => {
         setExpandedRows([e.data]);
     };
-    interface TableColumnProps extends ColumnProps {
-        field: keyof SupportHistory;
-    }
-
-    const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
-        { field: "username", header: "From" },
-        { field: "topic", header: "Theme" },
-        { field: "created", header: "Date" },
-    ];
 
     return (
         <DashboardDialog
