@@ -24,7 +24,7 @@ import { Inventory as InventoryModel, InventoryStockNumber } from "common/models
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { DeleteForm } from "./delete-form";
-import { Status } from "common/models/base-response";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { debounce } from "common/helpers";
 
 const STEP = "step";
@@ -203,7 +203,18 @@ export const InventoryForm = observer(() => {
         setDeleteActiveIndex(itemsMenuCount + 2);
 
         if (id) {
-            getInventory(id);
+            getInventory(id).then((response) => {
+                // eslint-disable-next-line no-console
+                console.log(response);
+                const res = response as unknown as BaseResponseError;
+                if (res?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: res.message,
+                    });
+                }
+            });
         } else {
             getCachedInventory();
         }
