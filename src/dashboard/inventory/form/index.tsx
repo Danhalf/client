@@ -204,15 +204,14 @@ export const InventoryForm = observer(() => {
 
         if (id) {
             getInventory(id).then((response) => {
-                // eslint-disable-next-line no-console
-                console.log(response);
                 const res = response as unknown as BaseResponseError;
                 if (res?.status === Status.ERROR) {
                     toast.current?.show({
                         severity: "error",
                         summary: Status.ERROR,
-                        detail: res.message,
+                        detail: res?.error || "",
                     });
+                    navigate(`/dashboard/inventory`);
                 }
             });
         } else {

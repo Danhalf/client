@@ -197,10 +197,9 @@ export class InventoryStore {
         try {
             const response = (await getInventoryInfo(itemuid)) as BaseResponseError;
             if (response?.status === Status.ERROR) {
-                const res = response as unknown as BaseResponseError;
-                throw new Error(res.error);
+                throw response.error;
             } else {
-                const info = response as unknown as Inventory;
+                const info = response as Inventory;
                 this._inventoryID = info.itemuid;
                 const { extdata, options_info, Audit, ...inventory } = info;
                 this._inventory =
