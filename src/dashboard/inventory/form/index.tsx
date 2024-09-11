@@ -26,6 +26,7 @@ import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decode
 import { DeleteForm } from "./delete-form";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { debounce } from "common/helpers";
+import { TOAST_LIFETIME } from "common/settings";
 
 const STEP = "step";
 
@@ -210,6 +211,7 @@ export const InventoryForm = observer(() => {
                         severity: "error",
                         summary: Status.ERROR,
                         detail: res?.error || "",
+                        life: TOAST_LIFETIME,
                     });
                     navigate(`/dashboard/inventory`);
                 }
