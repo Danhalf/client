@@ -140,21 +140,21 @@ export const VehicleGeneral = observer((): ReactElement => {
                 });
                 changeInventory({
                     key: "Transmission",
-                    value: vinInfo.Transmission_id || values.Transmission,
+                    value: vinInfo.Transmission_id || values.Transmission_id,
                 });
                 changeInventory({
                     key: "TypeOfFuel",
-                    value: vinInfo.TypeOfFuel_id || values.TypeOfFuel,
+                    value: vinInfo.TypeOfFuel_id || values.TypeOfFuel_id,
                 });
                 changeInventory({
                     key: "DriveLine",
-                    value: vinInfo.DriveLine_id || values.DriveLine,
+                    value: vinInfo.DriveLine_id || values.DriveLine_id,
                 });
                 changeInventory({
                     key: "Cylinders",
-                    value: vinInfo.Cylinders_id || values.Cylinders,
+                    value: vinInfo.Cylinders_id || values.Cylinders_id,
                 });
-                changeInventory({ key: "Engine", value: vinInfo.Engine_id || values.Engine });
+                changeInventory({ key: "Engine", value: vinInfo.Engine_id || values.Engine_id });
                 changeInventory({ key: "StockNo", value: vinInfo.StockNo || values.StockNo });
                 changeInventory({ key: "Trim", value: vinInfo.Trim || values.Trim });
                 changeInventory({ key: "BodyStyle", value: vinInfo.BodyStyle || values.BodyStyle });
@@ -177,21 +177,21 @@ export const VehicleGeneral = observer((): ReactElement => {
                 });
                 changeInventory({
                     key: "Transmission",
-                    value: inventory.Transmission || vinInfo.Transmission_id,
+                    value: inventory.Transmission_id || vinInfo.Transmission_id,
                 });
                 changeInventory({
                     key: "TypeOfFuel",
-                    value: inventory.TypeOfFuel || vinInfo.TypeOfFuel_id,
+                    value: inventory.TypeOfFuel_id || vinInfo.TypeOfFuel_id,
                 });
                 changeInventory({
                     key: "DriveLine",
-                    value: inventory.DriveLine || vinInfo.DriveLine_id,
+                    value: inventory.DriveLine_id || vinInfo.DriveLine_id,
                 });
                 changeInventory({
                     key: "Cylinders",
-                    value: inventory.Cylinders || vinInfo.Cylinders_id,
+                    value: inventory.Cylinders_id || vinInfo.Cylinders_id,
                 });
-                changeInventory({ key: "Engine", value: inventory.Engine || vinInfo.Engine_id });
+                changeInventory({ key: "Engine", value: inventory.Engine_id || vinInfo.Engine_id });
                 changeInventory({ key: "StockNo", value: inventory.StockNo || vinInfo.StockNo });
                 changeInventory({ key: "Trim", value: inventory.Trim || vinInfo.Trim });
                 changeInventory({
