@@ -6,7 +6,7 @@ import { ReactElement, useEffect, useState } from "react";
 import { ReportSelect } from "../common";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
@@ -21,6 +21,7 @@ const dataSetValues: ReportServices[] = [
 ];
 
 export const ReportEditForm = observer((): ReactElement => {
+    const navigate = useNavigate();
     const store = useStore().reportStore;
     const userStore = useStore().userStore;
     const { authUser } = userStore;
@@ -63,6 +64,7 @@ export const ReportEditForm = observer((): ReactElement => {
                         detail: response?.error || "Error while fetching report",
                         life: TOAST_LIFETIME,
                     });
+                    navigate(`/dashboard/reports`);
                 }
             });
         return () => {
