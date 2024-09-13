@@ -18,6 +18,7 @@ import * as Yup from "yup";
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { BaseResponseError, Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
 
 const STEP = "step";
 
@@ -180,7 +181,8 @@ export const DealsForm = observer(() => {
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
 
     const store = useStore().dealStore;
-    const { deal, dealType, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged } = store;
+    const { deal, dealType, dealExtData, getDeal, saveDeal, clearDeal, isFormChanged, isLoading } =
+        store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
@@ -214,7 +216,18 @@ export const DealsForm = observer(() => {
     };
 
     useEffect(() => {
-        id && getDeal(id);
+        id &&
+            getDeal(id).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: (response?.error as string) || "",
+                        life: TOAST_LIFETIME,
+                    });
+                    navigate(`/dashboard/deals`);
+                }
+            });
         return () => clearDeal();
     }, [id]);
 
@@ -286,12 +299,15 @@ export const DealsForm = observer(() => {
                     severity: "error",
                     summary: "Validation Error",
                     detail: "Please fill in all required fields.",
+                    life: TOAST_LIFETIME,
                 });
             }
         });
     };
 
-    return (
+    return isLoading ? (
+        <Loader overlay />
+    ) : (
         <Suspense>
             <div className='grid relative'>
                 <Button

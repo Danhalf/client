@@ -24,8 +24,9 @@ import { Inventory as InventoryModel, InventoryStockNumber } from "common/models
 import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { DeleteForm } from "./delete-form";
-import { Status } from "common/models/base-response";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { debounce } from "common/helpers";
+import { TOAST_LIFETIME } from "common/settings";
 
 const STEP = "step";
 
@@ -82,6 +83,7 @@ export const InventoryForm = observer(() => {
         currentLocation,
         deleteReason,
         memoRoute,
+        isLoading,
     } = store;
     const navigate = useNavigate();
     const [inventorySections, setInventorySections] = useState<InventorySection[]>([]);
@@ -203,7 +205,18 @@ export const InventoryForm = observer(() => {
         setDeleteActiveIndex(itemsMenuCount + 2);
 
         if (id) {
-            getInventory(id);
+            getInventory(id).then((response) => {
+                const res = response as unknown as BaseResponseError;
+                if (res?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: res?.error || "",
+                        life: TOAST_LIFETIME,
+                    });
+                    navigate(`/dashboard/inventory`);
+                }
+            });
         } else {
             getCachedInventory();
         }
@@ -285,7 +298,9 @@ export const InventoryForm = observer(() => {
         });
     };
 
-    return (
+    return isLoading ? (
+        <Loader overlay />
+    ) : (
         <Suspense>
             <div className='grid relative'>
                 <Button
