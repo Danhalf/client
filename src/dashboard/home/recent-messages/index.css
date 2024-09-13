@@ -33,7 +33,7 @@
     padding: 8px 10px;
 }
 
-.table-message .p-datatable-tbody tr:first-child td {
+.table-message .p-datatable-tbody tr:not(.p-datatable-emptymessage):first-child td {
     color: var(--admss-app-green);
     font-weight: 600;
 }
