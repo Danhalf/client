@@ -65,6 +65,9 @@ export const ReportEditForm = observer((): ReactElement => {
                     });
                 }
             });
+        return () => {
+            store.report = {};
+        };
     }, [id]);
 
     const moveItem = (
@@ -181,8 +184,8 @@ export const ReportEditForm = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
-                            value={reportName}
-                            onChange={(e) => (store.reportName = e.target.value)}
+                            value={report.name || reportName}
+                            onChange={(e) => changeReport("name", e.target.value)}
                         />
                         <label className='float-label w-full'>Name</label>
                     </span>
