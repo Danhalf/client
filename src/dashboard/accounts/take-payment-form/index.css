@@ -1,6 +1,10 @@
 .take-payment {
     --input-regular: 40px;
     --input-small: 30px;
+
+    .info-section__title {
+        color: var(--admss-app-main-blue);
+    }
 }
 
 .take-payment .p-tabview-nav-content {
@@ -27,13 +31,16 @@
 .take-payment__item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     font-size: 16px;
     font-weight: 600;
 }
 
 .take-payment__item--subtitle {
     font-size: 18px;
+}
+
+.take-payment__value {
+    padding-left: 2.4rem;
 }
 
 .take-payment__item--bold .take-payment__value,
