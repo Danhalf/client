@@ -1,6 +1,6 @@
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import { Column, ColumnProps } from "primereact/column";
+import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
@@ -25,11 +25,15 @@ export const AccountDownPayment = (): ReactElement => {
     const { id } = useParams();
     const toast = useToast();
     const [paymentList, setPaymentList] = useState<AccountDownPayments[]>([]);
+    const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
 
     useEffect(() => {
         if (id) {
             listAccountDownPayments(id).then((res) => {
-                if (Array.isArray(res) && res.length) setPaymentList(res);
+                if (Array.isArray(res) && res.length) {
+                    setPaymentList(res);
+                    setSelectedRows(Array(res.length).fill(false));
+                }
             });
         }
     }, [id]);
@@ -47,6 +51,35 @@ export const AccountDownPayment = (): ReactElement => {
             },
         },
     ];
+
+    const controlColumnHeader = (): ReactElement => (
+        <Checkbox
+            checked={selectedRows.every((checkbox) => !!checkbox)}
+            onClick={({ checked }) => {
+                setSelectedRows(selectedRows.map(() => !!checked));
+            }}
+        />
+    );
+
+    const controlColumnBody = (
+        options: AccountDownPayments,
+        { rowIndex }: ColumnBodyOptions
+    ): ReactElement => {
+        return (
+            <div className={`flex gap-3 align-items-center`}>
+                <Checkbox
+                    checked={selectedRows[rowIndex]}
+                    onClick={() => {
+                        setSelectedRows(
+                            selectedRows.map((state, index) =>
+                                index === rowIndex ? !state : state
+                            )
+                        );
+                    }}
+                />
+            </div>
+        );
+    };
 
     return (
         <div className='down-payment account-card'>
@@ -96,13 +129,8 @@ export const AccountDownPayment = (): ReactElement => {
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            body={() => {
-                                return (
-                                    <div className='flex gap-3 align-items-center'>
-                                        <Checkbox checked={false} />
-                                    </div>
-                                );
-                            }}
+                            header={controlColumnHeader}
+                            body={controlColumnBody}
                             pt={{
                                 root: {
                                     style: {
@@ -117,6 +145,11 @@ export const AccountDownPayment = (): ReactElement => {
                                 header={header}
                                 alignHeader={"left"}
                                 key={field}
+                                body={({ [field]: value }, { rowIndex }) => (
+                                    <div className={`${selectedRows[rowIndex] && "row--selected"}`}>
+                                        {value || "-"}
+                                    </div>
+                                )}
                                 headerClassName='cursor-move'
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
                             />
