@@ -1,4 +1,3 @@
-import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
@@ -9,6 +8,9 @@ import { useParams } from "react-router-dom";
 import { AccountDownPayments } from "common/models/accounts";
 import { useToast } from "dashboard/common/toast";
 import { SplitButton } from "primereact/splitbutton";
+import { makeShortReports } from "http/services/reports.service";
+import { useStore } from "store/hooks";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountDownPayments;
@@ -21,11 +23,22 @@ const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
     { field: "Paid", header: "Payed" },
 ];
 
+enum ModalErrors {
+    TITLE_NO_RECEIPT = "Receipt is not Selected!",
+    TEXT_NO_PRINT_RECEIPT = "No receipt has been selected for printing. Please select a receipt and try again.",
+    TEXT_NO_DOWNLOAD_RECEIPT = "No receipt has been selected for downloading. Please select a receipt and try again.",
+}
+
 export const AccountDownPayment = (): ReactElement => {
     const { id } = useParams();
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const toast = useToast();
     const [paymentList, setPaymentList] = useState<AccountDownPayments[]>([]);
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [modalTitle, setModalTitle] = useState<string>("");
+    const [modalText, setModalText] = useState<string>("");
 
     useEffect(() => {
         if (id) {
@@ -52,6 +65,53 @@ export const AccountDownPayment = (): ReactElement => {
         },
     ];
 
+    const getShortReports = async (currentData: AccountDownPayments[], print = false) => {
+        const columns = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
+        const date = new Date();
+        const name = `account-down-payment_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        if (authUser) {
+            const data = currentData.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                renderColumnsData.forEach((column) => {
+                    if (item.hasOwnProperty(column.field)) {
+                        filteredItem[column.field] = item[column.field as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
+            const JSONreport = {
+                name,
+                itemUID: "0",
+                data,
+                columns,
+                format: "",
+            };
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                if (!print) {
+                    link.download = `Report-${name}.pdf`;
+                    link.click();
+                }
+
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            });
+        }
+    };
+
     const controlColumnHeader = (): ReactElement => (
         <Checkbox
             checked={selectedRows.every((checkbox) => !!checkbox)}
@@ -62,7 +122,7 @@ export const AccountDownPayment = (): ReactElement => {
     );
 
     const controlColumnBody = (
-        options: AccountDownPayments,
+        _: AccountDownPayments,
         { rowIndex }: ColumnBodyOptions
     ): ReactElement => {
         return (
@@ -80,6 +140,40 @@ export const AccountDownPayment = (): ReactElement => {
             </div>
         );
     };
+
+    const printItems = [
+        {
+            label: "Print receipt",
+            icon: "icon adms-blank",
+            command: () => {
+                const currentData = paymentList.filter((_, index) => selectedRows[index]);
+                if (!currentData.length) {
+                    setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                    setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                    setModalVisible(true);
+                    return;
+                }
+                getShortReports(currentData, true);
+            },
+        },
+    ];
+
+    const downloadItems = [
+        {
+            label: "Download receipt",
+            icon: "icon adms-blank",
+            command: () => {
+                const currentData = paymentList.filter((_, index) => selectedRows[index]);
+                if (!currentData.length) {
+                    setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                    setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                    setModalVisible(true);
+                    return;
+                }
+                getShortReports(currentData);
+            },
+        },
+    ];
 
     return (
         <div className='down-payment account-card'>
@@ -157,12 +251,49 @@ export const AccountDownPayment = (): ReactElement => {
                     </DataTable>
                 </div>
                 {!!paymentList.length && (
-                    <div className='col-12 flex gap-3 align-items-end justify-content-start'>
-                        <Button className='down-payment__button'>Print</Button>
-                        <Button className='down-payment__button'>Download</Button>
+                    <div className='col-12 flex gap-3 align-items-end justify-content-start account-management__actions'>
+                        <SplitButton
+                            model={printItems}
+                            className='account__split-button'
+                            label='Print'
+                            icon='pi pi-table'
+                            tooltip='Print table'
+                            tooltipOptions={{
+                                position: "bottom",
+                            }}
+                            onClick={() => {
+                                getShortReports(paymentList, true);
+                            }}
+                            outlined
+                        />
+                        <SplitButton
+                            model={downloadItems}
+                            className='account__split-button'
+                            label='Download'
+                            icon='pi pi-table'
+                            tooltip='Download table'
+                            tooltipOptions={{
+                                position: "bottom",
+                            }}
+                            onClick={() => {
+                                getShortReports(paymentList);
+                            }}
+                            outlined
+                        />
                     </div>
                 )}
             </div>
+            <ConfirmModal
+                visible={!!modalVisible}
+                title={modalTitle}
+                icon='pi-exclamation-triangle'
+                bodyMessage={modalText}
+                confirmAction={() => setModalVisible(false)}
+                draggable={false}
+                acceptLabel='Got It'
+                className='account-warning'
+                onHide={() => setModalVisible(false)}
+            />
         </div>
     );
 };

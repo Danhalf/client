@@ -19,6 +19,8 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { AccountTakePaymentTabs } from "dashboard/accounts/take-payment-form";
 import { AddPaymentNoteDialog } from "./add-payment-note";
 import { AddNoteDialog } from "../notes/add-note-dialog";
+import { makeShortReports } from "http/services/reports.service";
+import { useStore } from "store/hooks";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -57,6 +59,8 @@ export const AccountPaymentHistory = (): ReactElement => {
     const [selectedPayment, setSelectedPayment] = useState<string>(
         ACCOUNT_PAYMENT_STATUS_LIST[0].name
     );
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const navigate = useNavigate();
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
@@ -79,14 +83,67 @@ export const AccountPaymentHistory = (): ReactElement => {
         setActiveColumns(renderColumnsData.filter(({ checked }) => checked));
     }, [id]);
 
+    const getShortReports = async (currentData: AccountHistory[], print = false) => {
+        const columns = renderColumnsData.map((column) => ({
+            name: column.header as string,
+            data: column.field as string,
+        }));
+        const date = new Date();
+        const name = `account-history_${
+            date.getMonth() + 1
+        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
+
+        if (authUser) {
+            const data = currentData.map((item) => {
+                const filteredItem: Record<string, any> = {};
+                renderColumnsData.forEach((column) => {
+                    if (item.hasOwnProperty(column.field)) {
+                        filteredItem[column.field] = item[column.field as keyof typeof item];
+                    }
+                });
+                return filteredItem;
+            });
+            const JSONreport = {
+                name,
+                itemUID: "0",
+                data,
+                columns,
+                format: "",
+            };
+            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
+                const url = new Blob([response], { type: "application/pdf" });
+                let link = document.createElement("a");
+                link.href = window.URL.createObjectURL(url);
+                if (!print) {
+                    link.download = `Report-${name}.pdf`;
+                    link.click();
+                }
+
+                if (print) {
+                    window.open(
+                        link.href,
+                        "_blank",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                    );
+                }
+            });
+        }
+    };
+
     const printItems = [
         {
             label: "Print receipt",
             icon: "icon adms-blank",
             command: () => {
-                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
-                setModalVisible(true);
+                const currentData = historyList.filter((_, index) => selectedRows[index]);
+                if (!currentData.length) {
+                    setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                    setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                    setModalVisible(true);
+                    return;
+                }
+
+                getShortReports(currentData, true);
             },
         },
     ];
@@ -96,9 +153,15 @@ export const AccountPaymentHistory = (): ReactElement => {
             label: "Download receipt",
             icon: "icon adms-blank",
             command: () => {
-                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
-                setModalVisible(true);
+                const currentData = historyList.filter((_, index) => selectedRows[index]);
+                if (!currentData.length) {
+                    setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                    setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                    setModalVisible(true);
+                    return;
+                }
+
+                getShortReports(currentData);
             },
         },
     ];
@@ -329,9 +392,7 @@ export const AccountPaymentHistory = (): ReactElement => {
                                 position: "bottom",
                             }}
                             onClick={() => {
-                                setModalVisible(true);
-                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                                setModalText(ModalErrors.TEXT_NO_PRINT_RECEIPT);
+                                getShortReports(historyList, true);
                             }}
                             outlined
                         />
@@ -345,9 +406,7 @@ export const AccountPaymentHistory = (): ReactElement => {
                                 position: "bottom",
                             }}
                             onClick={() => {
-                                setModalVisible(true);
-                                setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
-                                setModalText(ModalErrors.TEXT_NO_DOWNLOAD_RECEIPT);
+                                getShortReports(historyList);
                             }}
                             outlined
                         />

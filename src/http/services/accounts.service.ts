@@ -806,22 +806,3 @@ export const updateAccountTakePayment = async (
         }
     }
 };
-
-export const getAccountPrintFormTemplate = async (account: string, templateuid: string) => {
-    try {
-        const request = await authorizedUserApiInstance.get<any>(
-            `print/${account}/${templateuid}/form`,
-            {
-                responseType: "blob",
-            }
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting print form template",
-            };
-        }
-    }
-};
