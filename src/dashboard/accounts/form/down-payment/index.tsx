@@ -3,7 +3,7 @@ import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { listAccountDownPayments } from "http/services/accounts.service";
+import { deletePaymentInfo, listAccountDownPayments } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { AccountDownPayments } from "common/models/accounts";
 import { useToast } from "dashboard/common/toast";
@@ -27,6 +27,7 @@ enum ModalErrors {
     TITLE_NO_RECEIPT = "Receipt is not Selected!",
     TEXT_NO_PRINT_RECEIPT = "No receipt has been selected for printing. Please select a receipt and try again.",
     TEXT_NO_DOWNLOAD_RECEIPT = "No receipt has been selected for downloading. Please select a receipt and try again.",
+    TEXT_NO_PAYMENT_DELETE = "No payment has been selected for deleting. Please select a payment and try again.",
 }
 
 export const AccountDownPayment = (): ReactElement => {
@@ -55,12 +56,37 @@ export const AccountDownPayment = (): ReactElement => {
         {
             label: "Delete Payment",
             icon: "icon adms-close",
-            command: () => {
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Updated",
-                    detail: "Data Updated",
-                });
+            command: async () => {
+                const currentData = paymentList.filter((_, index) => selectedRows[index]);
+                if (!currentData.length) {
+                    setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
+                    setModalText(ModalErrors.TEXT_NO_PAYMENT_DELETE);
+                    setModalVisible(true);
+                    return;
+                }
+
+                try {
+                    const deletePromises = currentData.map((item) =>
+                        deletePaymentInfo(item.itemuid)
+                    );
+
+                    await Promise.all(deletePromises);
+
+                    if (id) {
+                        listAccountDownPayments(id).then((res) => {
+                            if (Array.isArray(res) && res.length) {
+                                setPaymentList(res);
+                                setSelectedRows(Array(res.length).fill(false));
+                            }
+                        });
+                    }
+                } catch (error) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Something went wrong. Please try again.",
+                    });
+                }
             },
         },
     ];

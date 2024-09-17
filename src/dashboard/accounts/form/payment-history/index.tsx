@@ -6,7 +6,7 @@ import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { listAccountHistory } from "http/services/accounts.service";
+import { deleteHistoryInfo, listAccountHistory } from "http/services/accounts.service";
 import { AccountHistory } from "common/models/accounts";
 import { ACCOUNT_PAYMENT_STATUS_LIST } from "common/constants/account-options";
 import {
@@ -21,6 +21,7 @@ import { AddPaymentNoteDialog } from "./add-payment-note";
 import { AddNoteDialog } from "../notes/add-note-dialog";
 import { makeShortReports } from "http/services/reports.service";
 import { useStore } from "store/hooks";
+import { useToast } from "dashboard/common/toast";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountHistory | "";
@@ -59,6 +60,7 @@ export const AccountPaymentHistory = (): ReactElement => {
     const [selectedPayment, setSelectedPayment] = useState<string>(
         ACCOUNT_PAYMENT_STATUS_LIST[0].name
     );
+    const toast = useToast();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const navigate = useNavigate();
@@ -183,10 +185,35 @@ export const AccountPaymentHistory = (): ReactElement => {
         {
             label: "Delete Payment",
             icon: "icon adms-close",
-            command: () => {
-                setModalTitle(ModalErrors.TITLE_NO_PAYMENT);
-                setModalText(ModalErrors.TEXT_NO_PAYMENT_DELETE);
-                setModalVisible(true);
+            command: async () => {
+                const currentData = historyList.filter((_, index) => selectedRows[index]);
+                if (!currentData.length) {
+                    setModalTitle(ModalErrors.TITLE_NO_PAYMENT);
+                    setModalText(ModalErrors.TEXT_NO_PAYMENT_DELETE);
+                    setModalVisible(true);
+                    return;
+                }
+
+                try {
+                    const deletePromises = currentData.map((item) =>
+                        deleteHistoryInfo(item.itemuid)
+                    );
+
+                    await Promise.all(deletePromises);
+
+                    await listAccountHistory(id!).then((res) => {
+                        if (Array.isArray(res) && res.length) {
+                            setHistoryList(res);
+                            setSelectedRows(Array(res.length).fill(false));
+                        }
+                    });
+                } catch (error) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Something went wrong. Please try again.",
+                    });
+                }
             },
         },
     ];
