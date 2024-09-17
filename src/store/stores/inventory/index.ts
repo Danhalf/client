@@ -193,7 +193,6 @@ export class InventoryStore {
     }
 
     public getInventory = async (itemuid: string) => {
-        this._isLoading = true;
         try {
             const response = (await getInventoryInfo(itemuid)) as BaseResponseError;
             if (response?.status === Status.ERROR) {
@@ -230,7 +229,6 @@ export class InventoryStore {
     };
 
     private getInventoryMedia = async (): Promise<Status> => {
-        this._isLoading = true;
         try {
             const response = await getInventoryMediaItemList(this._inventoryID);
             if (response && response.length > 0) {
@@ -284,42 +282,30 @@ export class InventoryStore {
     };
 
     public getInventoryExportWeb = async (id = this._inventoryID): Promise<void> => {
-        this._isLoading = true;
         try {
             const response = await getInventoryWebInfo(id);
             if (response) {
                 this._exportWeb = response;
             }
-        } catch (error) {
-        } finally {
-            this._isLoading = false;
-        }
+        } catch (error) {}
     };
 
     public getInventoryPayments = async (id = this._inventoryID): Promise<void> => {
-        this._isLoading = true;
         try {
             const response = await getAccountPayment(id);
             if (response) {
                 this._inventoryPayments = response;
             }
-        } catch (error) {
-        } finally {
-            this._isLoading = false;
-        }
+        } catch (error) {}
     };
 
     public getInventoryExportWebHistory = async (id = this._inventoryID): Promise<void> => {
-        this._isLoading = true;
         try {
             const response = await getInventoryWebInfoHistory(id);
             if (response) {
                 this._exportWebHistory = response;
             }
-        } catch (error) {
-        } finally {
-            this._isLoading = false;
-        }
+        } catch (error) {}
     };
 
     public changeInventory = action(
@@ -368,7 +354,6 @@ export class InventoryStore {
     });
 
     public getWebCheckStatus = async (id = this._inventoryID) => {
-        this._isLoading = true;
         try {
             const response = await getInventoryWebCheck(id);
             if (response?.status === Status.OK) {
@@ -386,8 +371,6 @@ export class InventoryStore {
                 };
             }
             return undefined;
-        } finally {
-            this._isLoading = false;
         }
     };
 
@@ -425,15 +408,16 @@ export class InventoryStore {
                 };
                 const webResponse = await setInventoryExportWeb(inventoryuid, this._exportWeb);
                 const inventoryResponse = await setInventory(inventoryuid, inventoryData);
-                const InventoryWebCheck = await setInventoryWebCheck(inventoryuid, {
-                    enabled: !!this._exportWebActive ? 1 : 0,
+
+                await Promise.all([inventoryResponse, webResponse]).then((response) => {
+                    inventoryuid !== "0" &&
+                        setInventoryWebCheck(inventoryuid, {
+                            enabled: !!this._exportWebActive ? 1 : 0,
+                        });
+                    return response.every((item) => item?.status === Status.OK)
+                        ? inventoryuid
+                        : undefined;
                 });
-                await Promise.all([inventoryResponse, webResponse, InventoryWebCheck]).then(
-                    (response) =>
-                        response.every((item) => item?.status === Status.OK)
-                            ? inventoryuid
-                            : undefined
-                );
             } catch (error) {
                 // TODO: add error handlers
                 return undefined;
@@ -573,7 +557,6 @@ export class InventoryStore {
         inventoryMediaID: Partial<InventoryMediaItemID>[]
     ) {
         try {
-            this._isLoading = true;
             await this.getInventoryMedia();
 
             const result: MediaItem[] = [...mediaArray];
@@ -634,7 +617,6 @@ export class InventoryStore {
 
     public getPrintList = action(async (inventoryuid = this._inventoryID) => {
         try {
-            this._isLoading = true;
             const response = await getInventoryPrintForms(inventoryuid);
             if (response) {
                 this._printList = response;
