@@ -28,6 +28,7 @@ import { getUserGroupActiveList } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
 import { Button } from "primereact/button";
+import { AutoComplete } from "primereact/autocomplete";
 
 const EQUIPMENT = "equipment";
 
@@ -361,25 +362,26 @@ export const VehicleGeneral = observer((): ReactElement => {
             </div>
             <div className='col-6 relative'>
                 <span className='p-float-label'>
-                    <Dropdown
+                    <AutoComplete
                         {...getFieldProps("Make")}
-                        optionLabel='name'
-                        optionValue='name'
                         value={values.Make}
-                        options={automakesList}
-                        editable
-                        filter
-                        onChange={({ value }) => {
+                        suggestions={automakesList}
+                        field='name'
+                        completeMethod={({ query }) => {
                             setAutomakesList(
                                 initialAutoMakesList.filter((item) =>
-                                    item.name.includes(value.toUpperCase())
+                                    item.name.includes(query.toUpperCase())
                                 )
                             );
-                            setFieldValue("Make", value);
-                            changeInventory({ key: "Make", value });
                         }}
-                        valueTemplate={selectedAutoMakesTemplate}
+                        dropdown
+                        onChange={({ value }) => {
+                            const make = typeof value === "string" ? value : value.name;
+                            setFieldValue("Make", make);
+                            changeInventory({ key: "Make", value: make });
+                        }}
                         itemTemplate={autoMakesOptionTemplate}
+                        selectedItemTemplate
                         placeholder='Make (required)'
                         className={`vehicle-general__dropdown w-full ${
                             errors.Make ? "p-invalid" : ""
