@@ -124,16 +124,17 @@ export const EditAccessDialog = ({
         let newSelectedValues = [...selectedValues];
 
         const allRolesSelected = selectedValues.includes("All_roles");
-        const allAccessSelected = selectedValues.includes("All_access");
 
         if (allRolesSelected) {
-            const allRoles = filterOptions[0].items.map((item) => item.value);
-            newSelectedValues = Array.from(new Set([...newSelectedValues, ...allRoles]));
-        }
+            const allRoles = filterOptions[0].items
+                .map((item) => item.value)
+                .filter((role) => role !== "All_roles");
 
-        if (allAccessSelected) {
-            const allAccess = filterOptions[1].items.map((item) => item.value);
-            newSelectedValues = Array.from(new Set([...newSelectedValues, ...allAccess]));
+            if (newSelectedValues.includes("All_roles")) {
+                newSelectedValues = Array.from(new Set([...allRoles]));
+            } else {
+                newSelectedValues = Array.from(new Set([...newSelectedValues, ...allRoles]));
+            }
         }
 
         setSelectedRole(newSelectedValues);
@@ -287,6 +288,7 @@ export const ActionButtons = ({
     const [editAccessActive, setEditAccessActive] = useState(false);
     const toast = useToast();
     const menu = useRef<Menu>(null!);
+    const navigate = useNavigate();
 
     const handleEditAccess = () => {
         setEditAccessActive(true);
@@ -343,6 +345,10 @@ export const ActionButtons = ({
         });
     };
 
+    const handleEditReport = () => {
+        navigate(`/dashboard/reports/${report.itemUID}`);
+    };
+
     return (
         <>
             <div className='reports-actions flex'>
@@ -381,6 +387,13 @@ export const ActionButtons = ({
                     outlined
                     onClick={handleChangeIsFavorite}
                     tooltip={!!report.isfavorite ? "Remove from Favorites" : "Add to Favorites"}
+                />
+                <Button
+                    className='p-button reports-actions__button'
+                    icon='icon adms-edit-item'
+                    outlined
+                    tooltip='Edit Report'
+                    onClick={handleEditReport}
                 />
                 <Button
                     className='p-button reports-actions__button'
@@ -549,6 +562,7 @@ export const CollectionPanelContent = ({
                     });
                 } else {
                     handleClosePanel?.();
+                    setCollectionNameInput("");
                 }
             });
     };

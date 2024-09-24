@@ -18,11 +18,9 @@ import {
     ReportsAccordionHeader,
     ReportsPanelHeader,
 } from "dashboard/reports/common";
-import { useNavigate } from "react-router-dom";
 import { useStore } from "store/hooks";
 
 export default function Reports(): ReactElement {
-    const navigate = useNavigate();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [reportSearch, setReportSearch] = useState<string>("");
@@ -272,15 +270,7 @@ export default function Reports(): ReactElement {
                                                                     className='reports__list-item reports__list-item--inner'
                                                                     key={report.itemUID}
                                                                 >
-                                                                    <p
-                                                                        onClick={() =>
-                                                                            navigate(
-                                                                                `/dashboard/reports/${report.itemUID}`
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        {report.name}
-                                                                    </p>
+                                                                    <p>{report.name}</p>
                                                                     <ActionButtons
                                                                         report={report}
                                                                         collectionList={collections}
