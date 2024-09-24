@@ -43,22 +43,35 @@ interface EditAccessDialogProps {
     reportuid: string;
 }
 
+enum ROLE {
+    ALL = "All_roles",
+    ADMIN = "admin.role",
+    MANAGER = "manager.role",
+    SALES = "sales.role",
+}
+
+enum ACCESS {
+    ALL = "All_access",
+    GRANTED = "granted.access",
+    DENIED = "denied.access",
+}
+
 const filterOptions = [
     {
         label: "Role",
         items: [
-            { name: "All roles", value: "All_roles" },
-            { name: "Admin", value: "admin.role" },
-            { name: "Manager", value: "manager.role" },
-            { name: "Sales person", value: "sales.role" },
+            { name: "All roles", value: ROLE.ALL },
+            { name: "Admin", value: ROLE.ADMIN },
+            { name: "Manager", value: ROLE.MANAGER },
+            { name: "Sales person", value: ROLE.SALES },
         ],
     },
     {
         label: "Access",
         items: [
-            { name: "All access", value: "All_access" },
-            { name: "Denied", value: "denied.access" },
-            { name: "Granted", value: "granted.access" },
+            { name: "All access", value: ACCESS.ALL },
+            { name: "Denied", value: ACCESS.DENIED },
+            { name: "Granted", value: ACCESS.GRANTED },
         ],
     },
 ];
@@ -70,7 +83,7 @@ export const EditAccessDialog = ({
 }: EditAccessDialogProps): ReactElement => {
     const toast = useToast();
     const [accessList, setAccessList] = useState<ReportAccess[]>([]);
-    const [selectedRole, setSelectedRole] = useState<string[]>([]);
+    const [selectedRole, setSelectedRole] = useState<(ROLE | ACCESS)[]>([]);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [search, setSearch] = useState<string>("");
 
@@ -107,33 +120,90 @@ export const EditAccessDialog = ({
 
         if (selectedRole) {
             const selectedFilters: string = [...selectedRole]
-                .filter((item) => !item.includes("All_"))
+                .filter((item) => !item.includes(ROLE.ALL || ACCESS.ALL))
                 .join("+");
             if (selectedFilters.length) {
                 qry = `${search ? `${qry}+` : ""}${selectedFilters}`;
             }
         }
-        qry.length && handleGetReportAccessList({ qry });
+        handleGetReportAccessList({ qry });
     }, [search, selectedRole]);
 
     const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
     };
 
-    const handleRoleSelection = (selectedValues: string[]) => {
-        let newSelectedValues = [...selectedValues];
+    const handleRoleSelection = (selectedValue: { name: string; value: ROLE | ACCESS }) => {
+        let newSelectedValues: (ROLE | ACCESS)[] = [...selectedRole];
 
-        const allRolesSelected = selectedValues.includes("All_roles");
+        const allRoles: ROLE[] = [ROLE.ADMIN, ROLE.MANAGER, ROLE.SALES];
+        const allAccess: ACCESS[] = [ACCESS.GRANTED, ACCESS.DENIED];
 
-        if (allRolesSelected) {
-            const allRoles = filterOptions[0].items
-                .map((item) => item.value)
-                .filter((role) => role !== "All_roles");
+        if (selectedValue.value === ROLE.ALL) {
+            const isAllRolesSelected = newSelectedValues.includes(ROLE.ALL);
 
-            if (newSelectedValues.includes("All_roles")) {
-                newSelectedValues = Array.from(new Set([...allRoles]));
+            if (isAllRolesSelected) {
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => !allRoles.includes(value as ROLE)
+                );
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => value !== ROLE.ALL
+                );
             } else {
-                newSelectedValues = Array.from(new Set([...newSelectedValues, ...allRoles]));
+                newSelectedValues = Array.from(
+                    new Set([...newSelectedValues, ...allRoles, ROLE.ALL])
+                );
+            }
+        } else if (selectedValue.value === ACCESS.ALL) {
+            const isAllAccessSelected = newSelectedValues.includes(ACCESS.ALL);
+
+            if (isAllAccessSelected) {
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => !allAccess.includes(value as ACCESS)
+                );
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => value !== ACCESS.ALL
+                );
+            } else {
+                newSelectedValues = Array.from(
+                    new Set([...newSelectedValues, ...allAccess, ACCESS.ALL])
+                );
+            }
+        } else {
+            const isItemSelected = newSelectedValues.includes(selectedValue.value);
+
+            if (isItemSelected) {
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => value !== selectedValue.value
+                );
+            } else {
+                newSelectedValues.push(selectedValue.value);
+            }
+
+            const allRolesSelected = allRoles.every((role) => newSelectedValues.includes(role));
+
+            if (allRolesSelected) {
+                if (!newSelectedValues.includes(ROLE.ALL)) {
+                    newSelectedValues.push(ROLE.ALL);
+                }
+            } else {
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => value !== ROLE.ALL
+                );
+            }
+
+            const allAccessSelected = allAccess.every((access) =>
+                newSelectedValues.includes(access)
+            );
+
+            if (allAccessSelected) {
+                if (!newSelectedValues.includes(ACCESS.ALL)) {
+                    newSelectedValues.push(ACCESS.ALL);
+                }
+            } else {
+                newSelectedValues = newSelectedValues.filter(
+                    (value: ROLE | ACCESS) => value !== ACCESS.ALL
+                );
             }
         }
 
@@ -213,7 +283,7 @@ export const EditAccessDialog = ({
                         panelHeaderTemplate={<></>}
                         onChange={(e) => {
                             e.stopPropagation();
-                            handleRoleSelection(e.value);
+                            handleRoleSelection(e.selectedOption);
                         }}
                         pt={{
                             wrapper: {
