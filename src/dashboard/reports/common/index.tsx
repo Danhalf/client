@@ -20,9 +20,9 @@ import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
-import { MultiSelect } from "primereact/multiselect";
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { PanelHeaderTemplateOptions } from "primereact/panel";
-import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface TableColumnProps extends ColumnProps {
@@ -133,7 +133,8 @@ export const EditAccessDialog = ({
         setSearch(e.target.value);
     };
 
-    const handleRoleSelection = (selectedValue: { name: string; value: ROLE | ACCESS }) => {
+    const handleRoleSelection = (selectData: MultiSelectChangeEvent) => {
+        const selectedValue: { name: string; value: ROLE | ACCESS } = selectData.selectedOption;
         let newSelectedValues: (ROLE | ACCESS)[] = [...selectedRole];
 
         const allRoles: ROLE[] = [ROLE.ADMIN, ROLE.MANAGER, ROLE.SALES];
@@ -207,7 +208,7 @@ export const EditAccessDialog = ({
             }
         }
 
-        setSelectedRole(newSelectedValues);
+        setSelectedRole(newSelectedValues.filter(Boolean));
     };
 
     const accessField = (data: ReportAccess): ReactElement => {
@@ -281,9 +282,9 @@ export const EditAccessDialog = ({
                         value={selectedRole}
                         display='chip'
                         panelHeaderTemplate={<></>}
-                        onChange={(e) => {
-                            e.stopPropagation();
-                            handleRoleSelection(e.selectedOption);
+                        onChange={(event) => {
+                            event.stopPropagation();
+                            handleRoleSelection(event);
                         }}
                         pt={{
                             wrapper: {
@@ -615,6 +616,21 @@ export const CollectionPanelContent = ({
     const [confirmTitle, setConfirmTitle] = useState<string>("");
     const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
     const toast = useToast();
+    const [initialCollectionName, setInitialCollectionName] = useState<string>(collectionName);
+    const [initialSelectedReports, setInitialSelectedReports] =
+        useState<ReportDocument[]>(selectedReports);
+
+    useEffect(() => {
+        setInitialCollectionName(collectionName);
+        setInitialSelectedReports(selectedReports);
+    }, [collectionuid]);
+
+    const reportsAreEqual = (reports1: ReportDocument[], reports2: ReportDocument[]) => {
+        if (reports1.length !== reports2.length) return false;
+        const sorted1 = [...reports1].sort((a, b) => a.itemUID.localeCompare(b.itemUID));
+        const sorted2 = [...reports2].sort((a, b) => a.itemUID.localeCompare(b.itemUID));
+        return sorted1.every((item, idx) => item.itemUID === sorted2[idx].itemUID);
+    };
 
     const selectedItemTemplate = (item: ReportDocument): ReactElement => {
         return <span className='multiselect-label'>{item?.name || ""}</span>;
@@ -638,12 +654,16 @@ export const CollectionPanelContent = ({
     };
 
     const handleCloseClick = () => {
-        setConfirmTitle("Quit Editing?");
-        setConfirmMessage(
-            "Are you sure you want to cancel creating a new collection? All unsaved data will be lost."
-        );
-        setConfirmAction(() => handleClosePanel!);
-        setIsConfirmVisible(true);
+        if (isUpdateDisabled) {
+            handleClosePanel?.();
+        } else {
+            setConfirmTitle("Quit Editing?");
+            setConfirmMessage(
+                "Are you sure you want to cancel editing? All unsaved data will be lost."
+            );
+            setConfirmAction(() => handleClosePanel!);
+            setIsConfirmVisible(true);
+        }
     };
 
     const handleDeleteClick = () => {
@@ -652,6 +672,14 @@ export const CollectionPanelContent = ({
         setConfirmAction(() => handleDeleteCollection);
         setIsConfirmVisible(true);
     };
+
+    const isUpdateDisabled = useMemo(() => {
+        return (
+            !collectionNameInput ||
+            (collectionNameInput === initialCollectionName &&
+                reportsAreEqual(selectedReports, initialSelectedReports))
+        );
+    }, [collectionNameInput, initialCollectionName, selectedReports, initialSelectedReports]);
 
     return (
         <>
@@ -722,8 +750,8 @@ export const CollectionPanelContent = ({
                     )}
                     <Button
                         className='edit-collection__button'
-                        disabled={!collectionName}
-                        severity={!collectionName ? "secondary" : "success"}
+                        disabled={isUpdateDisabled}
+                        severity={isUpdateDisabled ? "secondary" : "success"}
                         type='button'
                         onClick={handleCreateCollection}
                         outlined
