@@ -30,6 +30,7 @@ export default function Reports(): ReactElement {
     const [newCollectionsReports, setNewCollectionsReports] = useState<ReportDocument[]>([]);
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
     const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
+    const [activeIndexes, setActiveIndexes] = useState<number[]>([]);
 
     const toast = useToast();
 
@@ -135,14 +136,24 @@ export default function Reports(): ReactElement {
                     });
                     setCollectionName("");
                     setSelectedReports([]);
+                    setIsCollectionEditing(null);
                 }
             });
         }
     };
 
-    const handleEditCollection = (event: React.MouseEvent<HTMLElement>, id: string) => {
+    const handleEditCollection = (
+        event: React.MouseEvent<HTMLElement>,
+        id: string,
+        index: number
+    ) => {
         event.preventDefault();
+        event.stopPropagation();
         setIsCollectionEditing(id);
+
+        if (!activeIndexes.includes(index)) {
+            setActiveIndexes([...activeIndexes, index]);
+        }
     };
 
     return (
@@ -181,16 +192,24 @@ export default function Reports(): ReactElement {
                                 </Panel>
                             </div>
                             <div className='col-12'>
-                                <Accordion multiple className='reports__accordion'>
+                                <Accordion
+                                    multiple
+                                    className='reports__accordion'
+                                    activeIndex={activeIndexes}
+                                    onTabChange={(e) => setActiveIndexes(e.index as number[])}
+                                >
                                     {collections &&
                                         [...favoriteCollections, ...collections].map(
-                                            ({
-                                                itemUID,
-                                                name,
-                                                isfavorite,
-                                                documents,
-                                                userUID,
-                                            }: ReportCollection) => {
+                                            (
+                                                {
+                                                    itemUID,
+                                                    name,
+                                                    isfavorite,
+                                                    documents,
+                                                    userUID,
+                                                }: ReportCollection,
+                                                index: number
+                                            ) => {
                                                 const isContainsSearchedValue =
                                                     reportSearch &&
                                                     documents?.some((report) =>
@@ -220,7 +239,8 @@ export default function Reports(): ReactElement {
                                                                             onClick={(e) =>
                                                                                 handleEditCollection(
                                                                                     e,
-                                                                                    itemUID
+                                                                                    itemUID,
+                                                                                    index
                                                                                 )
                                                                             }
                                                                         />
