@@ -1,4 +1,4 @@
-import { Dropdown, DropdownProps } from "primereact/dropdown";
+import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
 import { ReactElement, useCallback, useEffect, useState } from "react";
@@ -105,21 +105,17 @@ export const VehicleGeneral = observer((): ReactElement => {
         if (inventory.Make) handleSelectMake();
     }, [handleSelectMake, inventory.Make]);
 
-    const selectedAutoMakesTemplate = (option: MakesListData, props: DropdownProps) => {
-        if (option) {
-            return (
-                <div className='flex align-items-center'>
-                    <img
-                        alt={option.name}
-                        src={option?.logo || defaultMakesLogo}
-                        className='mr-2 vehicle-general__dropdown-icon'
-                    />
-                    <div>{option.name}</div>
-                </div>
-            );
-        }
-
-        return <span>{props.placeholder}</span>;
+    const selectedAutoMakesTemplate = (option: MakesListData) => {
+        return (
+            <div className='flex align-items-center'>
+                <img
+                    alt={option.name}
+                    src={option?.logo || defaultMakesLogo}
+                    className='mr-2 vehicle-general__dropdown-icon'
+                />
+                <div>{option.name}</div>
+            </div>
+        );
     };
 
     const autoMakesOptionTemplate = (option: MakesListData) => {
@@ -366,7 +362,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                         {...getFieldProps("Make")}
                         value={values.Make}
                         suggestions={automakesList}
-                        field='name'
                         completeMethod={({ query }) => {
                             setAutomakesList(
                                 initialAutoMakesList.filter((item) =>
@@ -381,7 +376,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             changeInventory({ key: "Make", value: make });
                         }}
                         itemTemplate={autoMakesOptionTemplate}
-                        selectedItemTemplate
+                        selectedItemTemplate={selectedAutoMakesTemplate}
                         placeholder='Make (required)'
                         className={`vehicle-general__dropdown w-full ${
                             errors.Make ? "p-invalid" : ""
