@@ -135,6 +135,20 @@ export const getInventoryWebCheck = async (inventoryuid: string) => {
     }
 };
 
+export const getVINCheck = async (VIN: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<any>(`inventory/${VIN}/checkvin`);
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while VIN check",
+            };
+        }
+    }
+};
+
 export const setInventory = async (
     inventoryUid: string,
     inventoryData: Partial<Inventory>
