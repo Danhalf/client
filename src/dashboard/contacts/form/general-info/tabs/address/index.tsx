@@ -6,7 +6,11 @@ import "./index.css";
 import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
 
-export const ContactsAddressInfo = observer((): ReactElement => {
+interface ContactsAddressInfoProps {
+    type?: string;
+}
+
+export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps): ReactElement => {
     const store = useStore().contactStore;
     const { contact, changeContact } = store;
 
