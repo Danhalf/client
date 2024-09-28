@@ -19,7 +19,7 @@ export const ContactsBuyerInfo = observer((): ReactElement => {
                     <ContactsIdentificationInfo type='buyer' />
                 </TabPanel>
                 <TabPanel header='OFAC CHECK'>
-                    <div>OFAC CHECK</div>
+                    <div>OFAC CHECK TAB</div>
                 </TabPanel>
             </TabView>
         </div>
