@@ -20,7 +20,7 @@ const titleList = [
 ];
 
 interface ContactsGeneralInfoProps {
-    type?: string;
+    type?: "buyer" | "co-buyer";
 }
 
 export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps): ReactElement => {

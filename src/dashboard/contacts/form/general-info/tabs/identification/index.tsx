@@ -20,7 +20,7 @@ const SexList = [
 const BUYER_TYPE_ID = 1;
 
 interface ContactsIdentificationInfoProps {
-    type?: string;
+    type?: "buyer" | "co-buyer";
 }
 
 export const ContactsIdentificationInfo = observer(

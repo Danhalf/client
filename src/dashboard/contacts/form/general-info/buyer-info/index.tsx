@@ -4,6 +4,7 @@ import { ReactElement } from "react";
 import { ContactsGeneralInfo } from "../tabs/general";
 import { ContactsAddressInfo } from "../tabs/address";
 import { ContactsIdentificationInfo } from "../tabs/identification";
+import { ContactsOfacCheck } from "../tabs/ofac-check";
 
 export const ContactsBuyerInfo = observer((): ReactElement => {
     return (
@@ -19,7 +20,7 @@ export const ContactsBuyerInfo = observer((): ReactElement => {
                     <ContactsIdentificationInfo type='buyer' />
                 </TabPanel>
                 <TabPanel header='OFAC CHECK'>
-                    <div>OFAC CHECK TAB</div>
+                    <ContactsOfacCheck type='buyer' />
                 </TabPanel>
             </TabView>
         </div>

@@ -8,7 +8,7 @@ import { STATES_LIST } from "common/constants/states";
 import { Checkbox } from "primereact/checkbox";
 
 interface ContactsAddressInfoProps {
-    type?: string;
+    type?: "buyer" | "co-buyer";
 }
 
 export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps): ReactElement => {
