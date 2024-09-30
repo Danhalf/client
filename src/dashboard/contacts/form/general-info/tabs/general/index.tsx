@@ -20,7 +20,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     const { id } = useParams();
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
-    const { contact, contactExtData, changeContact, changeContactExtData } = store;
+    const { contact, changeContact } = store;
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
 
     const { errors, setFieldValue } = useFormikContext<Contact>();
@@ -36,28 +36,10 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
 
     return (
         <div className='grid general-info row-gap-2'>
-            <div className='col-4 relative'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='id'
-                        value={contact.type || 0}
-                        filter
-                        options={typeList}
-                        onChange={(e) => {
-                            setFieldValue("type", e.value);
-                            changeContact("type", e.value);
-                        }}
-                        className={`w-full general-info__dropdown ${
-                            errors.type ? "p-invalid" : ""
-                        }`}
-                    />
-                    <label className='float-label'>Type (required)</label>
-                </span>
-                <small className='p-error'>{errors.type}</small>
+            <div className='col-3'>
+                <Button label='Scan driver license' className='general-info__button' outlined />
             </div>
-
-            <div className='col-8'>
+            <div className='col-9'>
                 <div className='general-info-overwrite pb-3'>
                     <Checkbox
                         checked={allowOverwrite}
@@ -73,12 +55,34 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     </label>
                     <Button
                         text
-                        tooltip='Data received from the VIN decoder service will overwrite user-entered data.'
+                        tooltip='Data received from the DL’s backside will overwrite user-entered data'
                         icon='icon adms-help'
                         type='button'
                         severity='info'
                         className='general-info-overwrite__icon transparent'
                     />
+                </div>
+            </div>
+            <div className='col-12 grid'>
+                <div className='col-4 relative'>
+                    <span className='p-float-label'>
+                        <Dropdown
+                            optionLabel='name'
+                            optionValue='id'
+                            value={contact.type || 0}
+                            filter
+                            options={typeList}
+                            onChange={(e) => {
+                                setFieldValue("type", e.value);
+                                changeContact("type", e.value);
+                            }}
+                            className={`w-full general-info__dropdown ${
+                                errors.type ? "p-invalid" : ""
+                            }`}
+                        />
+                        <label className='float-label'>Type (required)</label>
+                    </span>
+                    <small className='p-error'>{errors.type}</small>
                 </div>
             </div>
 
