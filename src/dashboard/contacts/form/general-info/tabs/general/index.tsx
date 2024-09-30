@@ -9,15 +9,8 @@ import { Contact, ContactType } from "common/models/contact";
 import { getContactsTypeList } from "http/services/contacts-service";
 import { useFormikContext } from "formik";
 import { REQUIRED_COMPANY_TYPE_INDEXES } from "dashboard/contacts/form";
-
-const titleList = [
-    {
-        name: "Mr.",
-    },
-    {
-        name: "Mrs.",
-    },
-];
+import { Checkbox } from "primereact/checkbox";
+import { Button } from "primereact/button";
 
 interface ContactsGeneralInfoProps {
     type?: "buyer" | "co-buyer";
@@ -28,6 +21,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
     const { contact, contactExtData, changeContact, changeContactExtData } = store;
+    const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
 
     const { errors, setFieldValue } = useFormikContext<Contact>();
 
@@ -42,22 +36,50 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
 
     return (
         <div className='grid general-info row-gap-2'>
-            <div className='col-4'>
+            <div className='col-4 relative'>
                 <span className='p-float-label'>
                     <Dropdown
                         optionLabel='name'
-                        optionValue='name'
+                        optionValue='id'
+                        value={contact.type || 0}
                         filter
-                        placeholder='Title'
-                        value={contactExtData.Buyer_Salutation || ""}
-                        options={titleList}
-                        onChange={({ target: { value } }) => {
-                            changeContactExtData("Buyer_Salutation", value);
+                        options={typeList}
+                        onChange={(e) => {
+                            setFieldValue("type", e.value);
+                            changeContact("type", e.value);
                         }}
-                        className='w-full general-info__dropdown'
+                        className={`w-full general-info__dropdown ${
+                            errors.type ? "p-invalid" : ""
+                        }`}
                     />
-                    <label className='float-label'>Title</label>
+                    <label className='float-label'>Type (required)</label>
                 </span>
+                <small className='p-error'>{errors.type}</small>
+            </div>
+
+            <div className='col-8'>
+                <div className='general-info-overwrite pb-3'>
+                    <Checkbox
+                        checked={allowOverwrite}
+                        inputId='general-info-overwrite'
+                        className='general-info-overwrite__checkbox'
+                        onChange={() => setAllowOverwrite(!allowOverwrite)}
+                    />
+                    <label
+                        htmlFor='general-info-overwrite'
+                        className='pl-3 general-info-overwrite__label'
+                    >
+                        Overwrite data
+                    </label>
+                    <Button
+                        text
+                        tooltip='Data received from the VIN decoder service will overwrite user-entered data.'
+                        icon='icon adms-help'
+                        type='button'
+                        severity='info'
+                        className='general-info-overwrite__icon transparent'
+                    />
+                </div>
             </div>
 
             <div className='col-4 relative'>
@@ -105,26 +127,6 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                 </span>
             </div>
 
-            <div className='col-4 relative'>
-                <span className='p-float-label'>
-                    <Dropdown
-                        optionLabel='name'
-                        optionValue='id'
-                        value={contact.type || 0}
-                        filter
-                        options={typeList}
-                        onChange={(e) => {
-                            setFieldValue("type", e.value);
-                            changeContact("type", e.value);
-                        }}
-                        className={`w-full general-info__dropdown ${
-                            errors.type ? "p-invalid" : ""
-                        }`}
-                    />
-                    <label className='float-label'>Type (required)</label>
-                </span>
-                <small className='p-error'>{errors.type}</small>
-            </div>
             <div className='col-4 relative'>
                 <span className='p-float-label'>
                     <InputText
