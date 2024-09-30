@@ -98,9 +98,25 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                             changeContact("firstName", value);
                         }}
                     />
-                    <label className='float-label'>First Name (required)</label>
+                    <label className='float-label'>
+                        First Name
+                        {!REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type) && " (required)"}
+                    </label>
                 </span>
                 <small className='p-error'>{errors.firstName}</small>
+            </div>
+
+            <div className='col-4 relative'>
+                <span className='p-float-label'>
+                    <InputText
+                        className='general-info__text-input w-full'
+                        value={contact.middleName || ""}
+                        onChange={({ target: { value } }) => {
+                            changeContact("middleName", value);
+                        }}
+                    />
+                    <label className='float-label'>Middle Name</label>
+                </span>
             </div>
 
             <div className='col-4 relative'>
@@ -115,7 +131,10 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                             changeContact("lastName", value);
                         }}
                     />
-                    <label className='float-label'>Last Name (required)</label>
+                    <label className='float-label'>
+                        Last Name
+                        {!REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type) && " (required)"}
+                    </label>
                 </span>
                 <small className='p-error'>{errors.lastName}</small>
             </div>
@@ -123,32 +142,18 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
             <div className='col-4'>
                 <span className='p-float-label'>
                     <InputText
-                        className='general-info__text-input w-full'
+                        className={`general-info__text-input w-full ${
+                            errors.businessName ? "p-invalid" : ""
+                        }`}
                         value={contact.businessName || ""}
                         onChange={({ target: { value } }) => changeContact("businessName", value)}
                     />
-                    <label className='float-label'>Business Name</label>
-                </span>
-            </div>
-
-            <div className='col-4 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`general-info__text-input w-full ${
-                            errors.companyName ? "p-invalid" : ""
-                        }`}
-                        value={contact.companyName || ""}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("companyName", value);
-                            changeContact("companyName", value);
-                        }}
-                    />
                     <label className='float-label'>
-                        Company Name
+                        Business Name
                         {REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type) && " (required)"}
                     </label>
                 </span>
-                <small className='p-error'>{errors.companyName}</small>
+                <small className='p-error'>{errors.businessName}</small>
             </div>
         </div>
     );
