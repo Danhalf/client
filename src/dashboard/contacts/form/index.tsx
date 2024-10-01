@@ -64,6 +64,23 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     }),
 });
 
+const DialogBody = (): ReactElement => {
+    return (
+        <>
+            <div className='confirm-header'>
+                <i className='pi pi-exclamation-triangle confirm-header__icon' />
+                <div className='confirm-header__title'>Required data is missing</div>
+            </div>
+            <div className='text-center w-full confirm-body'>
+                The form cannot be saved as it missing required data.
+            </div>
+            <div className='text-center w-full confirm-body--bold'>
+                Please fill in the required fields and try again.
+            </div>
+        </>
+    );
+};
+
 export const ContactForm = observer((): ReactElement => {
     const { id } = useParams();
     const location = useLocation();
@@ -419,16 +436,7 @@ export const ContactForm = observer((): ReactElement => {
                 footer='Got it'
                 action={() => setIsDataMissingConfirm(false)}
             >
-                <div className='confirm-header'>
-                    <i className='pi pi-exclamation-triangle confirm-header__icon' />
-                    <div className='confirm-header__title'>Required data is missing</div>
-                </div>
-                <div className='text-center w-full confirm-body'>
-                    The form cannot be saved as it missing required data.
-                </div>
-                <div className='text-center w-full confirm-body'>
-                    <strong>Please fill in the required fields and try again</strong>
-                </div>
+                <DialogBody />
             </DashboardDialog>
         </Suspense>
     );
