@@ -217,10 +217,13 @@ export const DealsForm = observer(() => {
                 });
             }
         }
+    }, [stepActiveIndex, stepsRef.current]);
+
+    useEffect(() => {
         if (stepActiveIndex === printActiveIndex) {
             getPrintList(id);
         }
-    }, [stepActiveIndex, stepsRef.current]);
+    }, [stepActiveIndex, printActiveIndex]);
 
     const getUrl = (activeIndex: number) => {
         const currentPath = id ? id : "create";
