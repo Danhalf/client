@@ -456,9 +456,7 @@ export const InventoryForm = observer(() => {
                                                     TypeOfFuel: inventory?.TypeOfFuel_id || "",
                                                     StockNo: inventory?.StockNo || "",
                                                     locationuid:
-                                                        inventory?.locationuid ||
-                                                        currentLocation ||
-                                                        " ",
+                                                        inventory?.locationuid || currentLocation,
                                                     GroupClassName: inventory?.GroupClassName || "",
                                                 } as PartialInventory
                                             }
