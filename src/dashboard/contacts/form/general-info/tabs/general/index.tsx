@@ -6,11 +6,14 @@ import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
 import { Contact, ContactType } from "common/models/contact";
-import { getContactsTypeList } from "http/services/contacts-service";
+import { getContactsTypeList, scanContactDL } from "http/services/contacts-service";
 import { useFormikContext } from "formik";
 import { REQUIRED_COMPANY_TYPE_INDEXES } from "dashboard/contacts/form";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
+import { useToast } from "dashboard/common/toast";
+import { Status } from "common/models/base-response";
+import { TOAST_LIFETIME } from "common/settings";
 
 interface ContactsGeneralInfoProps {
     type?: "buyer" | "co-buyer";
@@ -21,7 +24,9 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
     const { contact, changeContact } = store;
+    const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
+    const [driverLicense, setDriverLicense] = useState<string>("");
 
     const { errors, setFieldValue } = useFormikContext<Contact>();
 
@@ -33,6 +38,20 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
             }
         });
     }, [id]);
+
+    const handleScanDL = () => {
+        //@ts-ignore
+        scanContactDL(driverLicense).then((response) => {
+            if (response?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response.error,
+                    life: TOAST_LIFETIME,
+                });
+            }
+        });
+    };
 
     return (
         <div className='grid general-info row-gap-2'>
