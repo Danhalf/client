@@ -123,13 +123,16 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                     onClick={() => setAccessDialogVisible(true)}
                     outlined
                 />
-                <Button
-                    className='report__icon-button'
-                    icon='icon adms-blank'
-                    severity='success'
-                    onClick={handleDuplicateReport}
-                    outlined
-                />
+                {report.itemuid && (
+                    <Button
+                        className='report__icon-button'
+                        icon='icon adms-blank'
+                        severity='success'
+                        onClick={handleDuplicateReport}
+                        outlined
+                    />
+                )}
+
                 {!report.isdefault && report.itemuid && (
                     <Button
                         className='report__icon-button'
@@ -142,6 +145,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                 <Button
                     className='ml-auto uppercase px-6 report__button'
                     severity='danger'
+                    onClick={() => navigate("/dashboard/reports")}
                     outlined
                 >
                     Cancel
