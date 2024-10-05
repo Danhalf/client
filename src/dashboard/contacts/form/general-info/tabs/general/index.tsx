@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
@@ -26,8 +26,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     const { contact, changeContact } = store;
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
-    const [driverLicense, setDriverLicense] = useState<string>("");
-
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const { errors, setFieldValue } = useFormikContext<Contact>();
 
     useEffect(() => {
@@ -40,17 +39,24 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     }, [id]);
 
     const handleScanDL = () => {
-        //@ts-ignore
-        scanContactDL(driverLicense).then((response) => {
-            if (response?.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response.error,
-                    life: TOAST_LIFETIME,
-                });
-            }
-        });
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            scanContactDL(file).then((response) => {
+                if (response?.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response.error,
+                        life: TOAST_LIFETIME,
+                    });
+                }
+            });
+            event.target.value = "";
+        }
     };
 
     return (
@@ -61,6 +67,14 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     label='Scan driver license'
                     className='general-info__button'
                     outlined
+                    onClick={handleScanDL}
+                />
+                <input
+                    type='file'
+                    accept='image/*'
+                    style={{ display: "none" }}
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
                 />
             </div>
             <div className='col-9'>
