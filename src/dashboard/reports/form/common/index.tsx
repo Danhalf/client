@@ -2,7 +2,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { ReportServiceColumns } from "common/models/reports";
 import { TOAST_LIFETIME } from "common/settings";
 import { useToast } from "dashboard/common/toast";
-import { EditAccessDialog } from "dashboard/reports/common";
+import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
 import { copyReportDocument, deleteReportDocument } from "http/services/reports.service";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
