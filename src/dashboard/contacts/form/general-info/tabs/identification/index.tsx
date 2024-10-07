@@ -2,7 +2,7 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useMemo } from "react";
+import { ReactElement } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
@@ -18,8 +18,6 @@ const SexList = [
     },
 ];
 
-const BUYER_TYPE_ID = 1;
-
 const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 
 interface ContactsIdentificationInfoProps {
@@ -29,11 +27,7 @@ interface ContactsIdentificationInfoProps {
 export const ContactsIdentificationInfo = observer(
     ({ type }: ContactsIdentificationInfoProps): ReactElement => {
         const store = useStore().contactStore;
-        const { contact, contactExtData, changeContact, changeContactExtData } = store;
-
-        const isContactBuyer = useMemo(() => {
-            return contact.type === BUYER_TYPE_ID;
-        }, [contact]);
+        const { contactExtData, changeContactExtData } = store;
 
         return (
             <div className='grid address-info row-gap-2'>
