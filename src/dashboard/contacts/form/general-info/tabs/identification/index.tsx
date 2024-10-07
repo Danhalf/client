@@ -20,8 +20,10 @@ const SexList = [
 
 const BUYER_TYPE_ID = 1;
 
+const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
+
 interface ContactsIdentificationInfoProps {
-    type?: GENERAL_CONTACT_TYPE.BUYER | GENERAL_CONTACT_TYPE.CO_BUYER;
+    type?: typeof BUYER | typeof CO_BUYER;
 }
 
 export const ContactsIdentificationInfo = observer(
@@ -41,10 +43,17 @@ export const ContactsIdentificationInfo = observer(
                             optionLabel='label'
                             optionValue='id'
                             filter
-                            value={contactExtData.Buyer_DL_State || ""}
+                            value={
+                                (type === BUYER
+                                    ? contactExtData.Buyer_DL_State
+                                    : contactExtData.CoBuyer_DL_State) || ""
+                            }
                             options={STATES_LIST}
                             onChange={({ target: { value } }) =>
-                                changeContactExtData("Buyer_DL_State", value)
+                                changeContactExtData(
+                                    type === BUYER ? "Buyer_DL_State" : "CoBuyer_DL_State",
+                                    value
+                                )
                             }
                             className='w-full identification-info__dropdown'
                         />
@@ -57,16 +66,17 @@ export const ContactsIdentificationInfo = observer(
                         <InputText
                             className='identification-info__text-input w-full'
                             value={
-                                isContactBuyer
+                                type === BUYER
                                     ? contactExtData.Buyer_Driver_License_Num
-                                    : contact.dl_number
+                                    : contactExtData.CoBuyer_Driver_License_Num
                             }
                             onChange={({ target: { value } }) => {
-                                if (isContactBuyer) {
-                                    changeContactExtData("Buyer_Driver_License_Num", value);
-                                } else {
-                                    changeContact("dl_number", value);
-                                }
+                                changeContactExtData(
+                                    type === BUYER
+                                        ? "Buyer_Driver_License_Num"
+                                        : "CoBuyer_Driver_License_Num",
+                                    value
+                                );
                             }}
                         />
                         <label className='float-label'>Driver License's Number</label>
@@ -76,9 +86,16 @@ export const ContactsIdentificationInfo = observer(
                 <div className='col-3 mr-2'>
                     <DateInput
                         name="DL's exp. date"
-                        value={contactExtData.Buyer_DL_Exp_Date || ""}
+                        value={
+                            (type === BUYER
+                                ? contactExtData.Buyer_DL_Exp_Date
+                                : contactExtData.CoBuyer_DL_Exp_Date) || ""
+                        }
                         onChange={({ target: { value } }) =>
-                            changeContactExtData("Buyer_DL_Exp_Date", Date.parse(String(value)))
+                            changeContactExtData(
+                                type === BUYER ? "Buyer_DL_Exp_Date" : "CoBuyer_DL_Exp_Date",
+                                Date.parse(String(value))
+                            )
                         }
                         className='identification-info__date-input w-full'
                     />
@@ -90,10 +107,17 @@ export const ContactsIdentificationInfo = observer(
                             optionLabel='name'
                             optionValue='name'
                             filter
-                            value={contactExtData.Buyer_Sex || ""}
+                            value={
+                                (type === BUYER
+                                    ? contactExtData.Buyer_Sex
+                                    : contactExtData.CoBuyer_Sex) || ""
+                            }
                             options={SexList}
                             onChange={({ target: { value } }) =>
-                                changeContactExtData("Buyer_Sex", value)
+                                changeContactExtData(
+                                    type === BUYER ? "Buyer_Sex" : "CoBuyer_Sex",
+                                    value
+                                )
                             }
                             className='w-full identification-info__dropdown'
                         />
@@ -105,9 +129,16 @@ export const ContactsIdentificationInfo = observer(
                     <span className='p-float-label'>
                         <InputText
                             className='identification-info__text-input w-full'
-                            value={contactExtData.Buyer_SS_Number || ""}
+                            value={
+                                (type === BUYER
+                                    ? contactExtData.Buyer_SS_Number
+                                    : contactExtData.CoBuyer_SS_Number) || ""
+                            }
                             onChange={({ target: { value } }) => {
-                                changeContactExtData("Buyer_SS_Number", value);
+                                changeContactExtData(
+                                    type === BUYER ? "Buyer_SS_Number" : "CoBuyer_SS_Number",
+                                    value
+                                );
                             }}
                         />
                         <label className='float-label'>Social Security Number</label>
@@ -117,9 +148,16 @@ export const ContactsIdentificationInfo = observer(
                 <div className='col-3'>
                     <DateInput
                         name='Date of Birth'
-                        value={contactExtData.Buyer_Date_Of_Birth || ""}
+                        value={
+                            (type === BUYER
+                                ? contactExtData.Buyer_Date_Of_Birth
+                                : contactExtData.CoBuyer_Date_Of_Birth) || ""
+                        }
                         onChange={({ target: { value } }) =>
-                            changeContactExtData("Buyer_Date_Of_Birth", Date.parse(String(value)))
+                            changeContactExtData(
+                                type === BUYER ? "Buyer_Date_Of_Birth" : "CoBuyer_Date_Of_Birth",
+                                Date.parse(String(value))
+                            )
                         }
                         className='identification-info__date-input w-full'
                     />
