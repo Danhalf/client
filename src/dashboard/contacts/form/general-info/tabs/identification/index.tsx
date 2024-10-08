@@ -20,6 +20,9 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
+import dlFrontImage from "assets/images/empty_front_dl.svg";
+import dlBackImage from "assets/images/empty_back_dl.svg";
+import uploadImage from "assets/images/upload.svg";
 
 const SexList = [
     {
@@ -149,19 +152,26 @@ export const ContactsIdentificationInfo = observer(
             );
         };
 
-        const emptyTemplate = () => {
+        const emptyTemplate = (side: DLSide) => {
             return (
-                <div className='grid col-6 m-auto'>
-                    <div className='flex align-items-center flex-column col-12'>
-                        <i className='pi pi-cloud-upload dl__upload-icon' />
+                <div className='grid'>
+                    <div className='col-6'>
+                        <img
+                            alt={`empty ${DLSides.FRONT} DL`}
+                            src={side === DLSides.FRONT ? dlFrontImage : dlBackImage}
+                            className='mr-2 dropdown-icon'
+                        />
+                    </div>
+                    <div className='col-6 flex align-items-center flex-column'>
+                        <img alt='upload icon' src={uploadImage} className='mr-2 dropdown-icon' />
                         <span className='text-center dl__upload-icon-label'>
                             Drag and Drop Images Here
                         </span>
-                    </div>
-                    <div className='col-12 flex justify-content-center align-items-center dl__upload-splitter'>
-                        <hr className='dl__line mr-4 flex-1' />
-                        <span>or</span>
-                        <hr className='dl__line ml-4 flex-1' />
+                        <div className='col-12 flex justify-content-center align-items-center dl__upload-splitter'>
+                            <hr className='dl__line mr-4 flex-1' />
+                            <span>or</span>
+                            <hr className='dl__line ml-4 flex-1' />
+                        </div>
                     </div>
                 </div>
             );
@@ -325,7 +335,7 @@ export const ContactsIdentificationInfo = observer(
                                     itemTemplate={(file) =>
                                         itemTemplate(file as File, DLSides.FRONT)
                                     }
-                                    emptyTemplate={emptyTemplate}
+                                    emptyTemplate={emptyTemplate(DLSides.FRONT)}
                                     onSelect={(event) => onTemplateSelect(event, DLSides.FRONT)}
                                     progressBarTemplate={<></>}
                                 />
@@ -349,7 +359,7 @@ export const ContactsIdentificationInfo = observer(
                                     itemTemplate={(file) =>
                                         itemTemplate(file as File, DLSides.BACK)
                                     }
-                                    emptyTemplate={emptyTemplate}
+                                    emptyTemplate={emptyTemplate(DLSides.BACK)}
                                     onSelect={(event) => onTemplateSelect(event, DLSides.BACK)}
                                     progressBarTemplate={<></>}
                                 />
