@@ -309,12 +309,7 @@ export const ContactsIdentificationInfo = observer(
                 </div>
                 {id && (
                     <>
-                        <div className='flex col-12'>
-                            <h3 className='identification__title m-0 pr-3'>
-                                Driver license's photos
-                            </h3>
-                            <hr className='identification__line flex-1' />
-                        </div>
+                        <hr className='form-line' />
 
                         <div
                             className={`col-6 identification-dl ${
