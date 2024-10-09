@@ -71,17 +71,17 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
 
     const isNameFieldsFilled = () => {
         if (type === BUYER) {
-            return contact.firstName.trim() !== "" || contact.lastName.trim() !== "";
+            return contact.firstName?.trim() !== "" || contact.lastName?.trim() !== "";
         } else {
             return (
-                contactExtData.CoBuyer_First_Name.trim() !== "" ||
-                contactExtData.CoBuyer_Last_Name.trim() !== ""
+                contactExtData.CoBuyer_First_Name?.trim() !== "" ||
+                contactExtData.CoBuyer_Last_Name?.trim() !== ""
             );
         }
     };
 
     const shouldDisableNameFields =
-        isBusinessNameRequired || (contact.businessName && contact.businessName.trim() !== "");
+        isBusinessNameRequired || (contact.businessName && contact.businessName?.trim() !== "");
 
     const shouldDisableBusinessName = !isBusinessNameRequired && isNameFieldsFilled();
 

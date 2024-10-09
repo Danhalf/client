@@ -142,11 +142,7 @@ export const ContactsIdentificationInfo = observer(
         ) => {
             const { size } = side === DLSides.FRONT ? frontSideDL : backSideDL;
             return (
-                <div
-                    className={`col-6 flex justify-content-center ml-auto flex-wrap mb-3 dl-header ${
-                        size ? "dl-header__active" : ""
-                    }`}
-                >
+                <div className={`col-6 dl-header ${size ? "dl-header__active" : ""}`}>
                     {chooseButton}
                 </div>
             );
