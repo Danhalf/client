@@ -26,10 +26,10 @@ import uploadImage from "assets/images/upload.svg";
 
 const SexList = [
     {
-        name: "M",
+        name: "Male",
     },
     {
-        name: "F",
+        name: "Female",
     },
 ];
 
