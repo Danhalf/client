@@ -474,6 +474,7 @@ export const AccountPaymentHistory = (): ReactElement => {
                 accountuid={id}
             />
             <AddNoteDialog
+                position='top'
                 action={() => setNoteDialogVisible(false)}
                 onHide={() => setNoteDialogVisible(false)}
                 visible={noteDialogVisible}
@@ -481,6 +482,7 @@ export const AccountPaymentHistory = (): ReactElement => {
             />
             <ConfirmModal
                 visible={!!modalVisible}
+                position='top'
                 title={modalTitle}
                 icon='pi-exclamation-triangle'
                 bodyMessage={modalText}
