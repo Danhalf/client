@@ -5,8 +5,12 @@ import { ReactElement, useEffect, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
-import { Contact, ContactType } from "common/models/contact";
-import { getContactsTypeList, scanContactDL } from "http/services/contacts-service";
+import { Contact, ContactOFAC, ContactType } from "common/models/contact";
+import {
+    checkContactOFAC,
+    getContactsTypeList,
+    scanContactDL,
+} from "http/services/contacts-service";
 import { useFormikContext } from "formik";
 import { REQUIRED_COMPANY_TYPE_INDEXES } from "dashboard/contacts/form";
 import { Checkbox } from "primereact/checkbox";
@@ -155,6 +159,21 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
         type,
     ]);
 
+    const handleOfacCheck = () => {
+        checkContactOFAC(id).then((response) => {
+            if (response?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                store.contactOFAC = response as ContactOFAC;
+            }
+        });
+    };
+
     return (
         <div className='grid general-info row-gap-2'>
             <div className='col-3'>
@@ -240,6 +259,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_First_Name", value);
                             }
                         }}
+                        onBlur={handleOfacCheck}
                         tooltip={
                             shouldDisableNameFields
                                 ? "The type of contact you have selected requires entering only the business name"
@@ -297,6 +317,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_Last_Name", value);
                             }
                         }}
+                        onBlur={handleOfacCheck}
                         disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>
