@@ -312,6 +312,10 @@
     width: 30px;
 }
 
+.p-menu .p-menuitem-link {
+    height: 32px;
+}
+
 .p-menu .p-menuitem-link:not(.p-disabled):hover {
     background: var(--admss-app-light-green);
 }
