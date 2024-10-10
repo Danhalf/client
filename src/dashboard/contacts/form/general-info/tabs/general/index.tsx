@@ -22,6 +22,9 @@ interface ContactsGeneralInfoProps {
     type?: typeof BUYER | typeof CO_BUYER;
 }
 
+const ifBusinessNameFilledMessage =
+    "You can input either a person or a business name. If you entered a business name but intended to enter personal details, clear the business name field, and the fields for entering personal data will become active.";
+
 export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps): ReactElement => {
     const { id } = useParams();
     const [typeList, setTypeList] = useState<ContactType[]>([]);
@@ -159,6 +162,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                     type='button'
                     label='Scan driver license'
                     className='general-info__button'
+                    tooltip='Data received from the DL’s backside will fill in related fields'
                     outlined
                     onClick={handleScanDL}
                 />
@@ -188,9 +192,9 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                         text
                         tooltip='Data received from the DL’s backside will overwrite user-entered data'
                         icon='icon adms-help'
+                        outlined
                         type='button'
-                        severity='info'
-                        className='general-info-overwrite__icon transparent'
+                        className='general-info-overwrite__icon'
                     />
                 </div>
             </div>
@@ -236,6 +240,11 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_First_Name", value);
                             }
                         }}
+                        tooltip={
+                            shouldDisableNameFields
+                                ? "The type of contact you have selected requires entering only the business name"
+                                : ""
+                        }
                         disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>
@@ -262,6 +271,7 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 changeContactExtData("CoBuyer_Middle_Name", value);
                             }
                         }}
+                        tooltip={shouldDisableNameFields ? ifBusinessNameFilledMessage : ""}
                         disabled={!!shouldDisableNameFields}
                     />
                     <label className='float-label'>Middle Name</label>

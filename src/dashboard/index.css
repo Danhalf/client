@@ -420,6 +420,10 @@
     color: var(--admss-app-blue-text);
 }
 
+.p-datepicker:not(.p-datepicker-inline) .p-datepicker-header {
+    background: var(--admss-app-white);
+}
+
 @media screen and (min-width: 992px) {
     .main {
         margin-left: var(--admss-app-aside-small-width);
