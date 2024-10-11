@@ -60,6 +60,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
     const [accessDialogVisible, setAccessDialogVisible] = useState<boolean>(false);
 
     const handleSaveReport = () => {
+        if (!!report.isdefault) return;
         saveReport(report?.itemuid).then((response: BaseResponseError | undefined) => {
             if (response?.status === Status.OK) {
                 onAction();
