@@ -266,7 +266,9 @@ export default function Reports(): ReactElement {
                                                                         collectionuid={itemUID}
                                                                         collectionName={name}
                                                                         collections={collections}
-                                                                        selectedReports={documents}
+                                                                        selectedReports={
+                                                                            documents || []
+                                                                        }
                                                                         setCollectionName={
                                                                             setCollectionName
                                                                         }
