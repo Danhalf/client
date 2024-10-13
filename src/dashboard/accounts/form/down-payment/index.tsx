@@ -11,6 +11,7 @@ import { SplitButton } from "primereact/splitbutton";
 import { makeShortReports } from "http/services/reports.service";
 import { useStore } from "store/hooks";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { Button } from "primereact/button";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountDownPayments;
@@ -66,7 +67,7 @@ export const AccountDownPayment = (): ReactElement => {
         {
             label: "Delete Payment",
             icon: "icon adms-close",
-            command: async () => {
+            command: () => {
                 if (!currentPaymentList.length) {
                     setModalTitle(ModalErrors.TITLE_NO_RECEIPT);
                     setModalText(ModalErrors.TEXT_NO_PAYMENT_DELETE);
@@ -200,13 +201,7 @@ export const AccountDownPayment = (): ReactElement => {
 
             await Promise.all(deletePromises);
 
-            if (id) {
-                const res = await listAccountDownPayments(id);
-                if (Array.isArray(res) && res.length) {
-                    setPaymentList(res);
-                    setSelectedRows(Array(res.length).fill(false));
-                }
-            }
+            getDownPayments();
         } catch (error) {
             toast.current?.show({
                 severity: "error",
@@ -289,6 +284,28 @@ export const AccountDownPayment = (): ReactElement => {
                                 className='max-w-16rem overflow-hidden text-overflow-ellipsis'
                             />
                         ))}
+
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            reorderable={false}
+                            resizeable={false}
+                            body={() => {
+                                return (
+                                    <div className={`flex gap-3 align-items-center `}>
+                                        <Button className='down-payment__table-button' outlined>
+                                            Pay
+                                        </Button>
+                                    </div>
+                                );
+                            }}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "100px",
+                                    },
+                                },
+                            }}
+                        />
                     </DataTable>
                 </div>
                 {!!paymentList.length && (
