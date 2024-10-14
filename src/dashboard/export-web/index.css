@@ -72,6 +72,7 @@
 .export-web-service__input .p-inputnumber-input {
     width: 94px;
     height: 34px;
+    border: 1px solid var(--admss-app-light-grey);
 }
 
 .export-web-table tr td:has(.row--selected) {
@@ -144,22 +145,13 @@
     width: 180px;
 }
 
-.export-web__edit-input {
-    padding: 0;
-    max-width: 60px;
-    margin: 0;
-    height: 20px;
-}
-
-.export-web__edit-input.p-inputtext {
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    border: none;
-    height: 100%;
-}
-
 .expanded-row__link-text {
     color: var(--admss-app-main-blue);
     font-weight: 600;
+}
+
+.export-web__input-price .p-inputnumber-input {
+    width: 94px;
+    height: 34px;
+    border: 1px solid var(--admss-app-light-grey);
 }

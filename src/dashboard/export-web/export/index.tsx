@@ -12,7 +12,7 @@ import {
 import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Column, ColumnEditorOptions, ColumnProps } from "primereact/column";
+import { Column, ColumnProps } from "primereact/column";
 import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
 import {
     addExportTask,
@@ -38,7 +38,6 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { Loader } from "dashboard/common/loader";
 import { InputNumber } from "primereact/inputnumber";
-import { setInventoryExportWeb } from "http/services/inventory-service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof (ExportWebList & { mediacount: number });
@@ -616,49 +615,13 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         });
     };
 
-    const handlePriceEdit = (options: ColumnEditorOptions) => {
-        const field: keyof ExportWebList | string = options.field;
-        if (field === "ListPrice") {
-            const saveValue = () => {
-                const value =
-                    exportsToWeb.find((item) => item.itemuid === options.rowData.itemuid) || null;
-                if (value) {
-                    setInventoryExportWeb(options.rowData.itemuid, {
-                        ListPrice: value.ListPrice,
-                    }).then(() => handleGetExportWebList());
-                }
-            };
-
-            return (
-                <InputText
-                    className='export-web__edit-input'
-                    value={exportsToWeb[options.rowIndex!].ListPrice}
-                    onChange={({ target }) => {
-                        const value = target.value.replace(/[^0-9.]/g, "");
-                        setExportsToWeb(
-                            exportsToWeb.map((item) => {
-                                if (item.itemuid === options.rowData.itemuid) {
-                                    return {
-                                        ...item,
-                                        [field]: value,
-                                    };
-                                }
-                                return item;
-                            })
-                        );
-                    }}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            saveValue();
-                        }
-                    }}
-                    onBlur={saveValue}
-                />
-            );
-        } else {
-            return options.value;
-        }
+    const handleSavePrice = (event: any) => {
+        // const value = exportsToWeb.find((item) => item.itemuid === options.rowData.itemuid) || null;
+        // if (value) {
+        //     setInventoryExportWeb(options.rowData.itemuid, {
+        //         ListPrice: value.ListPrice,
+        //     }).then(() => handleGetExportWebList());
+        // }
     };
 
     return (
@@ -862,7 +825,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                         return (
                                             <div
                                                 className={`export-web-service ${
-                                                    selectedInventories[rowIndex] && "row--selected"
+                                                    selectedInventories[rowIndex]
+                                                        ? "row--selected"
+                                                        : ""
                                                 }`}
                                             >
                                                 <Checkbox
@@ -899,7 +864,6 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                     header={header}
                                     key={field}
                                     sortable
-                                    editor={handlePriceEdit}
                                     body={(data, { rowIndex }) => {
                                         let value: string | number;
                                         if (field === "VIN") {
@@ -911,10 +875,41 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                         return (
                                             <div
                                                 className={`${
-                                                    selectedInventories[rowIndex] && "row--selected"
+                                                    selectedInventories[rowIndex]
+                                                        ? "row--selected"
+                                                        : ""
                                                 }`}
                                             >
-                                                {field === "ListPrice" ? "$" : null} {value}
+                                                {field === "ListPrice" ? (
+                                                    <InputNumber
+                                                        className='export-web__input-price'
+                                                        value={Number(value)}
+                                                        onChange={({ value }) => {
+                                                            setExportsToWeb(
+                                                                exportsToWeb.map(
+                                                                    (item: ExportWebList) => {
+                                                                        if (
+                                                                            item?.itemuid ===
+                                                                            data?.rowData?.itemuid
+                                                                        ) {
+                                                                            return {
+                                                                                ...item,
+                                                                                [field]:
+                                                                                    value?.toString() ||
+                                                                                    "0",
+                                                                            };
+                                                                        }
+                                                                        return item;
+                                                                    }
+                                                                )
+                                                            );
+                                                        }}
+                                                        onKeyDown={handleSavePrice}
+                                                        onBlur={handleSavePrice}
+                                                    />
+                                                ) : (
+                                                    value
+                                                )}
                                             </div>
                                         );
                                     }}
