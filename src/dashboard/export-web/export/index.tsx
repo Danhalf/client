@@ -39,6 +39,7 @@ import { useToast } from "dashboard/common/toast";
 import { Loader } from "dashboard/common/loader";
 import { InputNumber } from "primereact/inputnumber";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { setInventoryExportWeb } from "http/services/inventory-service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof (ExportWebList & { mediacount: number });
@@ -132,7 +133,8 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const location = useLocation();
     const currentPath = location.pathname + location.search;
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
-    const [currentInventory, setCurrentInventory] = useState<ExportWebList | null>(null);
+    const [currentInventory, setCurrentInventory] = useState<Partial<ExportWebList> | null>(null);
+    const [priceChanged, setPriceChanged] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
@@ -618,18 +620,31 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
         });
     };
 
-    const handleSavePrice = (event: any) => {
-        if (event.key === "Enter") {
+    const handleChangePrice = () => {
+        if (priceChanged) {
             setConfirmActive(true);
-            return;
+            setPriceChanged(false);
         }
-        setConfirmActive(true);
-        // const value = exportsToWeb.find((item) => item.itemuid === options.rowData.itemuid) || null;
-        // if (value) {
-        //     setInventoryExportWeb(options.rowData.itemuid, {
-        //         ListPrice: value.ListPrice,
-        //     }).then(() => handleGetExportWebList());
-        // }
+    };
+
+    const handleConfirmSavePrice = async () => {
+        if (currentInventory && currentInventory.itemuid) {
+            const res = await setInventoryExportWeb(currentInventory.itemuid, {
+                ListPrice: currentInventory.ListPrice,
+            });
+
+            if (res?.error) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: res?.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else {
+                setConfirmActive(false);
+                handleGetExportWebList();
+            }
+        }
     };
 
     return (
@@ -893,27 +908,17 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                         className='export-web__input-price'
                                                         value={Number(value)}
                                                         onChange={({ value }) => {
-                                                            setExportsToWeb(
-                                                                exportsToWeb.map(
-                                                                    (item: ExportWebList) => {
-                                                                        if (
-                                                                            item?.itemuid ===
-                                                                            data?.rowData?.itemuid
-                                                                        ) {
-                                                                            return {
-                                                                                ...item,
-                                                                                [field]:
-                                                                                    value?.toString() ||
-                                                                                    "0",
-                                                                            };
-                                                                        }
-                                                                        return item;
-                                                                    }
-                                                                )
-                                                            );
+                                                            setPriceChanged(true);
+                                                            setCurrentInventory({
+                                                                ...data,
+                                                                ListPrice: value?.toString() || "",
+                                                            });
                                                         }}
-                                                        onKeyDown={handleSavePrice}
-                                                        onBlur={handleSavePrice}
+                                                        onKeyDown={(evt) =>
+                                                            evt.key === "Enter" &&
+                                                            handleChangePrice()
+                                                        }
+                                                        onBlur={handleChangePrice}
                                                     />
                                                 ) : (
                                                     value
@@ -941,15 +946,14 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
             </div>
             <ConfirmModal
                 visible={confirmActive}
+                position='top'
                 title='Save new price?'
                 bodyMessage='Are you sure you want to change the price? Please confirm to proceed with this action.'
-                confirmAction={() => {
-                    setConfirmActive(false);
-                }}
+                confirmAction={handleConfirmSavePrice}
                 draggable={false}
                 icon='pi pi-save'
                 rejectLabel='Cancel'
-                acceptLabel='Delete'
+                acceptLabel='Save'
                 className='price-change-confirm-dialog'
                 onHide={() => setConfirmActive(false)}
             />
