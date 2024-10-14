@@ -38,6 +38,7 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { Loader } from "dashboard/common/loader";
 import { InputNumber } from "primereact/inputnumber";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof (ExportWebList & { mediacount: number });
@@ -130,6 +131,8 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     const [currentParams, setCurrentParams] = useState<QueryParams | null>(null);
     const location = useLocation();
     const currentPath = location.pathname + location.search;
+    const [confirmActive, setConfirmActive] = useState<boolean>(false);
+    const [currentInventory, setCurrentInventory] = useState<ExportWebList | null>(null);
 
     const navigate = useNavigate();
 
@@ -616,6 +619,11 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     };
 
     const handleSavePrice = (event: any) => {
+        if (event.key === "Enter") {
+            setConfirmActive(true);
+            return;
+        }
+        setConfirmActive(true);
         // const value = exportsToWeb.find((item) => item.itemuid === options.rowData.itemuid) || null;
         // if (value) {
         //     setInventoryExportWeb(options.rowData.itemuid, {
@@ -931,6 +939,20 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                     </DataTable>
                 </div>
             </div>
+            <ConfirmModal
+                visible={confirmActive}
+                title='Save new price?'
+                bodyMessage='Are you sure you want to change the price? Please confirm to proceed with this action.'
+                confirmAction={() => {
+                    setConfirmActive(false);
+                }}
+                draggable={false}
+                icon='pi pi-save'
+                rejectLabel='Cancel'
+                acceptLabel='Delete'
+                className='price-change-confirm-dialog'
+                onHide={() => setConfirmActive(false)}
+            />
         </div>
     );
 };
