@@ -256,20 +256,31 @@ export const EditAccessDialog = ({
         const items = filterOptions.flatMap(
             (option: { items: { name: string; value: ROLE | ACCESS }[] }) => option.items
         );
-        const [selectedRole] = items.filter(({ value }) => value === item);
+        const [currentRole] = items.filter(({ value }) => value === item);
+        const handleDelete = (evt: React.MouseEvent<HTMLElement, MouseEvent>) => {
+            evt.preventDefault();
+            selectedRole.forEach((role: ROLE | ACCESS, index: number) => {
+                if (role === item) {
+                    selectedRole.splice(index, 1);
+                    setSelectedRole([...selectedRole]);
+                }
+            });
+        };
         return (
             <div
-                className='report-multiselect p-multiselect-label-container'
+                className='access-multiselect__select p-multiselect-label-container'
                 data-pc-section='labelcontainer'
             >
                 <div className='p-multiselect-label' data-pc-section='label'>
                     <div className='p-multiselect-token' data-pc-section='token'>
                         <span className='p-multiselect-token-label' data-pc-section='tokenlabel'>
-                            {selectedRole?.name}
+                            {currentRole?.name}
                         </span>
                         <Button
                             type='button'
+                            rounded
                             icon='pi pi-times'
+                            onClick={handleDelete}
                             className='p-multiselect-token-icon'
                         />
                     </div>
@@ -294,7 +305,7 @@ export const EditAccessDialog = ({
                     <MultiSelect
                         optionLabel='name'
                         options={filterOptions}
-                        className='w-full'
+                        className='access-multiselect'
                         optionGroupChildren='items'
                         optionGroupLabel='label'
                         showSelectAll={false}
