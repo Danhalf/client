@@ -1,0 +1,6 @@
+.report-multiselect .p-multiselect-label-container {
+    height: 50px;
+    .p-multiselect-label {
+        height: 100%;
+    }
+}

@@ -12,6 +12,7 @@ import { DataTable } from "primereact/datatable";
 import { InputText } from "primereact/inputtext";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { ChangeEvent, ReactElement, useEffect, useState } from "react";
+import "./index.css";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof ReportAccess;
@@ -249,15 +250,22 @@ export const EditAccessDialog = ({
     };
 
     const selectedItemTemplate = (item: ROLE | ACCESS) => {
-        const items = filterOptions.flatMap((option: any) => option.items);
-
-        const selectedRole = items.filter((role: any) => role.value === item);
+        if (!item) {
+            return <></>;
+        }
+        const items = filterOptions.flatMap(
+            (option: { items: { name: string; value: ROLE | ACCESS }[] }) => option.items
+        );
+        const [selectedRole] = items.filter(({ value }) => value === item);
         return (
-            <div className='p-multiselect-label-container' data-pc-section='labelcontainer'>
+            <div
+                className='report-multiselect p-multiselect-label-container'
+                data-pc-section='labelcontainer'
+            >
                 <div className='p-multiselect-label' data-pc-section='label'>
                     <div className='p-multiselect-token' data-pc-section='token'>
                         <span className='p-multiselect-token-label' data-pc-section='tokenlabel'>
-                            {selectedRole[0].name}
+                            {selectedRole?.name}
                         </span>
                         <Button
                             type='button'
