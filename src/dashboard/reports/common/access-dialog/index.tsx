@@ -5,6 +5,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { useToast } from "dashboard/common/toast";
 import { getReportAccessList, setReportAccessList } from "http/services/reports.service";
+import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
@@ -247,9 +248,32 @@ export const EditAccessDialog = ({
         });
     };
 
+    const selectedItemTemplate = (item: ROLE | ACCESS) => {
+        const items = filterOptions.flatMap((option: any) => option.items);
+
+        const selectedRole = items.filter((role: any) => role.value === item);
+        return (
+            <div className='p-multiselect-label-container' data-pc-section='labelcontainer'>
+                <div className='p-multiselect-label' data-pc-section='label'>
+                    <div className='p-multiselect-token' data-pc-section='token'>
+                        <span className='p-multiselect-token-label' data-pc-section='tokenlabel'>
+                            {selectedRole[0].name}
+                        </span>
+                        <Button
+                            type='button'
+                            icon='pi pi-times'
+                            className='p-multiselect-token-icon'
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
         <DashboardDialog
             className='edit-access'
+            position='top'
             action={handleSaveAccess}
             footer='Update'
             header='Edit Access'
@@ -269,6 +293,7 @@ export const EditAccessDialog = ({
                         value={selectedRole}
                         display='chip'
                         panelHeaderTemplate={<></>}
+                        selectedItemTemplate={selectedItemTemplate}
                         onChange={(event) => {
                             event.stopPropagation();
                             handleRoleSelection(event);
