@@ -11,6 +11,13 @@ import { useStore } from "store/hooks";
 
 const { BUYER } = GENERAL_CONTACT_TYPE;
 
+const tabs = [
+    { header: "General", component: <ContactsGeneralInfo type={BUYER} /> },
+    { header: "Address", component: <ContactsAddressInfo type={BUYER} /> },
+    { header: "Identification", component: <ContactsIdentificationInfo type={BUYER} /> },
+    { header: "OFAC CHECK", component: <ContactsOfacCheck type={BUYER} /> },
+];
+
 export const ContactsBuyerInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { activeTab } = store;
@@ -22,6 +29,11 @@ export const ContactsBuyerInfo = observer((): ReactElement => {
 
     useEffect(() => {
         store.activeTab = tabParam ? parseInt(tabParam, 10) : 0;
+        store.tabLength = tabs.length;
+        return () => {
+            store.activeTab = null;
+            store.tabLength = 0;
+        };
     }, [tabParam]);
 
     const handleTabChange = (e: { index: number }) => {
@@ -40,18 +52,11 @@ export const ContactsBuyerInfo = observer((): ReactElement => {
                 activeIndex={activeTab || 0}
                 onTabChange={handleTabChange}
             >
-                <TabPanel header='General'>
-                    <ContactsGeneralInfo type={BUYER} />
-                </TabPanel>
-                <TabPanel header='Address'>
-                    <ContactsAddressInfo type={BUYER} />
-                </TabPanel>
-                <TabPanel header='Identification'>
-                    <ContactsIdentificationInfo type={BUYER} />
-                </TabPanel>
-                <TabPanel header='OFAC CHECK'>
-                    <ContactsOfacCheck type={BUYER} />
-                </TabPanel>
+                {tabs.map((tab, index) => (
+                    <TabPanel key={index} header={tab.header}>
+                        {tab.component}
+                    </TabPanel>
+                ))}
             </TabView>
         </div>
     );
