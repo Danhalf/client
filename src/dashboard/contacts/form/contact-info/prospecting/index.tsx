@@ -7,15 +7,13 @@ import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
 import { getContactsProspectList, getContactsSalesmanList } from "http/services/contacts-service";
-import { LS_APP_USER } from "common/constants/localStorage";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
 import { useParams } from "react-router-dom";
 import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
 
 export const ContactsProspecting = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
+    const { authUser } = useStore().userStore;
     const { contactExtData, changeContactExtData } = store;
     const [salespersonsList, setSalespersonsList] = useState<unknown[]>([]);
     const [anotherVehicle, setAnotherVehicle] = useState<boolean>(false);
@@ -23,7 +21,6 @@ export const ContactsProspecting = observer((): ReactElement => {
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
 
     useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
         if (authUser) {
             getContactsSalesmanList(authUser.useruid).then((response) => {
                 response && setSalespersonsList(response);
@@ -59,17 +56,17 @@ export const ContactsProspecting = observer((): ReactElement => {
                 </span>
             </div>
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <DateInput
-                        placeholder='Contact till...'
-                        date={contactExtData.created}
-                        showTime
-                        hourFormat='24'
-                        onChange={() => changeContactExtData("created", "")}
-                        className='contacts-prospecting__date-input w-full'
-                    />
-                    <label className='float-label'>Contact till</label>
-                </span>
+                <DateInput
+                    placeholder='Contact till...'
+                    date={contactExtData.created}
+                    name='Contact till'
+                    showTime
+                    hourFormat='24'
+                    onChange={({ target: { value } }) =>
+                        changeContactExtData("created", Number(value))
+                    }
+                    className='contacts-prospecting__date-input w-full'
+                />
             </div>
             <div className='col-6'>
                 <span className='p-float-label'>
