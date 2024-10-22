@@ -1,13 +1,12 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
-import { ReactElement, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { ReactElement, Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { ContactAccordionItems, ContactItem, ContactSection } from "../common/step-navigation";
 import { useNavigate, useParams } from "react-router-dom";
-import { BUYER_ID, getGeneralInfoData } from "./general-info";
+import { BUYER_ID, generalBuyerInfo, generalCoBuyerInfo } from "./general-info";
 import { ContactInfoData } from "./contact-info";
-import { ContactMediaData } from "./media-data";
 import { useStore } from "store/hooks";
 import { useLocation } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
@@ -20,6 +19,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { Status } from "common/models/base-response";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { DashboardDialog } from "dashboard/common/dialog";
+import { ContactMediaData } from "./media-data";
 const STEP = "step";
 
 export type PartialContact = Pick<
@@ -106,6 +106,7 @@ export const ContactForm = observer((): ReactElement => {
     const store = useStore().contactStore;
     const {
         contact,
+        contactType,
         contactExtData,
         getContact,
         clearContact,
@@ -126,12 +127,34 @@ export const ContactForm = observer((): ReactElement => {
     const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
     const [isDataMissingConfirm, setIsDataMissingConfirm] = useState<boolean>(false);
 
-    const contactSectionsData = useMemo(() => {
-        return [getGeneralInfoData(contact?.type), ContactInfoData];
-    }, [contact.type]);
+    useEffect(() => {
+        let contactsSections = [ContactInfoData];
+
+        switch (contactType) {
+            case BUYER_ID:
+                contactsSections = [generalCoBuyerInfo, ...contactsSections];
+                break;
+            default:
+                contactsSections = [generalBuyerInfo, ...contactsSections];
+                break;
+        }
+
+        if (id) {
+            contactsSections = [...contactsSections, ContactMediaData];
+        }
+
+        const sections = contactsSections.map((sectionData) => new ContactSection(sectionData));
+        setContactSections(sections);
+        setAccordionSteps(sections.map((item) => item.startIndex));
+        const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
+        setItemsMenuCount(itemsMenuCount);
+
+        return () => {
+            sections.forEach((section) => section.clearCount());
+        };
+    }, [contactType]);
 
     useEffect(() => {
-        // const contactSections: any[] = [getGeneralInfoData(contact?.type), ContactInfoData];
         if (id) {
             getContact(id).then((response) => {
                 if (response?.status === Status.ERROR) {
@@ -144,20 +167,13 @@ export const ContactForm = observer((): ReactElement => {
                     navigate(`/dashboard/contacts`);
                 }
             });
-            contactSectionsData.splice(2, 0, ContactMediaData);
         } else {
             clearContact();
         }
-        const sections = contactSections.map((sectionData) => new ContactSection(sectionData));
-        setContactSections(sections);
-        setAccordionSteps(sections.map((item) => item.startIndex));
-        const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
-        setItemsMenuCount(itemsMenuCount);
         return () => {
             clearContact();
-            sections.forEach((section) => section.clearCount());
         };
-    }, [id, store, contactSectionsData]);
+    }, [id, store]);
 
     const getUrl = (activeIndex: number) => {
         const currentPath = id ? id : "create";
@@ -411,25 +427,29 @@ export const ContactForm = observer((): ReactElement => {
                                         >
                                             <Form name='contactForm' className='w-full'>
                                                 {contactSections.map((section) =>
-                                                    section.items.map((item: ContactItem) => (
-                                                        <div
-                                                            key={item.itemIndex}
-                                                            className={`${
-                                                                stepActiveIndex === item.itemIndex
-                                                                    ? "block contact-form"
-                                                                    : "hidden"
-                                                            }`}
-                                                        >
-                                                            <div className='contact-form__title uppercase'>
-                                                                {item.itemLabel}
+                                                    section.items.map((item: ContactItem) => {
+                                                        return (
+                                                            <div
+                                                                key={item.itemIndex}
+                                                                className={`${
+                                                                    stepActiveIndex ===
+                                                                    item.itemIndex
+                                                                        ? "block contact-form"
+                                                                        : "hidden"
+                                                                }`}
+                                                            >
+                                                                <div className='contact-form__title uppercase'>
+                                                                    {item.itemLabel}
+                                                                </div>
+                                                                {stepActiveIndex ===
+                                                                    item.itemIndex && (
+                                                                    <Suspense fallback={<Loader />}>
+                                                                        {item.component}
+                                                                    </Suspense>
+                                                                )}
                                                             </div>
-                                                            {stepActiveIndex === item.itemIndex && (
-                                                                <Suspense fallback={<Loader />}>
-                                                                    {item.component}
-                                                                </Suspense>
-                                                            )}
-                                                        </div>
-                                                    ))
+                                                        );
+                                                    })
                                                 )}
                                             </Form>
                                         </Formik>

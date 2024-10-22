@@ -15,19 +15,26 @@ export enum GENERAL_CONTACT_TYPE {
 
 export const BUYER_ID = 1;
 
-export const getGeneralInfoData = (clientId: number): Pick<Contact, "label" | "items"> => {
-    const items = [
+export const generalBuyerInfo: Pick<Contact, "label" | "items"> = {
+    label: "General information",
+    items: [
         {
             itemLabel: ContactAccordionItems.BUYER,
             component: <ContactsBuyerInfo />,
         },
-        ...(clientId === BUYER_ID
-            ? [{ itemLabel: ContactAccordionItems.CO_BUYER, component: <ContactsCoBuyerInfo /> }]
-            : []),
-    ];
+    ],
+};
 
-    return {
-        label: "General information",
-        items,
-    };
+export const generalCoBuyerInfo: Pick<Contact, "label" | "items"> = {
+    label: "General information",
+    items: [
+        {
+            itemLabel: ContactAccordionItems.BUYER,
+            component: <ContactsBuyerInfo />,
+        },
+        {
+            itemLabel: ContactAccordionItems.CO_BUYER,
+            component: <ContactsCoBuyerInfo />,
+        },
+    ],
 };
