@@ -1,11 +1,11 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import { Steps } from "primereact/steps";
-import { ReactElement, Suspense, useEffect, useRef, useState } from "react";
+import { ReactElement, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
 import { ContactAccordionItems, ContactItem, ContactSection } from "../common/step-navigation";
 import { useNavigate, useParams } from "react-router-dom";
-import { GeneralInfoData } from "./general-info";
+import { BUYER_ID, getGeneralInfoData } from "./general-info";
 import { ContactInfoData } from "./contact-info";
 import { ContactMediaData } from "./media-data";
 import { useStore } from "store/hooks";
@@ -62,6 +62,16 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         message: "Invalid phone number.",
         excludeEmptyString: false,
     }),
+    CoBuyer_First_Name: Yup.string()
+        ?.trim()
+        .when("type", (type, schema) => {
+            return Number(type) === BUYER_ID ? schema.required("Data is required.") : schema;
+        }),
+    CoBuyer_Last_Name: Yup.string()
+        ?.trim()
+        .when("type", (type, schema) => {
+            return Number(type) ? schema.required("Data is required.") : schema;
+        }),
 });
 
 const DialogBody = (): ReactElement => {
@@ -116,8 +126,12 @@ export const ContactForm = observer((): ReactElement => {
     const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
     const [isDataMissingConfirm, setIsDataMissingConfirm] = useState<boolean>(false);
 
+    const contactSectionsData = useMemo(() => {
+        return [getGeneralInfoData(contact?.type), ContactInfoData];
+    }, [contact.type]);
+
     useEffect(() => {
-        const contactSections: any[] = [GeneralInfoData, ContactInfoData];
+        // const contactSections: any[] = [getGeneralInfoData(contact?.type), ContactInfoData];
         if (id) {
             getContact(id).then((response) => {
                 if (response?.status === Status.ERROR) {
@@ -130,7 +144,7 @@ export const ContactForm = observer((): ReactElement => {
                     navigate(`/dashboard/contacts`);
                 }
             });
-            contactSections.splice(2, 0, ContactMediaData);
+            contactSectionsData.splice(2, 0, ContactMediaData);
         } else {
             clearContact();
         }
@@ -143,7 +157,7 @@ export const ContactForm = observer((): ReactElement => {
             clearContact();
             sections.forEach((section) => section.clearCount());
         };
-    }, [id, store]);
+    }, [id, store, contactSectionsData]);
 
     const getUrl = (activeIndex: number) => {
         const currentPath = id ? id : "create";
@@ -173,15 +187,15 @@ export const ContactForm = observer((): ReactElement => {
     };
 
     useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isContactChanged) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
+        // const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+        //     if (isContactChanged) {
+        //         event.preventDefault();
+        //     }
+        // };
+        // window.addEventListener("beforeunload", handleBeforeUnload);
+        // return () => {
+        //     window.removeEventListener("beforeunload", handleBeforeUnload);
+        // };
     }, [isContactChanged]);
 
     useEffect(() => {
@@ -369,6 +383,10 @@ export const ContactForm = observer((): ReactElement => {
                                                         contactExtData.Buyer_Emp_Ext || "",
                                                     Buyer_Emp_Phone:
                                                         contactExtData.Buyer_Emp_Phone || "",
+                                                    CoBuyer_First_Name:
+                                                        contactExtData.CoBuyer_First_Name || "",
+                                                    CoBuyer_Last_Name:
+                                                        contactExtData.CoBuyer_Last_Name || "",
                                                 } as PartialContact
                                             }
                                             enableReinitialize
