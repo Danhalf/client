@@ -72,7 +72,7 @@ export const AccountPromiseToPay = (): ReactElement => {
             promises.forEach(async (promise) => {
                 const res = await addAccountPromise(id, {
                     ...promise,
-                    status,
+                    pstatusname: status,
                 });
                 if (res && res.status === Status.ERROR) {
                     return toast.current?.show({
