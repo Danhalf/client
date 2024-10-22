@@ -103,6 +103,8 @@ export const ContactForm = observer((): ReactElement => {
         isContactChanged,
         memoRoute,
         isLoading,
+        activeTab,
+        tabLength,
     } = store;
     const navigate = useNavigate();
     const formikRef = useRef<FormikProps<PartialContact>>(null);
@@ -176,9 +178,7 @@ export const ContactForm = observer((): ReactElement => {
                 event.preventDefault();
             }
         };
-
         window.addEventListener("beforeunload", handleBeforeUnload);
-
         return () => {
             window.removeEventListener("beforeunload", handleBeforeUnload);
         };
@@ -222,6 +222,53 @@ export const ContactForm = observer((): ReactElement => {
         });
     };
 
+    const handleOnBackClick = () => {
+        if (activeTab !== null && activeTab && activeTab > 0) {
+            store.activeTab = activeTab - 1;
+        } else {
+            setStepActiveIndex((prev) => {
+                const newStep = prev - 1;
+                navigate(getUrl(newStep));
+                return newStep;
+            });
+        }
+    };
+
+    const handleOnNextClick = () => {
+        if (activeTab !== null && activeTab < tabLength - 1) {
+            store.activeTab = activeTab + 1;
+        } else {
+            setStepActiveIndex((prev) => {
+                const newStep = prev + 1;
+                navigate(getUrl(newStep));
+                return newStep;
+            });
+        }
+    };
+
+    const stepAccordionHeader = (section: ContactSection) => {
+        const validTabsCount = section.items.reduce((count, item) => {
+            const tabFieldsForItem = tabFields[item.itemLabel];
+
+            const hasErrors = tabFieldsForItem?.some(
+                (fieldName) => formikRef.current?.errors[fieldName]
+            );
+
+            return hasErrors ? count : count + 1;
+        }, 0);
+
+        const totalTabsCount = section.items.length;
+
+        return (
+            <div className='p-0'>
+                {section.label}
+                <span className='ml-2 text--green'>
+                    ({validTabsCount}/{totalTabsCount})
+                </span>
+            </div>
+        );
+    };
+
     return isLoading ? (
         <Loader overlay />
     ) : (
@@ -263,7 +310,7 @@ export const ContactForm = observer((): ReactElement => {
                                         {contactSections.map((section) => (
                                             <AccordionTab
                                                 key={section.sectionId}
-                                                header={section.label}
+                                                header={stepAccordionHeader(section)}
                                             >
                                                 <Steps
                                                     model={section.items.map(
@@ -373,28 +420,18 @@ export const ContactForm = observer((): ReactElement => {
                             </div>
                             <div className='flex justify-content-end gap-3 mt-5 mr-3 form-nav'>
                                 <Button
-                                    onClick={() => {
-                                        setStepActiveIndex((prev) => {
-                                            const newStep = prev - 1;
-                                            navigate(getUrl(newStep));
-                                            return newStep;
-                                        });
-                                    }}
+                                    onClick={handleOnBackClick}
                                     className='form-nav__button'
                                     outlined
-                                    disabled={stepActiveIndex <= 0}
-                                    severity={stepActiveIndex <= 0 ? "secondary" : "success"}
+                                    disabled={stepActiveIndex <= 0 && !activeTab}
+                                    severity={
+                                        stepActiveIndex <= 0 && !activeTab ? "secondary" : "success"
+                                    }
                                 >
                                     Back
                                 </Button>
                                 <Button
-                                    onClick={() =>
-                                        setStepActiveIndex((prev) => {
-                                            const newStep = prev + 1;
-                                            navigate(getUrl(newStep));
-                                            return newStep;
-                                        })
-                                    }
+                                    onClick={handleOnNextClick}
                                     disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
                                         stepActiveIndex >= itemsMenuCount ? "secondary" : "success"
