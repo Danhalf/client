@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
 import { Dropdown } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
 import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
@@ -19,6 +18,7 @@ import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
+import { TextInput } from "dashboard/common/form/inputs";
 
 const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 
@@ -222,129 +222,109 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                 </div>
             )}
             <div className='col-4 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`general-info__text-input w-full ${errors.firstName ? "p-invalid" : ""}`}
-                        value={
-                            (type === BUYER
-                                ? contact.firstName
-                                : contactExtData.CoBuyer_First_Name) || ""
+                <TextInput
+                    className={`general-info__text-input ${errors.firstName ? "p-invalid" : ""}`}
+                    value={
+                        (type === BUYER ? contact.firstName : contactExtData.CoBuyer_First_Name) ||
+                        ""
+                    }
+                    onChange={({ target: { value } }) => {
+                        if (type === BUYER) {
+                            setFieldValue("firstName", value);
+                            changeContact("firstName", value);
+                        } else {
+                            changeContactExtData("CoBuyer_First_Name", value);
                         }
-                        onChange={({ target: { value } }) => {
-                            if (type === BUYER) {
-                                setFieldValue("firstName", value);
-                                changeContact("firstName", value);
-                            } else {
-                                changeContactExtData("CoBuyer_First_Name", value);
-                            }
-                        }}
-                        onBlur={handleOfacCheck}
-                        tooltip={
-                            isBusinessNameRequired
-                                ? TOOLTIP_MESSAGE.ONLY_BUSINESS
-                                : shouldDisableNameFields
-                                  ? TOOLTIP_MESSAGE.PERSON
-                                  : ""
-                        }
-                        tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
-                        disabled={shouldDisableNameFields}
-                    />
+                    }}
+                    onBlur={handleOfacCheck}
+                    name={`First Name${!shouldDisableNameFields ? " (required)" : ""}`}
+                    tooltip={
+                        isBusinessNameRequired
+                            ? TOOLTIP_MESSAGE.ONLY_BUSINESS
+                            : shouldDisableNameFields
+                              ? TOOLTIP_MESSAGE.PERSON
+                              : ""
+                    }
+                    disabled={shouldDisableNameFields}
+                    clearButton
+                />
 
-                    <label className='float-label'>
-                        First Name
-                        {!shouldDisableNameFields && " (required)"}
-                    </label>
-                </span>
                 <small className='p-error'>{errors.firstName}</small>
             </div>
 
             <div className='col-4 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className='general-info__text-input w-full'
-                        value={
-                            (type === BUYER
-                                ? contact.middleName
-                                : contactExtData.CoBuyer_Middle_Name) || ""
+                <TextInput
+                    name={`Last Name${!shouldDisableNameFields ? " (required)" : ""}`}
+                    className='general-info__text-input w-full'
+                    value={
+                        (type === BUYER
+                            ? contact.middleName
+                            : contactExtData.CoBuyer_Middle_Name) || ""
+                    }
+                    onChange={({ target: { value } }) => {
+                        if (type === BUYER) {
+                            changeContact("middleName", value);
+                        } else {
+                            changeContactExtData("CoBuyer_Middle_Name", value);
                         }
-                        onChange={({ target: { value } }) => {
-                            if (type === BUYER) {
-                                changeContact("middleName", value);
-                            } else {
-                                changeContactExtData("CoBuyer_Middle_Name", value);
-                            }
-                        }}
-                        tooltip={
-                            isBusinessNameRequired
-                                ? TOOLTIP_MESSAGE.ONLY_BUSINESS
-                                : shouldDisableNameFields
-                                  ? TOOLTIP_MESSAGE.PERSON
-                                  : ""
-                        }
-                        disabled={shouldDisableNameFields}
-                        tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
-                    />
-                    <label className='float-label'>Middle Name</label>
-                </span>
+                    }}
+                    tooltip={
+                        isBusinessNameRequired
+                            ? TOOLTIP_MESSAGE.ONLY_BUSINESS
+                            : shouldDisableNameFields
+                              ? TOOLTIP_MESSAGE.PERSON
+                              : ""
+                    }
+                    disabled={shouldDisableNameFields}
+                    clearButton
+                />
             </div>
 
             <div className='col-4 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`general-info__text-input w-full ${
-                            errors.lastName ? "p-invalid" : ""
-                        }`}
-                        value={
-                            (type === BUYER
-                                ? contact.lastName
-                                : contactExtData.CoBuyer_Last_Name) || ""
+                <TextInput
+                    name={`Last Name${!shouldDisableNameFields ? " (required)" : ""}`}
+                    className={`general-info__text-input ${errors.lastName ? "p-invalid" : ""}`}
+                    value={
+                        (type === BUYER ? contact.lastName : contactExtData.CoBuyer_Last_Name) || ""
+                    }
+                    onChange={({ target: { value } }) => {
+                        if (type === BUYER) {
+                            setFieldValue("lastName", value);
+                            changeContact("lastName", value);
+                        } else {
+                            changeContactExtData("CoBuyer_Last_Name", value);
                         }
-                        onChange={({ target: { value } }) => {
-                            if (type === BUYER) {
-                                setFieldValue("lastName", value);
-                                changeContact("lastName", value);
-                            } else {
-                                changeContactExtData("CoBuyer_Last_Name", value);
-                            }
-                        }}
-                        onBlur={handleOfacCheck}
-                        disabled={shouldDisableNameFields}
-                        tooltip={
-                            isBusinessNameRequired
-                                ? TOOLTIP_MESSAGE.ONLY_BUSINESS
-                                : shouldDisableNameFields
-                                  ? TOOLTIP_MESSAGE.PERSON
-                                  : ""
-                        }
-                        tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
-                    />
-                    <label className='float-label'>
-                        Last Name
-                        {!shouldDisableNameFields && " (required)"}
-                    </label>
-                </span>
+                    }}
+                    onBlur={handleOfacCheck}
+                    disabled={shouldDisableNameFields}
+                    tooltip={
+                        isBusinessNameRequired
+                            ? TOOLTIP_MESSAGE.ONLY_BUSINESS
+                            : shouldDisableNameFields
+                              ? TOOLTIP_MESSAGE.PERSON
+                              : ""
+                    }
+                    clearButton
+                />
+
                 <small className='p-error'>{errors.lastName}</small>
             </div>
 
-            <div className='col-4'>
-                <span className='p-float-label'>
-                    <InputText
-                        className={`general-info__text-input w-full ${
-                            errors.businessName ? "p-invalid" : ""
-                        }`}
-                        value={savedBusinessName || contact.businessName}
-                        onChange={({ target: { value } }) => {
-                            changeContact("businessName", value);
-                        }}
-                        disabled={!!shouldDisableBusinessName}
-                        tooltip={shouldDisableBusinessName ? TOOLTIP_MESSAGE.BUSINESS : ""}
-                        tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
-                    />
-                    <label className='float-label'>
-                        Business Name
-                        {!shouldDisableBusinessName && " (required)"}
-                    </label>
-                </span>
+            <div className='col-4 relative'>
+                <TextInput
+                    name={`Business Name${!shouldDisableBusinessName ? " (required)" : ""}`}
+                    className={`general-info__text-input w-full ${
+                        errors.businessName ? "p-invalid" : ""
+                    }`}
+                    value={savedBusinessName || contact.businessName}
+                    onChange={({ target: { value } }) => {
+                        changeContact("businessName", value);
+                    }}
+                    disabled={!!shouldDisableBusinessName}
+                    tooltip={shouldDisableBusinessName ? TOOLTIP_MESSAGE.BUSINESS : ""}
+                    clearButton
+                />
+
                 <small className='p-error'>{errors.businessName}</small>
             </div>
         </div>
