@@ -214,8 +214,9 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
                                 className={`w-full general-info__dropdown ${
                                     errors.type ? "p-invalid" : ""
                                 }`}
+                                showClear={contact.type >= 1}
                             />
-                            <label className='float-label'>Type (required)</label>
+                            <label className='float-label'>Type (required) {contact.type}</label>
                         </span>
                         <small className='p-error'>{errors.type}</small>
                     </div>
