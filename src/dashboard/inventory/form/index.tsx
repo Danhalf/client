@@ -32,7 +32,14 @@ const STEP = "step";
 
 type PartialInventory = Pick<
     InventoryModel,
-    "VIN" | "Make" | "Model" | "Year" | "locationuid" | "GroupClassName" | "StockNo" | "TypeOfFuel"
+    | "VIN"
+    | "Make"
+    | "Model"
+    | "Year"
+    | "locationuid"
+    | "GroupClassName"
+    | "StockNo"
+    | "TypeOfFuel_id"
 >;
 
 const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
@@ -45,7 +52,7 @@ const tabFields: Partial<Record<AccordionItems, (keyof PartialInventory)[]>> = {
         "GroupClassName",
         "StockNo",
     ],
-    [AccordionItems.DESCRIPTION]: ["TypeOfFuel"],
+    [AccordionItems.DESCRIPTION]: ["TypeOfFuel_id"],
 };
 
 const MIN_YEAR = 1970;
@@ -164,20 +171,24 @@ export const InventoryForm = observer(() => {
                 .required("Data is required."),
             Make: Yup.string().trim().required("Data is required."),
             Model: Yup.string().trim().required("Data is required."),
-            Year: Yup.string().test(
-                "is-valid-year",
-                `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
-                function (value) {
-                    const year = Number(value);
-                    if (year < MIN_YEAR) {
-                        return this.createError({ message: `Must be greater than ${MIN_YEAR}` });
+            Year: Yup.string()
+                .test(
+                    "is-valid-year",
+                    `Must be between ${MIN_YEAR} and ${MAX_YEAR}`,
+                    function (value) {
+                        const year = Number(value);
+                        if (year < MIN_YEAR) {
+                            return this.createError({
+                                message: `Must be greater than ${MIN_YEAR}`,
+                            });
+                        }
+                        if (year > MAX_YEAR) {
+                            return this.createError({ message: `Must be less than ${MAX_YEAR}` });
+                        }
+                        return true;
                     }
-                    if (year > MAX_YEAR) {
-                        return this.createError({ message: `Must be less than ${MAX_YEAR}` });
-                    }
-                    return true;
-                }
-            ),
+                )
+                .required("Data is required."),
             locationuid: Yup.string().trim().required("Data is required."),
             GroupClassName: Yup.string().trim().required("Data is required."),
             StockNo: Yup.string()
@@ -189,7 +200,7 @@ export const InventoryForm = observer(() => {
                         debouncedCheckStockNoAvailability(value || "", resolve);
                     });
                 }),
-            TypeOfFuel: Yup.string().trim().required("Data is required."),
+            TypeOfFuel_id: Yup.string().trim().required("Data is required."),
         });
     };
 
@@ -453,7 +464,7 @@ export const InventoryForm = observer(() => {
                                                     Make: inventory.Make,
                                                     Model: inventory.Model,
                                                     Year: inventory.Year,
-                                                    TypeOfFuel: inventory?.TypeOfFuel_id || "",
+                                                    TypeOfFuel_id: inventory?.TypeOfFuel_id || "0",
                                                     StockNo: inventory?.StockNo || "",
                                                     locationuid:
                                                         inventory?.locationuid || currentLocation,
