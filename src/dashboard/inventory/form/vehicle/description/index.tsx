@@ -98,7 +98,7 @@ export const VehicleDescription = observer((): ReactElement => {
                         optionValue='id'
                         filter
                         options={fuelList}
-                        value={inventory.TypeOfFuel_id?.toString() || "0"}
+                        value={inventory.TypeOfFuel_id?.toString()}
                         onChange={({ value }) => {
                             setFieldValue("TypeOfFuel_id", value || "0");
                             changeInventory({ key: "TypeOfFuel_id", value: value || "0" });
@@ -110,9 +110,7 @@ export const VehicleDescription = observer((): ReactElement => {
                     />
                     <label className='float-label'>Type of Fuel (required)</label>
                 </span>
-                <small className='p-error'>
-                    {errors.TypeOfFuel_id} id: {values.TypeOfFuel_id}
-                </small>
+                <small className='p-error'>{errors.TypeOfFuel_id}</small>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
