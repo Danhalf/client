@@ -20,6 +20,7 @@ import {
 } from "dashboard/reports/common/report-headers";
 import { ActionButtons } from "dashboard/reports/common/report-buttons";
 import { useNavigate } from "react-router-dom";
+import { ReportParameters } from "./common/report-parameters";
 
 export default function Reports(): ReactElement {
     const navigate = useNavigate();
@@ -33,6 +34,8 @@ export default function Reports(): ReactElement {
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
     const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
     const [activeIndexes, setActiveIndexes] = useState<number[]>([]);
+    const [customActiveIndex, setCustomActiveIndex] = useState<number | null>(null);
+    const [isParametersEditing, setIsParametersEditing] = useState<ReportDocument | null>(null);
 
     const toast = useToast();
 
@@ -160,6 +163,18 @@ export default function Reports(): ReactElement {
         if (!activeIndexes.includes(index)) {
             setActiveIndexes([...activeIndexes, index]);
         }
+    };
+
+    const handleCustomEditCollection = (
+        event: React.MouseEvent<HTMLElement>,
+        id: string,
+        index: number
+    ) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setIsCollectionEditing(id);
+
+        setCustomActiveIndex(index);
     };
 
     return (
@@ -304,6 +319,11 @@ export default function Reports(): ReactElement {
                                                                 <div
                                                                     className='reports__list-item reports__list-item--inner'
                                                                     key={report.documentUID}
+                                                                    onClick={() => {
+                                                                        setIsParametersEditing(
+                                                                            report
+                                                                        );
+                                                                    }}
                                                                     onDoubleClick={() => {
                                                                         navigate(
                                                                             `/dashboard/reports/${report.documentUID}`
@@ -324,6 +344,11 @@ export default function Reports(): ReactElement {
                                                                 </div>
                                                             ))
                                                         )}
+                                                        {isParametersEditing && (
+                                                            <ReportParameters
+                                                                report={isParametersEditing}
+                                                            />
+                                                        )}
                                                     </AccordionTab>
                                                 );
                                             }
@@ -333,7 +358,7 @@ export default function Reports(): ReactElement {
                                         className='reports__accordion-tab'
                                     >
                                         <Accordion
-                                            multiple
+                                            activeIndex={customActiveIndex}
                                             className='reports__accordion reports__accordion--inner'
                                         >
                                             {collections.flatMap((collection) =>
@@ -388,7 +413,7 @@ export default function Reports(): ReactElement {
                                                                                     className='reports-actions__button cursor-pointer'
                                                                                     outlined
                                                                                     onClick={(e) =>
-                                                                                        handleEditCollection(
+                                                                                        handleCustomEditCollection(
                                                                                             e,
                                                                                             itemUID,
                                                                                             index
@@ -452,6 +477,11 @@ export default function Reports(): ReactElement {
                                                                                     `/dashboard/reports/${report.documentUID}`
                                                                                 );
                                                                             }}
+                                                                            onClick={() => {
+                                                                                setIsParametersEditing(
+                                                                                    report
+                                                                                );
+                                                                            }}
                                                                         >
                                                                             <p>{report.name}</p>
                                                                             <ActionButtons
@@ -469,6 +499,14 @@ export default function Reports(): ReactElement {
                                                                         </div>
                                                                     ))
                                                                 )}
+                                                                {isParametersEditing &&
+                                                                    !isCollectionEditing && (
+                                                                        <ReportParameters
+                                                                            report={
+                                                                                isParametersEditing
+                                                                            }
+                                                                        />
+                                                                    )}
                                                             </AccordionTab>
                                                         );
                                                     }
