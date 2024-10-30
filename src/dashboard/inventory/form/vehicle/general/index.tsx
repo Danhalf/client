@@ -566,7 +566,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         placeholder='Select Status'
                         className='w-full vehicle-general__dropdown'
                     />
-                    <label className='float-label'>Vehicle Status</label>
+                    <label className='float-label'>Status</label>
                 </span>
             </div>
         </div>
