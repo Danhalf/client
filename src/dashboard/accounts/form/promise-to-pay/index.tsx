@@ -3,7 +3,7 @@ import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { addAccountPromise, listAccountPromises } from "http/services/accounts.service";
+import { listAccountPromises, updateAccountPromise } from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { AccountPromise } from "common/models/accounts";
 import { SplitButton } from "primereact/splitbutton";
@@ -72,7 +72,7 @@ export const AccountPromiseToPay = (): ReactElement => {
             });
             const pstatus = ACCOUNT_PROMISE_STATUS.find((item) => item.name === status);
             promises.forEach(async (promise) => {
-                const res = await addAccountPromise(id, {
+                const res = await updateAccountPromise(id, {
                     ...promise,
                     pstatus: pstatus?.id,
                     pstatusname: status,
