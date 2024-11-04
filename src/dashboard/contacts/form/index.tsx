@@ -63,10 +63,12 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
                 : Yup.string()?.trim();
         }),
     Buyer_Emp_Ext: Yup.string().email("Invalid email address."),
-    Buyer_Emp_Phone: Yup.string().matches(/^[\d]{10,13}$/, {
-        message: "Invalid phone number.",
-        excludeEmptyString: false,
-    }),
+    Buyer_Emp_Phone: Yup.string()
+        .transform((value) => value.replace(/-/g, ""))
+        .matches(/^[\d]{10,13}$/, {
+            message: "Invalid phone number.",
+            excludeEmptyString: false,
+        }),
     CoBuyer_First_Name: Yup.string()
         ?.trim()
         .when("type", (type, schema) => {
