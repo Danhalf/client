@@ -213,17 +213,17 @@ export const ContactForm = observer((): ReactElement => {
         }
     };
 
-    useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isContactChanged) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    }, [isContactChanged]);
+    // useEffect(() => {
+    //     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    //         if (isContactChanged) {
+    //             event.preventDefault();
+    //         }
+    //     };
+    //     window.addEventListener("beforeunload", handleBeforeUnload);
+    //     return () => {
+    //         window.removeEventListener("beforeunload", handleBeforeUnload);
+    //     };
+    // }, [isContactChanged]);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -513,6 +513,8 @@ export const ContactForm = observer((): ReactElement => {
                                                 ? setConfirmActive(true)
                                                 : setAttemptedSubmit(true)
                                         }
+                                        disabled={!deleteReason.length}
+                                        {...(!deleteReason.length && { severity: "secondary" })}
                                         className='form-nav__button form-nav__button--danger'
                                     >
                                         Delete
