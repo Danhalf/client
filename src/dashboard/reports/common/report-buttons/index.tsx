@@ -95,6 +95,7 @@ export const ActionButtons = ({
                 const detail = !!report.isfavorite
                     ? "Report is successfully removed from Favorites!"
                     : "Report is successfully added to Favorites!";
+                refetchCollectionsAction?.();
                 refetchFavoritesAction?.();
                 toast.current?.show({
                     severity: "success",
