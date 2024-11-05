@@ -55,7 +55,7 @@ interface ReportFooterProps {
 export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactElement => {
     const reportStore = useStore().reportStore;
     const navigate = useNavigate();
-    const { report, saveReport } = reportStore;
+    const { report, saveReport, isReportChanged } = reportStore;
     const toast = useToast();
     const [accessDialogVisible, setAccessDialogVisible] = useState<boolean>(false);
 
@@ -161,8 +161,12 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                 </Button>
                 <Button
                     className='uppercase px-6 report__button'
-                    disabled={!report.name || !!report.isdefault}
-                    severity={!report.name || !!report.isdefault ? "secondary" : "success"}
+                    disabled={!report.name || !!report.isdefault || !isReportChanged}
+                    severity={
+                        !report.name || !!report.isdefault || !isReportChanged
+                            ? "secondary"
+                            : "success"
+                    }
                     onClick={() => handleSaveReport()}
                 >
                     {report?.itemuid ? "Update" : "Create"}
