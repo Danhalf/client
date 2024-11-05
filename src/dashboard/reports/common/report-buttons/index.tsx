@@ -32,7 +32,8 @@ export const ActionButtons = ({
     const menu = useRef<Menu>(null!);
     const navigate = useNavigate();
 
-    const handleEditAccess = () => {
+    const handleEditAccess = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
         setEditAccessActive(true);
     };
 
@@ -77,7 +78,8 @@ export const ActionButtons = ({
         },
     ];
 
-    const handleChangeIsFavorite = () => {
+    const handleChangeIsFavorite = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
         updateReportInfo(report.documentUID, {
             ...report,
             isfavorite: !report.isfavorite ? 1 : 0,
@@ -104,8 +106,14 @@ export const ActionButtons = ({
         });
     };
 
-    const handleEditReport = () => {
+    const handleEditReport = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
         navigate(`/dashboard/reports/${report.documentUID}`);
+    };
+
+    const handleAddToCollection = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation();
+        menu.current.toggle(event);
     };
 
     return (
@@ -138,7 +146,7 @@ export const ActionButtons = ({
                     icon='pi pi-plus'
                     tooltip='Add to Collection'
                     outlined
-                    onClick={(event) => menu.current.toggle(event)}
+                    onClick={handleAddToCollection}
                 />
                 <Button
                     className='p-button reports-actions__button'
