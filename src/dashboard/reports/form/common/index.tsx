@@ -123,8 +123,9 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                         icon='icon adms-password'
                         severity='success'
                         onClick={() => setAccessDialogVisible(true)}
-                        tooltip='Edit access'
                         outlined
+                        tooltip='Edit access'
+                        tooltipOptions={{ position: "mouse" }}
                     />
                 )}
                 {report.itemuid && (
@@ -135,6 +136,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                         onClick={handleDuplicateReport}
                         outlined
                         tooltip='Duplicate report'
+                        tooltipOptions={{ position: "mouse" }}
                     />
                 )}
 
@@ -146,6 +148,7 @@ export const ReportFooter = observer(({ onAction }: ReportFooterProps): ReactEle
                         outlined
                         severity='danger'
                         tooltip='Delete report'
+                        tooltipOptions={{ position: "mouse" }}
                     />
                 )}
                 <Button

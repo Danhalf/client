@@ -145,6 +145,7 @@ export const ActionButtons = ({
                     className='p-button reports-actions__button reports-actions__add-button'
                     icon='pi pi-plus'
                     tooltip='Add to Collection'
+                    tooltipOptions={{ position: "mouse" }}
                     outlined
                     onClick={handleAddToCollection}
                 />
@@ -154,12 +155,14 @@ export const ActionButtons = ({
                     outlined
                     onClick={handleChangeIsFavorite}
                     tooltip={!!report.isfavorite ? "Remove from Favorites" : "Add to Favorites"}
+                    tooltipOptions={{ position: "mouse" }}
                 />
                 <Button
                     className='p-button reports-actions__button'
                     icon='icon adms-edit-item'
                     outlined
                     tooltip='Edit Report'
+                    tooltipOptions={{ position: "mouse" }}
                     onClick={handleEditReport}
                 />
                 <Button
@@ -167,6 +170,7 @@ export const ActionButtons = ({
                     icon='icon adms-password'
                     outlined={!editAccessActive}
                     tooltip='Edit Access'
+                    tooltipOptions={{ position: "mouse" }}
                     onClick={handleEditAccess}
                 />
             </div>

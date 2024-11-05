@@ -137,6 +137,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
                 icon={`pi pi-angle-${icon}`}
                 disabled={!!report.isdefault || !currentItem || disabled}
                 tooltip={tooltip}
+                tooltipOptions={{ position: "mouse" }}
                 outlined
                 onClick={() => currentItem && action()}
             />
