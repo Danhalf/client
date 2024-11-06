@@ -27,7 +27,7 @@ export default function Reports(): ReactElement {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [reportSearch, setReportSearch] = useState<string>("");
-    const [collections, setCollections] = useState<ReportCollection[]>([]);
+    const [reportCollections, setReportCollections] = useState<ReportCollection[]>([]);
     const [customCollections, setCustomCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [collectionName, setCollectionName] = useState<string>("");
@@ -65,10 +65,10 @@ export default function Reports(): ReactElement {
                 const customCollections = collectionsWithoutFavorite
                     .flatMap((collection) => collection.collections)
                     .filter(Boolean);
-                setCollections(collectionsWithoutFavorite);
+                setReportCollections(collectionsWithoutFavorite);
                 setCustomCollections(customCollections);
             } else {
-                setCollections([]);
+                setReportCollections([]);
             }
         });
     };
@@ -218,7 +218,7 @@ export default function Reports(): ReactElement {
                                 >
                                     <CollectionPanelContent
                                         collectionName={collectionName}
-                                        collections={collections}
+                                        collections={reportCollections}
                                         selectedReports={newCollectionsReports}
                                         setCollectionName={setCollectionName}
                                         setSelectedReports={setNewCollectionsReports}
@@ -233,8 +233,8 @@ export default function Reports(): ReactElement {
                                     activeIndex={activeIndexes}
                                     onTabChange={handleTabChange}
                                 >
-                                    {collections &&
-                                        [...favoriteCollections, ...collections].map(
+                                    {reportCollections &&
+                                        [...favoriteCollections, ...reportCollections].map(
                                             (
                                                 {
                                                     itemUID,
@@ -308,7 +308,9 @@ export default function Reports(): ReactElement {
                                                                         }}
                                                                         collectionuid={itemUID}
                                                                         collectionName={name}
-                                                                        collections={collections}
+                                                                        collections={
+                                                                            reportCollections
+                                                                        }
                                                                         selectedReports={
                                                                             documents || []
                                                                         }
@@ -360,7 +362,9 @@ export default function Reports(): ReactElement {
                                                                     </p>
                                                                     <ActionButtons
                                                                         report={report}
-                                                                        collectionList={collections}
+                                                                        collectionList={
+                                                                            reportCollections
+                                                                        }
                                                                         refetchCollectionsAction={
                                                                             handleGetUserReportCollections
                                                                         }
@@ -481,7 +485,7 @@ export default function Reports(): ReactElement {
                                                                             collectionuid={itemUID}
                                                                             collectionName={name}
                                                                             collections={
-                                                                                collections
+                                                                                reportCollections
                                                                             }
                                                                             selectedReports={
                                                                                 documents || []
@@ -522,7 +526,7 @@ export default function Reports(): ReactElement {
                                                                         <ActionButtons
                                                                             report={report}
                                                                             collectionList={
-                                                                                collections
+                                                                                reportCollections
                                                                             }
                                                                             refetchCollectionsAction={
                                                                                 handleGetUserReportCollections
