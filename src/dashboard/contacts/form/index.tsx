@@ -38,8 +38,16 @@ const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>
 export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
 
 export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.object().shape({
-    firstName: Yup.string()?.trim().required("Data is required."),
-    lastName: Yup.string()?.trim().required("Data is required."),
+    firstName: Yup.string()
+        ?.trim()
+        .when("type", (type, schema) => {
+            return Number(type) === BUYER_ID ? schema.required("Data is required.") : schema;
+        }),
+    lastName: Yup.string()
+        ?.trim()
+        .when("type", (type, schema) => {
+            return Number(type) === BUYER_ID ? schema.required("Data is required.") : schema;
+        }),
     type: Yup.number().default(0).required("Data is required."),
     email1: Yup.string().email("Invalid email address."),
     email2: Yup.string().email("Invalid email address."),
@@ -77,7 +85,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     CoBuyer_Last_Name: Yup.string()
         ?.trim()
         .when("type", (type, schema) => {
-            return Number(type) ? schema.required("Data is required.") : schema;
+            return Number(type) === BUYER_ID ? schema.required("Data is required.") : schema;
         }),
 });
 
