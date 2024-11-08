@@ -211,7 +211,11 @@ export const ContactsIdentificationInfo = observer(
                                 }
                                 className='w-full identification-info__dropdown'
                                 disabled={isControlDisabled}
-                                showClear
+                                showClear={
+                                    !!(type === BUYER
+                                        ? contactExtData.Buyer_DL_State
+                                        : contactExtData.CoBuyer_DL_State)
+                                }
                             />
                             <label className='float-label'>DL's State</label>
                         </span>
@@ -279,7 +283,11 @@ export const ContactsIdentificationInfo = observer(
                                 }
                                 className='w-full identification-info__dropdown'
                                 disabled={isControlDisabled}
-                                showClear
+                                showClear={
+                                    !!(type === BUYER
+                                        ? contactExtData.Buyer_Sex
+                                        : contactExtData.CoBuyer_Sex)
+                                }
                             />
                             <label className='float-label'>Sex</label>
                         </span>
