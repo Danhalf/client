@@ -31,6 +31,11 @@ export const ReportColumnSelect = observer((): ReactElement => {
         if (report?.columns) {
             setSelectedValues(report.columns.filter(Boolean));
         }
+        return () => {
+            setSelectedValues([]);
+            setAvailableValues([]);
+            setDataSet(null);
+        };
     }, [report]);
 
     useEffect(() => {
