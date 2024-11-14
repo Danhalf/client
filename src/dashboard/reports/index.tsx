@@ -35,7 +35,7 @@ export default function Reports(): ReactElement {
     const [selectedReports, setSelectedReports] = useState<ReportDocument[]>([]);
     const [isCollectionEditing, setIsCollectionEditing] = useState<string | null>(null);
     const [activeIndexes, setActiveIndexes] = useState<number[]>([]);
-    const [customActiveIndex, setCustomActiveIndex] = useState<number | null>(null);
+    const [customActiveIndex, setCustomActiveIndex] = useState<number[]>([]);
     const [isParametersEditing, setIsParametersEditing] = useState<ReportDocument | null>(null);
     const [defaultReportsCount, setDefaultReportsCount] = useState<number>(0);
 
@@ -164,7 +164,8 @@ export default function Reports(): ReactElement {
         }
     };
 
-    const handleTabChange = (e: AccordionTabChangeEvent) => {
+    const handleTabChange = (e: AccordionTabChangeEvent, isCustomTab: boolean = false) => {
+        if (isCustomTab) return setCustomActiveIndex(e.index as number[]);
         setActiveIndexes(e.index as number[]);
     };
 
@@ -173,10 +174,18 @@ export default function Reports(): ReactElement {
         id: string,
         index: number
     ) => {
-        event.preventDefault();
-        setIsCollectionEditing(id);
-
-        setCustomActiveIndex(index);
+        if (event.target instanceof HTMLElement) {
+            if (
+                event.target.classList.contains("reports-actions__button") ||
+                event.target.classList.contains("p-button-label")
+            ) {
+                event.stopPropagation();
+                setCustomActiveIndex([index]);
+                setIsCollectionEditing(id);
+            } else {
+                return;
+            }
+        }
     };
 
     const handleOpenParameters = (event: React.MouseEvent<HTMLElement>, report: ReportDocument) => {
@@ -285,7 +294,11 @@ export default function Reports(): ReactElement {
                                                     >
                                                         {index === 1 && (
                                                             <Accordion
+                                                                multiple
                                                                 activeIndex={customActiveIndex}
+                                                                onTabChange={(event) =>
+                                                                    handleTabChange(event, true)
+                                                                }
                                                                 className='reports__accordion reports__accordion--inner'
                                                             >
                                                                 {customCollections?.map(
@@ -524,6 +537,11 @@ export default function Reports(): ReactElement {
                                                                         </p>
                                                                         <ActionButtons
                                                                             report={report}
+                                                                            tooltip={
+                                                                                name === "Favorites"
+                                                                                    ? "Add to Collection"
+                                                                                    : "Copy to Collection"
+                                                                            }
                                                                             collectionList={[
                                                                                 ...customCollections,
                                                                                 ...reportCollections,
