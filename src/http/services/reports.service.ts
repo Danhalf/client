@@ -253,7 +253,7 @@ export const printReportInfo = async (
 
 export const setReportDocumentTemplate = async (
     documentuid: string,
-    { itemUID, columns }: { itemUID: string; columns: Partial<ReportServiceColumns>[] }
+    { itemUID, columns }: { itemUID: string; columns?: Partial<ReportServiceColumns>[] }
 ) => {
     try {
         const request = await authorizedUserApiInstance.post<any>(
@@ -341,10 +341,15 @@ export const deleteReportCollection = async (collectionuid: string, reportuid?: 
     }
 };
 
-export const moveReportToCollection = async (collectionuid: string, reportuid: string) => {
+export const moveReportToCollection = async (
+    collectionuid: string,
+    reportuid: string,
+    newCollectionuid: string
+) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
-            `reports/${collectionuid}/${reportuid}/move`
+            `reports/${collectionuid}/${reportuid}/move`,
+            { collectionuid: newCollectionuid }
         );
         return request.data;
     } catch (error) {

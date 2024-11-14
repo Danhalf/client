@@ -34,6 +34,7 @@ export const ReportEditForm = observer((): ReactElement => {
                 }
             });
         return () => {
+            store.reportName = "";
             store.report = {};
         };
     }, [id]);
@@ -86,6 +87,7 @@ export const ReportEditForm = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
+                            disabled={!!report.isdefault}
                             value={report?.name || reportName}
                             onChange={(e) => changeReport("name", e.target.value)}
                         />
@@ -142,6 +144,7 @@ export const ReportEditForm = observer((): ReactElement => {
                     <label className='cursor-pointer report-control__checkbox'>
                         <Checkbox
                             checked={!!report.ShowAverages}
+                            disabled={!!report.isdefault}
                             onChange={() => {
                                 changeReport("ShowAverages", !report.ShowAverages ? 1 : 0);
                             }}
@@ -153,6 +156,7 @@ export const ReportEditForm = observer((): ReactElement => {
                     <label className='cursor-pointer report-control__checkbox'>
                         <Checkbox
                             checked={!!report.ShowLineCount}
+                            disabled={!!report.isdefault}
                             onChange={() => {
                                 changeReport("ShowLineCount", !report.ShowLineCount ? 1 : 0);
                             }}
@@ -170,6 +174,7 @@ export const ReportEditForm = observer((): ReactElement => {
                     <label className='cursor-pointer report-control__checkbox'>
                         <Checkbox
                             checked={!!report.AskForStartAndEndDates}
+                            disabled={!!report.isdefault}
                             onChange={() => {
                                 changeReport(
                                     "AskForStartAndEndDates",

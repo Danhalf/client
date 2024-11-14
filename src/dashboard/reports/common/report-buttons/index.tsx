@@ -16,11 +16,13 @@ import { EditAccessDialog } from "dashboard/reports/common/access-dialog";
 
 interface ActionButtonsProps {
     report: ReportDocument;
+    tooltip?: string;
     collectionList?: ReportCollection[];
     refetchCollectionsAction?: () => void;
 }
 
 export const ActionButtons = ({
+    tooltip,
     report,
     refetchCollectionsAction,
     collectionList,
@@ -60,7 +62,8 @@ export const ActionButtons = ({
                     } else {
                         const response = await moveReportToCollection(
                             collection.itemUID,
-                            report.documentUID
+                            report.documentUID,
+                            collection.itemUID
                         );
                         if (response?.status === Status.ERROR) {
                             toast.current?.show({
@@ -145,7 +148,7 @@ export const ActionButtons = ({
                 <Button
                     className='p-button reports-actions__button reports-actions__add-button'
                     icon={`pi ${addedToCollection ? "pi-check" : "pi-plus"}`}
-                    tooltip='Add to Collection'
+                    tooltip={tooltip || "Add to Collection"}
                     tooltipOptions={{ position: "mouse" }}
                     outlined
                     onClick={handleAddToCollection}
