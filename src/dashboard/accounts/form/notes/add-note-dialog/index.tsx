@@ -26,6 +26,7 @@ export const AddNoteDialog = ({
     ...props
 }: AddNoteDialogProps): ReactElement => {
     const toast = useToast();
+    const store = useStore().accountStore;
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -65,6 +66,7 @@ export const AddNoteDialog = ({
                         life: TOAST_LIFETIME,
                     });
                     setContactType(ACCOUNT_NOTE_CONTACT_TYPE[0]);
+                    store.isAccountChanged = true;
                     setNote("");
                     action();
                     onHide();
