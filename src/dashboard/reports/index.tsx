@@ -537,6 +537,11 @@ export default function Reports(): ReactElement {
                                                                         </p>
                                                                         <ActionButtons
                                                                             report={report}
+                                                                            tooltip={
+                                                                                name === "Favorites"
+                                                                                    ? "Add to Collection"
+                                                                                    : "Copy to Collection"
+                                                                            }
                                                                             collectionList={[
                                                                                 ...customCollections,
                                                                                 ...reportCollections,
