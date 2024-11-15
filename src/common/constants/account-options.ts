@@ -3,9 +3,9 @@ import { TypeList } from "common/models";
 export const ACCOUNT_STATUS_LIST = [
     { name: "OK" },
     { name: "1-29 Days Overdue" },
-    { name: "30-60 Days Overdue" },
-    { name: "60-90 Days Overdue" },
-    { name: "90-150 Days Overdue" },
+    { name: "30-59 Days Overdue" },
+    { name: "60-89 Days Overdue" },
+    { name: "90-149 Days Overdue" },
     { name: "150+ Days Overdue" },
 ];
 

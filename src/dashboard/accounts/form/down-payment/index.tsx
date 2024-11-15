@@ -46,7 +46,7 @@ export const AccountDownPayment = (): ReactElement => {
     const [modalText, setModalText] = useState<string>("");
     const [modalAction, setModalAction] = useState<(() => void) | null>(null);
     const [selectedPayments, setSelectedPayments] = useState<AccountDownPayments[]>([]);
-    const [downPaymentDialogActive, setDownPaymentDialogActive] = useState<boolean>(!false);
+    const [downPaymentDialogActive, setDownPaymentDialogActive] = useState<boolean>(false);
 
     const getDownPayments = async () => {
         if (id) {

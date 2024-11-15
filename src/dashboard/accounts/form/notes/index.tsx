@@ -208,6 +208,9 @@ export const AccountNotes = observer((): ReactElement => {
                                     height: "300px",
                                 },
                             },
+                            wrapper: {
+                                className: "thin-scrollbar",
+                            },
                         }}
                     >
                         <Column
