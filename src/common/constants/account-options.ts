@@ -11,21 +11,25 @@ export const ACCOUNT_STATUS_LIST = [
 
 export const ACCOUNT_ACTIVITY_LIST = ["All Activity", "Active data", "Deleted payments"];
 
-export const ACCOUNT_PAYMENT_METHODS: readonly Partial<TypeList>[] = [
-    { name: "Check" },
-    { name: "Cash" },
-    { name: "VISA" },
-    { name: "MC" },
-    { name: "Discovery" },
-    { name: "AMEX" },
-    { name: "Debit" },
-    { name: "ACH" },
-    { name: "Money Order" },
-    { name: "Western Union" },
-    { name: "Travel Check" },
-    { name: "Bank Check" },
-    { name: "Trade-In" },
-];
+export enum ACCOUNT_PAYMENT_METHODS_NAMES {
+    CHECK = "Check",
+    CASH = "Cash",
+    VISA = "VISA",
+    MC = "MC",
+    DISCOVERY = "Discovery",
+    AMEX = "AMEX",
+    DEBIT = "Debit",
+    ACH = "ACH",
+    MONEY_ORDER = "Money Order",
+    WESTERN_UNION = "Western Union",
+    TRAVEL_CHECK = "Travel Check",
+    BANK_CHECK = "Bank Check",
+    TRADE_IN = "Trade-In",
+}
+
+export const ACCOUNT_PAYMENT_METHODS: readonly Partial<TypeList>[] = Object.values(
+    ACCOUNT_PAYMENT_METHODS_NAMES
+).map((method) => ({ name: method }));
 
 export const ACCOUNT_FEE_TYPES: readonly Partial<TypeList>[] = [
     { name: "Other" },
