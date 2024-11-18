@@ -507,7 +507,7 @@ export default function Reports(): ReactElement {
                                                                     key={report.itemUID}
                                                                 >
                                                                     <div
-                                                                        className='reports__list-item reports__list-item--inner'
+                                                                        className='reports__list-item'
                                                                         key={report.itemUID}
                                                                         onClick={(event) =>
                                                                             handleOpenParameters(
