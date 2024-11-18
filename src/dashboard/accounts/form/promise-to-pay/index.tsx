@@ -148,7 +148,6 @@ export const AccountPromiseToPay = (): ReactElement => {
 
     const getPromiseStatusColor = (statusId: number): string => {
         const status = ACCOUNT_PROMISE_STATUS.find((item) => item.id === statusId)?.name;
-        // debugger;
         switch (status) {
             case PAID_STATUS.LATE:
                 return PAID_COLOR.LATE;
@@ -285,7 +284,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                         showGridlines
                         className='account-promise__table'
                         value={promiseList}
-                        emptyMessage='No activity yet.'
+                        emptyMessage='No promises added yet.'
                         reorderableColumns
                         resizableColumns
                         scrollable
