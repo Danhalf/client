@@ -540,7 +540,9 @@ export default function Reports(): ReactElement {
                                                                             tooltip={
                                                                                 name === "Favorites"
                                                                                     ? "Add to Collection"
-                                                                                    : "Copy to Collection"
+                                                                                    : !!report.isdefault
+                                                                                      ? "Copy to Collection"
+                                                                                      : "Move to Collection"
                                                                             }
                                                                             collectionList={[
                                                                                 ...customCollections,
