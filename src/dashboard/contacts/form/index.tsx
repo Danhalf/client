@@ -77,16 +77,6 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             message: "Invalid phone number.",
             excludeEmptyString: false,
         }),
-    CoBuyer_First_Name: Yup.string()
-        ?.trim()
-        .when("type", (type, schema) => {
-            return Number(type) === BUYER_ID ? schema.required("Data is required.") : schema;
-        }),
-    CoBuyer_Last_Name: Yup.string()
-        ?.trim()
-        .when("type", (type, schema) => {
-            return Number(type) === BUYER_ID ? schema.required("Data is required.") : schema;
-        }),
 });
 
 const DialogBody = (): ReactElement => {
@@ -532,7 +522,10 @@ export const ContactForm = observer((): ReactElement => {
                                 ) : (
                                     <Button
                                         className='form-nav__button'
+                                        type='button'
                                         onClick={handleSaveContactForm}
+                                        disabled={!isContactChanged}
+                                        severity={isContactChanged ? "success" : "secondary"}
                                     >
                                         Save
                                     </Button>
