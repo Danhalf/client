@@ -507,7 +507,7 @@ export default function Reports(): ReactElement {
                                                                     key={report.itemUID}
                                                                 >
                                                                     <div
-                                                                        className='reports__list-item reports__list-item--inner'
+                                                                        className='reports__list-item'
                                                                         key={report.itemUID}
                                                                         onClick={(event) =>
                                                                             handleOpenParameters(
@@ -540,7 +540,9 @@ export default function Reports(): ReactElement {
                                                                             tooltip={
                                                                                 name === "Favorites"
                                                                                     ? "Add to Collection"
-                                                                                    : "Copy to Collection"
+                                                                                    : !!report.isdefault
+                                                                                      ? "Copy to Collection"
+                                                                                      : "Move to Collection"
                                                                             }
                                                                             collectionList={[
                                                                                 ...customCollections,
@@ -550,6 +552,9 @@ export default function Reports(): ReactElement {
                                                                                     collection.itemUID !==
                                                                                     itemUID
                                                                             )}
+                                                                            currentCollectionUID={
+                                                                                itemUID
+                                                                            }
                                                                             refetchCollectionsAction={
                                                                                 handleGetUserReportCollections
                                                                             }
