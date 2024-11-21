@@ -5,7 +5,7 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { InventoryExtData } from "common/models/inventory";
 
-export const VehicleInspections = observer((): ReactElement => {
+export const StateInspections = observer((): ReactElement => {
     const store = useStore().inventoryStore;
 
     const {
