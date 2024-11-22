@@ -145,7 +145,10 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     }, [shouldDisableBusinessName, contact.firstName, contact.lastName]);
 
     const handleOfacCheck = () => {
-        checkContactOFAC(id, contactFullInfo).then((response) => {
+        if (!contactFullInfo.firstName || !contactFullInfo.lastName) {
+            return;
+        }
+        checkContactOFAC(id, { ...contactFullInfo }).then((response) => {
             if (response?.status === Status.ERROR) {
                 toast.current?.show({
                     severity: "error",
