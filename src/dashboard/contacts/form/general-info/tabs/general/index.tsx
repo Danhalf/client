@@ -93,6 +93,13 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
     }, [isBusinessNameRequired, values.businessName]);
 
     const shouldDisableBusinessName = useMemo(() => {
+        if (type === CO_BUYER) {
+            return (
+                !isBusinessNameRequired &&
+                (!!contactExtData.CoBuyer_First_Name?.trim() ||
+                    !!contactExtData.CoBuyer_Last_Name?.trim())
+            );
+        }
         return (
             !isBusinessNameRequired && (!!contact.firstName?.trim() || !!contact.lastName?.trim())
         );
@@ -328,12 +335,19 @@ export const ContactsGeneralInfo = observer(({ type }: ContactsGeneralInfoProps)
 
             <div className='col-4 relative'>
                 <TextInput
-                    name={`Business Name${!shouldDisableBusinessName ? " (required)" : ""}`}
+                    name={`Business Name${!shouldDisableBusinessName && type === BUYER ? " (required)" : ""}`}
                     className={`general-info__text-input w-full ${
                         errors.businessName ? "p-invalid" : ""
                     }`}
-                    value={savedBusinessName || contact.businessName}
+                    value={
+                        type === CO_BUYER
+                            ? contactExtData.CoBuyer_Emp_Company
+                            : savedBusinessName || contact.businessName
+                    }
                     onChange={({ target: { value } }) => {
+                        if (type === CO_BUYER) {
+                            return changeContactExtData("CoBuyer_Emp_Company", value);
+                        }
                         changeContact("businessName", value);
                         setFieldValue("businessName", value);
                     }}
