@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
 import "./index.css";
-import { DateInput, StateDropdown, TextInput } from "dashboard/common/form/inputs";
+import { DateInput, PhoneInput, StateDropdown, TextInput } from "dashboard/common/form/inputs";
 import { InventorySearch } from "dashboard/inventory/common/inventory-search";
 import { InputTextarea } from "primereact/inputtextarea";
 import { TestDriver } from "./form-data";
@@ -18,11 +18,10 @@ import { ContactTypeNameList, ContactUser } from "common/models/contact";
 import { setContact } from "http/services/contacts-service";
 import { Form, Formik } from "formik";
 import { Inventory } from "common/models/inventory";
-import { InputMask } from "primereact/inputmask";
 
 const validationSchema = Yup.object().shape({
-    customerName: Yup.string().required("First Name is required"),
-    customerLastName: Yup.string().required("Last Name is required"),
+    customerName: Yup.string().trim().required("First Name is required"),
+    customerLastName: Yup.string().trim().required("Last Name is required"),
     homePhone: Yup.string().required("Phone Number is required"),
     dlNumber: Yup.string().required("Driver License Number is required"),
     dlState: Yup.string().required("DL’s State is required"),
@@ -283,33 +282,22 @@ export const PrintForTestDrive = (): ReactElement => {
                                                             </div>
                                                         )}
                                                 </div>
+
                                                 <div className='col-4 relative'>
-                                                    <span className='p-float-label'>
-                                                        <InputMask
-                                                            type='tel'
-                                                            mask='999-999-9999'
-                                                            className='w-full'
-                                                            onBlur={handleBlur}
-                                                            value={values.homePhone}
-                                                            onChange={({ target: { value } }) =>
-                                                                handleChange({
-                                                                    target: {
-                                                                        name: "homePhone",
-                                                                        value,
-                                                                    },
-                                                                })
-                                                            }
-                                                        />
-                                                        {errors.homePhone && touched.homePhone && (
-                                                            <div className='p-error'>
-                                                                {errors.homePhone}
-                                                            </div>
-                                                        )}
-                                                        <label className='float-label'>
-                                                            Phone Number
-                                                        </label>
-                                                    </span>
+                                                    <PhoneInput
+                                                        name='Phone Number (required)'
+                                                        value={values.homePhone}
+                                                        onChange={handleChange}
+                                                        onBlur={(e) => e && handleBlur}
+                                                        id='homePhone'
+                                                    />
+                                                    {errors.homePhone && touched.homePhone && (
+                                                        <div className='p-error'>
+                                                            {errors.homePhone}
+                                                        </div>
+                                                    )}
                                                 </div>
+
                                                 <div className='col-4 relative'>
                                                     <TextInput
                                                         name='Driver License’s Number (required)'
@@ -539,12 +527,12 @@ export const PrintForTestDrive = (): ReactElement => {
                                                     label='Add to contacts'
                                                     onClick={() => handleAddToContact(values)}
                                                     disabled={
-                                                        !values.customerName ||
-                                                        !values.customerLastName
+                                                        !values.customerName.trim() ||
+                                                        !values.customerLastName.trim()
                                                     }
                                                     severity={
-                                                        !values.customerName ||
-                                                        !values.customerLastName
+                                                        !values.customerName.trim() ||
+                                                        !values.customerLastName.trim()
                                                             ? "secondary"
                                                             : "success"
                                                     }
