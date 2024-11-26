@@ -15,6 +15,7 @@ import {
     InventoryStockNumber,
     InventoryWebCheck,
     InventoryCheckVIN,
+    InventoryExpense,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -313,6 +314,28 @@ export const setInventoryWebCheck = async (
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error,
+            };
+        }
+    }
+};
+
+export const setInventoryExpense = async (
+    expenseuid: string,
+    expenseData: Partial<InventoryExpense>
+) => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `inventory/${expenseuid}/expense`,
+            expenseData
+        );
+        if (response.data.status === Status.OK) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error on set inventory expense",
             };
         }
     }

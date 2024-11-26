@@ -10,9 +10,10 @@ import { useStore } from "store/hooks";
 import { AuthUser } from "http/services/auth.service";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
-import { getAccountPaymentsList, setAccountPayment } from "http/services/accounts.service";
+import { getAccountPaymentsList } from "http/services/accounts.service";
 import { AccountPayment } from "common/models/accounts";
 import { useParams } from "react-router-dom";
+import { setInventoryExpense } from "http/services/inventory-service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPayment;
@@ -29,6 +30,7 @@ export const PurchasePayments = observer((): ReactElement => {
         changeInventoryExtData,
         getInventoryPayments,
     } = store;
+    const [description, setDescription] = useState<string>("");
 
     useEffect(() => {
         const authUser: AuthUser = getKeyValue(LS_APP_USER);
@@ -50,12 +52,9 @@ export const PurchasePayments = observer((): ReactElement => {
     ];
 
     const handleSavePayment = () => {
-        setAccountPayment("0", {
-            inventoryuid: id,
-            payExpenses,
-            payPack: payPack * 100,
-            payPaid,
-            paySalesTaxPaid,
+        setInventoryExpense("0", {
+            useruid: user!.useruid,
+            description,
         }).then(() => {
             if (id) {
                 getAccountPaymentsList(id);
@@ -120,7 +119,8 @@ export const PurchasePayments = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputTextarea
                             className='purchase-payments__text-area'
-                            //TODO: missed payment description data
+                            value={description}
+                            onChange={({ target: { value } }) => setDescription(value)}
                         />
                         <label className='float-label'>Description</label>
                     </span>
