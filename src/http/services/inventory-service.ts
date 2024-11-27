@@ -15,7 +15,7 @@ import {
     InventoryStockNumber,
     InventoryWebCheck,
     InventoryCheckVIN,
-    InventoryExpense,
+    InventoryPaymentBack,
 } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
 import { authorizedUserApiInstance } from "http/index";
@@ -319,14 +319,14 @@ export const setInventoryWebCheck = async (
     }
 };
 
-export const setInventoryExpense = async (
-    expenseuid: string,
-    expenseData: Partial<InventoryExpense>
+export const setInventoryPaymentBack = async (
+    inventoryuid: string,
+    inventoryPayment: Partial<InventoryPaymentBack>
 ) => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponse>(
-            `inventory/${expenseuid}/expense`,
-            expenseData
+            `inventory/${inventoryuid}/paymentpack`,
+            inventoryPayment
         );
         if (response.data.status === Status.OK) {
             return response.data;

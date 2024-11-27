@@ -13,7 +13,7 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { getAccountPaymentsList } from "http/services/accounts.service";
 import { AccountPayment } from "common/models/accounts";
 import { useParams } from "react-router-dom";
-import { setInventoryExpense } from "http/services/inventory-service";
+import { setInventoryPaymentBack } from "http/services/inventory-service";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPayment;
@@ -25,11 +25,11 @@ export const PurchasePayments = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().inventoryStore;
     const [user, setUser] = useState<AuthUser | null>(null);
-    const {
-        inventoryExtData: { payExpenses, payPack, payPaid, paySalesTaxPaid },
-        changeInventoryExtData,
-        getInventoryPayments,
-    } = store;
+    const { getInventoryPayments } = store;
+    const [packsForVehicle, setPacksForVehicle] = useState<number>(0);
+    const [defaultExpenses, setDefaultExpenses] = useState<0 | 1>(0);
+    const [paid, setPaid] = useState<0 | 1>(0);
+    const [salesTaxPaid, setSalesTaxPaid] = useState<0 | 1>(0);
     const [description, setDescription] = useState<string>("");
 
     useEffect(() => {
@@ -52,9 +52,12 @@ export const PurchasePayments = observer((): ReactElement => {
     ];
 
     const handleSavePayment = () => {
-        setInventoryExpense("0", {
-            useruid: user!.useruid,
-            description,
+        setInventoryPaymentBack(id || "0", {
+            payPack: packsForVehicle,
+            payDefaultExpAdded: defaultExpenses,
+            payPaid: paid,
+            paySalesTaxPaid: salesTaxPaid,
+            payRemarks: description,
         }).then(() => {
             if (id) {
                 getAccountPaymentsList(id);
@@ -69,48 +72,30 @@ export const PurchasePayments = observer((): ReactElement => {
                     <CurrencyInput
                         labelPosition='top'
                         title='Pack for this Vehicle'
-                        value={payPack}
+                        value={packsForVehicle}
                         onChange={({ value }) => {
-                            changeInventoryExtData({
-                                key: "payPack",
-                                value: Number(value),
-                            });
+                            setPacksForVehicle(Number(value));
                         }}
                     />
                 </div>
                 <div className='col-3'>
                     <BorderedCheckbox
-                        checked={!!payExpenses}
-                        onChange={() =>
-                            changeInventoryExtData({
-                                key: "payExpenses",
-                                value: !!payExpenses ? 0 : 1,
-                            })
-                        }
+                        checked={!!defaultExpenses}
+                        onChange={() => setDefaultExpenses(!!defaultExpenses ? 0 : 1)}
                         name='Default Expenses'
                     />
                 </div>
                 <div className='col-3'>
                     <BorderedCheckbox
-                        checked={!!payPaid}
-                        onChange={() =>
-                            changeInventoryExtData({
-                                key: "payPaid",
-                                value: !!payPaid ? 0 : 1,
-                            })
-                        }
+                        checked={!!paid}
+                        onChange={() => setPaid(!!paid ? 0 : 1)}
                         name='Paid'
                     />
                 </div>
                 <div className='col-3'>
                     <BorderedCheckbox
-                        checked={!!paySalesTaxPaid}
-                        onChange={() =>
-                            changeInventoryExtData({
-                                key: "paySalesTaxPaid",
-                                value: !!paySalesTaxPaid ? 0 : 1,
-                            })
-                        }
+                        checked={!!salesTaxPaid}
+                        onChange={() => setSalesTaxPaid(!!salesTaxPaid ? 0 : 1)}
                         name='Sales Tax Paid'
                     />
                 </div>

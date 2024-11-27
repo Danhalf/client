@@ -405,3 +405,11 @@ export interface InventoryExpense extends BaseResponseError {
     description: string;
     checknumber: string;
 }
+
+export interface InventoryPaymentBack extends BaseResponseError {
+    payPack: number;
+    payDefaultExpAdded: number;
+    payPaid: number;
+    paySalesTaxPaid: number;
+    payRemarks: string;
+}
