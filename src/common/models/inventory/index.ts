@@ -408,8 +408,8 @@ export interface InventoryExpense extends BaseResponseError {
 
 export interface InventoryPaymentBack extends BaseResponseError {
     payPack: number;
-    payDefaultExpAdded: number;
-    payPaid: number;
-    paySalesTaxPaid: number;
+    payDefaultExpAdded: 0 | 1;
+    payPaid: 0 | 1;
+    paySalesTaxPaid: 0 | 1;
     payRemarks: string;
 }

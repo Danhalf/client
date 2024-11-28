@@ -13,7 +13,8 @@ import { LS_APP_USER } from "common/constants/localStorage";
 import { getAccountPaymentsList } from "http/services/accounts.service";
 import { AccountPayment } from "common/models/accounts";
 import { useParams } from "react-router-dom";
-import { setInventoryPaymentBack } from "http/services/inventory-service";
+import { getInventoryPaymentBack, setInventoryPaymentBack } from "http/services/inventory-service";
+import { InventoryPaymentBack } from "common/models/inventory";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPayment;
@@ -44,6 +45,25 @@ export const PurchasePayments = observer((): ReactElement => {
         }
     }, [user]);
 
+    const fetchInventoryPaymentBack = async () => {
+        if (id) {
+            const response = await getInventoryPaymentBack(id);
+            if (response) {
+                const { payPack, payDefaultExpAdded, payPaid, paySalesTaxPaid, payRemarks } =
+                    response as InventoryPaymentBack;
+                setPacksForVehicle(payPack);
+                setDefaultExpenses(payDefaultExpAdded);
+                setPaid(payPaid);
+                setSalesTaxPaid(paySalesTaxPaid);
+                setDescription(payRemarks);
+            }
+        }
+    };
+
+    useEffect(() => {
+        fetchInventoryPaymentBack();
+    }, [id]);
+
     const renderColumnsData: TableColumnsList[] = [
         { field: "ACCT_NUM", header: "Pack for this Vehicle" },
         { field: "Status", header: "Default Expenses" },
@@ -53,10 +73,10 @@ export const PurchasePayments = observer((): ReactElement => {
 
     const handleSavePayment = () => {
         setInventoryPaymentBack(id || "0", {
-            payPack: packsForVehicle,
-            payDefaultExpAdded: defaultExpenses,
-            payPaid: paid,
-            paySalesTaxPaid: salesTaxPaid,
+            payPack: packsForVehicle || 0,
+            payDefaultExpAdded: defaultExpenses || 0,
+            payPaid: paid || 0,
+            paySalesTaxPaid: salesTaxPaid || 0,
             payRemarks: description,
         }).then(() => {
             if (id) {

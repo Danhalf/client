@@ -137,6 +137,24 @@ export const getInventoryWebCheck = async (inventoryuid: string) => {
     }
 };
 
+export const getInventoryPaymentBack = async (inventoryuid: string) => {
+    try {
+        const response = await authorizedUserApiInstance.get<InventoryPaymentBack>(
+            `inventory/${inventoryuid}/paymentpack`
+        );
+        if (response.data.status === Status.OK) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error on get inventory expense",
+            };
+        }
+    }
+};
+
 export const getVINCheck = async (VIN: string) => {
     try {
         const request = await authorizedUserApiInstance.get<InventoryCheckVIN>(
