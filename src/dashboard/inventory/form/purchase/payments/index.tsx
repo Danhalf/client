@@ -15,6 +15,8 @@ import { AccountPayment } from "common/models/accounts";
 import { useParams } from "react-router-dom";
 import { getInventoryPaymentBack, setInventoryPaymentBack } from "http/services/inventory-service";
 import { InventoryPaymentBack } from "common/models/inventory";
+import { getExpensesList } from "http/services/expenses.service";
+import { Expenses } from "common/models/expenses";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPayment;
@@ -27,6 +29,7 @@ export const PurchasePayments = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const [user, setUser] = useState<AuthUser | null>(null);
     const { getInventoryPayments } = store;
+    const [expensesList, setExpensesList] = useState<Expenses[]>([]);
     const [packsForVehicle, setPacksForVehicle] = useState<number>(0);
     const [defaultExpenses, setDefaultExpenses] = useState<0 | 1>(0);
     const [paid, setPaid] = useState<0 | 1>(0);
@@ -60,7 +63,17 @@ export const PurchasePayments = observer((): ReactElement => {
         }
     };
 
+    const fetchInventoryExpenses = async () => {
+        if (id) {
+            const response = await getExpensesList(id);
+            if (response) {
+                setExpensesList(response);
+            }
+        }
+    };
+
     useEffect(() => {
+        fetchInventoryExpenses();
         fetchInventoryPaymentBack();
     }, [id]);
 
@@ -144,7 +157,7 @@ export const PurchasePayments = observer((): ReactElement => {
                     <DataTable
                         showGridlines
                         className='mt-6 purchase-payments__table'
-                        value={[]}
+                        value={expensesList}
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
