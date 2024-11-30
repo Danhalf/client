@@ -6,10 +6,6 @@ import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { observer } from "mobx-react-lite";
-import { useStore } from "store/hooks";
-import { AuthUser } from "http/services/auth.service";
-import { getKeyValue } from "services/local-storage.service";
-import { LS_APP_USER } from "common/constants/localStorage";
 import { getAccountPaymentsList } from "http/services/accounts.service";
 import { AccountPayment } from "common/models/accounts";
 import { useParams } from "react-router-dom";
@@ -26,27 +22,12 @@ type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
 
 export const PurchasePayments = observer((): ReactElement => {
     const { id } = useParams();
-    const store = useStore().inventoryStore;
-    const [user, setUser] = useState<AuthUser | null>(null);
-    const { getInventoryPayments } = store;
     const [expensesList, setExpensesList] = useState<Expenses[]>([]);
     const [packsForVehicle, setPacksForVehicle] = useState<number>(0);
     const [defaultExpenses, setDefaultExpenses] = useState<0 | 1>(0);
     const [paid, setPaid] = useState<0 | 1>(0);
     const [salesTaxPaid, setSalesTaxPaid] = useState<0 | 1>(0);
     const [description, setDescription] = useState<string>("");
-
-    useEffect(() => {
-        const authUser: AuthUser = getKeyValue(LS_APP_USER);
-        setUser(authUser);
-    }, []);
-
-    useEffect(() => {
-        if (user) {
-            getInventoryPayments(user.useruid);
-            getAccountPaymentsList(user.useruid);
-        }
-    }, [user]);
 
     const fetchInventoryPaymentBack = async () => {
         if (id) {
