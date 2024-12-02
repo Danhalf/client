@@ -297,9 +297,22 @@ export const ContactsDataTable = ({
             return updatedSearch;
         });
 
-        const isAnyValueEmpty = Object.values(advancedSearch).every((val) => !val);
+        try {
+            setIsLoading(true);
+            const updatedSearch = { ...advancedSearch };
+            delete updatedSearch[key];
 
-        setButtonDisabled(isAnyValueEmpty);
+            const isAdvancedSearchEmpty = isObjectValuesEmpty(updatedSearch);
+            const searchQuery = Object.entries(isAdvancedSearchEmpty)
+                .filter(([_, value]) => value)
+                .map(([key, value]) => `${value}.${key}`)
+                .join("+");
+
+            await handleGetContactsList({ qry: searchQuery });
+        } finally {
+            setDialogVisible(false);
+            setButtonDisabled(false);
+        }
     };
 
     const searchFields: SearchField<AdvancedSearch>[] = [
