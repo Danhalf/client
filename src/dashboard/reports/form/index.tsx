@@ -12,6 +12,7 @@ import "./index.css";
 import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
 import { ReportFooter } from "./common";
+import { OrderList } from "primereact/orderlist";
 
 enum REPORT_TYPES {
     FAVORITES = "Favorites",
@@ -122,6 +123,24 @@ export const ReportForm = observer((): ReactElement => {
         navigate(`/dashboard/reports/${report.documentUID}`);
     };
 
+    const listItemTemplate = (report: ReportDocument) => {
+        return (
+            <Button
+                className={`report__list-item w-full ${
+                    selectedTabUID === report.documentUID ? "report__list-item--selected" : ""
+                }`}
+                key={report.itemUID}
+                text
+                onClick={(event) => {
+                    event.preventDefault();
+                    handleAccordionTabChange(report);
+                }}
+            >
+                <p className='report-item__name'>{report.name}</p>
+            </Button>
+        );
+    };
+
     return (
         <div className='grid relative'>
             <Button
@@ -188,55 +207,28 @@ export const ReportForm = observer((): ReactElement => {
                                                                     : ""
                                                             }`}
                                                         >
-                                                            {nestedCollection.documents &&
-                                                                nestedCollection.documents.map(
-                                                                    (report) => (
-                                                                        <Button
-                                                                            className={`report__list-item w-full ${
-                                                                                selectedTabUID ===
-                                                                                report.documentUID
-                                                                                    ? "report__list-item--selected"
-                                                                                    : ""
-                                                                            }`}
-                                                                            key={report.itemUID}
-                                                                            text
-                                                                            onClick={(event) => {
-                                                                                event.preventDefault();
-                                                                                handleAccordionTabChange(
-                                                                                    report
-                                                                                );
-                                                                            }}
-                                                                        >
-                                                                            <p className='report-item__name'>
-                                                                                {report.name}
-                                                                            </p>
-                                                                        </Button>
-                                                                    )
-                                                                )}
+                                                            {nestedCollection.documents && (
+                                                                <OrderList
+                                                                    key={nestedCollection.itemUID}
+                                                                    itemTemplate={(item) =>
+                                                                        listItemTemplate(item)
+                                                                    }
+                                                                    value={
+                                                                        nestedCollection.documents
+                                                                    }
+                                                                />
+                                                            )}
                                                         </AccordionTab>
                                                     ))}
                                                 </Accordion>
                                             )}
-                                            {documents &&
-                                                documents.map((report) => (
-                                                    <Button
-                                                        className={`report__list-item report-item w-full ${
-                                                            selectedTabUID === report.documentUID
-                                                                ? "report__list-item--selected"
-                                                                : ""
-                                                        }`}
-                                                        key={report.itemUID}
-                                                        text
-                                                        onClick={(event) => {
-                                                            event.preventDefault();
-                                                            handleAccordionTabChange(report);
-                                                        }}
-                                                    >
-                                                        <p className='report-item__name'>
-                                                            {report.name}
-                                                        </p>
-                                                    </Button>
-                                                ))}
+                                            {documents && (
+                                                <OrderList
+                                                    key={itemUID}
+                                                    itemTemplate={(item) => listItemTemplate(item)}
+                                                    value={documents}
+                                                />
+                                            )}
                                         </AccordionTab>
                                     )
                                 )}
