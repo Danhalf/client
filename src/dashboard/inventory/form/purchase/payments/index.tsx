@@ -7,22 +7,19 @@ import { DataTable } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { observer } from "mobx-react-lite";
 import { getAccountPaymentsList } from "http/services/accounts.service";
-import { AccountPayment } from "common/models/accounts";
 import { useParams } from "react-router-dom";
 import { getInventoryPaymentBack, setInventoryPaymentBack } from "http/services/inventory-service";
 import { InventoryPaymentBack } from "common/models/inventory";
-import { getExpensesList } from "http/services/expenses.service";
-import { Expenses } from "common/models/expenses";
 
 interface TableColumnProps extends ColumnProps {
-    field: keyof AccountPayment;
+    field: keyof InventoryPaymentBack;
 }
 
 type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
 
 export const PurchasePayments = observer((): ReactElement => {
     const { id } = useParams();
-    const [expensesList, setExpensesList] = useState<Expenses[]>([]);
+    const [expensesList, setExpensesList] = useState<InventoryPaymentBack[]>([]);
     const [packsForVehicle, setPacksForVehicle] = useState<number>(0);
     const [defaultExpenses, setDefaultExpenses] = useState<0 | 1>(0);
     const [paid, setPaid] = useState<0 | 1>(0);
@@ -33,36 +30,26 @@ export const PurchasePayments = observer((): ReactElement => {
         if (id) {
             const response = await getInventoryPaymentBack(id);
             if (response) {
-                const { payPack, payDefaultExpAdded, payPaid, paySalesTaxPaid, payRemarks } =
-                    response as InventoryPaymentBack;
-                setPacksForVehicle(payPack);
-                setDefaultExpenses(payDefaultExpAdded);
-                setPaid(payPaid);
-                setSalesTaxPaid(paySalesTaxPaid);
-                setDescription(payRemarks);
-            }
-        }
-    };
-
-    const fetchInventoryExpenses = async () => {
-        if (id) {
-            const response = await getExpensesList(id);
-            if (response) {
-                setExpensesList(response);
+                const expenses = response as InventoryPaymentBack;
+                setExpensesList([expenses]);
+                setPacksForVehicle(expenses.payPack);
+                setDefaultExpenses(expenses.payDefaultExpAdded);
+                setPaid(expenses.payPaid);
+                setSalesTaxPaid(expenses.paySalesTaxPaid);
+                setDescription(expenses.payRemarks);
             }
         }
     };
 
     useEffect(() => {
-        fetchInventoryExpenses();
         fetchInventoryPaymentBack();
     }, [id]);
 
     const renderColumnsData: TableColumnsList[] = [
-        { field: "ACCT_NUM", header: "Pack for this Vehicle" },
-        { field: "Status", header: "Default Expenses" },
-        { field: "Amount", header: "Paid" },
-        { field: "PTPDate", header: "Sales Tax Paid" },
+        { field: "payPack", header: "Pack for this Vehicle" },
+        { field: "payDefaultExpAdded", header: "Default Expenses" },
+        { field: "payPaid", header: "Paid" },
+        { field: "paySalesTaxPaid", header: "Sales Tax Paid" },
     ];
 
     const handleSavePayment = () => {
