@@ -141,6 +141,15 @@ export const ReportForm = observer((): ReactElement => {
         );
     };
 
+    const handleChangeListOrder = (event: { value: ReportDocument[] }) => {
+        const { value } = event;
+        debugger;
+        const newCollections = collections.map((collection) => {
+            return { ...collection, documents: value };
+        });
+        setCollections(newCollections);
+    };
+
     return (
         <div className='grid relative'>
             <Button
@@ -216,6 +225,8 @@ export const ReportForm = observer((): ReactElement => {
                                                                     value={
                                                                         nestedCollection.documents
                                                                     }
+                                                                    dragdrop
+                                                                    onChange={handleChangeListOrder}
                                                                 />
                                                             )}
                                                         </AccordionTab>
@@ -227,6 +238,8 @@ export const ReportForm = observer((): ReactElement => {
                                                     key={itemUID}
                                                     itemTemplate={(item) => listItemTemplate(item)}
                                                     value={documents}
+                                                    dragdrop
+                                                    onChange={handleChangeListOrder}
                                                 />
                                             )}
                                         </AccordionTab>
