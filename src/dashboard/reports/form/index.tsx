@@ -2,6 +2,7 @@ import { ReportCollection, ReportDocument } from "common/models/reports";
 import {
     getUserFavoriteReportList,
     getUserReportCollectionsContent,
+    moveReportToCollection,
 } from "http/services/reports.service";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
@@ -13,6 +14,9 @@ import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
 import { ReportFooter } from "./common";
 import { OrderList } from "primereact/orderlist";
+import { Status } from "common/models/base-response";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 enum REPORT_TYPES {
     FAVORITES = "Favorites",
@@ -25,6 +29,7 @@ export const ReportForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { authUser } = userStore;
+    const toast = useToast();
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [selectedTabUID, setSelectedTabUID] = useState<string | null>(null);
@@ -172,15 +177,33 @@ export const ReportForm = observer((): ReactElement => {
         e.dataTransfer.dropEffect = "move";
     };
 
-    const reportMove = (
+    const reportMove = async (
         report: ReportDocument,
         sourceCollectionId: string,
         targetCollectionId: string
     ) => {
-        // eslint-disable-next-line no-console
-        console.log(
-            `"${report.name}" moved from collection "${sourceCollectionId}" to collection "${targetCollectionId}"`
+        const response = await moveReportToCollection(
+            sourceCollectionId,
+            report.documentUID,
+            targetCollectionId
         );
+
+        if (response && response.status === Status.ERROR) {
+            toast.current?.show({
+                severity: "error",
+                summary: Status.ERROR,
+                detail: response.error || "Error while moving report to collection",
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Report moved successfully!",
+                life: TOAST_LIFETIME,
+            });
+            handleGetUserReportCollections(authUser?.useruid!);
+        }
     };
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCollectionId: string) => {
