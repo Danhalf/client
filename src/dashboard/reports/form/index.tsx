@@ -29,6 +29,10 @@ export const ReportForm = observer((): ReactElement => {
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [selectedTabUID, setSelectedTabUID] = useState<string | null>(null);
     const [activeIndex, setActiveIndex] = useState<number[]>(!id ? [1] : []);
+    const [draggedReport, setDraggedReport] = useState<{
+        report: ReportDocument;
+        sourceCollectionId: string;
+    } | null>(null);
 
     const handleGetUserReportCollections = async (useruid: string) => {
         const response = await getUserReportCollectionsContent(useruid);
@@ -123,7 +127,7 @@ export const ReportForm = observer((): ReactElement => {
         navigate(`/dashboard/reports/${report.documentUID}`);
     };
 
-    const listItemTemplate = (report: ReportDocument) => {
+    const listItemTemplate = (report: ReportDocument, collectionId: string) => {
         return (
             <Button
                 className={`report__list-item w-full ${
@@ -131,6 +135,8 @@ export const ReportForm = observer((): ReactElement => {
                 }`}
                 key={report.itemUID}
                 text
+                draggable
+                onDragStart={(e: any) => handleDragStart(e, report, collectionId)}
                 onClick={(event) => {
                     event.preventDefault();
                     handleAccordionTabChange(report);
@@ -141,13 +147,81 @@ export const ReportForm = observer((): ReactElement => {
         );
     };
 
-    const handleChangeListOrder = (event: { value: ReportDocument[] }) => {
-        const { value } = event;
-        debugger;
-        const newCollections = collections.map((collection) => {
-            return { ...collection, documents: value };
-        });
-        setCollections(newCollections);
+    const handleChangeListOrder = (event: { value: ReportDocument[] }, collectionId: string) => {
+        setCollections((prevCollections) =>
+            prevCollections.map((collection) => {
+                if (collection.itemUID === collectionId) {
+                    return { ...collection, documents: event.value };
+                }
+                return collection;
+            })
+        );
+    };
+
+    const handleDragStart = (
+        e: React.DragEvent<HTMLDivElement>,
+        report: ReportDocument,
+        sourceCollectionId: string
+    ) => {
+        setDraggedReport({ report, sourceCollectionId });
+        e.dataTransfer.effectAllowed = "move";
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+    };
+
+    const reportMove = (
+        report: ReportDocument,
+        sourceCollectionId: string,
+        targetCollectionId: string
+    ) => {
+        // eslint-disable-next-line no-console
+        console.log(
+            `"${report.name}" moved from collection "${sourceCollectionId}" to collection "${targetCollectionId}"`
+        );
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetCollectionId: string) => {
+        e.preventDefault();
+        if (!draggedReport) return;
+
+        const { report, sourceCollectionId } = draggedReport;
+        if (sourceCollectionId === targetCollectionId) {
+        } else {
+            setCollections((prevCollections) => {
+                let updatedCollections = [...prevCollections];
+
+                updatedCollections = updatedCollections.map((collection) => {
+                    if (collection.itemUID === sourceCollectionId) {
+                        return {
+                            ...collection,
+                            documents: collection.documents?.filter(
+                                (doc) => doc.documentUID !== report.documentUID
+                            ),
+                        };
+                    }
+                    return collection;
+                });
+
+                updatedCollections = updatedCollections.map((collection) => {
+                    if (collection.itemUID === targetCollectionId) {
+                        return {
+                            ...collection,
+                            documents: [...(collection.documents || []), report],
+                        };
+                    }
+                    return collection;
+                });
+
+                return updatedCollections;
+            });
+
+            reportMove(report, sourceCollectionId, targetCollectionId);
+        }
+
+        setDraggedReport(null);
     };
 
     return (
@@ -200,48 +274,84 @@ export const ReportForm = observer((): ReactElement => {
                                                     : ""
                                             }`}
                                         >
-                                            {nestedCollections && (
-                                                <Accordion multiple className='nested-accordion'>
-                                                    {nestedCollections.map((nestedCollection) => (
-                                                        <AccordionTab
-                                                            key={nestedCollection.itemUID}
-                                                            header={nestedCollection.name}
-                                                            disabled={
-                                                                !nestedCollection.documents?.length
-                                                            }
-                                                            className={`nested-accordion-tab ${
-                                                                selectedTabUID ===
-                                                                nestedCollection.itemUID
-                                                                    ? "report__list-item--selected"
-                                                                    : ""
-                                                            }`}
-                                                        >
-                                                            {nestedCollection.documents && (
-                                                                <OrderList
+                                            <div
+                                                className='report__list-wrapper'
+                                                onDragOver={handleDragOver}
+                                                onDrop={(e) => handleDrop(e, itemUID)}
+                                            >
+                                                {nestedCollections && (
+                                                    <Accordion
+                                                        multiple
+                                                        className='nested-accordion'
+                                                    >
+                                                        {nestedCollections.map(
+                                                            (nestedCollection) => (
+                                                                <AccordionTab
                                                                     key={nestedCollection.itemUID}
-                                                                    itemTemplate={(item) =>
-                                                                        listItemTemplate(item)
+                                                                    header={nestedCollection.name}
+                                                                    disabled={
+                                                                        !nestedCollection.documents
+                                                                            ?.length
                                                                     }
-                                                                    value={
-                                                                        nestedCollection.documents
-                                                                    }
-                                                                    dragdrop
-                                                                    onChange={handleChangeListOrder}
-                                                                />
-                                                            )}
-                                                        </AccordionTab>
-                                                    ))}
-                                                </Accordion>
-                                            )}
-                                            {documents && (
-                                                <OrderList
-                                                    key={itemUID}
-                                                    itemTemplate={(item) => listItemTemplate(item)}
-                                                    value={documents}
-                                                    dragdrop
-                                                    onChange={handleChangeListOrder}
-                                                />
-                                            )}
+                                                                    className={`nested-accordion-tab ${
+                                                                        selectedTabUID ===
+                                                                        nestedCollection.itemUID
+                                                                            ? "report__list-item--selected"
+                                                                            : ""
+                                                                    }`}
+                                                                >
+                                                                    <div
+                                                                        className='report__list-wrapper'
+                                                                        onDragOver={handleDragOver}
+                                                                        onDrop={(e) =>
+                                                                            handleDrop(
+                                                                                e,
+                                                                                nestedCollection.itemUID
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        {nestedCollection.documents && (
+                                                                            <OrderList
+                                                                                value={
+                                                                                    nestedCollection.documents
+                                                                                }
+                                                                                itemTemplate={(
+                                                                                    item
+                                                                                ) =>
+                                                                                    listItemTemplate(
+                                                                                        item,
+                                                                                        nestedCollection.itemUID
+                                                                                    )
+                                                                                }
+                                                                                dragdrop
+                                                                                onChange={(e) =>
+                                                                                    handleChangeListOrder(
+                                                                                        e,
+                                                                                        nestedCollection.itemUID
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                        )}
+                                                                    </div>
+                                                                </AccordionTab>
+                                                            )
+                                                        )}
+                                                    </Accordion>
+                                                )}
+                                                {documents && (
+                                                    <OrderList
+                                                        key={itemUID}
+                                                        itemTemplate={(item) =>
+                                                            listItemTemplate(item, itemUID)
+                                                        }
+                                                        value={documents}
+                                                        dragdrop
+                                                        onChange={(e) =>
+                                                            handleChangeListOrder(e, itemUID)
+                                                        }
+                                                    />
+                                                )}
+                                            </div>
                                         </AccordionTab>
                                     )
                                 )}
