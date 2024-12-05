@@ -34,6 +34,7 @@ export const ReportForm = observer((): ReactElement => {
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
     const [selectedTabUID, setSelectedTabUID] = useState<string | null>(null);
     const [activeIndex, setActiveIndex] = useState<number[]>(!id ? [1] : []);
+
     const [draggedReport, setDraggedReport] = useState<{
         report: ReportDocument;
         sourceCollectionId: string;
@@ -141,7 +142,9 @@ export const ReportForm = observer((): ReactElement => {
                 key={report.itemUID}
                 text
                 draggable
-                onDragStart={(e: any) => handleDragStart(e, report, collectionId)}
+                onDragStart={(e: React.DragEvent<HTMLButtonElement>) =>
+                    handleDragStart(e, report, collectionId)
+                }
                 onClick={(event) => {
                     event.preventDefault();
                     handleAccordionTabChange(report);
@@ -164,7 +167,7 @@ export const ReportForm = observer((): ReactElement => {
     };
 
     const handleDragStart = (
-        e: React.DragEvent<HTMLDivElement>,
+        e: React.DragEvent,
         report: ReportDocument,
         sourceCollectionId: string
     ) => {
@@ -287,7 +290,14 @@ export const ReportForm = observer((): ReactElement => {
                                     }: ReportCollection) => (
                                         <AccordionTab
                                             key={itemUID}
-                                            header={name}
+                                            header={
+                                                <div
+                                                    onDragOver={handleDragOver}
+                                                    onDrop={(e) => handleDrop(e, itemUID)}
+                                                >
+                                                    {name}
+                                                </div>
+                                            }
                                             disabled={
                                                 !documents?.length && !nestedCollections?.length
                                             }
@@ -297,11 +307,7 @@ export const ReportForm = observer((): ReactElement => {
                                                     : ""
                                             }`}
                                         >
-                                            <div
-                                                className='report__list-wrapper'
-                                                onDragOver={handleDragOver}
-                                                onDrop={(e) => handleDrop(e, itemUID)}
-                                            >
+                                            <div className='report__list-wrapper'>
                                                 {nestedCollections && (
                                                     <Accordion
                                                         multiple
@@ -311,7 +317,21 @@ export const ReportForm = observer((): ReactElement => {
                                                             (nestedCollection) => (
                                                                 <AccordionTab
                                                                     key={nestedCollection.itemUID}
-                                                                    header={nestedCollection.name}
+                                                                    header={
+                                                                        <div
+                                                                            onDragOver={
+                                                                                handleDragOver
+                                                                            }
+                                                                            onDrop={(e) =>
+                                                                                handleDrop(
+                                                                                    e,
+                                                                                    nestedCollection.itemUID
+                                                                                )
+                                                                            }
+                                                                        >
+                                                                            {nestedCollection.name}
+                                                                        </div>
+                                                                    }
                                                                     disabled={
                                                                         !nestedCollection.documents
                                                                             ?.length
@@ -323,16 +343,7 @@ export const ReportForm = observer((): ReactElement => {
                                                                             : ""
                                                                     }`}
                                                                 >
-                                                                    <div
-                                                                        className='report__list-wrapper'
-                                                                        onDragOver={handleDragOver}
-                                                                        onDrop={(e) =>
-                                                                            handleDrop(
-                                                                                e,
-                                                                                nestedCollection.itemUID
-                                                                            )
-                                                                        }
-                                                                    >
+                                                                    <div className='report__list-wrapper'>
                                                                         {nestedCollection.documents && (
                                                                             <OrderList
                                                                                 value={
