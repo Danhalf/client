@@ -3,6 +3,7 @@ import {
     getUserFavoriteReportList,
     getUserReportCollectionsContent,
     moveReportToCollection,
+    setReportOrder,
 } from "http/services/reports.service";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
@@ -155,15 +156,58 @@ export const ReportForm = observer((): ReactElement => {
         );
     };
 
-    const handleChangeListOrder = (event: { value: ReportDocument[] }, collectionId: string) => {
+    const handleChangeReportOrder = async (
+        updatedReports: ReportDocument[],
+        collectionId: string
+    ) => {
+        const promises = updatedReports.map((report) => {
+            return setReportOrder(collectionId, report.itemUID, report.order);
+        });
+
+        const responses = await Promise.all(promises);
+
+        responses.forEach((response, index) => {
+            if (response && response.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail:
+                        response.error ||
+                        `Error while updating report order for "${updatedReports[index].name}"`,
+                    life: TOAST_LIFETIME,
+                });
+            }
+        });
+
+        toast.current?.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Report order updated successfully!",
+            life: TOAST_LIFETIME,
+        });
+    };
+
+    const handleChangeListOrder = async (
+        event: { value: ReportDocument[] },
+        collectionId: string
+    ) => {
+        const updatedReports = event.value.map((report, index) => {
+            return {
+                ...report,
+                order: index,
+            };
+        });
+
         setCollections((prevCollections) =>
             prevCollections.map((collection) => {
                 if (collection.itemUID === collectionId) {
-                    return { ...collection, documents: event.value };
+                    return { ...collection, documents: updatedReports };
                 }
                 return collection;
             })
         );
+
+        await handleChangeReportOrder(updatedReports, collectionId);
     };
 
     const handleDragStart = (
