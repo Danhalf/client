@@ -198,7 +198,7 @@ export default function Inventories({
         const columns: ReportsColumn[] = activeColumns.map((column) => ({
             name: column.header as string,
             data: column.field as string,
-            width: columnWidths.find((item) => item.field === column.field)?.width || 0,
+            width: columnWidths?.find((item) => item.field === column.field)?.width || 0,
         }));
         const date = new Date();
         const name = `inventory_${
@@ -245,8 +245,8 @@ export default function Inventories({
     const changeSettings = (settings: Partial<InventoryUserSettings>) => {
         if (authUser) {
             if (settings.activeColumns) {
-                const filteredSettings = serverSettings?.inventory.columnWidth
-                    ? Object.entries(serverSettings.inventory.columnWidth)
+                const filteredSettings = serverSettings?.inventory?.columnWidth
+                    ? Object.entries(serverSettings.inventory?.columnWidth)
                           .filter(([column]) =>
                               settings.activeColumns?.some((col) => col === column)
                           )
@@ -841,8 +841,8 @@ export default function Inventories({
                                     onColumnResizeEnd={(event) => {
                                         if (authUser && event) {
                                             const newColumnWidth = {
-                                                [event.column.props.field as string]:
-                                                    event.element.offsetWidth,
+                                                [event.column?.props?.field as string]:
+                                                    event.element?.offsetWidth,
                                             };
                                             changeSettings({
                                                 columnWidth: {
