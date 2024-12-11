@@ -98,7 +98,6 @@ export const ReportForm = observer((): ReactElement => {
         return {
             key: collection.itemUID,
             label: collection.name,
-            // type: "collection",
             data: { ...collection },
             children,
         };
