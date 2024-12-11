@@ -74,7 +74,7 @@ export const ReportForm = observer((): ReactElement => {
             documents?.map((doc) => ({
                 key: doc.itemUID,
                 label: doc.name,
-                type: "document", // можна використати для відрізнення документів
+                type: "document",
                 data: { ...doc },
             })) || []
         );
@@ -87,12 +87,10 @@ export const ReportForm = observer((): ReactElement => {
     const transformCollectionToNode = (collection: ReportCollection): TreeNode => {
         const children: TreeNode[] = [];
 
-        // Додаємо підколекції
         if (collection.collections) {
             children.push(...transformCollectionsToNodes(collection.collections));
         }
 
-        // Додаємо документи
         if (collection.documents) {
             children.push(...transformDocumentsToNodes(collection.documents));
         }
@@ -114,33 +112,15 @@ export const ReportForm = observer((): ReactElement => {
     const handleNodeSelect = (node: TreeNode) => {
         const data = node.data as ReportDocument | ReportCollection;
         if ("documentUID" in data && data.documentUID) {
-            // Це документ
             if (data.documentUID === id) return;
             reportStore.report = data as ReportDocument;
             reportStore.reportName = data.name;
             setSelectedKey(data.itemUID);
             navigate(`/dashboard/reports/${data.itemUID}`);
-            // } else if ("itemUID" in data && data.itemUID && !data.documents && !data.collections) {
-            // Це теж може бути документ, перевірка для документа в if вище
-            // Якщо колекція без документів і вкладених колекцій
-            // переходимо до неї, якщо це потрібно
         }
-        // Якщо це колекція, можна реалізувати логіку переходу при потребі
     };
 
     const handleDragDrop = async (event: any) => {
-        // event.value - оновлене дерево після drag&drop
-        // Тут можна зберегти новий порядок у бекенд
-
-        // У цьому прикладі просто оновимо дерево в стані
-        // Щоб оновити порівняно з прикладом Accordion, вам треба
-        // зберігати state з transformed data і при onDragDrop
-        // викликати setState з event.value
-
-        // Якщо треба зберегти порядок на бекенд, розпарсіть event.value
-        // і викличте moveReportToCollection чи setReportOrder відповідно
-        // для документів чи колекцій.
-
         toast.current?.show({
             severity: "success",
             summary: "Success",
