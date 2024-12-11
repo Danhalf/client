@@ -259,6 +259,7 @@ export const ContactsIdentificationInfo = observer(
                                 )
                             }
                             className='identification-info__date-input w-full'
+                            emptyDate
                             disabled={isControlDisabled}
                         />
                     </div>
@@ -332,6 +333,7 @@ export const ContactsIdentificationInfo = observer(
                                 )
                             }
                             className='identification-info__date-input w-full'
+                            emptyDate
                             disabled={isControlDisabled}
                         />
                     </div>
