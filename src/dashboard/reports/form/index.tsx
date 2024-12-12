@@ -2,6 +2,7 @@ import { ReportCollection, ReportDocument } from "common/models/reports";
 import {
     getUserFavoriteReportList,
     getUserReportCollectionsContent,
+    moveReportToCollection,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
@@ -11,6 +12,7 @@ import "./index.css";
 import { ReportEditForm } from "./edit";
 import { observer } from "mobx-react-lite";
 import { ReportFooter } from "./common";
+import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Tree } from "primereact/tree";
@@ -30,7 +32,17 @@ export const ReportForm = observer((): ReactElement => {
     const toast = useToast();
     const [collections, setCollections] = useState<ReportCollection[]>([]);
     const [favoriteCollections, setFavoriteCollections] = useState<ReportCollection[]>([]);
-    const [selectedKey, setSelectedKey] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (authUser) {
+            handleGetUserReportCollections(authUser.useruid);
+            getUserFavoriteReportList(authUser.useruid).then((response) => {
+                if (Array.isArray(response)) {
+                    setFavoriteCollections(response);
+                }
+            });
+        }
+    }, [authUser]);
 
     const handleGetUserReportCollections = async (useruid: string) => {
         const response = await getUserReportCollectionsContent(useruid);
@@ -58,74 +70,102 @@ export const ReportForm = observer((): ReactElement => {
         }
     };
 
-    useEffect(() => {
-        if (authUser) {
-            handleGetUserReportCollections(authUser.useruid);
-            getUserFavoriteReportList(authUser.useruid).then((response) => {
-                if (Array.isArray(response)) {
-                    setFavoriteCollections(response);
-                }
-            });
-        }
-    }, [authUser]);
+    const buildTreeNodes = (collectionsData: ReportCollection[]): TreeNode[] => {
+        return collectionsData.map((col) => {
+            const children: TreeNode[] = [];
 
-    const transformDocumentsToNodes = (documents?: ReportDocument[]): TreeNode[] => {
-        return (
-            documents?.map((doc) => ({
-                key: doc.itemUID,
-                label: doc.name,
-                type: "document",
-                data: { ...doc },
-            })) || []
-        );
+            if (col.collections && col.collections.length) {
+                children.push(...buildTreeNodes(col.collections));
+            }
+
+            if (col.documents && col.documents.length) {
+                children.push(
+                    ...col.documents.map((doc) => ({
+                        key: doc.itemUID,
+                        label: doc.name,
+                        type: "document",
+                        data: { document: doc, collectionId: col.itemUID },
+                    }))
+                );
+            }
+
+            return {
+                key: col.itemUID,
+                label: col.name,
+                type: "collection",
+                data: { collection: col },
+                children,
+            };
+        });
     };
 
-    const transformCollectionsToNodes = (collections?: ReportCollection[]): TreeNode[] => {
-        return collections?.map((col) => transformCollectionToNode(col)) || [];
-    };
-
-    const transformCollectionToNode = (collection: ReportCollection): TreeNode => {
-        const children: TreeNode[] = [];
-
-        if (collection.collections) {
-            children.push(...transformCollectionsToNodes(collection.collections));
-        }
-
-        if (collection.documents) {
-            children.push(...transformDocumentsToNodes(collection.documents));
-        }
-
-        return {
-            key: collection.itemUID,
-            label: collection.name,
-            data: { ...collection },
-            children,
-        };
-    };
-
-    const rootNodes = [
-        ...favoriteCollections.map((c) => transformCollectionToNode(c)),
-        ...collections.map((c) => transformCollectionToNode(c)),
+    const allNodes = [
+        ...favoriteCollections.map((fc) => ({
+            key: fc.itemUID,
+            label: fc.name,
+            type: "collection",
+            data: { collection: fc },
+            children:
+                fc.documents?.map((doc) => ({
+                    key: doc.itemUID,
+                    label: doc.name,
+                    type: "document",
+                    data: { document: doc, collectionId: fc.itemUID },
+                })) || [],
+        })),
+        ...buildTreeNodes(collections),
     ];
 
-    const handleNodeSelect = (node: TreeNode) => {
-        const data = node.data as ReportDocument | ReportCollection;
-        if ("documentUID" in data && data.documentUID) {
-            if (data.documentUID === id) return;
-            reportStore.report = data as ReportDocument;
-            reportStore.reportName = data.name;
-            setSelectedKey(data.itemUID);
-            navigate(`/dashboard/reports/${data.itemUID}`);
+    const handleSelection = (node: any) => {
+        const { type, data } = node;
+        if (type === "document") {
+            const doc: ReportDocument = data.document;
+            if (doc.documentUID !== id) {
+                reportStore.report = doc as any;
+                reportStore.reportName = doc.name;
+                navigate(`/dashboard/reports/${doc.documentUID}`);
+            }
         }
     };
 
     const handleDragDrop = async (event: any) => {
-        toast.current?.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Node order updated successfully!",
-            life: TOAST_LIFETIME,
-        });
+        const dragType = event.dragNode.type;
+        const dropType = event.dropNode.type;
+        const dragData = event.dragNode.data;
+        const dropData = event.dropNode.data;
+
+        if (dragType === "document" && dropType === "collection") {
+            const sourceCollectionId = dragData.collectionId;
+            const targetCollectionId = dropData.collection.itemUID;
+
+            if (sourceCollectionId !== targetCollectionId) {
+                const report: ReportDocument = dragData.document;
+                const response = await moveReportToCollection(
+                    sourceCollectionId,
+                    report.documentUID,
+                    targetCollectionId
+                );
+                if (response && response.status === Status.ERROR) {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: Status.ERROR,
+                        detail: response.error || "Error while moving report to collection",
+                        life: TOAST_LIFETIME,
+                    });
+                } else {
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "Report moved successfully!",
+                        life: TOAST_LIFETIME,
+                    });
+                    handleGetUserReportCollections(authUser?.useruid!);
+                }
+            }
+        } else if (dragType === "document" && dropType === "document") {
+        } else if (dragType === "collection" && dropType === "collection") {
+        }
+        handleGetUserReportCollections(authUser?.useruid!);
     };
 
     return (
@@ -154,14 +194,13 @@ export const ReportForm = observer((): ReactElement => {
                     <div className='card-content report__card grid'>
                         <div className='col-4'>
                             <Tree
-                                value={rootNodes}
-                                dragdropScope='inventory'
+                                value={allNodes}
+                                dragdropScope='reports'
                                 onDragDrop={handleDragDrop}
-                                onSelect={(e) => handleNodeSelect(e.node)}
-                                selectionMode='single'
-                                selectionKeys={selectedKey as any}
-                                onSelectionChange={(e) => setSelectedKey(e.value as string)}
-                                className='report__tree'
+                                expandedKeys={{}}
+                                nodeTemplate={(node) => (
+                                    <span onClick={() => handleSelection(node)}>{node.label}</span>
+                                )}
                             />
                         </div>
                         <ReportEditForm />
