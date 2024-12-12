@@ -3,6 +3,7 @@ import {
     getUserFavoriteReportList,
     getUserReportCollectionsContent,
     moveReportToCollection,
+    setReportOrder,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
@@ -100,17 +101,17 @@ export const ReportForm = observer((): ReactElement => {
     };
 
     const allNodes = [
-        ...favoriteCollections.map((fc) => ({
-            key: fc.itemUID,
-            label: fc.name,
+        ...favoriteCollections.map((collection) => ({
+            key: collection.itemUID,
+            label: collection.name,
             type: "collection",
-            data: { collection: fc },
+            data: { collection: collection },
             children:
-                fc.documents?.map((doc) => ({
+                collection.documents?.map((doc) => ({
                     key: doc.itemUID,
                     label: doc.name,
                     type: "document",
-                    data: { document: doc, collectionId: fc.itemUID },
+                    data: { document: doc, collectionId: collection.itemUID },
                 })) || [],
         })),
         ...buildTreeNodes(collections),
@@ -120,12 +121,41 @@ export const ReportForm = observer((): ReactElement => {
         const { type, data } = node;
         if (type === "document") {
             const doc: ReportDocument = data.document;
-            if (doc.documentUID !== id) {
-                reportStore.report = doc as any;
-                reportStore.reportName = doc.name;
-                navigate(`/dashboard/reports/${doc.documentUID}`);
-            }
+            reportStore.report = doc as any;
+            reportStore.reportName = doc.name;
+            navigate(`/dashboard/reports/${doc.documentUID}`);
         }
+    };
+
+    const handleChangeReportOrder = async (
+        updatedReports: ReportDocument[],
+        collectionId: string
+    ) => {
+        const promises = updatedReports.map((report) => {
+            return setReportOrder(collectionId, report.itemUID, report.order);
+        });
+
+        const responses = await Promise.all(promises);
+
+        responses.forEach((response, index) => {
+            if (response && response.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail:
+                        response.error ||
+                        `Error while updating report order for "${updatedReports[index].name}"`,
+                    life: TOAST_LIFETIME,
+                });
+            }
+        });
+
+        toast.current?.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Report order updated successfully!",
+            life: TOAST_LIFETIME,
+        });
     };
 
     const handleDragDrop = async (event: any) => {
@@ -163,7 +193,9 @@ export const ReportForm = observer((): ReactElement => {
                 }
             }
         } else if (dragType === "document" && dropType === "document") {
+            debugger;
         } else if (dragType === "collection" && dropType === "collection") {
+            debugger;
         }
         handleGetUserReportCollections(authUser?.useruid!);
     };
@@ -199,7 +231,14 @@ export const ReportForm = observer((): ReactElement => {
                                 onDragDrop={handleDragDrop}
                                 expandedKeys={{}}
                                 nodeTemplate={(node) => (
-                                    <span onClick={() => handleSelection(node)}>{node.label}</span>
+                                    <Button
+                                        onClick={() => handleSelection(node)}
+                                        className={`report__list-item w-full 
+                                        `}
+                                        text
+                                    >
+                                        {node.label}
+                                    </Button>
                                 )}
                             />
                         </div>
