@@ -192,6 +192,10 @@
 }
 
 .report__list-item.p-button.p-button-text {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: Open Sans;
+    line-height: 24.51px;
     color: var(--admss-app-primary);
     padding-left: 0;
     border-radius: 0;
@@ -217,7 +221,7 @@
         .p-orderlist-list {
             min-height: auto;
             .p-orderlist-item {
-                padding: 0;
+                padding-top: 25px;
             }
             .p-orderlist-item:not(.p-highlight):hover {
                 background-color: var(--admss-app-light-blue);
