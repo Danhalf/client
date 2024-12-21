@@ -124,7 +124,7 @@ export const NoteEditor = ({
     };
 
     return (
-        <div className={`account-note ${className}`}>
+        <div className={`account-note ${className || ""}`}>
             <span className='p-float-label'>
                 <InputTextarea
                     id={id}
