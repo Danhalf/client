@@ -51,6 +51,7 @@ export const AccountPromiseToPay = (): ReactElement => {
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
     const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [currentPromise, setCurrentPromise] = useState<AccountPromise | null>(null);
     const toast = useToast();
 
     const getPromiseList = async () => {
@@ -97,7 +98,10 @@ export const AccountPromiseToPay = (): ReactElement => {
         {
             label: "Edit Promise",
             icon: `icon adms-edit-item`,
-            command: () => {},
+            command: (promise: AccountPromise) => {
+                setCurrentPromise(promise);
+                setAddPromiseVisible(true);
+            },
         },
         {
             label: "Delete Promise",
@@ -251,7 +255,7 @@ export const AccountPromiseToPay = (): ReactElement => {
             <div className='grid account__body'>
                 <div className='col-12 account__control'>
                     <SplitButton
-                        model={promiseItems}
+                        model={promiseItems as any}
                         className='account__split-button'
                         label='Add Promise'
                         tooltip='Add Promise'
@@ -360,6 +364,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                     setAddPromiseVisible(false);
                     getPromiseList();
                 }}
+                currentPromise={currentPromise}
                 onHide={() => setAddPromiseVisible(false)}
                 statusList={Object.values(paymentItems).map((item) => item.label)}
                 visible={addPromiseVisible}

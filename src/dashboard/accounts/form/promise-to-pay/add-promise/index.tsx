@@ -1,3 +1,4 @@
+import { AccountPromise } from "common/models/accounts";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog, DashboardDialogProps } from "dashboard/common/dialog";
@@ -12,6 +13,7 @@ import { useStore } from "store/hooks";
 interface AddPromiseDialogProps extends DashboardDialogProps {
     visible: boolean;
     accountuid?: string;
+    currentPromise?: AccountPromise | null;
     statusList: Readonly<string[]>;
     action: () => void;
     onHide: () => void;
@@ -23,16 +25,19 @@ export const AddPromiseDialog = ({
     action,
     accountuid,
     statusList,
+    currentPromise,
     ...props
 }: AddPromiseDialogProps): ReactElement => {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-    const [noteTaker, setNoteTaker] = useState<string>(authUser?.loginname || "");
-    const [note, setNote] = useState<string>("");
-    const [amount, setAmount] = useState<number>(0);
-    const [paydate, setPaydate] = useState<number>(0);
-    const [status, setStatus] = useState<string>("");
+    const [noteTaker, setNoteTaker] = useState<string>(
+        currentPromise?.username || authUser?.loginname || ""
+    );
+    const [note, setNote] = useState<string>(currentPromise?.notes || "");
+    const [amount, setAmount] = useState<number>(currentPromise?.amount || 0);
+    const [paydate, setPaydate] = useState<number>(currentPromise?.paydate || 0);
+    const [status, setStatus] = useState<string>(currentPromise?.pstatus.toString() || "");
     const toast = useToast();
     const currentTime = useMemo(
         () => `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`,
@@ -41,13 +46,19 @@ export const AddPromiseDialog = ({
 
     const handleAddPromise = async () => {
         if (accountuid) {
-            const res = await addAccountPromise(accountuid, {
+            const payload: Partial<AccountPromise> = {
                 username: noteTaker,
                 amount,
                 paydate,
-                status,
+                pstatus: parseInt(status, 10),
                 notes: note,
-            });
+            };
+
+            if (currentPromise?.itemuid) {
+                payload.itemuid = currentPromise.itemuid;
+            }
+
+            const res = await addAccountPromise(accountuid, payload);
             if (res && res.status === Status.ERROR) {
                 return toast.current?.show({
                     severity: "error",
@@ -138,6 +149,7 @@ export const AddPromiseDialog = ({
                     <span className='p-float-label'>
                         <Dropdown
                             id='noteTaker'
+                            value={status}
                             onChange={(e) => setStatus(e.value)}
                             className='w-full'
                             options={[...statusList]}
