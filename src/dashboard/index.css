@@ -628,7 +628,7 @@
     line-height: 1.5;
 }
 
-.row-deleted {
+.row--deleted {
     opacity: 0.5;
     pointer-events: none;
 }
