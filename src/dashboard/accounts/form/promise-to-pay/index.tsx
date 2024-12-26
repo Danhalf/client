@@ -16,6 +16,7 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { ACCOUNT_PROMISE_STATUS } from "common/constants/account-options";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { observer } from "mobx-react-lite";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -42,7 +43,7 @@ enum PAID_COLOR {
     DISABLED = "grey",
 }
 
-export const AccountPromiseToPay = (): ReactElement => {
+export const AccountPromiseToPay = observer((): ReactElement => {
     const { id } = useParams();
     const userStore = useStore().userStore;
     const { authUser } = userStore;
@@ -98,15 +99,34 @@ export const AccountPromiseToPay = (): ReactElement => {
         {
             label: "Edit Promise",
             icon: `icon adms-edit-item`,
-            command: (promise: AccountPromise) => {
-                setCurrentPromise(promise);
+            command: () => {
                 setAddPromiseVisible(true);
             },
         },
         {
             label: "Delete Promise",
             icon: `pi pi-times`,
-            command: () => {},
+            command: () => {
+                selectedRows.forEach(async (isSelected, index) => {
+                    if (isSelected) {
+                        const promise = promiseList[index];
+                        const res = await updateAccountPromise(promise.itemuid, {
+                            ...promise,
+                            deleted: 1,
+                        });
+                        if (res && res.status === Status.ERROR) {
+                            return toast.current?.show({
+                                severity: "error",
+                                summary: Status.ERROR,
+                                detail: res.error,
+                                life: TOAST_LIFETIME,
+                            });
+                        } else {
+                            getPromiseList();
+                        }
+                    }
+                });
+            },
         },
     ];
 
@@ -176,6 +196,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                 <Checkbox
                     checked={selectedRows[rowIndex]}
                     onClick={() => {
+                        setCurrentPromise(options);
                         setSelectedRows(
                             selectedRows.map((state, index) =>
                                 index === rowIndex ? !state : state
@@ -187,7 +208,10 @@ export const AccountPromiseToPay = (): ReactElement => {
                     className='text export-web__icon-button'
                     icon='pi pi-angle-down'
                     disabled={!options.notes}
-                    onClick={() => handleRowExpansionClick(options)}
+                    onClick={() => {
+                        setCurrentPromise(options);
+                        handleRowExpansionClick(options);
+                    }}
                 />
                 <Button icon={`pi pi-circle pi-circle--${color}`} text />
             </div>
@@ -255,7 +279,7 @@ export const AccountPromiseToPay = (): ReactElement => {
             <div className='grid account__body'>
                 <div className='col-12 account__control'>
                     <SplitButton
-                        model={promiseItems as any}
+                        model={promiseItems}
                         className='account__split-button'
                         label='Add Promise'
                         tooltip='Add Promise'
@@ -297,6 +321,7 @@ export const AccountPromiseToPay = (): ReactElement => {
                         rowExpansionTemplate={rowExpansionTemplate}
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
+                        rowClassName={(data) => (data.deleted === 1 ? "row--deleted" : "")}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
@@ -318,7 +343,9 @@ export const AccountPromiseToPay = (): ReactElement => {
                                 alignHeader={"left"}
                                 key={field}
                                 body={({ [field]: value }, { rowIndex }) => (
-                                    <div className={`${selectedRows[rowIndex] && "row--selected"}`}>
+                                    <div
+                                        className={`${selectedRows[rowIndex] ? "row--selected" : ""}`}
+                                    >
                                         {value || "-"}
                                     </div>
                                 )}
@@ -372,4 +399,4 @@ export const AccountPromiseToPay = (): ReactElement => {
             />
         </div>
     );
-};
+});
