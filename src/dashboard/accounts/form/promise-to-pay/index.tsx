@@ -321,7 +321,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
                         rowExpansionTemplate={rowExpansionTemplate}
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
-                        rowClassName={(data) => (data.deleted === 1 ? "row--deleted" : "")}
+                        rowClassName={(data) => (!!data.deleted ? "row--deleted" : "")}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
