@@ -3,7 +3,11 @@ import { Column, ColumnBodyOptions, ColumnProps } from "primereact/column";
 import { DataTable, DataTableRowClickEvent, DataTableValue } from "primereact/datatable";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
-import { listAccountPromises, updateAccountPromise } from "http/services/accounts.service";
+import {
+    deleteAccountPromise,
+    listAccountPromises,
+    updateAccountPromise,
+} from "http/services/accounts.service";
 import { useParams } from "react-router-dom";
 import { AccountPromise } from "common/models/accounts";
 import { SplitButton } from "primereact/splitbutton";
@@ -110,10 +114,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
                 selectedRows.forEach(async (isSelected, index) => {
                     if (isSelected) {
                         const promise = promiseList[index];
-                        const res = await updateAccountPromise(promise.itemuid, {
-                            ...promise,
-                            deleted: 1,
-                        });
+                        const res = await deleteAccountPromise(promise.itemuid);
                         if (res && res.status === Status.ERROR) {
                             return toast.current?.show({
                                 severity: "error",
