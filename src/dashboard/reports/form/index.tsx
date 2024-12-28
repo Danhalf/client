@@ -25,8 +25,8 @@ import { TOAST_LIFETIME } from "common/settings";
 import { Tree, TreeDragDropEvent } from "primereact/tree";
 import { TreeNode } from "primereact/treenode";
 import { Status } from "common/models/base-response";
+import { buildTreeNodes, convertTreeNodesToCollections } from "../common/drag-and-drop";
 import { TreeNodeEvent } from "common/models";
-import { convertTreeNodesToCollections } from "../common/drag-and-drop";
 
 const NodeContent = ({
     node,
@@ -109,39 +109,6 @@ export const ReportForm = observer((): ReactElement => {
         } else {
             setCollections([]);
         }
-    };
-
-    const buildTreeNodes = (collectionsData: ReportCollection[]): TreeNode[] => {
-        return collectionsData
-            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .map((col) => {
-                let children: TreeNode[] = [];
-                if (col.collections && col.collections.length) {
-                    children = children.concat(buildTreeNodes(col.collections));
-                }
-                if (col.documents && col.documents.length) {
-                    const docNodes = col.documents
-                        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-                        .map((doc) => ({
-                            key: doc.itemUID,
-                            label: doc.name,
-                            type: NODE_TYPES.DOCUMENT,
-                            data: {
-                                document: doc,
-                                collectionId: col.itemUID,
-                                order: doc.order,
-                            },
-                        }));
-                    children = children.concat(docNodes);
-                }
-                return {
-                    key: col.itemUID,
-                    label: col.name,
-                    type: NODE_TYPES.COLLECTION,
-                    data: { collection: col, order: col.order },
-                    children,
-                };
-            });
     };
 
     const allNodes = [

@@ -1,5 +1,48 @@
 import { TreeNodeEvent } from "common/models";
 import { ReportCollection, NODE_TYPES, ReportDocument } from "common/models/reports";
+import { TreeNode } from "primereact/treenode";
+
+export const buildTreeNodes = (collectionsData: ReportCollection[]): TreeNode[] => {
+    return collectionsData
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+        .map((col) => {
+            let children: TreeNode[] = [];
+            if (col.collections && col.collections.length) {
+                children = children.concat(buildTreeNodes(col.collections));
+            }
+            if (col.documents && col.documents.length) {
+                const docNodes = col.documents
+                    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                    .map((doc) => ({
+                        key: doc.itemUID,
+                        label: doc.name,
+                        type: NODE_TYPES.DOCUMENT,
+
+                        data: {
+                            type: NODE_TYPES.DOCUMENT,
+                            document: doc,
+                            collectionId: col.itemUID,
+                            order: doc.order,
+                            parentCollectionUID: col.itemUID,
+                        },
+                    }));
+                children = children.concat(docNodes);
+            }
+            return {
+                key: col.itemUID,
+                label: col.name,
+                type: NODE_TYPES.COLLECTION,
+                data: {
+                    type: NODE_TYPES.COLLECTION,
+                    collectionId: col.itemUID,
+                    parentCollectionUID: col.itemUID,
+                    collection: col,
+                    order: col.order,
+                },
+                children,
+            };
+        });
+};
 
 export const convertTreeNodesToCollections = (
     nodes: TreeNodeEvent[],
