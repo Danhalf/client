@@ -28,7 +28,11 @@ import { ActionButtons } from "dashboard/reports/common/report-buttons";
 import { useNavigate } from "react-router-dom";
 import { ReportParameters } from "./common/report-parameters";
 import { TreeNodeEvent } from "common/models";
-import { buildTreeNodes, convertTreeNodesToCollections } from "./common/drag-and-drop";
+import {
+    buildTreeNodes,
+    convertTreeNodesToCollections,
+    transformLabel,
+} from "./common/drag-and-drop";
 import "./index.css";
 
 const EDIT_COLLECTION_CLASSES: Readonly<string[]> = ["reports-actions__button", "p-button-label"];
@@ -358,7 +362,7 @@ export default function Reports(): ReactElement {
             return (
                 <div className='reports__list-item'>
                     <div className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>
-                        {node.data.jsxContent || node.label}
+                        {typeof node.label === "string" ? transformLabel(node.label) : node.label}
                     </div>
                     {hasNewDocs && <div className='reports-accordion-header__label ml-2'>New</div>}
                     {currentCollection.userUID === authUser?.useruid &&
@@ -390,9 +394,9 @@ export default function Reports(): ReactElement {
                         <p className={isMatchedBySearch ? "searched-item" : "reports__list-name"}>
                             {currentReport.name}
                         </p>
-                        {currentReport.isNew && (
+                        {currentReport.isNew ? (
                             <div className='reports-accordion-header__label ml-2'>New</div>
-                        )}
+                        ) : null}
                         <ActionButtons
                             report={currentReport}
                             collectionList={[reportCollections[0], ...customCollections].filter(

@@ -24,11 +24,16 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        font-weight: 700;
+        font-weight: 600;
     }
 
-    .p-treenode-leaf .reports__list-name {
-        font-weight: 400;
+    .p-treenode-leaf {
+        .p-treenode-content {
+            border: none;
+        }
+        .reports__list-name {
+            font-weight: 400;
+        }
     }
 }
 

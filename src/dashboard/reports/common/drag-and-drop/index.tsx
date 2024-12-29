@@ -1,6 +1,25 @@
 import { TreeNodeEvent } from "common/models";
-import { ReportCollection, NODE_TYPES, ReportDocument } from "common/models/reports";
+import { ReportCollection, NODE_TYPES, ReportDocument, REPORT_TYPES } from "common/models/reports";
 import { TreeNode } from "primereact/treenode";
+
+export const transformLabel = (label: string): JSX.Element | string => {
+    const regex = /^([^(]+)\s*\((.+)\)$/;
+    const match = label.match(regex);
+
+    if (!match) {
+        return label;
+    }
+
+    const mainText = match[1].trim();
+    const parenthesesText = `(${match[2]})`;
+
+    return (
+        <div className='flex gap-1'>
+            <div className='reports-accordion-header__title'>{mainText}</div>
+            <div className='reports-accordion-header__info '>{parenthesesText}</div>
+        </div>
+    );
+};
 
 const countNested = (collection: ReportCollection): number => {
     let totalDocs = collection.documents?.length ?? 0;
@@ -22,60 +41,45 @@ export const buildTreeNodes = (
     return collectionsData
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
         .map((col) => {
-            const docsCount = col.documents?.length || 0;
-            let labelText = col.name;
-            let jsxContent: JSX.Element | null = null;
-
-            if (countInfo) {
-                if (col.name === "Custom reports") {
-                    const nested = countNested(col);
-                    labelText = `${col.name} (${col.collections?.length || 0} collections / ${nested} reports)`;
-                    jsxContent = (
-                        <>
-                            {col.name}
-                            <div className='reports-accordion-header__info'>
-                                ({col.collections?.length || 0} collections / {nested} reports)
-                            </div>
-                        </>
-                    );
-                } else {
-                    labelText = `${col.name} (${docsCount} reports)`;
-                    jsxContent = (
-                        <>
-                            {col.name}
-                            <div className='reports-accordion-header__info'>
-                                ({docsCount} reports)
-                            </div>
-                        </>
-                    );
-                }
-            }
-
+            let label = col.name;
             let children: TreeNode[] = [];
             if (col.collections?.length) {
                 children = buildTreeNodes(col.collections, countInfo);
             }
             if (col.documents?.length) {
-                const docNodes = col.documents.map((doc) => ({
-                    key: doc.itemUID,
-                    label: doc.name,
-                    type: NODE_TYPES.DOCUMENT,
-                    data: {
+                const docNodes = col.documents
+                    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                    .map((doc: ReportDocument) => ({
+                        key: doc.itemUID,
+                        label: doc.name,
                         type: NODE_TYPES.DOCUMENT,
-                        document: doc,
-                    },
-                }));
+                        data: {
+                            type: NODE_TYPES.DOCUMENT,
+                            document: doc,
+                            collectionId: col.itemUID,
+                            order: doc.order,
+                            parentCollectionUID: col.itemUID,
+                        },
+                    }));
                 children.push(...docNodes);
             }
-
+            if (countInfo) {
+                if (col.name === REPORT_TYPES.CUSTOM) {
+                    label = `${col.name} (${col.collections?.length || 0} collections / ${countNested(col)} docs)`;
+                } else {
+                    const currentDocsCount = col.documents?.length || 0;
+                    label = `${col.name} (${currentDocsCount} reports)`;
+                }
+            }
             return {
                 key: col.itemUID,
-                label: labelText,
+                label,
                 type: NODE_TYPES.COLLECTION,
                 data: {
                     type: NODE_TYPES.COLLECTION,
                     collection: col,
-                    jsxContent,
+                    order: col.order,
+                    parentCollectionUID: col.itemUID,
                 },
                 children,
             };
