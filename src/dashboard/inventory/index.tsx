@@ -167,8 +167,9 @@ export default function Inventories({
                         }
                         settings?.table &&
                             setLazyState({
-                                skip: settings.table.first || initialDataTableQueries.first,
-                                top: settings.table.rows || initialDataTableQueries.rows,
+                                first: settings.table.first || initialDataTableQueries.first,
+                                rows: settings.table.rows || initialDataTableQueries.rows,
+                                page: settings.table.page || initialDataTableQueries.page,
                                 column: settings.table.column || initialDataTableQueries.column,
                                 sortField:
                                     settings.table.sortField || initialDataTableQueries.sortField,
