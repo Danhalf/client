@@ -25,7 +25,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { Tree, TreeDragDropEvent } from "primereact/tree";
 import { TreeNode } from "primereact/treenode";
 import { Status } from "common/models/base-response";
-import { buildTreeNodes, convertTreeNodesToCollections } from "../common/drag-and-drop";
+import { buildTreeNodes } from "../common/drag-and-drop";
 import { TreeNodeEvent } from "common/models";
 
 export const NodeContent = ({
@@ -76,7 +76,7 @@ export const ReportForm = observer((): ReactElement => {
     const [expandedKeys, setExpandedKeys] = useState<{ [key: string]: boolean }>({});
     const expandedForId = useRef<string | null>(null);
 
-    useEffect(() => {
+    const getCollections = async () => {
         if (authUser) {
             handleGetUserReportCollections(authUser.useruid);
             getUserFavoriteReportList(authUser.useruid).then((response) => {
@@ -85,6 +85,10 @@ export const ReportForm = observer((): ReactElement => {
                 }
             });
         }
+    };
+
+    useEffect(() => {
+        getCollections();
     }, [authUser]);
 
     const handleGetUserReportCollections = async (useruid: string) => {
@@ -232,6 +236,7 @@ export const ReportForm = observer((): ReactElement => {
 
         if (
             dragNode?.type === NODE_TYPES.DOCUMENT &&
+            dragNode?.data?.collectionId !== dropNode?.data?.collection?.itemUID &&
             (!!dropNode?.data?.collection?.isdefault || !!dropNode?.data?.collection?.isfavorite)
         ) {
             showError(TOAST_MESSAGES.MOVE_INTO_DEFAULT_ERROR);
@@ -247,35 +252,19 @@ export const ReportForm = observer((): ReactElement => {
             return;
         }
 
-        const updatedNodes = event.value as TreeNode[];
-        const favoriteNode = updatedNodes.find((node) => node.label === REPORT_TYPES.FAVORITES);
-        const otherNodes = updatedNodes.filter((node) => node.label !== REPORT_TYPES.FAVORITES);
-        let newFavoriteCollections: ReportCollection[] = [];
-        let newCollections: ReportCollection[] = [];
-        if (favoriteNode) {
-            const favCols = convertTreeNodesToCollections([favoriteNode as TreeNodeEvent]);
-            if (favCols.length > 0) {
-                newFavoriteCollections = favCols;
-            }
-        }
-        const converted = convertTreeNodesToCollections(otherNodes as TreeNodeEvent[]);
-        newCollections = converted;
-        setFavoriteCollections(newFavoriteCollections);
-        setCollections(newCollections);
-
         const dragData = dragNode?.data;
         const dropData = dropNode?.data;
 
         if (
             dragNode?.type === NODE_TYPES.DOCUMENT &&
             dragData?.document &&
-            dropNode?.type !== NODE_TYPES.COLLECTION
+            dragNode?.data?.collectionId === dropNode?.data?.collection?.itemUID
         ) {
             const collectionId = dragData.collectionId;
             const currentCollectionsLength =
                 collections.find((col) => col.itemUID === collectionId)?.collections?.length || 0;
 
-            if (collectionId && dragData.document.documentUID != null && dropIndex != null) {
+            if (dropIndex !== undefined) {
                 const response = await setReportOrder(
                     collectionId,
                     dragData.document.documentUID,
@@ -285,7 +274,6 @@ export const ReportForm = observer((): ReactElement => {
                     showError(response.error);
                 } else {
                     showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
-                    await updateDocumentOrderInCollection(collectionId);
                 }
             }
         }
@@ -323,6 +311,8 @@ export const ReportForm = observer((): ReactElement => {
                 }
             }
         }
+
+        getCollections();
     };
 
     return (
