@@ -197,20 +197,6 @@ export const ReportForm = observer((): ReactElement => {
         }
     };
 
-    const updateDocumentOrderInCollection = async (collectionId: string) => {
-        const collection = collections.find((col) => col.itemUID === collectionId);
-        if (!collection || !collection.documents) return;
-        const updatedReports = collection.documents.map((doc, index) => ({
-            ...doc,
-            order: index,
-        }));
-        setCollections((prev) =>
-            prev.map((col) =>
-                col.itemUID === collectionId ? { ...col, documents: updatedReports } : col
-            )
-        );
-    };
-
     const showError = (detail: string) => {
         toast.current?.show({
             severity: "error",
