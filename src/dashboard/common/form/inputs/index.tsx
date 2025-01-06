@@ -271,7 +271,6 @@ export const DateInput = ({
 }: DateInputProps): ReactElement => {
     const [innerDate, setInnerDate] = useState<Date>(new Date());
     const [isChecked, setIsChecked] = useState<boolean>(false);
-
     useEffect(() => {
         if (!!date || !emptyDate) {
             const currentDate = new Date(Number(date));
@@ -286,7 +285,10 @@ export const DateInput = ({
             key={name}
             className='flex align-items-center justify-content-between date-item relative'
         >
-            <label htmlFor={name} className='date-item__label label-top'>
+            <label
+                htmlFor={name}
+                className={`date-item__label ${!date ? "date-item__label--empty" : ""} label-top`}
+            >
                 {name}
             </label>
             <div className='date-item__input w-full flex'>
