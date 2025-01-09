@@ -220,12 +220,24 @@ export const ReportForm = observer((): ReactElement => {
         const dropNode = event.dropNode as TreeNodeEvent | undefined;
         const dropIndex = event.dropIndex;
 
+        if (!dropNode) return;
+
         if (
             dragNode?.type === NODE_TYPES.DOCUMENT &&
             dragNode?.data?.collectionId !== dropNode?.data?.collection?.itemUID &&
             (!!dropNode?.data?.collection?.isdefault || !!dropNode?.data?.collection?.isfavorite)
         ) {
             showError(TOAST_MESSAGES.MOVE_INTO_DEFAULT_ERROR);
+            return;
+        }
+
+        if (
+            dragNode?.type === NODE_TYPES.DOCUMENT &&
+            dropNode?.type === NODE_TYPES.COLLECTION &&
+            dragNode?.data?.document?.isdefault &&
+            dragNode?.data?.collectionId !== dropNode?.data?.collection?.itemUID
+        ) {
+            showError(TOAST_MESSAGES.ERROR_CANNOT_MOVE_FROM_DEFAULT_COLLECTION);
             return;
         }
 
