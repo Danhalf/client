@@ -191,6 +191,13 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
                 />
             </div>
 
+            <div className='total-paid__item'>
+                <label className='total-paid__label'>Total Paid:</label>
+                <span className='total-paid__value'>
+                    {formatCurrency(newAmount?.TotalPaid || 0)}
+                </span>
+            </div>
+
             <Button
                 className='total-paid__button'
                 type='button'
