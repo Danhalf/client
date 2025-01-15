@@ -5,6 +5,13 @@
         border: none;
         .p-treenode {
             padding: 0;
+            .p-treenode-droppoint {
+                border: none;
+                margin: 0;
+                &.p-treenode-droppoint-active {
+                    background: var(--admss-app-light-blue);
+                }
+            }
         }
 
         .p-treenode-content {
