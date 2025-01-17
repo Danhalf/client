@@ -226,7 +226,7 @@ export const DealsForm = observer(() => {
     }, [stepActiveIndex, stepsRef.current]);
 
     useEffect(() => {
-        if (stepActiveIndex === printActiveIndex) {
+        if (stepActiveIndex === printActiveIndex && id) {
             getPrintList(id);
         }
     }, [stepActiveIndex, printActiveIndex]);
