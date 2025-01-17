@@ -317,6 +317,7 @@ export class ContactStore {
     public clearContact = () => {
         this._contact = {} as Contact;
         this._contactID = "";
+        this._contactType = 0;
         this._frontSiteDLurl = "";
         this._backSiteDLurl = "";
         this._frontSiteDL = {} as File;

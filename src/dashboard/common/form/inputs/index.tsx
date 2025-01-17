@@ -48,6 +48,8 @@ interface DateInputProps extends CalendarProps {
     colWidth?: Range<1, 13>;
     checkbox?: boolean;
     emptyDate?: boolean;
+    clearButton?: boolean;
+    onClearAction?: () => void;
 }
 
 interface TextInputProps extends InputTextProps {
@@ -267,29 +269,40 @@ export const DateInput = ({
     checkbox,
     colWidth,
     emptyDate,
+    clearButton,
+    onClearAction,
     ...props
 }: DateInputProps): ReactElement => {
     const [innerDate, setInnerDate] = useState<Date | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(false);
 
     useEffect(() => {
-        if (date !== undefined && date !== null && date !== "") {
+        if (date !== undefined && date !== null && !isNaN(Number(date)) && Number(date) !== 0) {
             setInnerDate(new Date(Number(date)));
+        } else if (value !== undefined && value !== null && value !== "" && !isNaN(Number(value))) {
+            setInnerDate(new Date(Number(value)));
         } else if (!emptyDate) {
             setInnerDate(new Date());
         } else {
             setInnerDate(null);
         }
-    }, [date, emptyDate]);
+    }, [date, value, emptyDate]);
 
     const handleDateChange = (selected: Date | null) => {
         setInnerDate(selected);
     };
 
+    const handleClearDate = () => {
+        setInnerDate(null);
+        onClearAction?.();
+    };
+
     const content = (
         <div
             key={name}
-            className='flex align-items-center justify-content-between date-item relative'
+            className={`flex align-items-center justify-content-between date-item relative ${
+                innerDate ? "date-item--filled" : "date-item--empty"
+            }`}
         >
             <label
                 htmlFor={name}
@@ -297,7 +310,7 @@ export const DateInput = ({
             >
                 {name}
             </label>
-            <div className='date-item__input w-full flex'>
+            <div className='date-item__input w-full flex relative'>
                 {checkbox && (
                     <Checkbox
                         className='date-item__checkbox'
@@ -313,6 +326,17 @@ export const DateInput = ({
                     onChange={(e) => handleDateChange(e.value as Date | null)}
                     {...props}
                 />
+                {innerDate && clearButton && (
+                    <Button
+                        type='button'
+                        className='date-item__clear-button'
+                        icon='pi pi-times'
+                        onClick={handleClearDate}
+                        text
+                        tooltip='Clear date'
+                        tooltipOptions={{ position: "top" }}
+                    />
+                )}
                 <div className='date-item__icon input-icon input-icon-right'>
                     <i className='adms-calendar' />
                 </div>
