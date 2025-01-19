@@ -95,7 +95,7 @@ export const Home = (): ReactElement => {
                     </div>
                 </div>
             </div>
-            <div className='col-12 xl:col-4'>
+            <div className='col-12 xl:col-5'>
                 <RecentMessages />
             </div>
             <div className='col-12 xl:col-4'>
@@ -123,7 +123,7 @@ export const Home = (): ReactElement => {
                     </div>
                 </div>
             </div>
-            <div className='col-12 xl:col-4'>
+            <div className='col-12 xl:col-3'>
                 <div className='card'>
                     <div className='card-header'>
                         <h2 className='uppercase m-0'>Printing</h2>

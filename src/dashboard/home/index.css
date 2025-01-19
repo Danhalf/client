@@ -24,6 +24,7 @@
 }
 
 .common-tasks-menu {
+    align-items: center;
     min-height: 180px;
 }
 
