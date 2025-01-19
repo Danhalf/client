@@ -98,7 +98,7 @@ export const Tasks = () => {
                 onClick={() => setShowAddTaskDialog(true)}
             >
                 <i className='pi pi-plus add-task-control__icon'></i>
-                Add new task
+                Add task
             </span>
             <div className='hidden'>
                 <AddTaskDialog
