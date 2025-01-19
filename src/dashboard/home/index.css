@@ -1,6 +1,10 @@
 .home {
     .card {
         padding: 40px;
+        .card-content__title,
+        .card-header__title {
+            font-size: 20px;
+        }
     }
 }
 
