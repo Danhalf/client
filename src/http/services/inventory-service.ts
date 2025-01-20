@@ -142,6 +142,22 @@ export const getInventoryOptions = async (inventoryuid: string) => {
     }
 };
 
+export const getInventoryGroupOptions = async (groupuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<ListData[]>(
+            `inventory/${groupuid}/groupoptions`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting inventory group options",
+            };
+        }
+    }
+};
+
 export const getInventoryPaymentBack = async (inventoryuid: string) => {
     try {
         const response = await authorizedUserApiInstance.get<InventoryPaymentBack>(

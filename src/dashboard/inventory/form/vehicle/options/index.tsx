@@ -13,7 +13,6 @@ export const VehicleOptions = observer((): ReactElement => {
     const toast = useToast();
 
     const { inventory, inventoryOptions, changeInventoryOptions } = store;
-    // const { authUser } = userStore;
     const [options, setOptions] = useState<OptionsListData[]>([]);
 
     const handleGetInventoryOptionsList = async () => {
@@ -32,9 +31,6 @@ export const VehicleOptions = observer((): ReactElement => {
     };
 
     useEffect(() => {
-        // getInventoryOptionsList().then((response) => {
-        //     response && setOptions(response);
-        // });
         handleGetInventoryOptionsList();
     }, []);
 
