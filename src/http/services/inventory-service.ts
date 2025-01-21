@@ -144,7 +144,7 @@ export const getInventoryOptions = async (inventoryuid: string) => {
 
 export const getInventoryGroupOptions = async (groupuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<ListData[]>(
+        const request = await authorizedUserApiInstance.get<InventoryOptions>(
             `inventory/${groupuid}/groupoptions`
         );
         return request.data;

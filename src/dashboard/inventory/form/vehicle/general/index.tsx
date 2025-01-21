@@ -70,6 +70,17 @@ export const VehicleGeneral = observer((): ReactElement => {
         });
     }, []);
 
+    const handleGetInventoryGroupFullInfo = (groupName: string) => {
+        if (groupName) {
+            const activeGroup = groupClassList.find(
+                (group) => group.description === inventory.GroupClassName
+            );
+            if (activeGroup) {
+                store.inventoryGroupID = activeGroup.itemuid;
+            }
+        }
+    };
+
     useEffect(() => {
         if (authUser) {
             getInventoryLocations(authUser.useruid).then((list) => {
@@ -80,6 +91,9 @@ export const VehicleGeneral = observer((): ReactElement => {
             getUserGroupActiveList(authUser.useruid).then((list) => {
                 if (list && Array.isArray(list)) {
                     setGroupClassList(list);
+                    if (list.some((group) => group.description === inventory.GroupClassName)) {
+                        handleGetInventoryGroupFullInfo(inventory.GroupClassName);
+                    }
                 }
             });
         }
@@ -295,6 +309,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                                 key: "GroupClassName",
                                 value,
                             });
+                            handleGetInventoryGroupFullInfo(value);
                         }}
                         placeholder='Group class'
                         className={`w-full vehicle-general__dropdown ${
