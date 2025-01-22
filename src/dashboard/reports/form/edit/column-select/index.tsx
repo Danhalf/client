@@ -17,16 +17,25 @@ const dataSetValues: ReportServices[] = [
     ReportServices.ACCOUNTS,
 ];
 
+const initialDataSetsData: Record<ReportServices, ReportServiceColumns[]> = {
+    [ReportServices.INVENTORY]: [],
+    [ReportServices.CONTACTS]: [],
+    [ReportServices.DEALS]: [],
+    [ReportServices.ACCOUNTS]: [],
+};
+
 export const ReportColumnSelect = observer((): ReactElement => {
     const store = useStore().reportStore;
     const { report } = store;
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const toast = useToast();
-    const [availableValues, setAvailableValues] = useState<ReportServiceColumns[]>([]);
-    const [selectedValues, setSelectedValues] = useState<ReportServiceColumns[]>([]);
     const [dataSet, setDataSet] = useState<ReportServices | null>(null);
+    const [selectedValues, setSelectedValues] = useState<ReportServiceColumns[]>([]);
+    const [availableValues, setAvailableValues] = useState<ReportServiceColumns[]>([]);
     const [currentItem, setCurrentItem] = useState<ReportServiceColumns | null>(null);
+    const [initialDataSets, setInitialDataSets] =
+        useState<Record<ReportServices, ReportServiceColumns[]>>(initialDataSetsData);
 
     useEffect(() => {
         if (report?.columns) {
@@ -40,32 +49,44 @@ export const ReportColumnSelect = observer((): ReactElement => {
     }, [report]);
 
     useEffect(() => {
+        if (dataSet) {
+            const allColumns = initialDataSets[dataSet] || [];
+            const filtered = allColumns.filter(
+                (col) => !selectedValues.some((sel) => sel.data === col.data)
+            );
+            setAvailableValues(filtered);
+        }
+    }, [dataSet, selectedValues, initialDataSets]);
+
+    useEffect(() => {
         const useruid = authUser?.useruid;
-        if (dataSet && useruid)
-            getReportColumns({ service: dataSet, useruid }).then((response) => {
-                if (response?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: response?.error,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    setAvailableValues(
-                        response.filter(
-                            (availableItem: ReportServiceColumns) =>
-                                !selectedValues.some(
-                                    (selectedItem) => selectedItem.data === availableItem.data
-                                )
-                        )
-                    );
-                }
-            });
-    }, [dataSet, authUser?.useruid]);
+        if (!dataSet || !useruid) return;
+        const alreadyLoaded = initialDataSets[dataSet] && initialDataSets[dataSet].length > 0;
+        if (alreadyLoaded) return;
+        getReportColumns({ service: dataSet, useruid }).then((response) => {
+            if (response?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response?.error,
+                    life: TOAST_LIFETIME,
+                });
+            } else if (response) {
+                const columnsWithOrigin = response.map((item: ReportServiceColumns) => ({
+                    ...item,
+                    originalDataSet: dataSet,
+                }));
+                setInitialDataSets((prev) => ({
+                    ...prev,
+                    [dataSet]: columnsWithOrigin,
+                }));
+            }
+        });
+    }, [dataSet, authUser?.useruid, toast, initialDataSets]);
 
     useEffect(() => {
         store.reportColumns = selectedValues;
-    }, [selectedValues]);
+    }, [selectedValues, store]);
 
     const moveItem = (
         item: ReportServiceColumns,
@@ -97,7 +118,6 @@ export const ReportColumnSelect = observer((): ReactElement => {
     ) => {
         const index = list.indexOf(item);
         if (index === -1) return;
-
         const newList = [...list];
         if (direction === "up" && index > 0) {
             newList.splice(index - 1, 0, newList.splice(index, 1)[0]);
@@ -108,7 +128,6 @@ export const ReportColumnSelect = observer((): ReactElement => {
         } else if (direction === "bottom") {
             newList.push(newList.splice(index, 1)[0]);
         }
-
         setList(newList);
     };
 
@@ -217,7 +236,6 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     "Move Right",
                     !!selectedValues.includes(currentItem!) || !currentItem
                 )}
-
                 {ControlButton(
                     "double-right",
                     () =>
@@ -230,7 +248,6 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     "Move All",
                     !availableValues.length
                 )}
-
                 {ControlButton(
                     "left",
                     () =>
@@ -245,7 +262,6 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     "Move Left",
                     !!availableValues.includes(currentItem!) || !currentItem
                 )}
-
                 {ControlButton(
                     "double-left",
                     () =>
@@ -283,7 +299,6 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     "Up",
                     selectedValues.findIndex((i) => i === currentItem) === 0 || !currentItem
                 )}
-
                 {ControlButton(
                     "double-up",
                     () =>
@@ -292,7 +307,6 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     "Top",
                     selectedValues.findIndex((i) => i === currentItem) === 0 || !currentItem
                 )}
-
                 {ControlButton(
                     "down",
                     () =>
@@ -302,7 +316,6 @@ export const ReportColumnSelect = observer((): ReactElement => {
                     selectedValues.findIndex((i) => i === currentItem) ===
                         selectedValues.length - 1 || !currentItem
                 )}
-
                 {ControlButton(
                     "double-down",
                     () =>
