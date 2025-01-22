@@ -2,7 +2,7 @@ import { ReportServiceColumns, ReportServices } from "common/models/reports";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { ReportSelect } from "../../common";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
@@ -36,6 +36,8 @@ export const ReportColumnSelect = observer((): ReactElement => {
     const [currentItem, setCurrentItem] = useState<ReportServiceColumns | null>(null);
     const [initialDataSets, setInitialDataSets] =
         useState<Record<ReportServices, ReportServiceColumns[]>>(initialDataSetsData);
+    const availableRef = useRef<HTMLDivElement>(null);
+    const selectedRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (report?.columns) {
@@ -88,6 +90,19 @@ export const ReportColumnSelect = observer((): ReactElement => {
         store.reportColumns = selectedValues;
     }, [selectedValues, store]);
 
+    const scrollToTop = (ref: React.RefObject<HTMLDivElement>) => {
+        ref.current?.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const scrollToBottom = (ref: React.RefObject<HTMLDivElement>) => {
+        if (ref.current) {
+            ref.current.scrollTo({
+                top: ref.current.scrollHeight,
+                behavior: "smooth",
+            });
+        }
+    };
+
     const moveItem = (
         item: ReportServiceColumns,
         from: ReportServiceColumns[],
@@ -129,6 +144,14 @@ export const ReportColumnSelect = observer((): ReactElement => {
             newList.push(newList.splice(index, 1)[0]);
         }
         setList(newList);
+        if (list === availableValues) {
+            if (direction === "top") scrollToTop(availableRef);
+            if (direction === "bottom") scrollToBottom(availableRef);
+        }
+        if (list === selectedValues) {
+            if (direction === "top") scrollToTop(selectedRef);
+            if (direction === "bottom") scrollToBottom(selectedRef);
+        }
     };
 
     const ControlButton = (
@@ -220,6 +243,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         setSelectedValues
                     )
                 }
+                containerRef={availableRef}
             />
             <div className='report-control'>
                 {ControlButton(
@@ -289,6 +313,7 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         setAvailableValues
                     )
                 }
+                containerRef={selectedRef}
             />
             <div className='report-control'>
                 {ControlButton(
