@@ -68,6 +68,7 @@ export const NodeContent = ({
 export const ReportForm = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const reportStore = useStore().reportStore;
+    const { isReportChanged } = reportStore;
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { authUser } = userStore;
@@ -315,8 +316,16 @@ export const ReportForm = observer((): ReactElement => {
         getCollections();
     };
 
-    const handleReturnPreviousPage = () => {
+    const navigateToReports = () => {
         navigate("/dashboard/reports");
+    };
+
+    const handleCloseClick = () => {
+        if (isReportChanged) {
+            setConfirmActive(true);
+        } else {
+            navigateToReports();
+        }
     };
 
     return (
@@ -324,7 +333,7 @@ export const ReportForm = observer((): ReactElement => {
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={() => setConfirmActive(true)}
+                onClick={handleCloseClick}
             />
             <div className='col-12'>
                 <div className='card report'>
@@ -387,7 +396,7 @@ export const ReportForm = observer((): ReactElement => {
                 bodyMessage='Are you sure you want to leave this page? All unsaved data will be lost.'
                 rejectLabel='Cancel'
                 acceptLabel='Confirm'
-                confirmAction={() => handleReturnPreviousPage()}
+                confirmAction={navigateToReports}
                 onHide={() => setConfirmActive(false)}
             />
         </div>
