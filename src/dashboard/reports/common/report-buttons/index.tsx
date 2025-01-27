@@ -136,7 +136,7 @@ export const ActionButtons = ({
 
     const handleEditReport = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.stopPropagation();
-        navigate(`/dashboard/reports/${report.virtualUID}`);
+        navigate(`/dashboard/reports/${report.documentUID}`);
     };
 
     const handleAddToCollection = (event: React.MouseEvent<HTMLButtonElement>) => {
