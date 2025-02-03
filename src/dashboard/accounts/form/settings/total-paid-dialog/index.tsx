@@ -68,7 +68,16 @@ export const TotalPaidDialog = ({ onHide, visible }: TotalPaidDialogProps) => {
             ExtraPrincipalPayments: centsToDollars(newAmount.ExtraPrincipalPayments),
         };
 
-        const response = await updateAccountTotal(id, originalValues ? originalAmount : amountData);
+        const originalAmountData: Partial<TotalPaidInfo> = {
+            PrincipalPaid: centsToDollars(originalAmount.PrincipalPaid),
+            InterestPaid: centsToDollars(originalAmount.InterestPaid),
+            ExtraPrincipalPayments: centsToDollars(originalAmount.ExtraPrincipalPayments),
+        };
+
+        const response = await updateAccountTotal(
+            id,
+            originalValues ? originalAmountData : amountData
+        );
         if (response?.status === Status.ERROR) {
             toast.current?.show({
                 severity: "error",
