@@ -66,15 +66,28 @@ export function debounce<T extends (...args: any[]) => any>(
 }
 
 export const formatPhoneNumber = (phone: string): string => {
-    let digits = phone.replace(/\D/g, "");
+    const digits = phone.replace(/\D/g, "");
+    let formatted = "";
 
-    if (digits.length === 11 && digits.startsWith("1")) {
-        return `${digits[0]}-${digits.slice(1, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
-    } else if (digits.length === 10) {
-        return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
-    } else {
-        return digits;
+    switch (true) {
+        case digits.length === 11 && digits.startsWith("1"):
+            formatted = `${digits[0]}-${digits.slice(1, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
+            break;
+        case digits.length === 10:
+            formatted = `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+            break;
+        case digits.length > 6:
+            formatted = `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+            break;
+        case digits.length > 3:
+            formatted = `${digits.slice(0, 3)}-${digits.slice(3, 6)}`;
+            break;
+        case digits.length > 0:
+            formatted = digits.slice(0, 3);
+            break;
     }
+
+    return formatted;
 };
 
 interface FormatCurrencyOptions {
