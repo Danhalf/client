@@ -10,10 +10,10 @@ import { AccountsDataTable } from "dashboard/accounts";
 
 const FIELD: keyof AccountInfo = "name";
 
-interface DealSearchProps extends DropdownProps {
-    onRowClick?: (dealName: string) => void;
+interface AccountSearchProps extends DropdownProps {
+    onRowClick?: (accountName: string) => void;
     returnedField?: keyof AccountInfo;
-    getFullInfo?: (deal: AccountInfo) => void;
+    getFullInfo?: (account: AccountInfo) => void;
 }
 
 export const AccountSearch = ({
@@ -24,13 +24,13 @@ export const AccountSearch = ({
     returnedField,
     getFullInfo,
     ...props
-}: DealSearchProps) => {
+}: AccountSearchProps) => {
     const [options, setOptions] = useState<AccountInfo[]>([]);
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
 
-    const handleDealInputChange = async (searchValue: string) => {
+    const handleAccountInputChange = async (searchValue: string) => {
         if (!searchValue.trim()) {
             return;
         }
@@ -47,13 +47,13 @@ export const AccountSearch = ({
         }
     };
 
-    const handleOnRowClick = (dealName: string) => {
-        onRowClick && onRowClick(dealName);
+    const handleOnRowClick = (accountName: string) => {
+        onRowClick && onRowClick(accountName);
         setDialogVisible(false);
     };
 
-    const handleGetFullInfo = (deal: AccountInfo) => {
-        getFullInfo && getFullInfo(deal);
+    const handleGetFullInfo = (account: AccountInfo) => {
+        getFullInfo && getFullInfo(account);
         setDialogVisible(false);
     };
 
@@ -65,7 +65,7 @@ export const AccountSearch = ({
                 optionValue={returnedField || FIELD}
                 optionLabel={FIELD}
                 options={options}
-                onInputChange={handleDealInputChange}
+                onInputChange={handleAccountInputChange}
                 value={value}
                 onChange={onChange}
                 onIconClick={() => {
