@@ -12,6 +12,8 @@ import { TOAST_LIFETIME } from "common/settings";
 import { DateInput } from "dashboard/common/form/inputs";
 import { InputMask } from "primereact/inputmask";
 import { useStore } from "store/hooks";
+import { CompanySearch } from "dashboard/contacts/common/company-search";
+import { DealSearch } from "dashboard/deals/common/deal-search";
 
 const DialogIcon = ({ icon }: { icon: "search" | string }) => {
     return (
@@ -168,22 +170,18 @@ export const AddTaskDialog = ({
                     />
                     <DialogIcon icon='search' />
                 </div>
-                <div className='p-inputgroup flex-1'>
-                    <InputText
-                        placeholder='Deal (optional)'
-                        value={deal}
-                        onChange={(e) => setDeal(e.target.value)}
-                    />
-                    <DialogIcon icon='search' />
-                </div>
-                <div className='p-inputgroup flex-1'>
-                    <InputText
-                        placeholder='Contact'
-                        value={contact}
-                        onChange={(e) => setContact(e.target.value)}
-                    />
-                    <DialogIcon icon='search' />
-                </div>
+
+                <DealSearch
+                    value={deal}
+                    onChange={(e) => setDeal(e.target.value)}
+                    onRowClick={(value) => setDeal(value)}
+                />
+
+                <CompanySearch
+                    value={contact}
+                    onChange={(e) => setContact(e.target.value)}
+                    onRowClick={(value) => setContact(value)}
+                />
                 <InputMask
                     type='tel'
                     mask='999-999-9999'
