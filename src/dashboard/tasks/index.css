@@ -40,4 +40,8 @@
       padding-bottom: 0;
     }
   }
+
+  .expanded-row__label {
+    flex: 0 1 13.5%;
+  }
 }
