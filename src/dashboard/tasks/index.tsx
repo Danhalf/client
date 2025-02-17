@@ -6,6 +6,7 @@ import {
     DataTablePageEvent,
     DataTableRowClickEvent,
     DataTableSortEvent,
+    DataTableValue,
 } from "primereact/datatable";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
@@ -87,6 +88,7 @@ export const TasksDataTable = observer(
         const [myTasksOnly, setMyTasksOnly] = useState<boolean>(false);
         const [, setSelectedFilterOptions] = useState<FilterOptions[] | null>(null);
         const [selectedFilter, setSelectedFilter] = useState<Pick<FilterOptions, "value">[]>([]);
+        const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
 
         const handleGetTasks = async (params?: QueryParams) => {
             const responseTotal = await getTasksByUserId(authUser!.useruid, { total: 1 });
@@ -277,6 +279,14 @@ export const TasksDataTable = observer(
             );
         };
 
+        const handleRowExpansionClick = (data: Task) => {
+            if (expandedRows.includes(data)) {
+                setExpandedRows(expandedRows.filter((item) => item !== data));
+                return;
+            }
+            setExpandedRows([...expandedRows, data]);
+        };
+
         return (
             <div className='card-content tasks'>
                 <div className='grid datatable-controls'>
@@ -394,12 +404,45 @@ export const TasksDataTable = observer(
                                 rowClassName={() => "hover:text-primary cursor-pointer"}
                                 onRowClick={handleOnRowClick}
                             >
+                                <Column
+                                    bodyStyle={{ textAlign: "center" }}
+                                    reorderable={false}
+                                    resizeable={false}
+                                    body={(options, { rowIndex }) => {
+                                        return (
+                                            <div className={`flex gap-3 align-items-center`}>
+                                                <Button
+                                                    className='text export-web__icon-button'
+                                                    icon='icon adms-edit-item'
+                                                />
+                                                <Button
+                                                    className='text export-web__icon-button'
+                                                    icon='pi pi-angle-down'
+                                                    onClick={() => handleRowExpansionClick(options)}
+                                                />
+                                            </div>
+                                        );
+                                    }}
+                                    pt={{
+                                        root: {
+                                            style: {
+                                                width: "100px",
+                                            },
+                                        },
+                                    }}
+                                />
                                 {renderColumnsData.map(({ field, header }) => (
                                     <Column
                                         field={field}
                                         header={header}
                                         key={field}
                                         sortable
+                                        body={(data) => {
+                                            let value: string | number;
+                                            value = data[field];
+
+                                            return <div>{value}</div>;
+                                        }}
                                         headerClassName='cursor-move'
                                     />
                                 ))}
