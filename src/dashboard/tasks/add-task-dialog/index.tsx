@@ -17,6 +17,9 @@ import { PostDataTask, Task, TaskUser } from "common/models/tasks";
 import { formatDateForServer } from "common/helpers";
 import "./index.css";
 import { observer } from "mobx-react-lite";
+import { ContactUser } from "common/models/contact";
+import { Deal } from "common/models/deals";
+import { Account } from "common/models/accounts";
 
 interface AddTaskDialogProps extends DialogProps {
     currentTask?: Task;
@@ -27,9 +30,12 @@ const initializeTaskState = (task?: Task): Partial<PostDataTask> => ({
     startdate: formatDateForServer(task?.startdate ? new Date(task.startdate) : new Date()),
     deadline: formatDateForServer(task?.deadline ? new Date(task.deadline) : new Date()),
     useruid: task?.useruid || "",
-    accountuid: task?.accountname || task?.accountuid || "",
-    dealuid: task?.dealname || task?.dealuid || "",
-    contactuid: task?.contactname || task?.contactuid || "",
+    accountuid: task?.accountuid || "",
+    accountname: task?.accountname || "",
+    dealuid: task?.dealuid || "",
+    dealname: task?.dealname || "",
+    contactuid: task?.contactuid || "",
+    contactname: task?.contactname || "",
     phone: task?.phone || "",
     description: task?.description || "",
 });
@@ -121,6 +127,26 @@ export const AddTaskDialog = observer(
             setIsSaving(false);
         };
 
+        const handleGetAccountInfo = (account: Account) => {
+            handleInputChange("accountuid", account.accountuid);
+            handleInputChange("accountname", account.name);
+        };
+
+        const handleGetCompanyInfo = (contact: ContactUser) => {
+            handleInputChange("contactuid", contact.contactuid);
+            handleInputChange(
+                "contactname",
+                contact.companyName ||
+                    `${contact.firstName} ${contact.lastName}`.trim() ||
+                    contact.userName
+            );
+        };
+
+        const handleGetDealInfo = (deal: Deal) => {
+            handleInputChange("dealuid", deal.dealuid);
+            handleInputChange("dealname", deal.contactinfo);
+        };
+
         return (
             <DashboardDialog
                 position='top'
@@ -176,23 +202,23 @@ export const AddTaskDialog = observer(
                     </div>
 
                     <AccountSearch
-                        value={taskState.accountuid || ""}
-                        onChange={(e) => handleInputChange("accountuid", e.target.value)}
-                        onRowClick={(value) => handleInputChange("accountuid", value)}
+                        value={taskState.accountname?.trim() || taskState.accountuid || ""}
+                        onRowClick={(value) => handleInputChange("accountname", value)}
+                        getFullInfo={handleGetAccountInfo}
                         name='Account (optional)'
                     />
 
                     <DealSearch
-                        value={taskState.dealuid || ""}
-                        onChange={(e) => handleInputChange("dealuid", e.target.value)}
-                        onRowClick={(value) => handleInputChange("dealuid", value)}
+                        value={taskState.dealname?.trim() || taskState.dealuid || ""}
+                        onRowClick={(value) => handleInputChange("dealname", value)}
+                        getFullInfo={handleGetDealInfo}
                         name='Deal (optional)'
                     />
 
                     <CompanySearch
-                        value={taskState.contactuid || ""}
-                        onChange={(e) => handleInputChange("contactuid", e.target.value)}
-                        onRowClick={(value) => handleInputChange("contactuid", value)}
+                        value={taskState.contactname?.trim() || taskState.contactuid || ""}
+                        onRowClick={(value) => handleInputChange("contactname", value)}
+                        getFullInfo={handleGetCompanyInfo}
                         name='Contact'
                     />
                     <InputMask
