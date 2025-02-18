@@ -117,7 +117,7 @@ export const AddTaskDialog = observer(
                 toast.current?.show({
                     severity: "success",
                     summary: "Success",
-                    detail: "Task created successfully!",
+                    detail: `Task ${currentTask ? "updated" : "created"} successfully!`,
                     life: TOAST_LIFETIME,
                 });
                 onHide();
