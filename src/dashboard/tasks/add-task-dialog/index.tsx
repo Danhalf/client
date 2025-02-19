@@ -14,7 +14,7 @@ import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { DealSearch } from "dashboard/deals/common/deal-search";
 import { AccountSearch } from "dashboard/accounts/common/account-search";
 import { PostDataTask, Task, TaskUser } from "common/models/tasks";
-import { formatDateForServer } from "common/helpers";
+import { formatDateForServer, validateDates } from "common/helpers";
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { ContactUser } from "common/models/contact";
@@ -54,12 +54,15 @@ export const AddTaskDialog = observer(
         const isSubmitDisabled =
             !taskState.description?.trim() || !!dateError || !isFormChanged || isSaving;
 
+        const handleGetTasksSubUserList = async () => {
+            const response = await getTasksSubUserList(authUser!.useruid);
+            if (response && Array.isArray(response)) setAssignToData(response);
+            setTaskState(initializeTaskState(currentTask));
+        };
+
         useEffect(() => {
             if (authUser && visible) {
-                getTasksSubUserList(authUser.useruid).then((response) => {
-                    if (response && Array.isArray(response)) setAssignToData(response);
-                });
-                setTaskState(initializeTaskState(currentTask));
+                handleGetTasksSubUserList();
             }
         }, [visible, currentTask]);
 
@@ -71,15 +74,6 @@ export const AddTaskDialog = observer(
                 setAssignToData(null);
             }
         }, [visible]);
-
-        const validateDates = (start: string, due: string) => {
-            if (new Date(start) > new Date(due)) {
-                setDateError("Start Date must be before Due Date");
-                return false;
-            }
-            setDateError("");
-            return true;
-        };
 
         const handleDateChange = (key: "startdate" | "deadline", date: Date) => {
             const formattedDate = formatDateForServer(date);
