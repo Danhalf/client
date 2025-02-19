@@ -10,6 +10,7 @@ import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
 import { TaskSummaryDialog } from "dashboard/tasks/task-summary";
 import "./index.css";
 import { renderTaskStatus } from "dashboard/tasks/common";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 const DEFAULT_TASK_COUNT = 4;
 
@@ -19,6 +20,7 @@ export const TasksWidget = observer(() => {
     const { authUser } = userStore;
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
     const [showEditTaskDialog, setShowEditTaskDialog] = useState<boolean>(false);
+    const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
     const [checkboxDisabled, setCheckboxDisabled] = useState<boolean>(false);
     const [currentTask, setCurrentTask] = useState<Task | null>(null);
     const [checkboxStates, setCheckboxStates] = useState<{ [key: string]: boolean }>({});
@@ -81,6 +83,11 @@ export const TasksWidget = observer(() => {
         !!currentTask &&
         (currentTask.parentuid === authUser!.useruid || currentTask.useruid === authUser!.useruid);
 
+    const handleStatusChange = (task: Task) => {
+        setCurrentTask(task);
+        setShowConfirmModal(true);
+    };
+
     return (
         <div className='tasks-widget'>
             <div className='tasks-widget-header flex justify-content-between align-items-center'>
@@ -108,7 +115,7 @@ export const TasksWidget = observer(() => {
                                     name='task'
                                     disabled={checkboxDisabled}
                                     checked={checkboxStates[task.itemuid] || false}
-                                    onChange={() => handleTaskStatusChange(task.itemuid)}
+                                    onChange={() => handleStatusChange(task)}
                                 />
                                 <label
                                     className='ml-2 cursor-pointer tasks-widget__label'
@@ -119,7 +126,7 @@ export const TasksWidget = observer(() => {
                                             task.username ?? `- ${task.username}`
                                         }`}
                                 </label>
-                                {renderTaskStatus(TaskStatus.POSTPONED)}
+                                {renderTaskStatus(task.task_status)}
                             </li>
                         );
                     })
@@ -128,7 +135,7 @@ export const TasksWidget = observer(() => {
                 )}
                 {allTasksCount > DEFAULT_TASK_COUNT && (
                     <li className='p-0'>
-                        <Button className='tasks__button messages-more' text>
+                        <Button className='tasks-widget__button messages-more' text>
                             View more...
                         </Button>
                     </li>
@@ -157,6 +164,18 @@ export const TasksWidget = observer(() => {
                         header='Task summary'
                     />
                 )}
+                <ConfirmModal
+                    position='top'
+                    visible={showConfirmModal}
+                    onHide={() => setShowConfirmModal(false)}
+                    bodyMessage='Are you sure you want to mark this task as completed?'
+                    title='Mark as done?'
+                    confirmAction={() => handleTaskStatusChange(currentTask!.itemuid)}
+                    rejectLabel='Cancel'
+                    acceptLabel='Confirm'
+                    icon='pi pi-check-circle'
+                    className='tasks-widget__confirm-modal'
+                />
             </div>
 
             <Toast ref={toast} />

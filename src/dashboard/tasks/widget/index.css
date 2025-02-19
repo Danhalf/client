@@ -1,5 +1,5 @@
-.tasks {
-    .tasks__button.messages-more.p-button {
+.tasks-widget {
+    .tasks-widget__button.messages-more.p-button {
         color: var(--admss-app-main-blue);
         padding-left: 0;
 
@@ -10,7 +10,7 @@
 }
 
 .empty-list,
-.tasks-count.empty-list {
+.tasks-widget-count.empty-list {
     color: var(--admss-app-medium-grey);
 }
 
@@ -28,14 +28,14 @@
 
 }
 
-.tasks-count {
+.tasks-widget-count {
     font-size: 18px;
     font-weight: 600;
     color: var(--admss-app-main-blue);
     margin-left: 6px;
 }
 
-.tasks-header {
+.tasks-widget-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -84,5 +84,29 @@
     &.tasks-widget__chip--postponed {
         border-color: var(--admss-app-warning-yellow);
         color: var(--admss-app-warning-yellow);
+    }
+}
+
+.tasks-widget__confirm-modal {
+    width: 380px;
+    height: 452px;
+
+    .confirm-header__icon {
+        color: var(--admss-app-primary-main-green);
+    }
+
+    .confirm-body {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .p-dialog-footer .p-button {
+        padding: 0;
+        height: 60px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 130px;
+        font-size: 20px;
     }
 }
