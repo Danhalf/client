@@ -70,21 +70,6 @@
     border-style: solid;
     padding: 0 8px;
     margin: 0 6px;
-
-    &.tasks-widget__chip--paused {
-        border-color: var(--admss-app-status-yellow);
-        color: var(--admss-app-status-yellow);
-    }
-
-    &.tasks-widget__chip--in-progress {
-        border-color: var(--admss-app-warning-blue);
-        color: var(--admss-app-warning-blue);
-    }
-
-    &.tasks-widget__chip--postponed {
-        border-color: var(--admss-app-warning-yellow);
-        color: var(--admss-app-warning-yellow);
-    }
 }
 
 .tasks-widget__confirm-modal {

@@ -27,21 +27,21 @@ export const renderTaskStatus = (task_status: TaskStatus) => {
             return (
                 <Chip
                     label={TaskStatus.IN_PROGRESS}
-                    className='tasks-widget__chip tasks-widget__chip--in-progress'
+                    className='tasks-widget__chip task-status--in-progress'
                 />
             );
         case TaskStatus.PAUSED:
             return (
                 <Chip
                     label={TaskStatus.PAUSED}
-                    className='tasks-widget__chip tasks-widget__chip--paused'
+                    className='tasks-widget__chip task-status--paused'
                 />
             );
         case TaskStatus.POSTPONED:
             return (
                 <Chip
                     label={TaskStatus.POSTPONED}
-                    className='tasks-widget__chip tasks-widget__chip--postponed'
+                    className='tasks-widget__chip task-status--postponed'
                 />
             );
     }
