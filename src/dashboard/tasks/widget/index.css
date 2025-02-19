@@ -14,6 +14,20 @@
     color: var(--admss-app-medium-grey);
 }
 
+.tasks-widget__item {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+
+    .tasks-widget__label {
+        font-size: 18px;
+        font-weight: 400;
+        color: var(--admss-app-blue-text);
+        line-height: 24.5px;
+    }
+
+}
+
 .tasks-count {
     font-size: 18px;
     font-weight: 600;
@@ -37,5 +51,38 @@
     .p-button-icon {
         font-size: 20px;
         font-weight: 900;
+    }
+}
+
+.tasks-widget__chip {
+    display: inline-flex;
+    cursor: default;
+    user-select: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    height: 20px;
+    background-color: transparent;
+    border-width: 1px;
+    border-style: solid;
+    padding: 0 8px;
+    margin: 0 6px;
+
+    &.tasks-widget__chip--paused {
+        border-color: var(--admss-app-status-yellow);
+        color: var(--admss-app-status-yellow);
+    }
+
+    &.tasks-widget__chip--in-progress {
+        border-color: var(--admss-app-warning-blue);
+        color: var(--admss-app-warning-blue);
+    }
+
+    &.tasks-widget__chip--postponed {
+        border-color: var(--admss-app-warning-yellow);
+        color: var(--admss-app-warning-yellow);
     }
 }

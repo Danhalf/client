@@ -9,6 +9,7 @@ import { Task, TaskStatus } from "common/models/tasks";
 import { AddTaskDialog } from "dashboard/tasks/add-task-dialog";
 import { TaskSummaryDialog } from "dashboard/tasks/task-summary";
 import "./index.css";
+import { renderTaskStatus } from "dashboard/tasks/common";
 
 const DEFAULT_TASK_COUNT = 4;
 
@@ -99,7 +100,10 @@ export const TasksWidget = observer(() => {
                 {tasks.length ? (
                     tasks.map((task) => {
                         return (
-                            <li key={`${task.itemuid}-${task.index}`} className='mb-2'>
+                            <li
+                                key={`${task.itemuid}-${task.index}`}
+                                className='mb-2 tasks-widget__item'
+                            >
                                 <Checkbox
                                     name='task'
                                     disabled={checkboxDisabled}
@@ -107,7 +111,7 @@ export const TasksWidget = observer(() => {
                                     onChange={() => handleTaskStatusChange(task.itemuid)}
                                 />
                                 <label
-                                    className='ml-2 cursor-pointer'
+                                    className='ml-2 cursor-pointer tasks-widget__label'
                                     onClick={() => handleEditTask(task)}
                                 >
                                     {task.taskname ||
@@ -115,6 +119,7 @@ export const TasksWidget = observer(() => {
                                             task.username ?? `- ${task.username}`
                                         }`}
                                 </label>
+                                {renderTaskStatus(TaskStatus.POSTPONED)}
                             </li>
                         );
                     })
