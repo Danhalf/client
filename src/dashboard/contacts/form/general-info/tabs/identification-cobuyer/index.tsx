@@ -23,6 +23,7 @@ import uploadImage from "assets/images/upload.svg";
 import { Image } from "primereact/image";
 import { InputMask } from "primereact/inputmask";
 import { BaseResponseError, Status } from "common/models/base-response";
+import "./index.css";
 
 const SexList = [
     {
@@ -44,7 +45,7 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
     const {
         contact,
         contactExtData,
-        changeContact,
+        changeCobuyerContact,
         changeContactExtData,
         coBuyerFrontSideDL,
         coBuyerBackSideDL,
@@ -86,11 +87,11 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
         if (side === DLSides.FRONT) {
             coBuyerFileUploadFrontRef.current?.clear();
             store.coBuyerFrontSideDL = {} as File;
-            changeContact("dluidfront", "");
+            changeCobuyerContact("dluidfront", "");
         } else {
             coBuyerFileUploadBackRef.current?.clear();
             store.coBuyerBackSideDL = {} as File;
-            changeContact("dluidback", "");
+            changeCobuyerContact("dluidback", "");
         }
 
         if (withRequest) {
@@ -118,8 +119,7 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
     const itemTemplate = (image: File | string, side: DLSide) => {
         const isFilePath = typeof image === "string";
         const alt = isFilePath ? "driven license" : image?.name;
-        const src =
-            side === DLSides.FRONT ? store.coBuyerFrontSideDLurl : store.coBuyerBackSideDLurl;
+        const src = isFilePath ? image : URL.createObjectURL(image);
         return (
             <div className='flex align-items-center dl-presentation relative'>
                 <Image

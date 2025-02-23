@@ -119,7 +119,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
     const itemTemplate = (image: File | string, side: DLSide) => {
         const isFilePath = typeof image === "string";
         const alt = isFilePath ? "driven license" : image?.name;
-        const src = side === DLSides.FRONT ? store.frontSideDLurl : store.backSideDLurl;
+        const src = isFilePath ? image : URL.createObjectURL(image);
         return (
             <div className='flex align-items-center dl-presentation relative'>
                 <Image
