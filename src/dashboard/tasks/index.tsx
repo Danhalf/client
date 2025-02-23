@@ -495,12 +495,12 @@ export const TasksDataTable = observer(
                                     pt={{
                                         root: {
                                             style: {
-                                                width: "100px",
+                                                width: "80px",
                                             },
                                         },
                                     }}
                                 />
-                                {alwaysActiveColumns.map(({ field, header }) => (
+                                {alwaysActiveColumns.map(({ field, header }, index) => (
                                     <Column
                                         field={field}
                                         header={header}
@@ -512,6 +512,13 @@ export const TasksDataTable = observer(
                                             return <div>{value}</div>;
                                         }}
                                         headerClassName='cursor-move'
+                                        pt={{
+                                            root: {
+                                                style: {
+                                                    borderLeft: index === 0 ? "none" : "",
+                                                },
+                                            },
+                                        }}
                                     />
                                 ))}
 
