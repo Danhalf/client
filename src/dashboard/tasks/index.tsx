@@ -51,7 +51,7 @@ const selectableColumns: TableColumnsList[] = [
 
 enum SEARCH_FORM_FIELDS {
     CREATION_DATE = "Creation Date",
-    DESCRIPTION = "Description",
+    DESCRIPTION = "Description (keywords)",
 }
 
 enum SEARCH_FORM_QUERY {
@@ -170,7 +170,7 @@ export const TasksDataTable = observer(
                 key: SEARCH_FORM_FIELDS.DESCRIPTION,
                 label: SEARCH_FORM_FIELDS.DESCRIPTION,
                 value: advancedSearch?.[SEARCH_FORM_FIELDS.DESCRIPTION],
-                type: "text",
+                type: "textarea",
             },
         ];
 
@@ -397,7 +397,7 @@ export const TasksDataTable = observer(
                                 e.stopPropagation();
                                 setSelectedStatusFilters(e.value);
                             }}
-                            placeholder='Filter'
+                            placeholder='Status'
                             className='pb-0 flex align-items-center tasks-filter'
                             display='chip'
                             selectedItemsLabel='Clear Filter'
