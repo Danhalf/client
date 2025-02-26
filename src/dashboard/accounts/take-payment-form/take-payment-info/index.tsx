@@ -20,9 +20,9 @@ export const TakePaymentInfo = observer((): ReactElement => {
     } = store;
     const toast = useToast();
 
-    const handleSaveNote = (saveItem: keyof AccountNoteData) => {
+    const handleSaveNote = (saveItem: keyof AccountNoteData, value: string) => {
         id &&
-            updateAccountNote(id, { [saveItem]: accountNote[saveItem] }).then((res) => {
+            updateAccountNote(id, { [saveItem]: value }).then((res) => {
                 if (res?.status === Status.ERROR) {
                     toast.current?.show({
                         severity: "error",
@@ -114,10 +114,10 @@ export const TakePaymentInfo = observer((): ReactElement => {
                 id='account-memo'
                 value={accountNote.note}
                 label='Account Memo'
-                onSave={() => handleSaveNote("note")}
+                onSave={() => handleSaveNote("note", accountNote.note)}
                 onClear={() => {
                     store.accountNote = { ...accountNote, note: "" };
-                    handleSaveNote("note");
+                    handleSaveNote("note", "");
                 }}
                 onChange={(value) => (store.accountNote = { ...accountNote, note: value })}
             />
@@ -126,10 +126,10 @@ export const TakePaymentInfo = observer((): ReactElement => {
                 value={accountNote.alert}
                 className='mt-4'
                 label='Payment Alert'
-                onSave={() => handleSaveNote("alert")}
+                onSave={() => handleSaveNote("alert", accountNote.alert)}
                 onClear={() => {
                     store.accountNote = { ...accountNote, alert: "" };
-                    handleSaveNote("alert");
+                    handleSaveNote("alert", "");
                 }}
                 onChange={(value) => (store.accountNote = { ...accountNote, alert: value })}
             />

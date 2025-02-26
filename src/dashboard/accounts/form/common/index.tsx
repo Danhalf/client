@@ -102,71 +102,64 @@ interface NoteEditorProps {
     className?: string;
 }
 
-export const NoteEditor = ({
-    id,
-    value,
-    label,
-    onSave,
-    onClear,
-    onChange,
-    className,
-}: NoteEditorProps): ReactElement => {
-    const [initialValue, setInitialValue] = useState<string>(value);
+export const NoteEditor = observer(
+    ({ id, value, label, onSave, onClear, onChange, className }: NoteEditorProps): ReactElement => {
+        const [initialValue, setInitialValue] = useState<string>(value);
 
-    useEffect(() => {
-        value || setInitialValue(value);
-        return () => setInitialValue("");
-    }, [value]);
+        useEffect(() => {
+            setInitialValue(value);
+        }, [value]);
 
-    const hasChanges = value !== initialValue;
-    const handleClear = () => {
-        onClear();
-        setInitialValue("");
-    };
+        const hasChanges = value !== initialValue;
+        const handleClear = () => {
+            setInitialValue("");
+            onClear();
+        };
 
-    return (
-        <div className={`account-note ${className || ""}`}>
-            <span className='p-float-label'>
-                <InputTextarea
-                    id={id}
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    className='account-note__input'
-                />
-                <label htmlFor={id}>{label}</label>
-            </span>
-            {initialValue ? (
-                <div className='account-note__buttons'>
-                    <Button
-                        className='account-note__button'
-                        label='Clear'
-                        outlined
-                        onClick={handleClear}
+        return (
+            <div className={`account-note ${className || ""}`}>
+                <span className='p-float-label'>
+                    <InputTextarea
+                        id={id}
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        className='account-note__input'
                     />
+                    <label htmlFor={id}>{label}</label>
+                </span>
+                {initialValue ? (
+                    <div className='account-note__buttons'>
+                        <Button
+                            className='account-note__button'
+                            label='Clear'
+                            outlined
+                            onClick={handleClear}
+                        />
+                        <Button
+                            className='account-note__button'
+                            label='Update'
+                            outlined
+                            disabled={!hasChanges}
+                            severity={hasChanges ? "success" : "secondary"}
+                            onClick={() => {
+                                onSave();
+                                setInitialValue(value);
+                            }}
+                        />
+                    </div>
+                ) : (
                     <Button
+                        severity={value ? "success" : "secondary"}
                         className='account-note__button'
-                        label='Update'
-                        outlined
-                        disabled={!hasChanges}
-                        severity={hasChanges ? "success" : "secondary"}
+                        label='Save'
+                        disabled={!value}
                         onClick={() => {
                             onSave();
                             setInitialValue(value);
                         }}
                     />
-                </div>
-            ) : (
-                <Button
-                    severity={value ? "success" : "secondary"}
-                    className='account-note__button'
-                    label='Save'
-                    disabled={!value}
-                    onClick={() => {
-                        onSave();
-                        setInitialValue(value);
-                    }}
-                />
-            )}
-        </div>
-    );
-};
+                )}
+            </div>
+        );
+    }
+);
