@@ -1,5 +1,5 @@
 import { Button, ButtonProps } from "primereact/button";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import { Tooltip } from "primereact/tooltip";
 
 import "./index.css";
@@ -102,18 +102,33 @@ interface NoteEditorProps {
     className?: string;
 }
 
+interface NoteEditorProps {
+    id: string;
+    value: string;
+    label: string;
+    onSave: () => void;
+    onClear: () => void;
+    onChange: (value: string) => void;
+    className?: string;
+}
+
+interface NoteEditorProps {
+    id: string;
+    value: string;
+    label: string;
+    onSave: () => void;
+    onClear: () => void;
+    onChange: (value: string) => void;
+    className?: string;
+}
+
 export const NoteEditor = observer(
     ({ id, value, label, onSave, onClear, onChange, className }: NoteEditorProps): ReactElement => {
-        const [initialValue, setInitialValue] = useState<string>(value);
+        const [isEditing, setIsEditing] = useState<boolean>(false);
 
-        useEffect(() => {
-            setInitialValue(value);
-        }, [value]);
-
-        const hasChanges = value !== initialValue;
         const handleClear = () => {
-            setInitialValue("");
             onClear();
+            setIsEditing(false);
         };
 
         return (
@@ -122,12 +137,26 @@ export const NoteEditor = observer(
                     <InputTextarea
                         id={id}
                         value={value}
-                        onChange={(e) => onChange(e.target.value)}
+                        onChange={(e) => {
+                            setIsEditing(true);
+                            onChange(e.target.value);
+                        }}
                         className='account-note__input'
                     />
                     <label htmlFor={id}>{label}</label>
                 </span>
-                {initialValue ? (
+                {value === "" && !isEditing ? (
+                    <Button
+                        severity={value ? "success" : "secondary"}
+                        className='account-note__button'
+                        label='Save'
+                        disabled={!value}
+                        onClick={() => {
+                            onSave();
+                            setIsEditing(false);
+                        }}
+                    />
+                ) : (
                     <div className='account-note__buttons'>
                         <Button
                             className='account-note__button'
@@ -139,25 +168,14 @@ export const NoteEditor = observer(
                             className='account-note__button'
                             label='Update'
                             outlined
-                            disabled={!hasChanges}
-                            severity={hasChanges ? "success" : "secondary"}
+                            disabled={!isEditing}
+                            severity={isEditing ? "success" : "secondary"}
                             onClick={() => {
                                 onSave();
-                                setInitialValue(value);
+                                setIsEditing(false);
                             }}
                         />
                     </div>
-                ) : (
-                    <Button
-                        severity={value ? "success" : "secondary"}
-                        className='account-note__button'
-                        label='Save'
-                        disabled={!value}
-                        onClick={() => {
-                            onSave();
-                            setInitialValue(value);
-                        }}
-                    />
                 )}
             </div>
         );

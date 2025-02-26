@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoSection } from "dashboard/accounts/form/information/info-section";
 import { useStore } from "store/hooks";
@@ -6,7 +6,7 @@ import { AccountNoteData } from "store/stores/account";
 import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { updateAccountNote } from "http/services/accounts.service";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { TOAST_LIFETIME } from "common/settings";
 import { AppColors } from "common/models/css-variables";
 import { NoteEditor } from "dashboard/accounts/form/common";
@@ -16,9 +16,17 @@ export const TakePaymentInfo = observer((): ReactElement => {
     const store = useStore().accountStore;
     const {
         accountNote,
+        getNotes,
         accountPaymentsInfo: { CurrentStatus, CollectionDetails },
     } = store;
     const toast = useToast();
+    const location = useLocation();
+
+    useEffect(() => {
+        if (id) {
+            getNotes(id);
+        }
+    }, [id, location.pathname]);
 
     const handleSaveNote = (saveItem: keyof AccountNoteData, value: string) => {
         id &&
