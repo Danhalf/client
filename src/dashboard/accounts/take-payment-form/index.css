@@ -167,22 +167,22 @@
     height: 100%;
 
     .account-note {
-        margin-bottom: 20px;
         height: 156px;
-
-        .account-note__button.p-button {
-            height: 40px;
-        }
+        position: relative;
+        border-bottom: none;
     }
+
+    .account-note:first-child {
+        margin-bottom: 30px;
+    }
+
+
 }
 
 .take-payment .form-line {
     margin: 12px 0;
 }
 
-.take-payment .account-note__input {
-    height: 114px;
-}
 
 .take-payment__info .info-section {
     margin-bottom: 30px;
