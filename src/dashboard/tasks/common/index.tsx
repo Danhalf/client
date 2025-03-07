@@ -41,7 +41,7 @@ export const tasksFilterOptions: FilterOptions[] = [
     { label: TaskStatus.DELETED, value: "deleted", column: "status" },
 ];
 
-const statusStyles = TASKS_STATUS_LIST.reduce(
+const statusClassNames = TASKS_STATUS_LIST.reduce(
     (acc, { code, name }) => ({
         ...acc,
         [code]: name.toLowerCase().replace(" ", "-"),
@@ -50,7 +50,9 @@ const statusStyles = TASKS_STATUS_LIST.reduce(
 );
 
 export const renderTaskStatus = (statuscode: number) => {
-    const style = statusStyles[statuscode] || "default";
+    const currentTaskClassName = statusClassNames[statuscode] || TaskStatus.DEFAULT.toLowerCase();
     const label = TASKS_STATUS_LIST.find((s) => s.code === statuscode)?.name || TaskStatus.DEFAULT;
-    return <Chip label={label} className={`tasks-widget__chip task-status--${style}`} />;
+    return (
+        <Chip label={label} className={`tasks-widget__chip task-status--${currentTaskClassName}`} />
+    );
 };
