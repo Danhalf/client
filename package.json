@@ -61,7 +61,8 @@
       "@typescript-eslint/no-unused-vars": "warn",
       "no-unused-vars": "warn",
       "no-console": "error",
-      "react-hooks/exhaustive-deps": "off"
+      "react-hooks/exhaustive-deps": "off",
+      "eol-last": ["error", "always"]
     }
   },
   "browserslist": {

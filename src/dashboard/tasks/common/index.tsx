@@ -30,117 +30,27 @@ export const TASKS_STATUS_LIST: TasksFilterOptions[] = [
 ];
 
 export const tasksFilterOptions: FilterOptions[] = [
-    {
-        label: TaskStatus.DEFAULT,
-        value: "default",
-        column: "status",
-    },
-    {
-        label: TaskStatus.STARTED,
-        value: "started",
-        column: "status",
-    },
-    {
-        label: TaskStatus.IN_PROGRESS,
-        value: "inProgress",
-        column: "status",
-    },
-    {
-        label: TaskStatus.CANCELLED,
-        value: "cancelled",
-        column: "status",
-    },
-    {
-        label: TaskStatus.POSTPONED,
-        value: "postponed",
-        column: "status",
-    },
-    {
-        label: TaskStatus.PAUSED,
-        value: "paused",
-        column: "status",
-    },
-    {
-        label: TaskStatus.COMPLETED,
-        value: "completed",
-        column: "status",
-    },
-    {
-        label: TaskStatus.OUTDATED,
-        value: "outdated",
-        column: "status",
-    },
-    {
-        label: TaskStatus.DELETED,
-        value: "deleted",
-        column: "status",
-    },
+    { label: TaskStatus.DEFAULT, value: "default", column: "status" },
+    { label: TaskStatus.STARTED, value: "started", column: "status" },
+    { label: TaskStatus.IN_PROGRESS, value: "inProgress", column: "status" },
+    { label: TaskStatus.CANCELLED, value: "cancelled", column: "status" },
+    { label: TaskStatus.POSTPONED, value: "postponed", column: "status" },
+    { label: TaskStatus.PAUSED, value: "paused", column: "status" },
+    { label: TaskStatus.COMPLETED, value: "completed", column: "status" },
+    { label: TaskStatus.OUTDATED, value: "outdated", column: "status" },
+    { label: TaskStatus.DELETED, value: "deleted", column: "status" },
 ];
 
-export const renderTaskStatus = (task_status: TaskStatus) => {
-    switch (task_status) {
-        case TaskStatus.IN_PROGRESS:
-            return (
-                <Chip
-                    label={TaskStatus.IN_PROGRESS}
-                    className='tasks-widget__chip task-status--in-progress'
-                />
-            );
-        case TaskStatus.PAUSED:
-            return (
-                <Chip
-                    label={TaskStatus.PAUSED}
-                    className='tasks-widget__chip task-status--paused'
-                />
-            );
-        case TaskStatus.POSTPONED:
-            return (
-                <Chip
-                    label={TaskStatus.POSTPONED}
-                    className='tasks-widget__chip task-status--postponed'
-                />
-            );
-        case TaskStatus.STARTED:
-            return (
-                <Chip
-                    label={TaskStatus.STARTED}
-                    className='tasks-widget__chip task-status--started'
-                />
-            );
-        case TaskStatus.COMPLETED:
-            return (
-                <Chip
-                    label={TaskStatus.COMPLETED}
-                    className='tasks-widget__chip task-status--completed'
-                />
-            );
-        case TaskStatus.CANCELLED:
-            return (
-                <Chip
-                    label={TaskStatus.CANCELLED}
-                    className='tasks-widget__chip task-status--cancelled'
-                />
-            );
-        case TaskStatus.OUTDATED:
-            return (
-                <Chip
-                    label={TaskStatus.OUTDATED}
-                    className='tasks-widget__chip task-status--outdated'
-                />
-            );
-        case TaskStatus.DELETED:
-            return (
-                <Chip
-                    label={TaskStatus.DELETED}
-                    className='tasks-widget__chip task-status--deleted'
-                />
-            );
-        default:
-            return (
-                <Chip
-                    label={TaskStatus.DEFAULT}
-                    className='tasks-widget__chip task-status--default'
-                />
-            );
-    }
+const statusStyles = TASKS_STATUS_LIST.reduce(
+    (acc, { code, name }) => ({
+        ...acc,
+        [code]: name.toLowerCase().replace(" ", "-"),
+    }),
+    {} as Record<number, string>
+);
+
+export const renderTaskStatus = (statuscode: number) => {
+    const style = statusStyles[statuscode] || "default";
+    const label = TASKS_STATUS_LIST.find((s) => s.code === statuscode)?.name || TaskStatus.DEFAULT;
+    return <Chip label={label} className={`tasks-widget__chip task-status--${style}`} />;
 };

@@ -1,7 +1,7 @@
 import { BaseResponseError } from "common/models/base-response";
 
 export enum TaskStatus {
-    DEFAULT = "Default1",
+    DEFAULT = "Default",
     STARTED = "Started",
     IN_PROGRESS = "In Progress",
     CANCELLED = "Cancelled",
