@@ -118,7 +118,7 @@ export const Home = (): ReactElement => {
                         </dl>
                         <dl className='contact-item flex'>
                             <dt className='contact-item__label'>Date & time:</dt>
-                            <dd>02, March 2025</dd>
+                            <dd>26, April 2023</dd>
                         </dl>
                     </div>
                 </div>

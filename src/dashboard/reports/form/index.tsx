@@ -212,7 +212,7 @@ export const ReportForm = observer((): ReactElement => {
         });
     };
 
-    const showSuccessToast = (detail: string) => {
+    const showSuccess = (detail: string) => {
         toast.current?.show({
             severity: "success",
             summary: TOAST_MESSAGES.SUCCESS,
@@ -277,7 +277,7 @@ export const ReportForm = observer((): ReactElement => {
                 if (response?.error) {
                     showError(response.error);
                 } else {
-                    showSuccessToast(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                    showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
                 }
             }
         }
@@ -299,7 +299,7 @@ export const ReportForm = observer((): ReactElement => {
                 if (response && response.status === Status.ERROR) {
                     showError(response.error);
                 } else {
-                    showSuccessToast(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
+                    showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
                 }
             }
         }
@@ -311,7 +311,7 @@ export const ReportForm = observer((): ReactElement => {
                 if (response && response.status === Status.ERROR) {
                     showError(response.error);
                 } else {
-                    showSuccessToast(TOAST_MESSAGES.COLLECTION_REORDERED_SUCCESS);
+                    showSuccess(TOAST_MESSAGES.COLLECTION_REORDERED_SUCCESS);
                 }
             }
         }
