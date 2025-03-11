@@ -49,7 +49,6 @@ export const AccountAdjustments = observer((): ReactElement => {
                     className={`take-payment__input ${
                         fieldChanged["AdjDate"] ? "input-change" : ""
                     }`}
-                    value={AdjDate?.toString()}
                     date={Number(AdjDate)}
                     onChange={({ target: { value } }) => {
                         markFieldChanged("AdjDate");
