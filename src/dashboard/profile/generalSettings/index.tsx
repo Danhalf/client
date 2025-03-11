@@ -1,17 +1,18 @@
-import { TabView, TabPanel } from "primereact/tabview";
 import "./index.css";
-import { SettingsDeals } from "./deals";
-import { SettingsFees } from "./fees";
-import { SettingsTaxes } from "./taxes";
-import { SettingsStockNew } from "./stockNew";
-import { SettingsStockTradeIn } from "./stockTradeIn";
-import { SettingsAccount } from "./account";
-import { SettingsContract } from "./contract";
-import { SettingsLease } from "./lease";
 import { ReactElement } from "react";
-import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
-import { SettingsInventoryGroups } from "./inventory-groups";
+import { TabView, TabPanel } from "primereact/tabview";
+import { Button } from "primereact/button";
+import { SettingsFees } from "dashboard/profile/generalSettings/fees";
+import { SettingsDeals } from "dashboard/profile/generalSettings/deals";
+import { SettingsTaxes } from "dashboard/profile/generalSettings/taxes";
+import { SettingsLease } from "dashboard/profile/generalSettings/lease";
+import { SettingsAccount } from "dashboard/profile/generalSettings/account";
+import { SettingsContract } from "dashboard/profile/generalSettings/contract";
+import { SettingsStockNew } from "dashboard/profile/generalSettings/stockNew";
+import { SettingsStockTradeIn } from "dashboard/profile/generalSettings/stockTradeIn";
+import { SettingsWatermarking } from "dashboard/profile/generalSettings/watermarking";
+import { SettingsInventoryGroups } from "dashboard/profile/generalSettings/inventory-groups";
 
 interface TabItem {
     settingName: string;
@@ -60,6 +61,7 @@ export const GeneralSettings = (): ReactElement => {
         { settingName: "Account Settings", component: <SettingsAccount /> },
         { settingName: "Contract Settings", component: <SettingsContract /> },
         { settingName: "Lease Settings", component: <SettingsLease /> },
+        { settingName: "Watermarking", component: <SettingsWatermarking /> },
     ];
 
     return (

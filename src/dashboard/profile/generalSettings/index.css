@@ -1,3 +1,6 @@
+.general-settings .card {
+    height: 83vh;
+}
 .general-settings__tabs {
     display: flex;
     border-right: 2px solid var(--admss-app-light-blue);
@@ -9,13 +12,15 @@
     width: 294px;
     border: none;
     min-height: 527px;
-    border-right: 5px solid var(--admss-app-light-blue);
+    height: 100%;
     gap: 10px;
 }
 
 .general-settings__tabs .p-tabview-panels {
     flex: 1;
     padding-top: 0;
+    border-left: 2px solid var(--admss-app-light-blue);
+    border-radius: 0;
 }
 
 .general-settings__tabs > .p-tabview-nav-container a.p-tabview-nav-link {
