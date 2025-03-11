@@ -1,5 +1,5 @@
 import "./index.css";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
 import { FileUpload, FileUploadHeaderTemplateOptions } from "primereact/fileupload";
@@ -7,6 +7,11 @@ import { MediaLimits } from "common/models";
 import { Tag } from "primereact/tag";
 import { InputNumber } from "primereact/inputnumber";
 import { Accordion, AccordionTab } from "primereact/accordion";
+import { getUserGeneralSettings, getWatermark } from "http/services/settings.service";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
+import { useStore } from "store/hooks";
+import { GeneralSettings } from "common/models/general-settings";
 
 const limitations: MediaLimits = {
     formats: ["PNG", "JPEG"],
@@ -21,9 +26,46 @@ interface LogoSettings {
 }
 
 export const SettingsWatermarking = () => {
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
     const [enableWatermark, setEnableWatermark] = useState<boolean>(false);
     const [logoSettings, setLogoSettings] = useState<LogoSettings>({ isActive: false });
     const fileUploadRef = useRef<FileUpload>(null);
+    const toast = useToast();
+
+    const handleGetWatermark = async () => {
+        if (!authUser) return;
+        const userSettings = await getUserGeneralSettings();
+        if (userSettings && userSettings.error) {
+            return toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: userSettings.error,
+                life: TOAST_LIFETIME,
+            });
+        }
+        const settingsResponse = userSettings as GeneralSettings;
+        if (!settingsResponse.logomediauid) return;
+        const watermark = await getWatermark(settingsResponse.logomediauid);
+        if (watermark.error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: watermark.error,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            setLogoSettings({
+                isActive: !!settingsResponse.logoenabled,
+                x: settingsResponse.logoposX,
+                y: settingsResponse.logoposY,
+            });
+        }
+    };
+
+    useEffect(() => {
+        handleGetWatermark();
+    }, []);
 
     const itemTemplate = (inFile: object) => {
         const file = inFile as File;
