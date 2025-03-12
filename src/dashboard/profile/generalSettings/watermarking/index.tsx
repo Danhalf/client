@@ -13,6 +13,8 @@ import { TOAST_LIFETIME } from "common/settings";
 import { useStore } from "store/hooks";
 import { GeneralSettings } from "common/models/general-settings";
 import { observer } from "mobx-react-lite";
+import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
 
 const limitations: MediaLimits = {
     formats: ["PNG", "JPEG"],
@@ -21,14 +23,174 @@ const limitations: MediaLimits = {
 };
 
 type LogoSettings = Partial<Pick<GeneralSettings, "logoenabled" | "logoposX" | "logoposY">>;
+type TextBlock = {
+    text: string;
+    fontName: string;
+    fontSize: number | string;
+    posX: number;
+    posY: number;
+};
+
+const mockTextBlock: TextBlock[] = [
+    {
+        text: "text",
+        fontName: "Arial",
+        fontSize: 12,
+        posX: 40,
+        posY: 40,
+    },
+];
 
 export const SettingsWatermarking = observer(() => {
     const store = useStore().generalSettingsStore;
     const { settings } = store;
     const [enableWatermark, setEnableWatermark] = useState<boolean>(false);
     const [logoSettings, setLogoSettings] = useState<LogoSettings>({ logoenabled: 0 });
+    const [textBlocks, setTextBlocks] = useState<TextBlock[]>(mockTextBlock);
     const fileUploadRef = useRef<FileUpload>(null);
     const toast = useToast();
+
+    const renderTextBlocks = () => {
+        const header = (blockIndex: number) => {
+            return (
+                <div className='flex align-items-center justify-content-between w-full'>
+                    {`TEXT BLOCK ${blockIndex + 1}`}
+                    <div className='watermarking__accordion-header-buttons'>
+                        <Button
+                            label='Clear'
+                            text
+                            className='watermarking__clear-button'
+                            disabled={textBlocks[blockIndex].text.length === 0}
+                            severity={
+                                textBlocks[blockIndex].text.length === 0 ? "secondary" : "success"
+                            }
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setTextBlocks((prev) => {
+                                    const newTextBlocks = [...prev];
+                                    newTextBlocks[blockIndex] = {
+                                        text: "",
+                                        fontName: "",
+                                        fontSize: 0,
+                                        posX: 0,
+                                        posY: 0,
+                                    };
+                                    return newTextBlocks;
+                                });
+                            }}
+                        />
+                        <Button
+                            icon='icon adms-close'
+                            className='watermarking__remove-button'
+                            text
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setTextBlocks(textBlocks.filter((_, i) => i !== blockIndex));
+                            }}
+                        />
+                    </div>
+                </div>
+            );
+        };
+
+        return textBlocks.map((block, index) => (
+            <AccordionTab
+                header={header(index)}
+                key={index}
+                className='watermarking__accordion-tab'
+                contentClassName='watermarking__accordion-content'
+            >
+                <p className='grid gap-3 mt-0'>
+                    <span className='col-12 p-0 p-float-label watermarking__textarea'>
+                        <InputTextarea
+                            value={block.text}
+                            onChange={(e) =>
+                                setTextBlocks((prev) => {
+                                    const newTextBlocks = [...prev];
+                                    newTextBlocks[index] = { ...block, text: e.target.value };
+                                    return newTextBlocks;
+                                })
+                            }
+                        />
+                        <label className='float-label'>Text</label>
+                    </span>
+                    <div className='col-12 p-0 flex align-items-center justify-content-between'>
+                        <span className='p-float-label watermarking__font-input'>
+                            <InputText
+                                value={block.fontName}
+                                onChange={(e) =>
+                                    setTextBlocks((prev) => {
+                                        const newTextBlocks = [...prev];
+                                        newTextBlocks[index] = {
+                                            ...block,
+                                            fontName: e.target.value,
+                                        };
+                                        return newTextBlocks;
+                                    })
+                                }
+                            />
+                            <label className='float-label'>Font name</label>
+                        </span>
+                        <span className='p-float-label watermarking__input'>
+                            <InputNumber
+                                value={Number(block.fontSize)}
+                                onChange={(e) =>
+                                    setTextBlocks((prev) => {
+                                        const newTextBlocks = [...prev];
+                                        newTextBlocks[index] = {
+                                            ...block,
+                                            fontSize: Number(e.value),
+                                        };
+                                        return newTextBlocks;
+                                    })
+                                }
+                            />
+                            <label className='float-label'>Font size</label>
+                        </span>
+                        <span className='p-float-label watermarking__input'>
+                            <InputNumber
+                                value={block.posX}
+                                onChange={(e) =>
+                                    setTextBlocks((prev) => {
+                                        const newTextBlocks = [...prev];
+                                        newTextBlocks[index] = { ...block, posX: Number(e.value) };
+                                        return newTextBlocks;
+                                    })
+                                }
+                            />
+                            <label className='float-label'>PosX</label>
+                        </span>
+                        <span className='p-float-label watermarking__input'>
+                            <InputNumber
+                                value={block.posY}
+                                onChange={(e) =>
+                                    setTextBlocks((prev) => {
+                                        const newTextBlocks = [...prev];
+                                        newTextBlocks[index] = { ...block, posY: Number(e.value) };
+                                        return newTextBlocks;
+                                    })
+                                }
+                            />
+                            <label className='float-label'>PosY</label>
+                        </span>
+                    </div>
+                </p>
+            </AccordionTab>
+        ));
+    };
+
+    const handleAddTextBlock = () => {
+        setTextBlocks([
+            ...textBlocks,
+            {
+                text: "",
+                fontName: "",
+                fontSize: 0,
+                posX: 0,
+                posY: 0,
+            },
+        ]);
+    };
 
     const handleGetWatermark = async () => {
         if (!settings.logomediauid) return;
@@ -117,7 +279,7 @@ export const SettingsWatermarking = observer(() => {
         <div className='settings-form watermarking'>
             <div className='settings-form__title'>Watermarking</div>
             <div className='grid align-items-center'>
-                <div className='col-6 p-0'>
+                <div className='col-6'>
                     <Checkbox
                         inputId='enableWatermark'
                         name='enableWatermark'
@@ -130,7 +292,7 @@ export const SettingsWatermarking = observer(() => {
                     </label>
                 </div>
 
-                <div className='col-6 flex watermarking__buttons justify-content-end'>
+                <div className='col-6 py-0 flex watermarking__buttons justify-content-end'>
                     <Button
                         label='Restore default'
                         className='watermarking__button'
@@ -146,9 +308,11 @@ export const SettingsWatermarking = observer(() => {
                     />
                 </div>
 
-                <hr className='form-line' />
+                <div className='col-12 py-0'>
+                    <hr className='form-line' />
+                </div>
 
-                <div className='col-12 p-0'>
+                <div className='col-12 py-0'>
                     <FileUpload
                         ref={fileUploadRef}
                         accept='image/*'
@@ -208,15 +372,12 @@ export const SettingsWatermarking = observer(() => {
                     </span>
                 </div>
 
-                <div className='col-12 watermarking__accordion p-0'>
-                    <Accordion>
-                        <AccordionTab header='TEXT BLOCK 1'>
-                            <p className='m-0'></p>
-                        </AccordionTab>
-                    </Accordion>
+                <div className='col-12 watermarking__accordion py-0'>
+                    <Accordion>{renderTextBlocks()}</Accordion>
                     <Button
                         icon='pi pi-plus'
                         className='watermarking__add-button'
+                        onClick={handleAddTextBlock}
                         label='Add new block'
                         outlined
                         type='button'

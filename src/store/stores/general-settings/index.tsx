@@ -122,6 +122,7 @@ export class GeneralSettingsStore {
     });
 
     public set watermarkImage(state: File | null) {
+        this._isSettingsChanged = true;
         this._watermarkImage = state;
     }
 

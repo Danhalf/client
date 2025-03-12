@@ -20,8 +20,12 @@
     .watermarking__logo-settings {
         display: flex;
         align-items: center;
-        padding: 40px 0;
+        padding-bottom: 40px;
+        padding-top: 40px;
+    }
 
+    .watermarking__logo-settings,
+    .watermarking__accordion-content {
         .watermarking__input {
             margin-left: 25px;
             .p-inputtext {
@@ -29,10 +33,20 @@
                 height: 50px;
             }
         }
+        .watermarking__font-input {
+            .p-inputtext {
+                width: 610px;
+                height: 50px;
+            }
+        }
+        .watermarking__textarea .p-inputtextarea {
+            width: 100%;
+            height: 110px;
+        }
     }
 
     .form-line {
-        margin: 50px 0;
+        margin: 36px 0;
     }
 
     .p-fileupload {
@@ -173,17 +187,63 @@
     }
 
     .watermarking__accordion .p-accordion {
+        .p-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 41px;
+            border: none;
+            background: transparent;
+            color: var(--admss-app-green);
+            box-shadow: none;
+
+            &:enabled:hover {
+                background: transparent;
+                color: var(--admss-app-dark-green);
+                border: none;
+                box-shadow: none;
+            }
+        }
+        .watermarking__remove-button {
+            padding-top: 4px;
+            font-size: 12px;
+        }
+        .p-accordion-header-text {
+            display: flex;
+            width: 100%;
+        }
+
+        .p-icon.p-accordion-toggle-icon {
+            color: var(--admss-app-green);
+            rotate: 90deg;
+        }
+
+        .p-accordion-tab-active {
+            .p-icon.p-accordion-toggle-icon {
+                rotate: 180deg;
+            }
+        }
         .p-accordion-header .p-accordion-header-link {
             background: var(--admss-app-lightest-green);
             border-color: var(--admss-app-green);
             border-bottom: none;
+            height: 50px;
             &:hover {
                 background: var(--admss-app-lightest-green);
                 border-color: var(--admss-app-green);
             }
         }
-        .p-accordion-tab:last-child .p-accordion-header .p-accordion-header-link {
+        .p-accordion-tab:first-child .p-accordion-header .p-accordion-header-link {
             border-radius: 5px 5px 0 0;
+        }
+        .p-accordion-tab:not(:first-child):last-child .p-accordion-header .p-accordion-header-link {
+            border-radius: 0;
+        }
+
+        .watermarking__accordion-content .p-accordion-content {
+            padding-top: 31px;
+            padding-bottom: 20px;
+            height: 247px;
         }
     }
 

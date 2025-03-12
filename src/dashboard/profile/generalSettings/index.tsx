@@ -14,6 +14,7 @@ import { SettingsStockTradeIn } from "dashboard/profile/generalSettings/stockTra
 import { SettingsWatermarking } from "dashboard/profile/generalSettings/watermarking";
 import { SettingsInventoryGroups } from "dashboard/profile/generalSettings/inventory-groups";
 import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
 interface TabItem {
     settingName: string;
@@ -21,11 +22,11 @@ interface TabItem {
     route: string;
 }
 
-export const GeneralSettings = (): ReactElement => {
+export const GeneralSettings = observer((): ReactElement => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().generalSettingsStore;
-    const { saveSettings, getSettings } = store;
+    const { isSettingsChanged, saveSettings, getSettings } = store;
 
     useEffect(() => {
         getSettings();
@@ -109,6 +110,16 @@ export const GeneralSettings = (): ReactElement => {
         setSearchParams({ tab: selectedTabRoute });
     };
 
+    const handleBackClick = () => {
+        const newIndex = Math.max(activeTabIndex - 1, 0); // Не дозволяємо перейти нижче 0
+        handleTabChange(newIndex);
+    };
+
+    const handleNextClick = () => {
+        const newIndex = Math.min(activeTabIndex + 1, tabItems.length - 1); // Не дозволяємо перейти за межі масиву
+        handleTabChange(newIndex);
+    };
+
     return (
         <div className='grid relative general-settings'>
             <Button
@@ -138,13 +149,32 @@ export const GeneralSettings = (): ReactElement => {
                         })}
                     </TabView>
                     <div className='flex justify-content-end gap-3 mt-8 mr-3'>
-                        <Button className='uppercase px-6 form__button' outlined>
+                        <Button
+                            onClick={handleBackClick}
+                            className='uppercase px-6 form__button'
+                            disabled={activeTabIndex <= 0}
+                            severity={activeTabIndex <= 0 ? "secondary" : "success"}
+                            outlined
+                        >
                             Back
                         </Button>
-                        <Button className='uppercase px-6 form__button' outlined>
+                        <Button
+                            onClick={handleNextClick}
+                            disabled={activeTabIndex >= tabItems.length - 1}
+                            severity={
+                                activeTabIndex >= tabItems.length - 1 ? "secondary" : "success"
+                            }
+                            className='uppercase px-6 form__button'
+                            outlined
+                        >
                             Next
                         </Button>
-                        <Button className='uppercase px-6 form__button' onClick={saveSettings}>
+                        <Button
+                            className='uppercase px-6 form__button'
+                            onClick={saveSettings}
+                            severity={isSettingsChanged ? "success" : "secondary"}
+                            disabled={!isSettingsChanged}
+                        >
                             Save
                         </Button>
                     </div>
@@ -152,4 +182,4 @@ export const GeneralSettings = (): ReactElement => {
             </div>
         </div>
     );
-};
+});
