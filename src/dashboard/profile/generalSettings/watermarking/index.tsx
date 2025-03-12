@@ -7,11 +7,12 @@ import { MediaLimits } from "common/models";
 import { Tag } from "primereact/tag";
 import { InputNumber } from "primereact/inputnumber";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { getUserGeneralSettings, getWatermark } from "http/services/settings.service";
+import { getWatermark } from "http/services/settings.service";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { useStore } from "store/hooks";
 import { GeneralSettings } from "common/models/general-settings";
+import { observer } from "mobx-react-lite";
 
 const limitations: MediaLimits = {
     formats: ["PNG", "JPEG"],
@@ -19,34 +20,19 @@ const limitations: MediaLimits = {
     maxSize: 2,
 };
 
-interface LogoSettings {
-    isActive: boolean;
-    x?: number;
-    y?: number;
-}
+type LogoSettings = Partial<Pick<GeneralSettings, "logoenabled" | "logoposX" | "logoposY">>;
 
-export const SettingsWatermarking = () => {
-    const userStore = useStore().userStore;
-    const { authUser } = userStore;
+export const SettingsWatermarking = observer(() => {
+    const store = useStore().generalSettingsStore;
+    const { settings } = store;
     const [enableWatermark, setEnableWatermark] = useState<boolean>(false);
-    const [logoSettings, setLogoSettings] = useState<LogoSettings>({ isActive: false });
+    const [logoSettings, setLogoSettings] = useState<LogoSettings>({ logoenabled: 0 });
     const fileUploadRef = useRef<FileUpload>(null);
     const toast = useToast();
 
     const handleGetWatermark = async () => {
-        if (!authUser) return;
-        const userSettings = await getUserGeneralSettings();
-        if (userSettings && userSettings.error) {
-            return toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: userSettings.error,
-                life: TOAST_LIFETIME,
-            });
-        }
-        const settingsResponse = userSettings as GeneralSettings;
-        if (!settingsResponse.logomediauid) return;
-        const watermark = await getWatermark(settingsResponse.logomediauid);
+        if (!settings.logomediauid) return;
+        const watermark = await getWatermark(settings.logomediauid);
         if (watermark.error) {
             toast.current?.show({
                 severity: "error",
@@ -55,17 +41,18 @@ export const SettingsWatermarking = () => {
                 life: TOAST_LIFETIME,
             });
         } else {
+            const { logoenabled, logoposX, logoposY } = settings;
             setLogoSettings({
-                isActive: !!settingsResponse.logoenabled,
-                x: settingsResponse.logoposX,
-                y: settingsResponse.logoposY,
+                logoenabled,
+                logoposX,
+                logoposY,
             });
         }
     };
 
     useEffect(() => {
         handleGetWatermark();
-    }, []);
+    }, [settings]);
 
     const itemTemplate = (inFile: object) => {
         const file = inFile as File;
@@ -171,6 +158,9 @@ export const SettingsWatermarking = () => {
                             icon: <></>,
                         }}
                         headerTemplate={chooseTemplate}
+                        onSelect={(event) => {
+                            store.watermarkImage = event.files[0];
+                        }}
                         itemTemplate={itemTemplate}
                         emptyTemplate={emptyTemplate}
                         progressBarTemplate={<></>}
@@ -182,9 +172,12 @@ export const SettingsWatermarking = () => {
                     <Checkbox
                         inputId='addLogo'
                         name='addLogo'
-                        value={logoSettings.isActive}
+                        value={logoSettings.logoenabled}
                         onChange={() =>
-                            setLogoSettings({ ...logoSettings, isActive: !logoSettings.isActive })
+                            setLogoSettings({
+                                ...logoSettings,
+                                logoenabled: !logoSettings.logoenabled ? 1 : 0,
+                            })
                         }
                         checked
                     />
@@ -194,18 +187,22 @@ export const SettingsWatermarking = () => {
 
                     <span className='p-float-label watermarking__input'>
                         <InputNumber
-                            value={logoSettings.x}
+                            value={logoSettings.logoposX}
                             allowEmpty
-                            onChange={(e) => setLogoSettings({ ...logoSettings, x: e.value || 0 })}
+                            onChange={(e) =>
+                                setLogoSettings({ ...logoSettings, logoposX: e.value || 0 })
+                            }
                         />
                         <label className='float-label'>PosX</label>
                     </span>
 
                     <span className='p-float-label watermarking__input'>
                         <InputNumber
-                            value={logoSettings.y}
+                            value={logoSettings.logoposY}
                             allowEmpty
-                            onChange={(e) => setLogoSettings({ ...logoSettings, y: e.value || 0 })}
+                            onChange={(e) =>
+                                setLogoSettings({ ...logoSettings, logoposY: e.value || 0 })
+                            }
                         />
                         <label className='float-label'>PosY</label>
                     </span>
@@ -228,4 +225,4 @@ export const SettingsWatermarking = () => {
             </div>
         </div>
     );
-};
+});
