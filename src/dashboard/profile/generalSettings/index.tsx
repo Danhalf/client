@@ -111,12 +111,12 @@ export const GeneralSettings = observer((): ReactElement => {
     };
 
     const handleBackClick = () => {
-        const newIndex = Math.max(activeTabIndex - 1, 0); // Не дозволяємо перейти нижче 0
+        const newIndex = Math.max(activeTabIndex - 1, 0);
         handleTabChange(newIndex);
     };
 
     const handleNextClick = () => {
-        const newIndex = Math.min(activeTabIndex + 1, tabItems.length - 1); // Не дозволяємо перейти за межі масиву
+        const newIndex = Math.min(activeTabIndex + 1, tabItems.length - 1);
         handleTabChange(newIndex);
     };
 
