@@ -32,7 +32,7 @@ export const Sidebar = observer((): ReactElement => {
                 store.isSettingsLoaded = true;
             });
         }
-    }, [authUser, settings]);
+    }, [settings]);
 
     const changeSettings = (newSidebarSettings: { isSidebarCollapsed: boolean }) => {
         if (authUser && serverSettings !== undefined) {
