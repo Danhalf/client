@@ -301,8 +301,8 @@ export const TasksDataTable = observer((): ReactElement => {
 
     return (
         <div className='card-content tasks'>
-            <div className='grid datatable-controls'>
-                <div className='col-6 p-0 flex gap-3'>
+            <div className='datatable-controls flex flex-wrap justify-content-between align-items-center gap-3'>
+                <div className='flex align-items-center gap-3 flex-wrap'>
                     <span className='p-input-icon-right tasks-search'>
                         <i className='icon adms-search' />
                         <InputText
@@ -318,7 +318,6 @@ export const TasksDataTable = observer((): ReactElement => {
                         type='button'
                         onClick={() => setDialogVisible(true)}
                     />
-
                     <Button
                         severity='success'
                         className='tasks__add-button'
@@ -328,7 +327,7 @@ export const TasksDataTable = observer((): ReactElement => {
                         onClick={() => handleCreateTask()}
                     />
                 </div>
-                <div className='col-6 p-0 flex gap-3'>
+                <div className='flex align-items-center gap-3 flex-wrap'>
                     <MultiSelect
                         optionValue='value'
                         optionLabel='name'
@@ -339,7 +338,7 @@ export const TasksDataTable = observer((): ReactElement => {
                             setSelectedStatusFilters(e.value);
                         }}
                         placeholder='Status'
-                        className='pb-0 flex align-items-center tasks-filter'
+                        className='tasks-filter'
                         display='chip'
                         selectedItemsLabel='Clear Filter'
                         panelHeaderTemplate={dropdownFilterHeaderPanel}
@@ -355,7 +354,6 @@ export const TasksDataTable = observer((): ReactElement => {
                             },
                         }}
                     />
-
                     <BorderedCheckbox
                         checked={onlyCurrentUserTasks}
                         onChange={(e) => {
@@ -372,7 +370,7 @@ export const TasksDataTable = observer((): ReactElement => {
                             setActiveColumns(value);
                         }}
                         panelHeaderTemplate={dropdownHeaderPanel}
-                        className='pb-0 h-full flex align-items-center tasks-filter'
+                        className='tasks-filter'
                         display='chip'
                         pt={{
                             header: {
