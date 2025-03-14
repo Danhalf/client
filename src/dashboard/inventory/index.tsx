@@ -19,7 +19,7 @@ import {
     MultiSelectChangeEvent,
     MultiSelectPanelHeaderTemplateEvent,
 } from "primereact/multiselect";
-import { ROWS_PER_PAGE } from "common/settings";
+import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
 import {
     AdvancedSearchDialog,
     SEARCH_FIELD_TYPE,
@@ -312,7 +312,7 @@ export default function Inventories({
                 severity: "error",
                 summary: "Error",
                 detail: String(error) || "Failed to load inventory data",
-                life: 3000,
+                life: TOAST_LIFETIME,
             });
         } finally {
             setIsLoading(false);
