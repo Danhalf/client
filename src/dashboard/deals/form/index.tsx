@@ -357,6 +357,30 @@ export const DealsForm = observer(() => {
                             <h2 className='card-header__title uppercase m-0'>
                                 {id ? "Edit" : "Create new"} Deal
                             </h2>
+                            {id && (
+                                <div className='card-header-info'>
+                                    Stock#
+                                    <span className='card-header-info__data'>
+                                        {dealExtData?.Trade1_StockNum}
+                                    </span>
+                                    Make
+                                    <span className='card-header-info__data'>
+                                        {dealExtData?.Trade1_Make}
+                                    </span>
+                                    Model
+                                    <span className='card-header-info__data'>
+                                        {dealExtData?.Trade1_Model}
+                                    </span>
+                                    Year
+                                    <span className='card-header-info__data'>
+                                        {dealExtData?.Trade1_Year}
+                                    </span>
+                                    VIN
+                                    <span className='card-header-info__data'>
+                                        {dealExtData?.Trade1_VIN}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                         <div className='card-content deal__card'>
                             <div className='grid flex-nowrap deal__card-content'>
@@ -570,7 +594,7 @@ export const DealsForm = observer(() => {
                                     severity={isFormChanged ? "success" : "secondary"}
                                     disabled={!isFormChanged}
                                 >
-                                    Save
+                                    {id ? "Update" : "Save"}
                                 </Button>
                             </div>
                         </div>
