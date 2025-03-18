@@ -17,7 +17,6 @@ import { Button } from "primereact/button";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
-import { BUYER_ID } from "dashboard/contacts/form/general-info";
 import { TextInput } from "dashboard/common/form/inputs";
 
 const enum TOOLTIP_MESSAGE {
@@ -75,8 +74,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const isBusinessNameRequired = useMemo(() => {
         return REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type);
     }, [contact.type]);
-
-    const isControlDisabled = useMemo(() => contact.type !== BUYER_ID, [contact.type]);
 
     const shouldDisableNameFields = useMemo(() => {
         return (
@@ -270,7 +267,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     <div className='col-4 relative'>
                         <TextInput
                             name='Middle Name'
-                            className='general-info__text-input w-full'
+                            className={`general-info__text-input ${errors.middleName ? "p-invalid" : ""}`}
                             value={contact.middleName || ""}
                             onChange={({ target: { value } }) => {
                                 changeContact("middleName", value);
@@ -286,6 +283,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             disabled={shouldDisableNameFields}
                             clearButton
                         />
+                        <small className='p-error'>{errors.middleName}</small>
                     </div>
 
                     <div className='col-4 relative'>
