@@ -216,7 +216,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                         <div className='general-info-overwrite pb-3'>
                             <Checkbox
                                 checked={allowOverwrite}
-                                disabled={isControlDisabled}
                                 inputId='general-info-overwrite'
                                 className='general-info-overwrite__checkbox'
                                 onChange={() => setAllowOverwrite(!allowOverwrite)}
