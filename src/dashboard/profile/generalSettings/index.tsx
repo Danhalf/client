@@ -13,6 +13,7 @@ import { SettingsStockNew } from "dashboard/profile/generalSettings/stockNew";
 import { SettingsStockTradeIn } from "dashboard/profile/generalSettings/stockTradeIn";
 import { SettingsWatermarking } from "dashboard/profile/generalSettings/watermarking";
 import { SettingsInventoryGroups } from "dashboard/profile/generalSettings/inventory-groups";
+import { SettingsOther } from "dashboard/profile/generalSettings/other";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { useToast } from "dashboard/common/toast";
@@ -121,6 +122,11 @@ export const GeneralSettings = observer((): ReactElement => {
             settingName: "Watermarking",
             route: "watermarking",
             component: <SettingsWatermarking />,
+        },
+        {
+            settingName: "Other",
+            route: "other",
+            component: <SettingsOther />,
         },
     ];
 
