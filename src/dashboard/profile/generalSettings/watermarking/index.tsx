@@ -1,5 +1,5 @@
 import "./index.css";
-import { ReactElement, useEffect, useRef } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
@@ -19,6 +19,7 @@ import {
     emptyTemplate,
 } from "dashboard/profile/generalSettings/watermarking/common";
 import { Status } from "common/models/base-response";
+import { ImagePreview } from "dashboard/profile/generalSettings/watermarking/preview";
 
 export const SettingsWatermarking = observer((): ReactElement => {
     const store = useStore().generalSettingsStore;
@@ -35,6 +36,7 @@ export const SettingsWatermarking = observer((): ReactElement => {
     } = store;
     const fileUploadRef = useRef<FileUpload>(null);
     const toast = useToast();
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     useEffect(() => {
         getPostProcessing();
@@ -85,6 +87,23 @@ export const SettingsWatermarking = observer((): ReactElement => {
             useruid: "",
         };
         changePostProcessing([...postProcessing, newTextBlock]);
+    };
+
+    const handlePreview = () => {
+        if (watermarkImageUrl || (watermarkImage && watermarkImage.size)) {
+            setIsPreviewOpen(true);
+        } else {
+            toast.current?.show({
+                severity: "warn",
+                summary: "No Image",
+                detail: "Please upload or fetch an image to preview.",
+                life: TOAST_LIFETIME,
+            });
+        }
+    };
+
+    const handleClosePreview = () => {
+        setIsPreviewOpen(false);
     };
 
     const renderTextBlocks = () => {
@@ -237,6 +256,7 @@ export const SettingsWatermarking = observer((): ReactElement => {
                     <Button
                         label='Preview'
                         className='watermarking__button'
+                        onClick={handlePreview}
                         outlined
                         type='button'
                     />
@@ -318,6 +338,13 @@ export const SettingsWatermarking = observer((): ReactElement => {
                     />
                 </div>
             </div>
+
+            <ImagePreview
+                imageUrl={watermarkImageUrl}
+                imageFile={watermarkImage}
+                isOpen={isPreviewOpen}
+                onClose={handleClosePreview}
+            />
         </div>
     );
 });

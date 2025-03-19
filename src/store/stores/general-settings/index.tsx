@@ -85,6 +85,10 @@ export class GeneralSettingsStore {
         return this._activeTab;
     }
 
+    private get logomediauid() {
+        return this._settings.logomediauid;
+    }
+
     public getSettings = async () => {
         this._isLoading = true;
         try {
@@ -279,8 +283,8 @@ export class GeneralSettingsStore {
 
     public set watermarkImageUrl(state: string | null) {
         if (!state) {
-            this._watermarkImage = null;
-            this._settings.logomediauid = "";
+            this.watermarkImage = null;
+            this.logomediauid = "";
         }
         this._isSettingsChanged = true;
         this._watermarkImageUrl = state;
@@ -304,6 +308,10 @@ export class GeneralSettingsStore {
 
     public set isSettingsChanged(state: boolean) {
         this._isSettingsChanged = state;
+    }
+
+    private set logomediauid(state: string) {
+        this._settings.logomediauid = state;
     }
 
     public clearSettings = () => {
