@@ -15,6 +15,8 @@ import { SettingsWatermarking } from "dashboard/profile/generalSettings/watermar
 import { SettingsInventoryGroups } from "dashboard/profile/generalSettings/inventory-groups";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { useToast } from "dashboard/common/toast";
+import { TOAST_LIFETIME } from "common/settings";
 
 interface TabItem {
     settingName: string;
@@ -26,11 +28,31 @@ export const GeneralSettings = observer((): ReactElement => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().generalSettingsStore;
+    const toast = useToast();
     const { isSettingsChanged, saveSettings, getSettings } = store;
 
     useEffect(() => {
         getSettings();
     }, []);
+
+    const handleSave = async () => {
+        const response = await saveSettings();
+        if (response.error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response.error,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Settings saved successfully!",
+                life: TOAST_LIFETIME,
+            });
+        }
+    };
 
     useEffect(() => {
         const defaultTabRoute = tabItems[0].route;
@@ -171,7 +193,7 @@ export const GeneralSettings = observer((): ReactElement => {
                         </Button>
                         <Button
                             className='uppercase px-6 form__button'
-                            onClick={saveSettings}
+                            onClick={handleSave}
                             severity={isSettingsChanged ? "success" : "secondary"}
                             disabled={!isSettingsChanged}
                         >
