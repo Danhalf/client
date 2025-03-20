@@ -85,4 +85,5 @@
     align-items: flex-end;
     justify-content: flex-end;
     gap: 25px;
+    padding-right: 30px;
 }
