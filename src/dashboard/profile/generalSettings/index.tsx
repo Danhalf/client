@@ -176,7 +176,7 @@ export const GeneralSettings = observer((): ReactElement => {
                             );
                         })}
                     </TabView>
-                    <div className='flex justify-content-end gap-3 mt-8 mr-3'>
+                    <div className='general-settings__buttons'>
                         <Button
                             onClick={handleBackClick}
                             className='uppercase px-6 form__button'
