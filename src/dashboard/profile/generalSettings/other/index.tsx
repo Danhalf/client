@@ -2,6 +2,7 @@ import "./index.css";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState, useRef } from "react";
 import { InputText } from "primereact/inputtext";
+import { Tooltip } from "primereact/tooltip";
 import { Loader } from "dashboard/common/loader";
 import { useToast } from "dashboard/common/toast";
 import { useStore } from "store/hooks";
@@ -11,6 +12,7 @@ import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 
 const NEW_ITEM = "new";
+const DESCRIPTION_LIMIT = 100;
 
 export const SettingsOther = (): ReactElement => {
     const toast = useToast();
@@ -102,6 +104,17 @@ export const SettingsOther = (): ReactElement => {
         }
     }, [editedItem]);
 
+    const getTruncatedText = (text: string | undefined) => {
+        if (!text) return "";
+        return text.length > DESCRIPTION_LIMIT
+            ? text.substring(0, DESCRIPTION_LIMIT) + "..."
+            : text;
+    };
+
+    const needsTooltip = (text: string | undefined) => {
+        return text ? text.length > DESCRIPTION_LIMIT : false;
+    };
+
     return (
         <div className='settings-form'>
             {isLoading && <Loader overlay />}
@@ -154,7 +167,24 @@ export const SettingsOther = (): ReactElement => {
                                             </Button>
                                         </div>
                                     ) : (
-                                        item.description
+                                        <>
+                                            <span
+                                                className={`description-text ${
+                                                    needsTooltip(item.description)
+                                                        ? `description-text--tooltip-${item.itemuid}`
+                                                        : ""
+                                                }`}
+                                            >
+                                                {getTruncatedText(item.description)}
+                                            </span>
+                                            {needsTooltip(item.description) && (
+                                                <Tooltip
+                                                    target={`.description-text--tooltip-${item.itemuid}`}
+                                                    content={item.description}
+                                                    position='mouse'
+                                                />
+                                            )}
+                                        </>
                                     )}
                                 </div>
                                 <div className='col-2 p-0 settings-other__actions'>
