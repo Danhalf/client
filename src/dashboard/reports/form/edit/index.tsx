@@ -95,7 +95,7 @@ export const ReportEditForm = observer((): ReactElement => {
                         <label className='float-label w-full'>Name</label>
                     </span>
                 </div>
-                {report && (
+                {report && id && (
                     <>
                         <div className='col-3'>
                             <Button
