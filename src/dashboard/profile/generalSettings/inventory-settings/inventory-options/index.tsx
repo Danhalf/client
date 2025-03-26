@@ -1,6 +1,6 @@
 import "./index.css";
 import { Button } from "primereact/button";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState, useMemo } from "react";
 import { UserGroup } from "common/models/user";
 import { TOAST_LIFETIME } from "common/settings";
 import { useToast } from "dashboard/common/toast";
@@ -9,7 +9,11 @@ import { getInventoryGroupOptions } from "http/services/inventory-service";
 import { Dropdown } from "primereact/dropdown";
 import { observer } from "mobx-react-lite";
 import { GeneralInventoryOptions } from "common/models/general-settings";
-import { NEW_ITEM, HeaderColumn, InventoryOptionRow } from "./template";
+import { NEW_ITEM, InventoryOptionRow } from "./template";
+import { Layout, Responsive, WidthProvider } from "react-grid-layout";
+import { setInventoryGroupOption } from "http/services/settings.service";
+
+const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export const SettingsInventoryOptions = observer((): ReactElement => {
     const toast = useToast();
@@ -41,11 +45,48 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
     }, [inventoryGroupID]);
 
     const handleSaveOption = () => {};
-    const handleDeleteOption = (optionuid: string) => {};
 
-    const midpoint = Math.ceil(inventoryOptions.length / 2);
-    const leftColumnOptions = inventoryOptions.slice(0, midpoint);
-    const rightColumnOptions = inventoryOptions.slice(midpoint);
+    const handleDeleteOption = (optionuid: string) => {
+        setInventoryOptions(inventoryOptions.filter((item) => item.itemuid !== optionuid));
+    };
+
+    const handleChangeOrder = async (_: Layout[], item: Layout) => {
+        const movedItem = inventoryOptions.find((opt) => opt.itemuid === item.i);
+        if (!movedItem) {
+            return;
+        }
+
+        const newOrder = item.y + 1 * item.x + 1;
+
+        const updatedItem: Partial<GeneralInventoryOptions> = {
+            itemuid: item.i,
+            order: newOrder,
+        };
+
+        try {
+            await setInventoryGroupOption(updatedItem);
+            await handleGetInventoryOptionsGroupList();
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Failed to update order",
+                life: TOAST_LIFETIME,
+            });
+        }
+    };
+
+    const layouts = useMemo(() => {
+        return {
+            lg: inventoryOptions.map((item, index) => ({
+                i: item.itemuid || `${index}`,
+                x: index % 2,
+                y: 0,
+                w: 1,
+                h: 1,
+            })),
+        };
+    }, [inventoryOptions]);
 
     return (
         <>
@@ -83,12 +124,20 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                     <div className='col-12'>No options available</div>
                 ) : (
                     <div className='col-12 grid p-0'>
-                        <div className='col-6 p-0'>
-                            <HeaderColumn />
-                            <div className='general-inventory-option__body'>
-                                {leftColumnOptions.map((item, index) => (
+                        <ResponsiveReactGridLayout
+                            className='layout relative'
+                            layouts={layouts}
+                            cols={{ lg: 2, md: 2, sm: 2, xs: 1, xxs: 1 }}
+                            rowHeight={50}
+                            width={600}
+                            isDraggable={true}
+                            isDroppable={true}
+                            onDragStop={handleChangeOrder}
+                            draggableCancel='.option-control__button, .inventory-options__edit-button, .inventory-options__delete-button, .row-edit'
+                        >
+                            {inventoryOptions.map((item, index) => (
+                                <div key={item.itemuid || `${index}`} className='cursor-move'>
                                     <InventoryOptionRow
-                                        key={item.itemuid}
                                         item={item}
                                         index={index}
                                         isFirst={index === 0}
@@ -97,27 +146,9 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                                         handleSaveOption={handleSaveOption}
                                         handleDeleteOption={handleDeleteOption}
                                     />
-                                ))}
-                            </div>
-                        </div>
-                        <div className='col-6 p-0'>
-                            <HeaderColumn />
-                            <div className='general-inventory-option__body'>
-                                {rightColumnOptions.map((item, index) => (
-                                    <InventoryOptionRow
-                                        key={item.itemuid}
-                                        item={item}
-                                        index={index}
-                                        isFirst={index === 0}
-                                        editedItem={editedItem}
-                                        setEditedItem={setEditedItem}
-                                        handleSaveOption={handleSaveOption}
-                                        handleDeleteOption={handleDeleteOption}
-                                        totalOffset={midpoint}
-                                    />
-                                ))}
-                            </div>
-                        </div>
+                                </div>
+                            ))}
+                        </ResponsiveReactGridLayout>
                     </div>
                 )}
             </div>

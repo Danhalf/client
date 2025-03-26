@@ -1,6 +1,10 @@
 import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
-import { GeneralSettings, WatermarkPostProcessing } from "common/models/general-settings";
+import {
+    GeneralInventoryOptions,
+    GeneralSettings,
+    WatermarkPostProcessing,
+} from "common/models/general-settings";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getUserGeneralSettings = async () => {
@@ -109,6 +113,23 @@ export const updatePostProcessing = async (
             return {
                 status: Status.ERROR,
                 error: error.response?.data.error || "Error while updating postprocessing",
+            };
+        }
+    }
+};
+
+export const setInventoryGroupOption = async (option: Partial<GeneralInventoryOptions>) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `inventory/${option.itemuid}/groupoption`,
+            option
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while updating inventory group option",
             };
         }
     }

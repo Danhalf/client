@@ -56,9 +56,7 @@ export const InventoryOptionRow = ({
             />
         </div>
         <div className='col-1 flex align-items-center'>
-            <span className='option-control__number'>
-                {(item?.order || index + totalOffset) + 1}
-            </span>
+            <span className='option-control__number'>{index + 1}</span>
         </div>
         <div className='col-7 flex align-items-center'>
             {editedItem.itemuid === item.itemuid ? (
