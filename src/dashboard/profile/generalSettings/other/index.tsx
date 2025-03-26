@@ -1,6 +1,6 @@
 import "./index.css";
 import { Button } from "primereact/button";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState, useRef } from "react";
 import { InputText } from "primereact/inputtext";
 import { Loader } from "dashboard/common/loader";
 import { useToast } from "dashboard/common/toast";
@@ -20,6 +20,7 @@ export const SettingsOther = (): ReactElement => {
     const [howToKnowList, setHowToKnowList] = useState<Partial<HowToKnow>[]>([]);
     const [editedItem, setEditedItem] = useState<Partial<HowToKnow>>({});
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const newInputRef = useRef<HTMLInputElement>(null);
 
     const handleGetUserHowKnowList = async () => {
         if (!authUser) return;
@@ -94,6 +95,12 @@ export const SettingsOther = (): ReactElement => {
         }
         setIsLoading(false);
     };
+
+    useEffect(() => {
+        if (editedItem.itemuid === NEW_ITEM && newInputRef.current) {
+            newInputRef.current.focus();
+        }
+    }, [editedItem]);
 
     return (
         <div className='settings-form'>
@@ -210,6 +217,7 @@ export const SettingsOther = (): ReactElement => {
                                                     description: e.target.value,
                                                 })
                                             }
+                                            ref={newInputRef}
                                         />
                                         <Button
                                             className='p-button row-edit__button'
