@@ -166,6 +166,26 @@
     font-weight: 700;
 }
 
+.report-form__control {
+    flex-wrap: wrap;
+    .report-form__input {
+        padding: 10px;
+        flex: 1 1 404px;
+    }
+}
+
+.report-form__buttons {
+    display: flex;
+    margin-left: auto;
+    flex: 0 0 135px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+
+    .report__button.p-button {
+        flex: 0 0 50px;
+    }
+}
+
 .report-select__item {
     cursor: pointer;
     padding: 10px;

@@ -113,6 +113,7 @@ export const ReportForm = observer((): ReactElement => {
                 (collection: ReportCollection) => collection.name === REPORT_TYPES.CUSTOM
             );
             if (customReportsCollection) {
+                reportStore.customCollections = [customReportsCollection];
                 setCollections([
                     customReportsCollection,
                     ...collectionsWithoutFavorite.filter(
