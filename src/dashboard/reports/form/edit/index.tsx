@@ -123,7 +123,6 @@ export const ReportEditForm = observer((): ReactElement => {
                             className='w-full edit-collection__multiselect'
                             selectedItemTemplate={selectedItemTemplate}
                             maxSelectedLabels={4}
-                            placeholder='Collection'
                             showSelectAll={false}
                             value={selectedCollection}
                             onChange={(e) => {
@@ -139,7 +138,7 @@ export const ReportEditForm = observer((): ReactElement => {
                                 },
                             }}
                         />
-                        <label className='float-label'>Select reports</label>
+                        <label className='float-label'>Collection</label>
                     </span>
                 </div>
                 {report && id && (
