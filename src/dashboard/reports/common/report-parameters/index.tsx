@@ -23,8 +23,8 @@ export const ReportParameters = ({
     const toast = useToast();
     const { authUser } = userStore;
     const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
-    const [startDate, setStartDate] = useState<string>(todayDate);
-    const [endDate, setEndDate] = useState<string>(todayDate);
+    const [startDate, setStartDate] = useState<string | number>(todayDate);
+    const [endDate, setEndDate] = useState<string | number>(todayDate);
 
     useEffect(() => {
         if (!startDate || !endDate) {
@@ -92,14 +92,16 @@ export const ReportParameters = ({
                 <DateInput
                     name='Start Date'
                     colWidth={3}
-                    value={startDate}
-                    onChange={({ value }) => setStartDate(String(value))}
+                    date={startDate}
+                    emptyDate
+                    onChange={({ value }) => setStartDate(Number(value))}
                 />
                 <DateInput
                     name='End Date'
                     colWidth={3}
-                    value={endDate}
-                    onChange={({ value }) => setEndDate(String(value))}
+                    date={endDate}
+                    emptyDate
+                    onChange={({ value }) => setEndDate(Number(value))}
                 />
                 <div className='col-12 flex justify-content-end gap-3'>
                     <Button

@@ -1,7 +1,7 @@
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { InputText } from "primereact/inputtext";
-import { ReactElement, useEffect } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { useNavigate, useParams } from "react-router-dom";
@@ -13,6 +13,13 @@ import { ReportColumnSelect } from "./column-select";
 import { MultiSelect } from "primereact/multiselect";
 import { ReportCollection, ReportCollections } from "common/models/reports";
 import { selectedItemTemplate } from "dashboard/reports/common/panel-content";
+import { DashboardDialog } from "dashboard/common/dialog";
+import { DateInput } from "dashboard/common/form/inputs";
+
+enum DIALOG_ACTION {
+    PREVIEW = "preview",
+    DOWNLOAD = "download",
+}
 
 export const ReportEditForm = observer((): ReactElement => {
     const navigate = useNavigate();
@@ -30,6 +37,12 @@ export const ReportEditForm = observer((): ReactElement => {
         changeReport,
     } = store;
     const toast = useToast();
+    const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
+    const [dialogAction, setDialogAction] = useState<
+        DIALOG_ACTION.PREVIEW | DIALOG_ACTION.DOWNLOAD | null
+    >(null);
+    const [startDate, setStartDate] = useState<string | number>("");
+    const [endDate, setEndDate] = useState<string | number>("");
 
     useEffect(() => {
         id &&
@@ -50,26 +63,39 @@ export const ReportEditForm = observer((): ReactElement => {
         };
     }, [id]);
 
-    const handleDownloadForm = async (download: boolean = false) => {
+    const handleDownloadForm = async (
+        download: boolean = false,
+        startDate?: string,
+        endDate?: string
+    ) => {
         const errorMessage = "Error while download report";
         if (authUser && authUser.useruid) {
-            const response = await setReportDocumentTemplate(id || "0", {
+            const payload: any = {
                 itemUID: id || "0",
                 timestamp: Date.now(),
                 columns: reportColumns,
-            }).then((response) => {
-                if (response && response.status === Status.ERROR) {
-                    const { error } = response;
-                    return toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: error || errorMessage,
-                        life: TOAST_LIFETIME,
-                    });
-                } else {
-                    return response;
+            };
+
+            if (startDate && endDate) {
+                payload.from_date = new Date(startDate).getTime();
+                payload.to_date = new Date(endDate).getTime();
+            }
+
+            const response = await setReportDocumentTemplate(id || "0", payload).then(
+                (response) => {
+                    if (response && response.status === Status.ERROR) {
+                        const { error } = response;
+                        return toast.current?.show({
+                            severity: "error",
+                            summary: Status.ERROR,
+                            detail: error || errorMessage,
+                            life: TOAST_LIFETIME,
+                        });
+                    } else {
+                        return response;
+                    }
                 }
-            });
+            );
             if (!response) {
                 return;
             }
@@ -87,6 +113,22 @@ export const ReportEditForm = observer((): ReactElement => {
                 );
             }
         }
+    };
+
+    const handleActionClick = (action: DIALOG_ACTION.PREVIEW | DIALOG_ACTION.DOWNLOAD) => {
+        if (report.AskForStartAndEndDates) {
+            setDialogAction(action);
+            setIsDialogVisible(true);
+        } else {
+            handleDownloadForm(action === DIALOG_ACTION.DOWNLOAD);
+        }
+    };
+
+    const handleDialogSubmit = (startDate: string, endDate: string) => {
+        if (dialogAction) {
+            handleDownloadForm(dialogAction === DIALOG_ACTION.DOWNLOAD, startDate, endDate);
+        }
+        setIsDialogVisible(false);
     };
 
     const getAllCollections = () => {
@@ -156,7 +198,7 @@ export const ReportEditForm = observer((): ReactElement => {
                     <div className='col-2 report-form__buttons'>
                         <Button
                             className='report__button'
-                            onClick={() => handleDownloadForm()}
+                            onClick={() => handleActionClick(DIALOG_ACTION.PREVIEW)}
                             icon='icon adms-preview'
                             disabled={!report.name}
                             severity={!report.name ? "secondary" : "success"}
@@ -164,7 +206,7 @@ export const ReportEditForm = observer((): ReactElement => {
                         <Button
                             className='report__button'
                             icon='icon adms-download'
-                            onClick={() => handleDownloadForm(true)}
+                            onClick={() => handleActionClick(DIALOG_ACTION.DOWNLOAD)}
                             disabled={!report.name}
                             severity={!report.name ? "secondary" : "success"}
                         />
@@ -238,6 +280,29 @@ export const ReportEditForm = observer((): ReactElement => {
                     </label>
                 </div>
             </div>
+
+            {}
+            <DashboardDialog
+                visible={isDialogVisible}
+                onHide={() => setIsDialogVisible(false)}
+                header='Report Parameters'
+                footer='Send'
+            >
+                <DateInput
+                    name='Start Date'
+                    colWidth={12}
+                    date={startDate}
+                    emptyDate
+                    onChange={({ value }) => setStartDate(Number(value))}
+                />
+                <DateInput
+                    name='End Date'
+                    colWidth={12}
+                    date={endDate}
+                    emptyDate
+                    onChange={({ value }) => setEndDate(Number(value))}
+                />
+            </DashboardDialog>
         </div>
     );
 });
