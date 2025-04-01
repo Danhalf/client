@@ -240,7 +240,8 @@ export const ReportEditForm = observer((): ReactElement => {
                         ...report,
                     })
                 }
-                header='Report Parameters'
+                header='Parameters'
+                className='report-parameters-dialog'
                 buttonDisabled={!startDate || !endDate || !report.AskForStartAndEndDates}
                 footer='Send'
             >
