@@ -97,7 +97,12 @@ export const AddTaskDialog = observer(
 
             setIsSaving(true);
 
-            const response = await createTask(taskState, currentTask?.itemuid);
+            const taskDataToSave = { ...taskState };
+            if (taskDataToSave.contactuid) {
+                delete taskDataToSave.contactname;
+            }
+
+            const response = await createTask(taskDataToSave, currentTask?.itemuid);
 
             if (response?.status === Status.ERROR) {
                 toast.current?.show({
@@ -126,7 +131,7 @@ export const AddTaskDialog = observer(
             handleInputChange("accountname", account.name);
         };
 
-        const handleGetCompanyInfo = (contact: ContactUser) => {
+        const handleGetContactInfo = (contact: ContactUser) => {
             handleInputChange("contactuid", contact.contactuid);
             handleInputChange(
                 "contactname",
@@ -196,23 +201,26 @@ export const AddTaskDialog = observer(
                     </div>
 
                     <AccountSearch
-                        value={taskState.accountname?.trim() || taskState.accountuid || ""}
+                        value={taskState.accountname || ""}
+                        onChange={(e) => handleInputChange("accountname", e.target.value)}
                         onRowClick={(value) => handleInputChange("accountname", value)}
                         getFullInfo={handleGetAccountInfo}
                         name='Account (optional)'
                     />
 
                     <DealSearch
-                        value={taskState.dealname?.trim() || taskState.dealuid || ""}
+                        value={taskState.dealname || ""}
+                        onChange={(e) => handleInputChange("dealname", e.target.value)}
                         onRowClick={(value) => handleInputChange("dealname", value)}
                         getFullInfo={handleGetDealInfo}
                         name='Deal (optional)'
                     />
 
                     <CompanySearch
-                        value={taskState.contactname?.trim() || taskState.contactuid || ""}
+                        value={taskState.contactname || ""}
+                        onChange={(e) => handleInputChange("contactname", e.target.value)}
                         onRowClick={(value) => handleInputChange("contactname", value)}
-                        getFullInfo={handleGetCompanyInfo}
+                        getFullInfo={handleGetContactInfo}
                         name='Contact'
                     />
                     <InputMask
