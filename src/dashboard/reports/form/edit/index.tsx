@@ -8,24 +8,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
-import { setReportDocumentTemplate } from "http/services/reports.service";
 import { ReportColumnSelect } from "./column-select";
 import { MultiSelect } from "primereact/multiselect";
 import { ReportCollection, ReportCollections } from "common/models/reports";
 import { selectedItemTemplate } from "dashboard/reports/common/panel-content";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { DateInput } from "dashboard/common/form/inputs";
-
-enum DIALOG_ACTION {
-    PREVIEW = "preview",
-    DOWNLOAD = "download",
-}
+import { DIALOG_ACTION, reportDownloadForm } from "dashboard/reports/common/report-parameters";
 
 export const ReportEditForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const store = useStore().reportStore;
-    const userStore = useStore().userStore;
-    const { authUser } = userStore;
     const { id } = useParams();
     const {
         report,
@@ -38,9 +31,7 @@ export const ReportEditForm = observer((): ReactElement => {
     } = store;
     const toast = useToast();
     const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
-    const [dialogAction, setDialogAction] = useState<
-        DIALOG_ACTION.PREVIEW | DIALOG_ACTION.DOWNLOAD | null
-    >(null);
+    const [dialogAction, setDialogAction] = useState<DIALOG_ACTION>(DIALOG_ACTION.PREVIEW);
     const [startDate, setStartDate] = useState<string | number>("");
     const [endDate, setEndDate] = useState<string | number>("");
 
@@ -63,72 +54,27 @@ export const ReportEditForm = observer((): ReactElement => {
         };
     }, [id]);
 
-    const handleDownloadForm = async (
-        download: boolean = false,
-        startDate?: string,
-        endDate?: string
-    ) => {
-        const errorMessage = "Error while download report";
-        if (authUser && authUser.useruid) {
-            const payload: any = {
-                itemUID: id || "0",
-                timestamp: Date.now(),
-                columns: reportColumns,
-            };
-
-            if (startDate && endDate) {
-                payload.from_date = new Date(startDate).getTime();
-                payload.to_date = new Date(endDate).getTime();
-            }
-
-            const response = await setReportDocumentTemplate(id || "0", payload).then(
-                (response) => {
-                    if (response && response.status === Status.ERROR) {
-                        const { error } = response;
-                        return toast.current?.show({
-                            severity: "error",
-                            summary: Status.ERROR,
-                            detail: error || errorMessage,
-                            life: TOAST_LIFETIME,
-                        });
-                    } else {
-                        return response;
-                    }
-                }
-            );
-            if (!response) {
-                return;
-            }
-            const url = new Blob([response], { type: "application/pdf" });
-            let link = document.createElement("a");
-            link.href = window.URL.createObjectURL(url);
-            if (download) {
-                link.download = `report_form_${id || reportName}.pdf`;
-                link.click();
-            } else {
-                window.open(
-                    link.href,
-                    "_blank",
-                    "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                );
-            }
-        }
-    };
-
-    const handleActionClick = (action: DIALOG_ACTION.PREVIEW | DIALOG_ACTION.DOWNLOAD) => {
+    const handleActionClick = async (action: DIALOG_ACTION) => {
         if (report.AskForStartAndEndDates) {
             setDialogAction(action);
             setIsDialogVisible(true);
         } else {
-            handleDownloadForm(action === DIALOG_ACTION.DOWNLOAD);
+            const response = await reportDownloadForm({
+                action,
+                columns: reportColumns,
+                from_date: startDate,
+                to_date: endDate,
+                ...report,
+            });
+            if (response && response.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: response.error || "Error while downloading report",
+                    life: TOAST_LIFETIME,
+                });
+            }
         }
-    };
-
-    const handleDialogSubmit = (startDate: string, endDate: string) => {
-        if (dialogAction) {
-            handleDownloadForm(dialogAction === DIALOG_ACTION.DOWNLOAD, startDate, endDate);
-        }
-        setIsDialogVisible(false);
     };
 
     const getAllCollections = () => {
@@ -285,7 +231,17 @@ export const ReportEditForm = observer((): ReactElement => {
             <DashboardDialog
                 visible={isDialogVisible}
                 onHide={() => setIsDialogVisible(false)}
+                action={() =>
+                    reportDownloadForm({
+                        action: dialogAction,
+                        columns: report.columns,
+                        from_date: startDate,
+                        to_date: endDate,
+                        ...report,
+                    })
+                }
                 header='Report Parameters'
+                buttonDisabled={!startDate || !endDate || !report.AskForStartAndEndDates}
                 footer='Send'
             >
                 <DateInput
