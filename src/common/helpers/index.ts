@@ -188,7 +188,10 @@ export const parseCustomDate = (dateAsString: string): number => {
     return date.getTime();
 };
 
-export const validateDates = (start: string, due: string): { isValid: boolean; error?: string } => {
+export const validateDates = (
+    start: string | number,
+    due: string | number
+): { isValid: boolean; error?: string } => {
     if (new Date(start) > new Date(due)) {
         return { isValid: false, error: "Start Date must be before Due Date" };
     }
