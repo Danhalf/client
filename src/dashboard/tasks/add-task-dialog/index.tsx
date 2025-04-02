@@ -14,7 +14,7 @@ import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { DealSearch } from "dashboard/deals/common/deal-search";
 import { AccountSearch } from "dashboard/accounts/common/account-search";
 import { PostDataTask, Task, TaskUser } from "common/models/tasks";
-import { validateDates } from "common/helpers";
+import { formatDateForServer, parseDateFromServer, validateDates } from "common/helpers";
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { ContactUser } from "common/models/contact";
@@ -26,14 +26,18 @@ enum DATE_TYPE {
     DEADLINE = "deadline",
 }
 
+const ERROR_MESSAGES = {
+    DATE_ERROR: "Start Date must be before Due Date",
+};
+
 interface AddTaskDialogProps extends DialogProps {
     currentTask?: Task;
     onAction?: () => void;
 }
 
 const initializeTaskState = (task?: Task): Partial<PostDataTask> => ({
-    startdate: "",
-    deadline: "",
+    startdate: task?.startdate ? String(parseDateFromServer(task.startdate)) : "",
+    deadline: task?.deadline ? String(parseDateFromServer(task.deadline)) : "",
     useruid: task?.useruid || "",
     accountuid: task?.accountuid || "",
     accountname: task?.accountname || "",
@@ -103,11 +107,17 @@ export const AddTaskDialog = observer(
         };
 
         const handleSaveTaskData = async () => {
-            if (dateError) return;
+            if (!validateDates(Number(taskState.startdate), Number(taskState.deadline)).isValid) {
+                return setDateError(ERROR_MESSAGES.DATE_ERROR);
+            }
 
             setIsSaving(true);
 
-            const taskDataToSave = { ...taskState };
+            const taskDataToSave = {
+                ...taskState,
+                startdate: formatDateForServer(Number(taskState.startdate)),
+                deadline: formatDateForServer(Number(taskState.deadline)),
+            };
             if (taskDataToSave.contactuid) {
                 delete taskDataToSave.contactname;
             }
