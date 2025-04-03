@@ -37,16 +37,19 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
             const response = await scanContactDL(file);
 
             if (!response) {
-                throw new Error("No response from server");
+                await Promise.reject("No response from server");
+                return;
             }
 
             if (response.status === Status.ERROR) {
-                throw new Error(response.error || "Failed to scan DL");
+                await Promise.reject(response.error || "Failed to scan DL");
+                return;
             }
 
             const { contact } = response as ScanBarcodeDL;
             if (!contact) {
-                throw new Error("Failed to parse driver license data");
+                await Promise.reject("Failed to parse driver license data");
+                return;
             }
 
             const {
