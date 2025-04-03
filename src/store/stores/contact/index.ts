@@ -221,10 +221,22 @@ export class ContactStore {
         }
     );
 
-    public changeContactExtData = action((key: keyof ContactExtData, value: string | number) => {
-        this._isContactChanged = true;
-        this._contactExtData[key] = value as never;
-    });
+    public changeContactExtData = action(
+        (
+            keyOrEntries: keyof ContactExtData | [keyof ContactExtData, string | number][],
+            value?: string | number
+        ) => {
+            this._isContactChanged = true;
+
+            if (Array.isArray(keyOrEntries)) {
+                keyOrEntries.forEach(([key, val]) => {
+                    this._contactExtData[key] = val as never;
+                });
+            } else {
+                this._contactExtData[keyOrEntries] = value as never;
+            }
+        }
+    );
 
     public saveContact = action(async (): Promise<BaseResponseError> => {
         try {
