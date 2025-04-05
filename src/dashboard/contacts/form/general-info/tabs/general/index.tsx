@@ -118,21 +118,24 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
             } = scannedContact;
 
             if (allowOverwrite) {
-                changeContact("firstName", firstName);
-                changeContact("lastName", lastName);
-                changeContact("middleName", middleName);
-                changeContact("ZIP", ZIP);
-                changeContact("city", city);
-                changeContact("streetAddress", streetAddress);
-                changeContact("state", state);
-                changeContact("sex", sex);
-                changeContactExtData("Buyer_Driver_License_Num", dl_number);
+                changeContact([
+                    ["firstName", firstName],
+                    ["lastName", lastName],
+                    ["middleName", middleName],
+                    ["ZIP", ZIP],
+                    ["city", city],
+                    ["streetAddress", streetAddress],
+                    ["state", state],
+                    ["sex", sex],
+                ]);
 
-                const dobTimestamp = parseCustomDate(dob);
-                changeContactExtData("Buyer_Date_Of_Birth", dobTimestamp);
+                const [dobTimestamp, expTimestamp] = [parseCustomDate(dob), parseCustomDate(exp)];
 
-                const expTimestamp = parseCustomDate(exp);
-                changeContactExtData("Buyer_DL_Exp_Date", expTimestamp);
+                changeContactExtData([
+                    ["Buyer_Driver_License_Num", dl_number],
+                    ["Buyer_Date_Of_Birth", dobTimestamp],
+                    ["Buyer_DL_Exp_Date", expTimestamp],
+                ]);
             } else {
                 const fieldsToUpdate = {
                     firstName,
