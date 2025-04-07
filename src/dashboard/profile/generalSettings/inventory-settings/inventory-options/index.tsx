@@ -9,7 +9,7 @@ import { getInventoryGroupOptions } from "http/services/inventory-service";
 import { Dropdown } from "primereact/dropdown";
 import { observer } from "mobx-react-lite";
 import { GeneralInventoryOptions } from "common/models/general-settings";
-import { NEW_ITEM, InventoryOptionRow } from "./template";
+import { NEW_ITEM, InventoryOptionRow, HeaderColumn } from "./template";
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
 import { setInventoryGroupOption } from "http/services/settings.service";
 
@@ -24,7 +24,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         []
     );
     const [editedItem, setEditedItem] = useState<Partial<GeneralInventoryOptions>>({});
-    const [draggedItem, setDraggedItem] = useState<Partial<GeneralInventoryOptions> | null>(null);
+    const [, setDraggedItem] = useState<Partial<GeneralInventoryOptions> | null>(null);
 
     const handleGetInventoryOptionsGroupList = async () => {
         const response = await getInventoryGroupOptions(inventoryGroupID);
@@ -115,8 +115,6 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
     };
 
     const handleDragItem = async (layout: Layout[], oldItem: Layout, newItem: Layout) => {
-        if (oldItem.i === newItem.i) return;
-
         const sortedLayout = [...layout].sort((a, b) => {
             if (a.x === b.x) return a.y - b.y;
             return a.x - b.x;
@@ -127,7 +125,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                 const originalItem = inventoryOptions.find((opt) => opt.itemuid === layoutItem.i);
                 return {
                     ...originalItem,
-                    order: index,
+                    order: index + 1,
                 };
             })
             .filter(Boolean) as Partial<GeneralInventoryOptions>[];
@@ -183,44 +181,71 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                 </Button>
             </div>
             <div className='grid general-inventory-option p-2'>
+                <HeaderColumn />
                 {!inventoryOptions.length ? (
                     <div className='col-12'>No options available</div>
                 ) : (
-                    <div className='col-12 grid p-0'>
-                        <ResponsiveReactGridLayout
-                            className='layout relative'
-                            layouts={layouts}
-                            cols={{ lg: 2, md: 2, sm: 2, xs: 1, xxs: 1 }}
-                            rowHeight={50}
-                            width={600}
-                            isDraggable={true}
-                            isDroppable={true}
-                            onDragStart={(_, item) => {
-                                const draggedItem = inventoryOptions.find(
-                                    (opt) => opt.itemuid === item.i
-                                );
-                                setDraggedItem(draggedItem || null);
-                            }}
-                            onDragStop={handleDragItem}
-                            draggableCancel='.option-control__button, .inventory-options__edit-button, .inventory-options__delete-button, .row-edit'
-                        >
-                            {inventoryOptions.map((item, index) => (
-                                <div key={item.itemuid || `${index}`} className='cursor-move'>
-                                    <InventoryOptionRow
-                                        item={item}
-                                        index={index}
-                                        isFirst={index === 0}
-                                        editedItem={editedItem}
-                                        draggedItemId={draggedItem?.itemuid}
-                                        setEditedItem={setEditedItem}
-                                        handleSaveOption={handleSaveOption}
-                                        handleSetOrder={handleChangeOrder}
-                                        handleDeleteOption={handleDeleteOption}
-                                        totalOffset={inventoryOptions.length}
-                                    />
+                    <div className='col-12 grid p-0 inventory-options-container'>
+                        <div className='inventory-numbers inventory-numbers--left'>
+                            {inventoryOptions
+                                .slice(0, inventoryOptions.length / 2)
+                                .map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className='inventory-option-number col-1 flex align-items-center'
+                                    >
+                                        <span className='option-control__number'>{index + 1}</span>
+                                    </div>
+                                ))}
+                        </div>
+                        {}
+                        <div className='inventory-content'>
+                            <ResponsiveReactGridLayout
+                                className='layout relative'
+                                layouts={layouts}
+                                cols={{ lg: 2, md: 2, sm: 2, xs: 1, xxs: 1 }}
+                                rowHeight={50}
+                                width={600}
+                                isDraggable={true}
+                                isDroppable={true}
+                                onDragStart={(_, item) => {
+                                    const draggedItem = inventoryOptions.find(
+                                        (opt) => opt.itemuid === item.i
+                                    );
+                                    setDraggedItem(draggedItem || null);
+                                }}
+                                onDragStop={handleDragItem}
+                                draggableCancel='.option-control__button, .inventory-options__edit-button, .inventory-options__delete-button, .row-edit'
+                            >
+                                {inventoryOptions.map((item, index) => (
+                                    <div key={item.itemuid || `${index}`} className='cursor-move'>
+                                        <InventoryOptionRow
+                                            item={item}
+                                            index={index}
+                                            isFirst={index === 0}
+                                            editedItem={editedItem}
+                                            setEditedItem={setEditedItem}
+                                            handleSaveOption={handleSaveOption}
+                                            handleSetOrder={handleChangeOrder}
+                                            handleDeleteOption={handleDeleteOption}
+                                            totalOffset={inventoryOptions.length}
+                                        />
+                                    </div>
+                                ))}
+                            </ResponsiveReactGridLayout>
+                        </div>
+                        <div className='inventory-numbers inventory-numbers--right'>
+                            {inventoryOptions.slice(inventoryOptions.length / 2).map((_, index) => (
+                                <div
+                                    key={index}
+                                    className='inventory-option-number col-1 flex align-items-center'
+                                >
+                                    <span className='option-control__number'>
+                                        {index + 1 + inventoryOptions.length / 2}
+                                    </span>
                                 </div>
                             ))}
-                        </ResponsiveReactGridLayout>
+                        </div>
                     </div>
                 )}
             </div>

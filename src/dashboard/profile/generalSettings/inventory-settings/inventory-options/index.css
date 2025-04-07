@@ -1,4 +1,15 @@
 .general-inventory-option {
+    .settings-inventory__header {
+        display: flex;
+        align-items: center;
+        .settings-inventory__number {
+            padding-left: 10px;
+            flex: 0 0 45px;
+        }
+        .settings-inventory__name {
+            flex: 1;
+        }
+    }
     .option-control {
         display: flex;
         align-items: center;
@@ -26,18 +37,57 @@
         background: transparent;
     }
 
+    .inventory-option-wrapper {
+        margin-right: -10px;
+    }
+
+    .inventory-options-container {
+        display: flex;
+        position: relative;
+    }
+
+    .inventory-numbers {
+        width: 60px;
+        padding-top: 2.5px;
+        display: flex;
+        flex-direction: column;
+        &.inventory-numbers--left {
+            margin-right: -10px;
+        }
+        &.inventory-numbers--right {
+            margin-left: -10px;
+        }
+    }
+
+    .inventory-content {
+        flex: 1;
+    }
+
     .settings-inventory__row {
-        justify-content: center;
         height: 45px;
+        align-items: center;
         padding: 0;
         margin: 0;
+        width: 100%;
+        border-bottom: 1px solid var(--admss-app-medium-blue);
     }
+
+    .inventory-option-number {
+        margin: 0.418rem 0;
+        display: flex;
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--admss-app-green);
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 45px;
+        border-bottom: 1px solid var(--admss-app-medium-blue);
+    }
+
     .layout {
         width: 100%;
         height: 400px;
         overflow: hidden;
-    }
-    .settings-inventory__row {
-        width: 100%;
     }
 }
