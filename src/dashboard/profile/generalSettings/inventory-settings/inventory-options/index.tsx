@@ -24,6 +24,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         []
     );
     const [editedItem, setEditedItem] = useState<Partial<GeneralInventoryOptions>>({});
+    const [draggedItem, setDraggedItem] = useState<Partial<GeneralInventoryOptions> | null>(null);
 
     const handleGetInventoryOptionsGroupList = async () => {
         const response = await getInventoryGroupOptions(inventoryGroupID);
@@ -44,44 +45,106 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         inventoryGroupID && handleGetInventoryOptionsGroupList();
     }, [inventoryGroupID]);
 
-    const handleSaveOption = () => {};
-
-    const handleDeleteOption = (optionuid: string) => {
-        setInventoryOptions(inventoryOptions.filter((item) => item.itemuid !== optionuid));
-    };
-
-    const handleChangeOrder = async (_: Layout[], item: Layout) => {
-        const movedItem = inventoryOptions.find((opt) => opt.itemuid === item.i);
-        if (!movedItem) {
+    const handleSaveOption = async (option: Partial<GeneralInventoryOptions>) => {
+        if (!option.name) {
+            toast.current?.show({
+                severity: "warn",
+                summary: "Warning",
+                detail: "Option name is required",
+                life: TOAST_LIFETIME,
+            });
             return;
         }
 
-        const newOrder = item.y + 1 * item.x + 1;
-
-        const updatedItem: Partial<GeneralInventoryOptions> = {
-            itemuid: item.i,
-            order: newOrder,
-        };
+        if (!option.itemuid) {
+            toast.current?.show({
+                severity: "warn",
+                summary: "Warning",
+                detail: "Option UID is required",
+                life: TOAST_LIFETIME,
+            });
+            return;
+        }
 
         try {
-            await setInventoryGroupOption(updatedItem);
+            const isNew = option.itemuid === NEW_ITEM;
+            const response = await setInventoryGroupOption(inventoryGroupID, option);
+            if (response?.error) {
+                throw new Error(response.error);
+            }
+
             await handleGetInventoryOptionsGroupList();
+            setEditedItem({});
+
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: isNew ? "Option created successfully" : "Option updated successfully",
+                life: TOAST_LIFETIME,
+            });
         } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: `Failed to ${option.itemuid === NEW_ITEM ? "create" : "update"} option`,
+                life: TOAST_LIFETIME,
+            });
+        }
+    };
+
+    const handleDeleteOption = (optionuid: string) => {};
+
+    const handleChangeOrder = async (
+        option: Partial<GeneralInventoryOptions>,
+        newOrder?: number
+    ) => {
+        const response = await setInventoryGroupOption(inventoryGroupID, {
+            ...option,
+            order: newOrder || option.order,
+        });
+        if (response?.error) {
             toast.current?.show({
                 severity: "error",
                 summary: "Error",
                 detail: "Failed to update order",
                 life: TOAST_LIFETIME,
             });
+        } else {
+            await handleGetInventoryOptionsGroupList();
         }
     };
 
+    const handleDragItem = async (layout: Layout[], oldItem: Layout, newItem: Layout) => {
+        if (oldItem.i === newItem.i) return;
+
+        const sortedLayout = [...layout].sort((a, b) => {
+            if (a.x === b.x) return a.y - b.y;
+            return a.x - b.x;
+        });
+
+        const updatedOptions = sortedLayout
+            .map((layoutItem, index) => {
+                const originalItem = inventoryOptions.find((opt) => opt.itemuid === layoutItem.i);
+                return {
+                    ...originalItem,
+                    order: index,
+                };
+            })
+            .filter(Boolean) as Partial<GeneralInventoryOptions>[];
+
+        const updatedOption = updatedOptions.find((opt) => opt.itemuid === newItem.i);
+        setDraggedItem(null);
+
+        updatedOption && handleChangeOrder(updatedOption);
+    };
+
     const layouts = useMemo(() => {
+        const itemsPerColumn = Math.ceil(inventoryOptions.length / 2);
         return {
             lg: inventoryOptions.map((item, index) => ({
                 i: item.itemuid || `${index}`,
-                x: index % 2,
-                y: 0,
+                x: index < itemsPerColumn ? 0 : 1,
+                y: index % itemsPerColumn,
                 w: 1,
                 h: 1,
             })),
@@ -132,7 +195,13 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                             width={600}
                             isDraggable={true}
                             isDroppable={true}
-                            onDragStop={handleChangeOrder}
+                            onDragStart={(_, item) => {
+                                const draggedItem = inventoryOptions.find(
+                                    (opt) => opt.itemuid === item.i
+                                );
+                                setDraggedItem(draggedItem || null);
+                            }}
+                            onDragStop={handleDragItem}
                             draggableCancel='.option-control__button, .inventory-options__edit-button, .inventory-options__delete-button, .row-edit'
                         >
                             {inventoryOptions.map((item, index) => (
@@ -142,9 +211,12 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                                         index={index}
                                         isFirst={index === 0}
                                         editedItem={editedItem}
+                                        draggedItemId={draggedItem?.itemuid}
                                         setEditedItem={setEditedItem}
                                         handleSaveOption={handleSaveOption}
+                                        handleSetOrder={handleChangeOrder}
                                         handleDeleteOption={handleDeleteOption}
+                                        totalOffset={inventoryOptions.length}
                                     />
                                 </div>
                             ))}

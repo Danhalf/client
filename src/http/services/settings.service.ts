@@ -118,10 +118,13 @@ export const updatePostProcessing = async (
     }
 };
 
-export const setInventoryGroupOption = async (option: Partial<GeneralInventoryOptions>) => {
+export const setInventoryGroupOption = async (
+    groupuid: string,
+    option: Partial<GeneralInventoryOptions>
+) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `inventory/${option.itemuid}/groupoption`,
+            `inventory/${groupuid}/groupoption`,
             option
         );
         return request.data;

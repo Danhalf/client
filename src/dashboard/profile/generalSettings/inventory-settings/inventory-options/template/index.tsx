@@ -9,9 +9,11 @@ interface InventoryOptionRowProps {
     item: Partial<GeneralInventoryOptions>;
     index: number;
     isFirst: boolean;
+    draggedItemId?: string | null;
     editedItem: Partial<GeneralInventoryOptions>;
     setEditedItem: (item: Partial<GeneralInventoryOptions>) => void;
-    handleSaveOption: () => void;
+    handleSetOrder: (option: Partial<GeneralInventoryOptions>, newOrder: number) => Promise<void>;
+    handleSaveOption: (option: Partial<GeneralInventoryOptions>) => void;
     handleDeleteOption: (optionuid: string) => void;
     totalOffset?: number;
 }
@@ -32,10 +34,17 @@ export const InventoryOptionRow = ({
     editedItem,
     setEditedItem,
     handleSaveOption,
+    handleSetOrder,
     handleDeleteOption,
+    draggedItemId = null,
     totalOffset = 0,
 }: InventoryOptionRowProps): ReactElement => (
     <div key={item.itemuid} className='settings-inventory__row grid col-12'>
+        {draggedItemId === item.itemuid || (
+            <div className='col-1 flex align-items-center'>
+                <span className='option-control__number'>{index + 1}</span>
+            </div>
+        )}
         <div className='col-2 option-control'>
             <Button
                 icon='pi pi-arrow-circle-up'
@@ -44,6 +53,7 @@ export const InventoryOptionRow = ({
                 severity='success'
                 tooltip='Move up'
                 className='p-button-text option-control__button'
+                onClick={() => handleSetOrder(item, index - 1)}
                 disabled={isFirst || item.itemuid === NEW_ITEM}
             />
             <Button
@@ -52,11 +62,10 @@ export const InventoryOptionRow = ({
                 text
                 severity='success'
                 tooltip='Move down'
+                disabled={item.itemuid === NEW_ITEM || index === totalOffset - 1}
+                onClick={() => handleSetOrder(item, index + 1)}
                 className='p-button-text option-control__button'
             />
-        </div>
-        <div className='col-1 flex align-items-center'>
-            <span className='option-control__number'>{index + 1}</span>
         </div>
         <div className='col-7 flex align-items-center'>
             {editedItem.itemuid === item.itemuid ? (
@@ -72,7 +81,12 @@ export const InventoryOptionRow = ({
                             })
                         }
                     />
-                    <Button className='p-button row-edit__button' onClick={handleSaveOption}>
+                    <Button
+                        className='p-button row-edit__button'
+                        onClick={() => {
+                            return handleSaveOption(editedItem);
+                        }}
+                    >
                         Save
                     </Button>
                 </div>
@@ -81,20 +95,24 @@ export const InventoryOptionRow = ({
             )}
         </div>
         <div className='col-2 option-control'>
-            <Button
-                tooltip='Edit option'
-                className='inventory-options__edit-button'
-                icon='icon adms-edit-item'
-                text
-                onClick={() => (editedItem.itemuid ? setEditedItem({}) : setEditedItem(item))}
-            />
-            <Button
-                tooltip='Delete option'
-                className='inventory-options__delete-button'
-                icon='icon adms-trash-can'
-                text
-                onClick={() => item?.itemuid && handleDeleteOption(item.itemuid)}
-            />
+            {editedItem.itemuid !== item.itemuid && (
+                <Button
+                    tooltip='Edit option'
+                    className='inventory-options__edit-button'
+                    icon='icon adms-edit-item'
+                    text
+                    onClick={() => (editedItem.itemuid ? setEditedItem({}) : setEditedItem(item))}
+                />
+            )}
+            {editedItem.itemuid !== item.itemuid && (
+                <Button
+                    tooltip='Delete option'
+                    className='inventory-options__delete-button'
+                    icon='icon adms-trash-can'
+                    text
+                    onClick={() => item?.itemuid && handleDeleteOption(item.itemuid)}
+                />
+            )}
         </div>
     </div>
 );
