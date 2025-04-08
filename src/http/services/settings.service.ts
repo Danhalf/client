@@ -137,3 +137,22 @@ export const setInventoryGroupOption = async (
         }
     }
 };
+
+export const deleteInventoryGroupOption = async (groupoptionuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError>(
+            `inventory/${groupoptionuid}/deletegroupoption`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.message ||
+                    error.response?.data.error ||
+                    "Error while deleting inventory group option",
+            };
+        }
+    }
+};

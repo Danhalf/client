@@ -11,7 +11,10 @@ import { observer } from "mobx-react-lite";
 import { GeneralInventoryOptions } from "common/models/general-settings";
 import { NEW_ITEM, InventoryOptionRow, HeaderColumn } from "./template";
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
-import { setInventoryGroupOption } from "http/services/settings.service";
+import {
+    deleteInventoryGroupOption,
+    setInventoryGroupOption,
+} from "http/services/settings.service";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -24,7 +27,6 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         []
     );
     const [editedItem, setEditedItem] = useState<Partial<GeneralInventoryOptions>>({});
-    const [, setDraggedItem] = useState<Partial<GeneralInventoryOptions> | null>(null);
 
     const handleGetInventoryOptionsGroupList = async () => {
         const response = await getInventoryGroupOptions(inventoryGroupID);
@@ -92,7 +94,19 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         }
     };
 
-    const handleDeleteOption = (optionuid: string) => {};
+    const handleDeleteOption = async (optionuid: string) => {
+        const response = await deleteInventoryGroupOption(optionuid);
+        if (response?.error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response?.error,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            await handleGetInventoryOptionsGroupList();
+        }
+    };
 
     const handleChangeOrder = async (
         option: Partial<GeneralInventoryOptions>,
@@ -131,7 +145,6 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             .filter(Boolean) as Partial<GeneralInventoryOptions>[];
 
         const updatedOption = updatedOptions.find((opt) => opt.itemuid === newItem.i);
-        setDraggedItem(null);
 
         updatedOption && handleChangeOrder(updatedOption);
     };
@@ -194,7 +207,9 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                                         key={index}
                                         className='inventory-option-number col-1 flex align-items-center'
                                     >
-                                        <span className='option-control__number'>{index + 1}</span>
+                                        <span className='option-control__number'>
+                                            {Math.ceil(index) + 1}
+                                        </span>
                                     </div>
                                 ))}
                         </div>
@@ -203,17 +218,12 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                             <ResponsiveReactGridLayout
                                 className='layout relative'
                                 layouts={layouts}
-                                cols={{ lg: 2, md: 2, sm: 2, xs: 1, xxs: 1 }}
-                                rowHeight={50}
+                                cols={{ lg: 2, md: 2, sm: 2, xs: 2, xxs: 1 }}
+                                rowHeight={45}
                                 width={600}
+                                margin={[0, 1]}
                                 isDraggable={true}
                                 isDroppable={true}
-                                onDragStart={(_, item) => {
-                                    const draggedItem = inventoryOptions.find(
-                                        (opt) => opt.itemuid === item.i
-                                    );
-                                    setDraggedItem(draggedItem || null);
-                                }}
                                 onDragStop={handleDragItem}
                                 draggableCancel='.option-control__button, .inventory-options__edit-button, .inventory-options__delete-button, .row-edit'
                             >
@@ -241,7 +251,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                                     className='inventory-option-number col-1 flex align-items-center'
                                 >
                                     <span className='option-control__number'>
-                                        {index + 1 + inventoryOptions.length / 2}
+                                        {index + 1 + Math.floor(inventoryOptions.length / 2)}
                                     </span>
                                 </div>
                             ))}
