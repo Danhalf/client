@@ -321,6 +321,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
                             position: "bottom",
                         }}
                         onClick={() => {
+                            setCurrentPromise(null);
                             setAddPromiseVisible(true);
                         }}
                         outlined

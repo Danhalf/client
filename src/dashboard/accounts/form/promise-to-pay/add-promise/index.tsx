@@ -110,7 +110,7 @@ export const AddPromiseDialog = observer(
                 buttonDisabled={isButtonDisabled}
                 {...props}
             >
-                <div className='grid row-gap-3'>
+                <div className='grid row-gap-2'>
                     <div className='add-note__info m-3'>
                         <strong>Date & Time: </strong>
                         <span className='add-note__time'>{currentTime}</span>
