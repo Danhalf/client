@@ -21,6 +21,8 @@ import { TOAST_LIFETIME } from "common/settings";
 import { ACCOUNT_PROMISE_STATUS } from "common/constants/account-options";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { observer } from "mobx-react-lite";
+import { MenuItem } from "primereact/menuitem";
+import { TypeList } from "common/models";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof AccountPromise | "";
@@ -167,6 +169,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
     const paymentItems = [
         {
             label: "Set Paid Late",
+            id: ACCOUNT_PROMISE_STATUS.find((item) => item.name === PAID_STATUS.LATE)?.id,
             icon: `pi pi-circle pi-circle--${PAID_COLOR.LATE}`,
             command: () => {
                 handleChangePromiseStatus(PAID_STATUS.LATE);
@@ -174,6 +177,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
         },
         {
             label: "Set Promise Broken",
+            id: ACCOUNT_PROMISE_STATUS.find((item) => item.name === PAID_STATUS.BROKEN)?.id,
             icon: `pi pi-circle pi-circle--${PAID_COLOR.BROKEN}`,
             command: () => {
                 handleChangePromiseStatus(PAID_STATUS.BROKEN);
@@ -181,6 +185,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
         },
         {
             label: "Set Outstanding",
+            id: ACCOUNT_PROMISE_STATUS.find((item) => item.name === PAID_STATUS.OUTSTANDING)?.id,
             icon: `pi pi-circle pi-circle--${PAID_COLOR.OUTSTANDING}`,
             command: () => {
                 handleChangePromiseStatus(PAID_STATUS.OUTSTANDING);
@@ -327,7 +332,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
                         outlined
                     />
                     <SplitButton
-                        model={paymentItems}
+                        model={paymentItems as MenuItem[]}
                         className='account__split-button ml-auto'
                         label='Set Paid As Promised'
                         tooltip='Set Paid As Promised'
@@ -428,7 +433,12 @@ export const AccountPromiseToPay = observer((): ReactElement => {
                 }}
                 currentPromise={currentPromise}
                 onHide={() => setAddPromiseVisible(false)}
-                statusList={Object.values(paymentItems).map((item) => item.label)}
+                statusList={
+                    Object.values(paymentItems).map((item) => ({
+                        name: item.label,
+                        id: item.id,
+                    })) as TypeList[]
+                }
                 visible={addPromiseVisible}
                 accountuid={id}
             />
