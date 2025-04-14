@@ -97,6 +97,10 @@ export class InventoryStore {
     private _uploadFileDocuments: UploadMediaItem = initialMediaItem;
     private _documents: MediaItem[] = [];
 
+    private _inventoryLinksID: Partial<InventoryMediaItemID>[] = [];
+    private _uploadFileLinks: UploadMediaItem = initialMediaItem;
+    private _links: MediaItem[] = [];
+
     private _printList: InventoryPrintForm[] = [];
     private _formErrorIndex: number[] = [];
     private _currentLocation: string = "";
@@ -162,6 +166,10 @@ export class InventoryStore {
     }
     public get documents() {
         return this._documents;
+    }
+
+    public get links() {
+        return this._links;
     }
 
     public get inventoryExportWebHistory() {
@@ -283,6 +291,13 @@ export class InventoryStore {
                                 break;
                             case MediaType.mtDocument:
                                 this.documents.push({
+                                    src: "",
+                                    itemuid,
+                                    info,
+                                });
+                                break;
+                            case MediaType.mtLink:
+                                this.links.push({
                                     src: "",
                                     itemuid,
                                     info,
@@ -609,6 +624,8 @@ export class InventoryStore {
                 this._videos = result;
             } else if (mediaType === MediaType.mtAudio) {
                 this._audios = result;
+            } else if (mediaType === MediaType.mtLink) {
+                this._links = result;
             }
         } catch (error) {
             // TODO: add error handler
@@ -639,6 +656,12 @@ export class InventoryStore {
         this._documents = [];
         this._inventoryDocumentsID = [];
         await this.fetchMedia(MediaType.mtDocument, this._documents, this._inventoryDocumentsID);
+    });
+
+    public fetchLinks = action(async () => {
+        this._links = [];
+        this._inventoryLinksID = [];
+        await this.fetchMedia(MediaType.mtLink, this._links, this._inventoryLinksID);
     });
 
     public getPrintList = action(async (inventoryuid = this._inventoryID) => {

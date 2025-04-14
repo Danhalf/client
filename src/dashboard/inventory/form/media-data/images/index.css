@@ -217,6 +217,7 @@
     color: var(--admss-app-medium-grey);
     background-color: transparent;
 }
+
 .media-images__close i {
     font-size: 14px;
     font-weight: 600;
