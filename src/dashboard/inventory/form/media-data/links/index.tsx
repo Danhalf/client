@@ -15,7 +15,8 @@ export const LinksMedia = observer((): ReactElement => {
     const { id } = useParams();
     const {
         getInventory,
-        // saveInventoryLinks,
+        saveInventoryLinks,
+        uploadFileLinks,
         // uploadFileLinks,
         links,
         isLoading,
@@ -67,8 +68,13 @@ export const LinksMedia = observer((): ReactElement => {
                 <span className='p-float-label'>
                     <InputTextarea
                         className='media-input__text w-full'
-                        // value={uploadFileLinks?.data?.notes || ""}
-                        // onChange={handleCommentaryChange}
+                        value={uploadFileLinks?.data?.mediaurl || ""}
+                        onChange={(e) => {
+                            store.uploadFileLinks = {
+                                ...store.uploadFileLinks,
+                                data: { ...store.uploadFileLinks.data, mediaurl: e.target.value },
+                            };
+                        }}
                     />
                     <label htmlFor='link'>Link</label>
                 </span>
@@ -94,6 +100,7 @@ export const LinksMedia = observer((): ReactElement => {
                     severity={totalCount ? "success" : "secondary"}
                     disabled={!totalCount || isLoading}
                     className='p-button media-input__button'
+                    onClick={saveInventoryLinks}
                 >
                     Save
                 </Button>

@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { AccountPayment } from "common/models/accounts";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { MediaType } from "common/models/enums";
@@ -170,6 +171,9 @@ export class InventoryStore {
 
     public get links() {
         return this._links;
+    }
+    public get uploadFileLinks() {
+        return this._uploadFileLinks;
     }
 
     public get inventoryExportWebHistory() {
@@ -475,6 +479,7 @@ export class InventoryStore {
                     [MediaType.mtVideo, this._uploadFileVideos],
                     [MediaType.mtAudio, this._uploadFileAudios],
                     [MediaType.mtDocument, this._uploadFileDocuments],
+                    [MediaType.mtLink, this._uploadFileLinks],
                 ]);
                 const uploadPromises = (currentMt.get(mediaType) || { file: [] }).file.map(
                     async (file) => {
@@ -486,17 +491,36 @@ export class InventoryStore {
                                 mediaType
                             )) as CreateMediaItemRecordResponse;
                             if (createMediaResponse?.status === Status.OK) {
-                                const uploadMediaResponse = (await uploadInventoryMedia(
-                                    createMediaResponse.itemUID,
-                                    formData
-                                )) as InventorySetResponse;
-                                if (uploadMediaResponse?.status === Status.OK) {
+                                if (mediaType !== MediaType.mtLink) {
+                                    const uploadMediaResponse = (await uploadInventoryMedia(
+                                        createMediaResponse.itemUID,
+                                        formData
+                                    )) as InventorySetResponse;
+                                    if (uploadMediaResponse?.status === Status.OK) {
+                                        await setMediaItemData(this._inventoryID, {
+                                            mediaitemuid: uploadMediaResponse.itemuid,
+                                            contenttype: (
+                                                currentMt.get(mediaType) as UploadMediaItem
+                                            ).data.contenttype,
+                                            notes: (currentMt.get(mediaType) as UploadMediaItem)
+                                                .data.notes,
+                                            type: mediaType,
+                                        }).then((response) => {
+                                            if (response?.status === Status.ERROR) {
+                                                const { error } = response as BaseResponseError;
+                                                this._formErrorMessage =
+                                                    error || "Failed to upload file";
+                                            }
+                                        });
+                                    }
+                                } else {
                                     await setMediaItemData(this._inventoryID, {
-                                        mediaitemuid: uploadMediaResponse.itemuid,
                                         contenttype: (currentMt.get(mediaType) as UploadMediaItem)
                                             .data.contenttype,
                                         notes: (currentMt.get(mediaType) as UploadMediaItem).data
                                             .notes,
+                                        mediaurl: (currentMt.get(mediaType) as UploadMediaItem).data
+                                            .mediaurl,
                                         type: mediaType,
                                     }).then((response) => {
                                         if (response?.status === Status.ERROR) {
@@ -573,6 +597,21 @@ export class InventoryStore {
         } catch (error) {
             // TODO: add error handler
             return undefined;
+        }
+    });
+
+    public saveInventoryLinks = action(async (): Promise<BaseResponseError | undefined> => {
+        try {
+            this._links = [];
+            await this.saveInventoryMedia(MediaType.mtLink);
+            this._uploadFileLinks = initialMediaItem;
+            this.fetchLinks();
+        } catch (error) {
+            const err = error as AxiosError;
+            return {
+                status: Status.ERROR,
+                error: err?.message,
+            };
         }
     });
 
@@ -713,6 +752,11 @@ export class InventoryStore {
     public set uploadFileDocuments(files: UploadMediaItem) {
         this._uploadFileDocuments = files;
     }
+
+    public set uploadFileLinks(files: UploadMediaItem) {
+        this._uploadFileLinks = files;
+    }
+
     public set exportWebActive(state: boolean) {
         this._exportWebActive = state;
     }
