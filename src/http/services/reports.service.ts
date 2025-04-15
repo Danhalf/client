@@ -228,10 +228,10 @@ export const createCustomReport = async (
     }
 };
 
-export const updateReportInfo = async (uid: string, body: Partial<ReportSetParams>) => {
+export const updateReportInfo = async (reportuid: string, body: Partial<ReportSetParams>) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `reports/${uid}/reportinfo`,
+            `reports/${reportuid}/reportinfo`,
             body
         );
         return request.data;
@@ -428,10 +428,10 @@ export const setCollectionOrder = async (collectionuid: string, order: number) =
     }
 };
 
-export const updateCollection = async (collectionuid: string, body: Partial<ReportCollection>) => {
+export const updateCollection = async (useruid: string, body: Partial<ReportCollection>) => {
     try {
         const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
-            `reports/${collectionuid}/collectionupdate`,
+            `reports/${useruid}/collectionupdate`,
             body
         );
         return request.data;
@@ -440,7 +440,7 @@ export const updateCollection = async (collectionuid: string, body: Partial<Repo
             return {
                 status: Status.ERROR,
                 error:
-                    error.response?.data.message ||
+                    error.response?.data.info ||
                     error.response?.data.error ||
                     "Error while updating collection",
             };
