@@ -554,6 +554,7 @@ export class InventoryStore {
                 if (createMediaResponse?.status === Status.OK) {
                     await setMediaItemData(this._inventoryID, {
                         contenttype: this._uploadFileLinks.contenttype,
+                        mediaitemuid: createMediaResponse.itemUID,
                         notes: this._uploadFileLinks.notes,
                         mediaurl: this._uploadFileLinks.mediaurl,
                         type: mediaType,
