@@ -53,12 +53,24 @@ interface UploadMediaItem {
     data: Partial<InventoryMediaPostData>;
 }
 
+interface UploadMediaLink {
+    contenttype: number;
+    notes: string;
+    mediaurl: string;
+}
+
 const initialMediaItem: UploadMediaItem = {
     file: [],
     data: {
         contenttype: MediaType.mtUnknown,
         notes: "",
     },
+};
+
+const initialMediaLink: UploadMediaLink = {
+    contenttype: MediaType.mtUnknown,
+    notes: "",
+    mediaurl: "",
 };
 
 const initialAuditState: Partial<Audit> = {
@@ -99,7 +111,7 @@ export class InventoryStore {
     private _documents: MediaItem[] = [];
 
     private _inventoryLinksID: Partial<InventoryMediaItemID>[] = [];
-    private _uploadFileLinks: UploadMediaItem = initialMediaItem;
+    private _uploadFileLinks: UploadMediaLink = initialMediaLink;
     private _links: MediaItem[] = [];
 
     private _printList: InventoryPrintForm[] = [];
@@ -479,7 +491,6 @@ export class InventoryStore {
                     [MediaType.mtVideo, this._uploadFileVideos],
                     [MediaType.mtAudio, this._uploadFileAudios],
                     [MediaType.mtDocument, this._uploadFileDocuments],
-                    [MediaType.mtLink, this._uploadFileLinks],
                 ]);
                 const uploadPromises = (currentMt.get(mediaType) || { file: [] }).file.map(
                     async (file) => {
@@ -491,36 +502,17 @@ export class InventoryStore {
                                 mediaType
                             )) as CreateMediaItemRecordResponse;
                             if (createMediaResponse?.status === Status.OK) {
-                                if (mediaType !== MediaType.mtLink) {
-                                    const uploadMediaResponse = (await uploadInventoryMedia(
-                                        createMediaResponse.itemUID,
-                                        formData
-                                    )) as InventorySetResponse;
-                                    if (uploadMediaResponse?.status === Status.OK) {
-                                        await setMediaItemData(this._inventoryID, {
-                                            mediaitemuid: uploadMediaResponse.itemuid,
-                                            contenttype: (
-                                                currentMt.get(mediaType) as UploadMediaItem
-                                            ).data.contenttype,
-                                            notes: (currentMt.get(mediaType) as UploadMediaItem)
-                                                .data.notes,
-                                            type: mediaType,
-                                        }).then((response) => {
-                                            if (response?.status === Status.ERROR) {
-                                                const { error } = response as BaseResponseError;
-                                                this._formErrorMessage =
-                                                    error || "Failed to upload file";
-                                            }
-                                        });
-                                    }
-                                } else {
+                                const uploadMediaResponse = (await uploadInventoryMedia(
+                                    createMediaResponse.itemUID,
+                                    formData
+                                )) as InventorySetResponse;
+                                if (uploadMediaResponse?.status === Status.OK) {
                                     await setMediaItemData(this._inventoryID, {
+                                        mediaitemuid: uploadMediaResponse.itemuid,
                                         contenttype: (currentMt.get(mediaType) as UploadMediaItem)
                                             .data.contenttype,
                                         notes: (currentMt.get(mediaType) as UploadMediaItem).data
                                             .notes,
-                                        mediaurl: (currentMt.get(mediaType) as UploadMediaItem).data
-                                            .mediaurl,
                                         type: mediaType,
                                     }).then((response) => {
                                         if (response?.status === Status.ERROR) {
@@ -549,6 +541,42 @@ export class InventoryStore {
             }
         }
     );
+
+    private saveInventoryMediaLink = action(async (): Promise<Status | undefined> => {
+        try {
+            this._isLoading = true;
+            const mediaType = MediaType.mtLink;
+
+            try {
+                const createMediaResponse = (await createMediaItemRecord(
+                    mediaType
+                )) as CreateMediaItemRecordResponse;
+                if (createMediaResponse?.status === Status.OK) {
+                    await setMediaItemData(this._inventoryID, {
+                        contenttype: this._uploadFileLinks.contenttype,
+                        notes: this._uploadFileLinks.notes,
+                        mediaurl: this._uploadFileLinks.mediaurl,
+                        type: mediaType,
+                    }).then((response) => {
+                        if (response?.status === Status.ERROR) {
+                            const { error } = response as BaseResponseError;
+                            this._formErrorMessage = error || "Failed to save link";
+                        }
+                    });
+                }
+            } finally {
+                this._isLoading = false;
+                this._formErrorMessage = "";
+            }
+
+            return Status.OK;
+        } catch (error) {
+            // TODO: add error handler
+            return undefined;
+        } finally {
+            this._isLoading = false;
+        }
+    });
 
     public saveInventoryImages = action(async (): Promise<Status | undefined> => {
         try {
@@ -603,8 +631,8 @@ export class InventoryStore {
     public saveInventoryLinks = action(async (): Promise<BaseResponseError | undefined> => {
         try {
             this._links = [];
-            await this.saveInventoryMedia(MediaType.mtLink);
-            this._uploadFileLinks = initialMediaItem;
+            await this.saveInventoryMediaLink();
+            this._uploadFileLinks = initialMediaLink;
             this.fetchLinks();
         } catch (error) {
             const err = error as AxiosError;
@@ -753,8 +781,8 @@ export class InventoryStore {
         this._uploadFileDocuments = files;
     }
 
-    public set uploadFileLinks(files: UploadMediaItem) {
-        this._uploadFileLinks = files;
+    public set uploadFileLinks(data: UploadMediaLink) {
+        this._uploadFileLinks = data;
     }
 
     public set exportWebActive(state: boolean) {
