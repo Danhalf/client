@@ -154,9 +154,9 @@ export const LinksMedia = observer((): ReactElement => {
     const actionColumnTemplate = (rowData: MediaItem) => {
         const mediaUrl = (rowData.info as UploadMediaLink)?.mediaurl || "";
         return (
-            <div className='flex gap-2'>
+            <div className='media-links__action-row'>
                 <Button
-                    tooltip='Navigate to link'
+                    tooltip='Open'
                     type='button'
                     className='inventory-links__navigate-button'
                     icon='adms-open'
@@ -164,7 +164,7 @@ export const LinksMedia = observer((): ReactElement => {
                     onClick={() => handleNavigateToLink(mediaUrl)}
                 />
                 <Button
-                    tooltip='Copy link'
+                    tooltip='Copy'
                     type='button'
                     className='inventory-links__copy-button'
                     icon='adms-copy'
@@ -172,7 +172,7 @@ export const LinksMedia = observer((): ReactElement => {
                     onClick={() => handleCopyLink(mediaUrl)}
                 />
                 <Button
-                    tooltip='Delete link'
+                    tooltip='Delete'
                     type='button'
                     className='inventory-links__delete-button'
                     icon='icon adms-trash-can'
@@ -184,8 +184,8 @@ export const LinksMedia = observer((): ReactElement => {
 
     const numberColumnTemplate = (rowData: MediaItem, { rowIndex }: { rowIndex: number }) => {
         return (
-            <div className='flex gap-2'>
-                <span className='link-number'>{rowIndex + 1}</span>
+            <div className='media-links__expand-row'>
+                <span className='media-links__number'>{rowIndex + 1}</span>
                 <Button
                     tooltip='Expand'
                     type='button'
@@ -279,14 +279,10 @@ export const LinksMedia = observer((): ReactElement => {
                             onRowToggle={handleRowToggle}
                             className='media-links-table'
                         >
-                            <Column body={linkControlTemplate} style={{ width: "10%" }} />
-                            <Column
-                                header='#'
-                                body={numberColumnTemplate}
-                                style={{ width: "10%" }}
-                            />
-                            <Column field='info.mediaurl' header='URL' style={{ width: "65%" }} />
-                            <Column body={actionColumnTemplate} style={{ width: "15%" }} />
+                            <Column body={linkControlTemplate} />
+                            <Column header='#' body={numberColumnTemplate} />
+                            <Column field='info.mediaurl' header='URL' style={{ width: "70%" }} />
+                            <Column body={actionColumnTemplate} />
                         </DataTable>
                     ) : (
                         <div className='media-links__empty'>No links added yet.</div>
