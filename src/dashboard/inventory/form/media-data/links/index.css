@@ -3,4 +3,23 @@
         height: 110px;
         resize: none;
     }
+
+    .p-tooltip-target-wrapper {
+        width: 23%;
+        .p-button {
+            width: 100%;
+        }
+    }
+
+    .p-datatable {
+        .p-datatable-thead {
+            height: 60px;
+        }
+
+        .p-datatable-tbody tr,
+        .p-datatable-tbody tr td {
+            height: 50px;
+            padding: 0;
+        }
+    }
 }

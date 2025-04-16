@@ -12,10 +12,12 @@ import {
     InventoryPrintForm,
     Audit,
     InventoryMediaPostData,
-    InventoryMedia,
     InventoryWebCheck,
     CreateMediaItemRecordResponse,
     InventorySetResponse,
+    UploadMediaLink,
+    UploadMediaItem,
+    MediaItem,
 } from "common/models/inventory";
 import { getAccountPayment } from "http/services/accounts.service";
 import {
@@ -38,26 +40,6 @@ import {
 } from "http/services/media.service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
-
-export interface MediaItem {
-    src: string;
-    itemuid: string;
-    mediauid?: string;
-    info?: Partial<InventoryMedia> & {
-        order?: number;
-    };
-}
-
-interface UploadMediaItem {
-    file: File[];
-    data: Partial<InventoryMediaPostData>;
-}
-
-interface UploadMediaLink {
-    contenttype: number;
-    notes: string;
-    mediaurl: string;
-}
 
 const initialMediaItem: UploadMediaItem = {
     file: [],

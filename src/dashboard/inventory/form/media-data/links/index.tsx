@@ -1,5 +1,5 @@
 import "./index.css";
-import { ChangeEvent, ReactElement, useEffect } from "react";
+import { ChangeEvent, ReactElement, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
@@ -9,16 +9,27 @@ import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { InputTextarea } from "primereact/inputtextarea";
-import { Responsive, WidthProvider } from "react-grid-layout";
 import { useToast } from "dashboard/common/toast";
-import { MediaLinkHeaderColumn, MediaLinkItem } from "./link-item";
+import { MediaLinkRowExpansionTemplate } from "./link-item";
+import { MediaItem, UploadMediaLink } from "common/models/inventory";
+import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
+import { Column } from "primereact/column";
 
-const ResponsiveReactGridLayout = WidthProvider(Responsive);
+const isValidUrl = (url: string): boolean => {
+    try {
+        new URL(url);
+        return true;
+    } catch {
+        return false;
+    }
+};
 
 export const LinksMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const { id } = useParams();
     const toast = useToast();
+    const [expandedRows, setExpandedRows] = useState<MediaItem[]>([]);
+    const [isUrlValid, setIsUrlValid] = useState(true);
     const {
         getInventory,
         saveInventoryLinks,
@@ -65,6 +76,17 @@ export const LinksMedia = observer((): ReactElement => {
         };
     };
 
+    const handleUrlChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+        const url = e.target.value;
+        const isValid = url ? isValidUrl(url) : true;
+        setIsUrlValid(isValid);
+
+        store.uploadFileLinks = {
+            ...uploadFileLinks,
+            mediaurl: url,
+        };
+    };
+
     const handleUploadLink = () => {
         if (formErrorMessage) {
             toast.current?.show({
@@ -78,14 +100,131 @@ export const LinksMedia = observer((): ReactElement => {
         saveInventoryLinks();
     };
 
-    const layouts = {
-        lg: links.map((item: any, index: number) => ({
-            i: item.info?.mediauid || `${index}`,
-            x: 0,
-            y: index,
-            w: 1,
-            h: 1,
-        })),
+    const handleCopyLink = (url: string) => {
+        navigator.clipboard
+            .writeText(url)
+            .then(() => {
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "URL copied to clipboard",
+                });
+            })
+            .catch(() => {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Failed to copy URL",
+                });
+            });
+    };
+
+    const handleNavigateToLink = (url: string) => {
+        if (url) {
+            window.open(url, "_blank");
+        } else {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Invalid URL",
+            });
+        }
+    };
+
+    const handleRowExpansionClick = (data: MediaItem) => {
+        const index = expandedRows.findIndex((item) => item.itemuid === data.itemuid);
+        if (index === -1) {
+            setExpandedRows([...expandedRows, data]);
+        } else {
+            const newExpandedRows = [...expandedRows];
+            newExpandedRows.splice(index, 1);
+            setExpandedRows(newExpandedRows);
+        }
+    };
+
+    const rowExpansionTemplate = (data: MediaItem) => {
+        return (
+            <MediaLinkRowExpansionTemplate
+                notes={data.info?.notes}
+                contenttype={data.info?.contenttype}
+            />
+        );
+    };
+
+    const actionColumnTemplate = (rowData: MediaItem) => {
+        const mediaUrl = (rowData.info as UploadMediaLink)?.mediaurl || "";
+        return (
+            <div className='flex gap-2'>
+                <Button
+                    tooltip='Navigate to link'
+                    type='button'
+                    className='inventory-links__navigate-button'
+                    icon='adms-open'
+                    text
+                    onClick={() => handleNavigateToLink(mediaUrl)}
+                />
+                <Button
+                    tooltip='Copy link'
+                    type='button'
+                    className='inventory-links__copy-button'
+                    icon='adms-copy'
+                    text
+                    onClick={() => handleCopyLink(mediaUrl)}
+                />
+                <Button
+                    tooltip='Delete link'
+                    type='button'
+                    className='inventory-links__delete-button'
+                    icon='icon adms-trash-can'
+                    text
+                />
+            </div>
+        );
+    };
+
+    const numberColumnTemplate = (rowData: MediaItem, { rowIndex }: { rowIndex: number }) => {
+        return (
+            <div className='flex gap-2'>
+                <span className='link-number'>{rowIndex + 1}</span>
+                <Button
+                    tooltip='Expand'
+                    type='button'
+                    className='inventory-links__expand-button'
+                    icon='pi pi-angle-down'
+                    text
+                    onClick={() => handleRowExpansionClick(rowData)}
+                />
+            </div>
+        );
+    };
+
+    const handleRowToggle = (e: DataTableRowClickEvent) => {
+        setExpandedRows(e.data as MediaItem[]);
+    };
+
+    const linkControlTemplate = () => {
+        return (
+            <div className='link-control p-0 flex justify-content-center'>
+                <Button
+                    icon='pi pi-arrow-circle-up'
+                    type='button'
+                    rounded
+                    text
+                    severity='success'
+                    tooltip='Up'
+                    className='p-button-text link-control__button'
+                />
+                <Button
+                    icon='pi pi-arrow-circle-down'
+                    type='button'
+                    rounded
+                    text
+                    severity='success'
+                    tooltip='Down'
+                    className='p-button-text link-control__button'
+                />
+            </div>
+        );
     };
 
     return (
@@ -96,18 +235,13 @@ export const LinksMedia = observer((): ReactElement => {
                     <InputTextarea
                         className='media-links__textarea w-full'
                         value={uploadFileLinks?.mediaurl || ""}
-                        onChange={(e) => {
-                            store.uploadFileLinks = {
-                                ...uploadFileLinks,
-                                mediaurl: e.target.value,
-                            };
-                        }}
+                        onChange={handleUrlChange}
                     />
-                    <label htmlFor='link'>Link</label>
+                    <label htmlFor='link'>URL</label>
                 </span>
             </div>
 
-            <div className='col-12 mt-4 media-input'>
+            <div className='col-12 mt-2 media-input'>
                 <Dropdown
                     className='media-input__dropdown'
                     placeholder='Category'
@@ -124,33 +258,36 @@ export const LinksMedia = observer((): ReactElement => {
                     onChange={handleCommentaryChange}
                 />
                 <Button
-                    severity='success'
                     type='button'
-                    disabled={isLoading}
+                    disabled={isLoading || !isUrlValid || !uploadFileLinks?.mediaurl}
+                    tooltip={!isUrlValid ? "Please enter a valid URL" : ""}
+                    tooltipOptions={{ showOnDisabled: true, position: "mouse" }}
+                    severity={!isUrlValid ? "secondary" : "success"}
                     className='p-button media-input__button'
                     onClick={handleUploadLink}
                 >
                     Save
                 </Button>
             </div>
-            <div className='media-links col-12'>
+            <div className='media-links mt-4 col-12'>
                 <div className='inventory-content w-full'>
-                    <MediaLinkHeaderColumn />
                     {links.length ? (
-                        <ResponsiveReactGridLayout
-                            className='layout relative w-full'
-                            layouts={layouts}
-                            cols={{ lg: 1, md: 1, sm: 1, xs: 1, xxs: 1 }}
-                            rowHeight={80}
-                            width={1200}
-                            margin={[0, 1]}
+                        <DataTable
+                            value={links}
+                            rowExpansionTemplate={rowExpansionTemplate}
+                            expandedRows={expandedRows}
+                            onRowToggle={handleRowToggle}
+                            className='media-links-table'
                         >
-                            {links.map((item: any, index: number) => (
-                                <div key={`${index}`}>
-                                    <MediaLinkItem item={item} index={index} />
-                                </div>
-                            ))}
-                        </ResponsiveReactGridLayout>
+                            <Column body={linkControlTemplate} style={{ width: "10%" }} />
+                            <Column
+                                header='#'
+                                body={numberColumnTemplate}
+                                style={{ width: "10%" }}
+                            />
+                            <Column field='info.mediaurl' header='URL' style={{ width: "65%" }} />
+                            <Column body={actionColumnTemplate} style={{ width: "15%" }} />
+                        </DataTable>
                     ) : (
                         <div className='media-links__empty'>No links added yet.</div>
                     )}
