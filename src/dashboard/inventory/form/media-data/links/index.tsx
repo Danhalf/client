@@ -14,6 +14,7 @@ import { MediaLinkRowExpansionTemplate } from "./link-item";
 import { MediaItem, UploadMediaLink } from "common/models/inventory";
 import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Status } from "common/models/base-response";
 
 const isValidUrl = (url: string): boolean => {
     try {
@@ -41,6 +42,7 @@ export const LinksMedia = observer((): ReactElement => {
         isFormChanged,
         formErrorMessage,
         removeMedia,
+        changeInventoryLinksOrder,
     } = store;
 
     useEffect(() => {
@@ -160,6 +162,70 @@ export const LinksMedia = observer((): ReactElement => {
         }
     };
 
+    const handleMoveUp = async (link: MediaItem) => {
+        try {
+            const currentIndex = links.findIndex((item) => item.itemuid === link.itemuid);
+            if (currentIndex > 0) {
+                const newOrder = links[currentIndex - 1].info?.order ?? 0;
+                const status = await changeInventoryLinksOrder([
+                    { itemuid: link.itemuid, order: newOrder },
+                ]);
+                if (status === Status.OK) {
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "Link order updated successfully",
+                    });
+                    await fetchLinks();
+                } else {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Failed to update link order",
+                    });
+                }
+            }
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Failed to update link order",
+            });
+        }
+    };
+
+    const handleMoveDown = async (link: MediaItem) => {
+        try {
+            const currentIndex = links.findIndex((item) => item.itemuid === link.itemuid);
+            if (currentIndex < links.length - 1) {
+                const newOrder = links[currentIndex + 1].info?.order ?? 0;
+                const status = await changeInventoryLinksOrder([
+                    { itemuid: link.itemuid, order: newOrder },
+                ]);
+                if (status === Status.OK) {
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "Link order updated successfully",
+                    });
+                    await fetchLinks();
+                } else {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Failed to update link order",
+                    });
+                }
+            }
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Failed to update link order",
+            });
+        }
+    };
+
     const rowExpansionTemplate = (data: MediaItem) => {
         return (
             <MediaLinkRowExpansionTemplate
@@ -221,7 +287,7 @@ export const LinksMedia = observer((): ReactElement => {
         setExpandedRows(e.data as MediaItem[]);
     };
 
-    const linkControlTemplate = () => {
+    const linkControlTemplate = (rowData: MediaItem) => {
         return (
             <div className='link-control p-0 flex justify-content-center'>
                 <Button
@@ -229,18 +295,22 @@ export const LinksMedia = observer((): ReactElement => {
                     type='button'
                     rounded
                     text
-                    severity='success'
+                    severity={rowData.info?.order === 0 ? "secondary" : "success"}
                     tooltip='Up'
                     className='p-button-text link-control__button'
+                    disabled={rowData.info?.order === 0}
+                    onClick={() => handleMoveUp(rowData)}
                 />
                 <Button
                     icon='pi pi-arrow-circle-down'
                     type='button'
                     rounded
                     text
-                    severity='success'
+                    severity={rowData.info?.order === links.length - 1 ? "secondary" : "success"}
+                    disabled={rowData.info?.order === links.length - 1}
                     tooltip='Down'
                     className='p-button-text link-control__button'
+                    onClick={() => handleMoveDown(rowData)}
                 />
             </div>
         );
