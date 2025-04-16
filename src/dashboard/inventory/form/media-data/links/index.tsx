@@ -40,6 +40,7 @@ export const LinksMedia = observer((): ReactElement => {
         clearMedia,
         isFormChanged,
         formErrorMessage,
+        removeMedia,
     } = store;
 
     useEffect(() => {
@@ -131,6 +132,23 @@ export const LinksMedia = observer((): ReactElement => {
         }
     };
 
+    const handleDeleteLink = async (link: MediaItem) => {
+        try {
+            await removeMedia(link.itemuid, () => {});
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Link deleted successfully",
+            });
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Failed to delete link",
+            });
+        }
+    };
+
     const handleRowExpansionClick = (data: MediaItem) => {
         const index = expandedRows.findIndex((item) => item.itemuid === data.itemuid);
         if (index === -1) {
@@ -175,8 +193,9 @@ export const LinksMedia = observer((): ReactElement => {
                     tooltip='Delete'
                     type='button'
                     className='inventory-links__delete-button'
-                    icon='icon adms-trash-can'
+                    icon='adms-trash-can'
                     text
+                    onClick={() => handleDeleteLink(rowData)}
                 />
             </div>
         );
