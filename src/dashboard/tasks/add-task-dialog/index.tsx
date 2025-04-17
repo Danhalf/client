@@ -20,6 +20,7 @@ import { observer } from "mobx-react-lite";
 import { ContactUser } from "common/models/contact";
 import { Deal } from "common/models/deals";
 import { Account } from "common/models/accounts";
+import { useDateRange } from "common/hooks";
 
 enum DATE_TYPE {
     START = "startdate",
@@ -54,6 +55,7 @@ export const AddTaskDialog = observer(
         const [assignToData, setAssignToData] = useState<TaskUser[] | null>(null);
         const [isFormChanged, setIsFormChanged] = useState<boolean>(false);
         const [isSaving, setIsSaving] = useState<boolean>(false);
+        const { startDate, endDate, handleDateChange } = useDateRange();
 
         const isSubmitDisabled = !taskState.description?.trim() || !isFormChanged || isSaving;
 
@@ -77,23 +79,25 @@ export const AddTaskDialog = observer(
             }
         }, [visible]);
 
-        const handleDateChange = (key: DATE_TYPE, date: number) => {
-            setIsFormChanged(true);
-            if (key === DATE_TYPE.START) {
-                setTaskState((prev) => {
-                    const currentDeadline = prev.deadline ? Number(prev.deadline) : 0;
-                    const shouldUpdateDeadline = !prev.deadline || currentDeadline < date;
-
-                    return {
-                        ...prev,
-                        [key]: String(date),
-                        ...(shouldUpdateDeadline ? { [DATE_TYPE.DEADLINE]: String(date) } : {}),
-                    };
-                });
-            } else {
-                setTaskState((prev) => ({ ...prev, [key]: String(date) }));
+        useEffect(() => {
+            if (startDate) {
+                setTaskState((prev) => ({
+                    ...prev,
+                    [DATE_TYPE.START]: String(startDate),
+                }));
+                setIsFormChanged(true);
             }
-        };
+        }, [startDate]);
+
+        useEffect(() => {
+            if (endDate) {
+                setTaskState((prev) => ({
+                    ...prev,
+                    [DATE_TYPE.DEADLINE]: String(endDate),
+                }));
+                setIsFormChanged(true);
+            }
+        }, [endDate]);
 
         const handleInputChange = (key: keyof PostDataTask, value: string) => {
             setTaskState((prev) => ({ ...prev, [key]: value }));
@@ -186,7 +190,7 @@ export const AddTaskDialog = observer(
                             name='Start Date'
                             showTime
                             hourFormat='12'
-                            onChange={(e) => handleDateChange(DATE_TYPE.START, Number(e.value))}
+                            onChange={({ value }) => handleDateChange(Number(value), true)}
                         />
                     </div>
                     <div className='p-inputgroup'>
@@ -201,7 +205,7 @@ export const AddTaskDialog = observer(
                                     ? new Date(Number(taskState.startdate))
                                     : undefined
                             }
-                            onChange={(e) => handleDateChange(DATE_TYPE.DEADLINE, Number(e.value))}
+                            onChange={({ value }) => handleDateChange(Number(value), false)}
                         />
                     </div>
                 </div>
