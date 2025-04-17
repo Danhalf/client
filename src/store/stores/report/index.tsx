@@ -213,6 +213,7 @@ export class ReportStore {
                                 this._report.itemuid!,
                                 {
                                     itemuid: this._report.itemuid!,
+                                    useruid: this.rootStore.userStore.authUser?.useruid!,
                                     collections,
                                 }
                             );
