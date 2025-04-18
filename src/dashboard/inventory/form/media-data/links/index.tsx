@@ -268,7 +268,11 @@ export const LinksMedia = observer((): ReactElement => {
                 <Button
                     tooltip='Expand'
                     type='button'
-                    className='inventory-links__expand-button'
+                    className={`inventory-links__expand-button ${
+                        expandedRows.includes(rowData)
+                            ? "inventory-links__expand-button--rotate"
+                            : ""
+                    }`}
                     icon='pi pi-angle-down'
                     text
                     onClick={() => handleRowExpansionClick(rowData)}
@@ -281,7 +285,9 @@ export const LinksMedia = observer((): ReactElement => {
         setExpandedRows(e.data as MediaItem[]);
     };
 
-    const linkControlTemplate = (rowData: MediaItem) => {
+    const linkControlTemplate = (rowData: MediaItem, { rowIndex }: { rowIndex: number }) => {
+        const isFirst = rowIndex === 0;
+        const isLast = rowIndex === links.length - 1;
         return (
             <div className='link-control p-0 flex justify-content-center'>
                 <Button
@@ -289,10 +295,10 @@ export const LinksMedia = observer((): ReactElement => {
                     type='button'
                     rounded
                     text
-                    severity={rowData.info?.order === 0 ? "secondary" : "success"}
+                    severity={isFirst ? "secondary" : "success"}
                     tooltip='Up'
                     className='p-button-text link-control__button'
-                    disabled={rowData.info?.order === 0}
+                    disabled={isFirst}
                     onClick={() => handleMoveUp(rowData)}
                 />
                 <Button
@@ -300,8 +306,8 @@ export const LinksMedia = observer((): ReactElement => {
                     type='button'
                     rounded
                     text
-                    severity={rowData.info?.order === links.length - 1 ? "secondary" : "success"}
-                    disabled={rowData.info?.order === links.length - 1}
+                    severity={isLast ? "secondary" : "success"}
+                    disabled={isLast}
                     tooltip='Down'
                     className='p-button-text link-control__button'
                     onClick={() => handleMoveDown(rowData)}

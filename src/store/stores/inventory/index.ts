@@ -300,11 +300,16 @@ export class InventoryStore {
                                 });
                                 break;
                             case MediaType.mtLink:
-                                this._links.push({
-                                    src: "",
-                                    itemuid,
-                                    info,
-                                });
+                                const linkExists = this._links.some(
+                                    (link) => link.itemuid === itemuid
+                                );
+                                if (!linkExists) {
+                                    this._links.push({
+                                        src: "",
+                                        itemuid,
+                                        info,
+                                    });
+                                }
                                 break;
                             default:
                                 break;
@@ -521,7 +526,6 @@ export class InventoryStore {
 
                 return Status.OK;
             } catch (error) {
-                // TODO: add error handler
                 return undefined;
             } finally {
                 this._isLoading = false;
@@ -533,6 +537,16 @@ export class InventoryStore {
         try {
             this._isLoading = true;
             const mediaType = MediaType.mtLink;
+
+            const existingLink = this._links.find(
+                (link) =>
+                    link.info && (link.info as any).mediaurl === this._uploadFileLinks.mediaurl
+            );
+
+            if (existingLink) {
+                this._formErrorMessage = "A link with this URL already exists";
+                return Status.ERROR;
+            }
 
             try {
                 const createMediaResponse = (await createMediaItemRecord(
@@ -559,7 +573,6 @@ export class InventoryStore {
 
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         } finally {
             this._isLoading = false;
@@ -574,7 +587,6 @@ export class InventoryStore {
             this.fetchImages();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         }
     });
@@ -586,7 +598,6 @@ export class InventoryStore {
             this.fetchVideos();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         }
     });
@@ -598,7 +609,6 @@ export class InventoryStore {
             this.fetchAudios();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         }
     });
@@ -611,17 +621,17 @@ export class InventoryStore {
             this.fetchDocuments();
             return Status.OK;
         } catch (error) {
-            // TODO: add error handler
             return undefined;
         }
     });
 
     public saveInventoryLinks = action(async (): Promise<BaseResponseError | undefined> => {
         try {
-            this._links = [];
-            await this.saveInventoryMediaLink();
-            this._uploadFileLinks = initialMediaLink;
-            this.fetchLinks();
+            const result = await this.saveInventoryMediaLink();
+            if (result === Status.OK) {
+                await this.fetchLinks();
+            }
+            return undefined;
         } catch (error) {
             const err = error as AxiosError;
             return {
@@ -703,10 +713,21 @@ export class InventoryStore {
             } else if (mediaType === MediaType.mtAudio) {
                 this._audios = result;
             } else if (mediaType === MediaType.mtLink) {
-                this._links = result;
+                this._links = [];
+
+                const uniqueLinks: MediaItem[] = [];
+                result.forEach((link) => {
+                    const linkExists = uniqueLinks.some(
+                        (existingLink) => existingLink.itemuid === link.itemuid
+                    );
+                    if (!linkExists) {
+                        uniqueLinks.push(link);
+                    }
+                });
+
+                this._links = uniqueLinks;
             }
         } catch (error) {
-            // TODO: add error handler
         } finally {
             this._isLoading = false;
         }
@@ -754,7 +775,6 @@ export class InventoryStore {
                 this._printList = response;
             }
         } catch (error) {
-            // TODO: add error handler
         } finally {
             this._isLoading = false;
         }
@@ -858,6 +878,8 @@ export class InventoryStore {
         this._audios = [];
         this._inventoryDocumentsID = [];
         this._documents = [];
+        this._inventoryLinksID = [];
+        this._links = [];
     };
 
     public clearInventory = () => {
