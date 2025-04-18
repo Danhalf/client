@@ -102,6 +102,7 @@ export class InventoryStore {
     private _deleteReason: string = "";
     private _memoRoute: string = "";
     private _activeTab: number | null = null;
+    private _inventoryLoaded: boolean = false;
     protected _tabLength: number = 0;
 
     protected _isLoading: boolean = false;
@@ -213,14 +214,17 @@ export class InventoryStore {
         return this._memoRoute;
     }
 
-    public getInventory = async (itemuid: string) => {
+    public get inventoryLoaded() {
+        return this._inventoryLoaded;
+    }
+
+    public getInventory = async () => {
         try {
-            const response = (await getInventoryInfo(itemuid)) as BaseResponseError;
+            const response = (await getInventoryInfo(this._inventoryID)) as BaseResponseError;
             if (response?.status === Status.ERROR) {
                 throw response.error;
             } else {
                 const info = response as Inventory;
-                this._inventoryID = info.itemuid;
                 const { extdata, options_info, Audit, ...inventory } = info;
                 this._inventory = { ...inventory, Make: inventory.Make.toUpperCase() } as Inventory;
 
@@ -244,6 +248,7 @@ export class InventoryStore {
 
                 this._inventoryExtData = changedExtData || ({} as InventoryExtData);
                 this._inventoryAudit = Audit || (initialAuditState as Audit);
+                this._inventoryLoaded = true;
             }
         } catch (error) {
             return {
@@ -288,14 +293,14 @@ export class InventoryStore {
                                 this._inventoryAudioID.push({ itemuid, mediauid });
                                 break;
                             case MediaType.mtDocument:
-                                this.documents.push({
+                                this._documents.push({
                                     src: "",
                                     itemuid,
                                     info,
                                 });
                                 break;
                             case MediaType.mtLink:
-                                this.links.push({
+                                this._links.push({
                                     src: "",
                                     itemuid,
                                     info,
@@ -673,8 +678,6 @@ export class InventoryStore {
         inventoryMediaID: Partial<InventoryMediaItemID>[]
     ) {
         try {
-            await this.getInventoryMedia();
-
             const result: MediaItem[] = [...mediaArray];
 
             await Promise.all(
@@ -712,30 +715,35 @@ export class InventoryStore {
     public fetchImages = action(async () => {
         this._images = [];
         this._inventoryImagesID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtPhoto, this._images, this._inventoryImagesID);
     });
 
     public fetchVideos = action(async () => {
         this._videos = [];
         this._inventoryVideoID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtVideo, this._videos, this._inventoryVideoID);
     });
 
     public fetchAudios = action(async () => {
         this._audios = [];
         this._inventoryAudioID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtAudio, this._audios, this._inventoryAudioID);
     });
 
     public fetchDocuments = action(async () => {
         this._documents = [];
         this._inventoryDocumentsID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtDocument, this._documents, this._inventoryDocumentsID);
     });
 
     public fetchLinks = action(async () => {
         this._links = [];
         this._inventoryLinksID = [];
+        await this.getInventoryMedia();
         await this.fetchMedia(MediaType.mtLink, this._links, this._inventoryLinksID);
     });
 
@@ -772,6 +780,10 @@ export class InventoryStore {
             }
         }
     );
+
+    public set inventoryID(id: string) {
+        this._inventoryID = id;
+    }
 
     public set uploadFileImages(files: UploadMediaItem) {
         this._uploadFileImages = files;

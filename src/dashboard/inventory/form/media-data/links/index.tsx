@@ -4,7 +4,6 @@ import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
-import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
@@ -27,33 +26,28 @@ const isValidUrl = (url: string): boolean => {
 
 export const LinksMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const { id } = useParams();
     const toast = useToast();
     const [expandedRows, setExpandedRows] = useState<MediaItem[]>([]);
     const [isUrlValid, setIsUrlValid] = useState(true);
     const {
-        getInventory,
         saveInventoryLinks,
         uploadFileLinks,
         links,
         isLoading,
         fetchLinks,
         clearMedia,
-        isFormChanged,
         formErrorMessage,
         removeMedia,
         changeInventoryLinksOrder,
     } = store;
 
     useEffect(() => {
-        if (id) {
-            isFormChanged ? fetchLinks() : getInventory(id).then(() => fetchLinks());
-        }
+        fetchLinks();
 
         return () => {
             clearMedia();
         };
-    }, [fetchLinks, id]);
+    }, []);
 
     useEffect(() => {
         if (formErrorMessage) {
