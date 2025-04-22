@@ -4,12 +4,13 @@ import "./index.css";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
 import { Checkbox, CheckboxProps } from "primereact/checkbox";
 import { Calendar, CalendarProps } from "primereact/calendar";
-import { Dropdown, DropdownProps } from "primereact/dropdown";
+import { DropdownProps } from "primereact/dropdown";
 import { InputText, InputTextProps } from "primereact/inputtext";
 import { STATES_LIST } from "common/constants/states";
 import { Button } from "primereact/button";
 import { InputMask, InputMaskProps } from "primereact/inputmask";
 import { useCursorToStart } from "common/hooks";
+import { ComboBox } from "../dropdown";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -233,7 +234,7 @@ export const SearchInput = ({
             className='flex align-items-center search-input'
         >
             <span className='p-float-label search-input__wrapper'>
-                <Dropdown
+                <ComboBox
                     ref={dropdownRef}
                     onInput={handleOnInputChange}
                     optionLabel='name'
@@ -416,7 +417,7 @@ export const TextInput = ({
 export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps): ReactElement => {
     const content = (
         <span className='p-float-label'>
-            <Dropdown
+            <ComboBox
                 optionLabel='label'
                 optionValue='id'
                 filter={props.filter || true}

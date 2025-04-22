@@ -1,5 +1,4 @@
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { InputText } from "primereact/inputtext";
 import { ReactElement, useEffect, useMemo, useRef } from "react";
 import "./index.css";
@@ -24,6 +23,7 @@ import uploadImage from "assets/images/upload.svg";
 import { Image } from "primereact/image";
 import { InputMask } from "primereact/inputmask";
 import { BaseResponseError, Status } from "common/models/base-response";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 const SexList = [
     {
@@ -178,7 +178,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
             <div className='grid address-info row-gap-2'>
                 <div className='col-3'>
                     <span className='p-float-label'>
-                        <Dropdown
+                        <ComboBox
                             optionLabel='label'
                             optionValue='id'
                             filter
@@ -222,7 +222,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
 
                 <div className='col-3'>
                     <span className='p-float-label'>
-                        <Dropdown
+                        <ComboBox
                             optionLabel='name'
                             optionValue='name'
                             filter

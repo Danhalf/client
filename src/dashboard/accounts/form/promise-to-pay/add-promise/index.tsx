@@ -3,11 +3,11 @@ import { AccountPromise } from "common/models/accounts";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DashboardDialog, DashboardDialogProps } from "dashboard/common/dialog";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { CurrencyInput, DateInput, TextInput } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
 import { addAccountPromise } from "http/services/accounts.service";
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
@@ -179,7 +179,7 @@ export const AddPromiseDialog = observer(
                     </div>
                     <div className='col-12'>
                         <span className='p-float-label'>
-                            <Dropdown
+                            <ComboBox
                                 id='noteTaker'
                                 value={promiseData.pstatus}
                                 optionLabel='name'

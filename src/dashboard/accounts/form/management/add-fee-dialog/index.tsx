@@ -1,7 +1,6 @@
 import { DashboardDialog, DashboardDialogProps } from "dashboard/common/dialog";
 import "./index.css";
 import { CurrencyInput } from "dashboard/common/form/inputs";
-import { Dropdown } from "primereact/dropdown";
 import { useMemo, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
@@ -11,6 +10,7 @@ import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { ACCOUNT_FEE_TYPES } from "common/constants/account-options";
+import { ComboBox } from "dashboard/common/form/dropdown";
 
 interface AddFeeDialogProps extends DashboardDialogProps {}
 type AddFeeInfo = {
@@ -86,7 +86,7 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
             cancelButton
         >
             <span className='p-float-label'>
-                <Dropdown
+                <ComboBox
                     className={`w-full ${changedFields.type ? "" : "input--grey"}`}
                     value={addFee.type}
                     onChange={({ value }) => {

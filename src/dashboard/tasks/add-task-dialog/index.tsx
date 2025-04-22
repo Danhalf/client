@@ -1,7 +1,6 @@
 import { DialogProps } from "primereact/dialog";
 import { useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
-import { Dropdown } from "primereact/dropdown";
 import { createTask, getTasksSubUserList } from "http/services/tasks.service";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { useToast } from "dashboard/common/toast";
@@ -20,7 +19,7 @@ import { observer } from "mobx-react-lite";
 import { ContactUser } from "common/models/contact";
 import { Deal } from "common/models/deals";
 import { Account } from "common/models/accounts";
-
+import { ComboBox } from "dashboard/common/form/dropdown";
 enum DATE_TYPE {
     START = "startdate",
     DEADLINE = "deadline",
@@ -177,7 +176,7 @@ export const AddTaskDialog = observer(
                 buttonDisabled={isSubmitDisabled}
             >
                 <span className='p-float-label'>
-                    <Dropdown
+                    <ComboBox
                         value={taskState.useruid || ""}
                         options={assignToData || []}
                         optionLabel='username'
