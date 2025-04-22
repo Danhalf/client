@@ -24,6 +24,7 @@ import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { TextInput } from "dashboard/common/form/inputs";
 import { parseCustomDate } from "common/helpers";
+import { SexList } from "common/constants/contract-options";
 import { ComboBox } from "dashboard/common/form/dropdown";
 
 const enum TOOLTIP_MESSAGE {
@@ -126,12 +127,13 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     ["city", city],
                     ["streetAddress", streetAddress],
                     ["state", state],
-                    ["sex", sex],
                 ]);
 
                 const [dobTimestamp, expTimestamp] = [parseCustomDate(dob), parseCustomDate(exp)];
 
                 changeContactExtData([
+                    ["Buyer_DL_State", state],
+                    ["Buyer_Sex", SexList.find((item) => item?.id === Number(sex))?.name || ""],
                     ["Buyer_Driver_License_Num", dl_number],
                     ["Buyer_Date_Of_Birth", dobTimestamp],
                     ["Buyer_DL_Exp_Date", expTimestamp],
@@ -145,7 +147,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     city,
                     streetAddress,
                     state,
-                    sex,
+                    sex: SexList.find((item) => item?.id === Number(sex))?.name || "",
                     dl_number,
                 };
 
@@ -154,6 +156,8 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 ).filter(([key]) => !contact[key]);
 
                 const extDataFieldsToUpdate = {
+                    Buyer_DL_State: state,
+                    Buyer_Sex: SexList.find((item) => item?.id === Number(sex))?.name || "",
                     Buyer_Driver_License_Num: dl_number,
                     Buyer_Date_Of_Birth: parseCustomDate(dob),
                     Buyer_DL_Exp_Date: parseCustomDate(exp),
