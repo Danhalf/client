@@ -177,21 +177,19 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
         <div className='grid address-info row-gap-2'>
             <div className='grid address-info row-gap-2'>
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <ComboBox
-                            optionLabel='label'
-                            optionValue='id'
-                            filter
-                            value={contactExtData.Buyer_DL_State || ""}
-                            options={STATES_LIST}
-                            onChange={({ target: { value } }) =>
-                                changeContactExtData("Buyer_DL_State", value)
-                            }
-                            className='w-full identification-info__dropdown'
-                            showClear={!!contactExtData.Buyer_DL_State}
-                        />
-                        <label className='float-label'>DL's State</label>
-                    </span>
+                    <ComboBox
+                        optionLabel='label'
+                        optionValue='id'
+                        filter
+                        value={contactExtData.Buyer_DL_State || ""}
+                        options={STATES_LIST}
+                        onChange={({ target: { value } }) =>
+                            changeContactExtData("Buyer_DL_State", value)
+                        }
+                        className='w-full identification-info__dropdown'
+                        showClear={!!contactExtData.Buyer_DL_State}
+                        label="DL's State"
+                    />
                 </div>
 
                 <div className='col-3'>
@@ -221,21 +219,19 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                 </div>
 
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <ComboBox
-                            optionLabel='name'
-                            optionValue='name'
-                            filter
-                            value={contactExtData.Buyer_Sex || ""}
-                            options={SexList}
-                            onChange={({ target: { value } }) =>
-                                changeContactExtData("Buyer_Sex", value)
-                            }
-                            className='w-full identification-info__dropdown'
-                            showClear={!!contactExtData.Buyer_Sex}
-                        />
-                        <label className='float-label'>Sex</label>
-                    </span>
+                    <ComboBox
+                        optionLabel='name'
+                        optionValue='name'
+                        filter
+                        value={contactExtData.Buyer_Sex || ""}
+                        options={SexList}
+                        onChange={({ target: { value } }) =>
+                            changeContactExtData("Buyer_Sex", value)
+                        }
+                        className='w-full identification-info__dropdown'
+                        showClear={!!contactExtData.Buyer_Sex}
+                        label='Sex'
+                    />
                 </div>
 
                 <div className='col-3'>

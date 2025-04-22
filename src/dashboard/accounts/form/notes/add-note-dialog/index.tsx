@@ -119,15 +119,13 @@ export const AddNoteDialog = ({
                     onChange={({ target: { value } }) => setNoteTaker(value)}
                 />
                 <div className='col-12'>
-                    <span className='p-float-label'>
-                        <ComboBox
-                            options={[...ACCOUNT_NOTE_CONTACT_TYPE]}
-                            value={contactType}
-                            onChange={(e) => setContactType(e.value)}
-                            className='w-full'
-                        />
-                        <label className='float-label'>Contact Type</label>
-                    </span>
+                    <ComboBox
+                        options={[...ACCOUNT_NOTE_CONTACT_TYPE]}
+                        value={contactType}
+                        onChange={(e) => setContactType(e.value)}
+                        className='w-full'
+                        label='Contact Type'
+                    />
                 </div>
                 <div className='col-12'>
                     <span className='p-float-label'>

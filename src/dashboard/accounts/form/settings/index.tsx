@@ -32,17 +32,15 @@ export const AccountSettings = observer((): ReactElement => {
 
             <div className='account-settings__header grid'>
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <ComboBox
-                            className='w-full'
-                            options={ACCOUNT_STATUS_LIST}
-                            optionValue='name'
-                            optionLabel='name'
-                            value={accountStatus}
-                            onChange={({ value }) => setAccountStatus(value)}
-                        />
-                        <label className='float-label'>Account Status</label>
-                    </span>
+                    <ComboBox
+                        className='w-full'
+                        options={ACCOUNT_STATUS_LIST}
+                        optionValue='name'
+                        optionLabel='name'
+                        value={accountStatus}
+                        onChange={({ value }) => setAccountStatus(value)}
+                        label='Account Status'
+                    />
                 </div>
                 <div className='col-3 account-settings__checkbox'>
                     <Checkbox

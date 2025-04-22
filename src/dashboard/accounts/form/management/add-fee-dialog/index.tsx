@@ -85,22 +85,21 @@ export const AddFeeDialog = ({ onHide, action, visible }: AddFeeDialogProps) => 
             buttonDisabled={buttonDisabled}
             cancelButton
         >
-            <span className='p-float-label'>
-                <ComboBox
-                    className={`w-full ${changedFields.type ? "" : "input--grey"}`}
-                    value={addFee.type}
-                    onChange={({ value }) => {
-                        handleInputChange("type", value);
-                        if (value !== "Other") {
-                            handleInputChange("other", "");
-                        }
-                    }}
-                    options={[...ACCOUNT_FEE_TYPES]}
-                    optionLabel='name'
-                    optionValue='name'
-                />
-                <label className='float-label'>Type</label>
-            </span>
+            <ComboBox
+                className={`w-full ${changedFields.type ? "" : "input--grey"}`}
+                value={addFee.type}
+                onChange={({ value }) => {
+                    handleInputChange("type", value);
+                    if (value !== "Other") {
+                        handleInputChange("other", "");
+                    }
+                }}
+                options={[...ACCOUNT_FEE_TYPES]}
+                label='Type'
+                optionLabel='name'
+                optionValue='name'
+            />
+
             <span className='p-float-label'>
                 <InputText
                     className={`w-full ${changedFields.other ? "" : "input--grey"}`}

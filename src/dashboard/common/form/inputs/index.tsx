@@ -418,18 +418,16 @@ export const TextInput = ({
 
 export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps): ReactElement => {
     const content = (
-        <span className='p-float-label'>
-            <ComboBox
-                optionLabel='label'
-                optionValue='id'
-                filter={props.filter || true}
-                options={STATES_LIST}
-                className={`w-full ${props.className || ""}`}
-                style={{ height: `${props.height || 50}px` }}
-                {...props}
-            />
-            <label className='float-label'>{name}</label>
-        </span>
+        <ComboBox
+            optionLabel='label'
+            optionValue='id'
+            filter={props.filter || true}
+            label={name}
+            options={STATES_LIST}
+            className={`w-full ${props.className || ""}`}
+            style={{ height: `${props.height || 50}px` }}
+            {...props}
+        />
     );
 
     return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;

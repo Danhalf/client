@@ -178,22 +178,20 @@ export const ContactsIdentificationCoBuyerInfo = observer((): ReactElement => {
         <div className='grid address-info row-gap-2'>
             <div className='grid address-info row-gap-2'>
                 <div className='col-3'>
-                    <span className='p-float-label'>
-                        <ComboBox
-                            optionLabel='label'
-                            optionValue='id'
-                            filter
-                            value={contactExtData.CoBuyer_DL_State || ""}
-                            options={STATES_LIST}
-                            onChange={({ target: { value } }) =>
-                                changeContactExtData("CoBuyer_DL_State", value)
-                            }
-                            className='w-full identification-info__dropdown'
-                            disabled={isControlDisabled}
-                            showClear={!!contactExtData.CoBuyer_DL_State}
-                        />
-                        <label className='float-label'>DL's State</label>
-                    </span>
+                    <ComboBox
+                        optionLabel='label'
+                        optionValue='id'
+                        filter
+                        value={contactExtData.CoBuyer_DL_State || ""}
+                        options={STATES_LIST}
+                        onChange={({ target: { value } }) =>
+                            changeContactExtData("CoBuyer_DL_State", value)
+                        }
+                        className='w-full identification-info__dropdown'
+                        disabled={isControlDisabled}
+                        showClear={!!contactExtData.CoBuyer_DL_State}
+                        label="DL's State"
+                    />
                 </div>
 
                 <div className='col-3'>

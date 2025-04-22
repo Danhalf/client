@@ -178,20 +178,18 @@ export const AddPromiseDialog = observer(
                         </span>
                     </div>
                     <div className='col-12'>
-                        <span className='p-float-label'>
-                            <ComboBox
-                                id='noteTaker'
-                                value={promiseData.pstatus}
-                                optionLabel='name'
-                                optionValue='id'
-                                onChange={(e) => {
-                                    return handleChange("pstatus", e.value);
-                                }}
-                                className='w-full'
-                                options={[...statusList]}
-                            />
-                            <label className='float-label'>Status</label>
-                        </span>
+                        <ComboBox
+                            id='noteTaker'
+                            value={promiseData.pstatus}
+                            optionLabel='name'
+                            optionValue='id'
+                            onChange={(e) => {
+                                return handleChange("pstatus", e.value);
+                            }}
+                            label='Status'
+                            className='w-full'
+                            options={[...statusList]}
+                        />
                     </div>
                 </div>
             </DashboardDialog>
