@@ -4,13 +4,14 @@ import "./index.css";
 import { InputNumber, InputNumberProps } from "primereact/inputnumber";
 import { Checkbox, CheckboxProps } from "primereact/checkbox";
 import { Calendar, CalendarProps } from "primereact/calendar";
-import { DropdownProps } from "primereact/dropdown";
+import { Dropdown, DropdownProps } from "primereact/dropdown";
 import { InputText, InputTextProps } from "primereact/inputtext";
 import { STATES_LIST } from "common/constants/states";
 import { Button } from "primereact/button";
 import { InputMask, InputMaskProps } from "primereact/inputmask";
 import { useCursorToStart } from "common/hooks";
 import { ComboBox } from "../dropdown";
+import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -234,8 +235,9 @@ export const SearchInput = ({
             className='flex align-items-center search-input'
         >
             <span className='p-float-label search-input__wrapper'>
-                <ComboBox
+                <Dropdown
                     ref={dropdownRef}
+                    filter={props.options && props.options?.length > DEFAULT_FILTER_THRESHOLD}
                     onInput={handleOnInputChange}
                     optionLabel='name'
                     editable

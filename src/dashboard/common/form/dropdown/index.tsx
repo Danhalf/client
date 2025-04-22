@@ -1,9 +1,7 @@
 import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
-import { LegacyRef } from "react";
 
 interface CustomDropdownProps extends DropdownProps {
-    ref?: LegacyRef<Dropdown>;
     filterThreshold?: number;
 }
 
