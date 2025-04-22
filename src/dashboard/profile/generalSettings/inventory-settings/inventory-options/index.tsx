@@ -195,21 +195,20 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             </div>
             <div className='grid general-inventory-option p-2'>
                 <HeaderColumn />
+
                 {!inventoryOptions.length ? (
                     <div className='col-12'>No options available</div>
                 ) : (
                     <div className='col-12 grid p-0 inventory-options-container'>
                         <div className='inventory-numbers inventory-numbers--left'>
                             {inventoryOptions
-                                .slice(0, inventoryOptions.length / 2)
+                                .slice(0, Math.ceil(inventoryOptions.length / 2))
                                 .map((_, index) => (
                                     <div
                                         key={index}
                                         className='inventory-option-number col-1 flex align-items-center'
                                     >
-                                        <span className='option-control__number'>
-                                            {Math.ceil(index) + 1}
-                                        </span>
+                                        <span className='option-control__number'>{index + 1}</span>
                                     </div>
                                 ))}
                         </div>
@@ -245,16 +244,18 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                             </ResponsiveReactGridLayout>
                         </div>
                         <div className='inventory-numbers inventory-numbers--right'>
-                            {inventoryOptions.slice(inventoryOptions.length / 2).map((_, index) => (
-                                <div
-                                    key={index}
-                                    className='inventory-option-number col-1 flex align-items-center'
-                                >
-                                    <span className='option-control__number'>
-                                        {index + 1 + Math.floor(inventoryOptions.length / 2)}
-                                    </span>
-                                </div>
-                            ))}
+                            {inventoryOptions
+                                .slice(Math.ceil(inventoryOptions.length / 2))
+                                .map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className='inventory-option-number col-1 flex align-items-center'
+                                    >
+                                        <span className='option-control__number'>
+                                            {index + Math.ceil(inventoryOptions.length / 2) + 1}
+                                        </span>
+                                    </div>
+                                ))}
                         </div>
                     </div>
                 )}

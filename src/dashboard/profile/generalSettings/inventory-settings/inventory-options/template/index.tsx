@@ -19,20 +19,21 @@ interface InventoryOptionRowProps {
     totalOffset?: number;
 }
 
-export const HeaderColumn = (): ReactElement => (
-    <div className='settings-inventory__header col-12 grid m-0'>
+export const HeaderColumn = (): ReactElement => {
+    const template = (
         <div className='col-6 grid m-0'>
-            <div className='settings-inventory__number settings-inventory__number--left'>#</div>
+            <div className='settings-inventory__number settings-inventory__number pl-0'>#</div>
             <div className='col-2'></div>
             <div className='settings-inventory__name justify-content-start'>Option</div>
         </div>
-        <div className='col-6 grid m-0'>
-            <div className='col-3'></div>
-            <div className='settings-inventory__name justify-content-end'>Option</div>
-            <div className='settings-inventory__number settings-inventory__number--right'>#</div>
+    );
+    return (
+        <div className='settings-inventory__header col-12 grid m-0'>
+            {template}
+            {template}
         </div>
-    </div>
-);
+    );
+};
 
 export const InventoryOptionRow = observer(
     ({

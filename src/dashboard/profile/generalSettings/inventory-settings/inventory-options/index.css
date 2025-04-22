@@ -77,7 +77,15 @@
             margin-right: -10px;
         }
         &.inventory-numbers--right {
-            margin-left: -10px;
+            position: absolute;
+            right: 45%;
+            @media (max-width: 1500px) {
+                right: 42.5%;
+            }
+            @media (max-width: 1206px) {
+                left: 0;
+                bottom: 0;
+            }
         }
     }
 
