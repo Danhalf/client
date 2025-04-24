@@ -161,6 +161,10 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
     };
 
     const handleDragItem = async (layout: Layout[], oldItem: Layout, newItem: Layout) => {
+        if (oldItem.x === newItem.x && oldItem.y === newItem.y) {
+            return;
+        }
+
         setIsLoading(true);
         const sortedLayout = [...layout].sort((a, b) => {
             if (a.x === b.x) return a.y - b.y;
@@ -172,13 +176,12 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                 const originalItem = inventoryOptions.find((opt) => opt.itemuid === layoutItem.i);
                 return {
                     ...originalItem,
-                    order: index + 1,
+                    order: index,
                 };
             })
             .filter(Boolean) as Partial<GeneralInventoryOptions>[];
 
         const updatedOption = updatedOptions.find((opt) => opt.itemuid === newItem.i);
-
         updatedOption && (await handleChangeOrder(updatedOption));
         setIsLoading(false);
     };
