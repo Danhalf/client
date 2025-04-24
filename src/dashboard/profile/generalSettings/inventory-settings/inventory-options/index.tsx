@@ -199,6 +199,19 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         };
     }, [inventoryOptions]);
 
+    const handleNewOption = () => {
+        setEditedItem({ name: "", itemuid: NEW_ITEM });
+        setInventoryOptions([...inventoryOptions, { name: "", itemuid: NEW_ITEM }]);
+        setTimeout(() => {
+            const contentRef = document.querySelector(
+                ".settings-inventory__tabs .p-tabview-panels"
+            ) as HTMLDivElement;
+            if (contentRef) {
+                contentRef.scrollTo({ top: contentRef.scrollHeight, behavior: "smooth" });
+            }
+        }, 100);
+    };
+
     return isLoading ? (
         <div className='form-loader'>
             <Loader />
@@ -231,14 +244,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                 >
                     Reset to Default
                 </Button>
-                <Button
-                    className='ml-4 settings-form__button'
-                    outlined
-                    onClick={() => {
-                        setEditedItem({ name: "", itemuid: NEW_ITEM });
-                        setInventoryOptions([...inventoryOptions, { name: "", itemuid: NEW_ITEM }]);
-                    }}
-                >
+                <Button className='ml-4 settings-form__button' outlined onClick={handleNewOption}>
                     New Option
                 </Button>
             </div>
