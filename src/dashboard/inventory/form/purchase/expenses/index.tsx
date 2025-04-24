@@ -293,9 +293,6 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         pt={{
                             wrapper: {
                                 className: "overflow-x-hidden",
-                                style: {
-                                    height: "249px",
-                                },
                             },
                         }}
                     >
