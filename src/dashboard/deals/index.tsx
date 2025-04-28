@@ -55,6 +55,12 @@ interface DealsFilterGroup {
     options: DealsFilterOptions[];
 }
 
+enum FILTER_CATEGORIES {
+    TYPE = "Type (one of the list)",
+    STATUS = "Status (one of the list)",
+    OTHER = "Other",
+}
+
 const DEALS_TYPE_LIST: DealsFilterOptions[] = [
     { name: "All", value: "allTypes" },
     { name: "Buy Here Pay Here", value: "0.DealType" },
@@ -80,9 +86,9 @@ const DEALS_STATUS_LIST: DealsFilterOptions[] = [
 ];
 
 const FILTER_GROUP_LIST: DealsFilterGroup[] = [
-    { name: "Type (one of the list)", options: DEALS_TYPE_LIST },
-    { name: "Status (one of the list)", options: DEALS_STATUS_LIST },
-    { name: "Other", options: DEALS_OTHER_LIST },
+    { name: FILTER_CATEGORIES.TYPE, options: DEALS_TYPE_LIST },
+    { name: FILTER_CATEGORIES.STATUS, options: DEALS_STATUS_LIST },
+    { name: FILTER_CATEGORIES.OTHER, options: DEALS_OTHER_LIST },
 ];
 
 enum SEARCH_FORM_FIELDS {
@@ -425,7 +431,30 @@ export const DealsDataTable = observer(
                             className='deals__filter'
                             onChange={(e) => {
                                 e.stopPropagation();
-                                setDealSelectedGroup(e.value);
+                                const newValue = [...e.value];
+                                const lastSelected = newValue[newValue.length - 1];
+
+                                const lastSelectedCategory = FILTER_GROUP_LIST.find((group) =>
+                                    group.options.some((option) => option.value === lastSelected)
+                                )?.name;
+
+                                if (
+                                    lastSelectedCategory === FILTER_CATEGORIES.TYPE ||
+                                    lastSelectedCategory === FILTER_CATEGORIES.STATUS
+                                ) {
+                                    const filteredValue = newValue.filter((item) => {
+                                        const itemCategory = FILTER_GROUP_LIST.find((group) =>
+                                            group.options.some((option) => option.value === item)
+                                        )?.name;
+                                        return (
+                                            itemCategory !== lastSelectedCategory ||
+                                            item === lastSelected
+                                        );
+                                    });
+                                    setDealSelectedGroup(filteredValue);
+                                } else {
+                                    setDealSelectedGroup(newValue);
+                                }
                             }}
                             pt={{
                                 wrapper: {
