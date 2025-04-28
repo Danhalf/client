@@ -14,7 +14,6 @@ import { TotalDealsList, getDealsList } from "http/services/deals.service";
 import { ROWS_PER_PAGE } from "common/settings";
 import { makeShortReports } from "http/services/reports.service";
 import { useNavigate } from "react-router-dom";
-import "./index.css";
 import { ReportsColumn } from "common/models/reports";
 import { Deal } from "common/models/deals";
 import { Loader } from "dashboard/common/loader";
@@ -29,19 +28,21 @@ import {
 import { useStore } from "store/hooks";
 import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers";
 import { observer } from "mobx-react-lite";
+import "./index.css";
+import { DropdownHeaderPanel } from "dashboard/deals/common";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
 }
 
-export type TableColumnsList = Pick<TableColumnProps, "header" | "field">;
+export type TableColumnsList = Pick<TableColumnProps, "header" | "field"> & { checked: boolean };
 
 const renderColumnsData: TableColumnsList[] = [
-    { field: "accountInfo", header: "Account" },
-    { field: "contactinfo", header: "Customer" },
-    { field: "dealtype", header: "Type" },
-    { field: "created", header: "Sale Date" },
-    { field: "inventoryinfo", header: "Info (Vehicle)" },
+    { field: "accountInfo", header: "Account", checked: true },
+    { field: "contactinfo", header: "Customer", checked: true },
+    { field: "dealtype", header: "Type", checked: true },
+    { field: "created", header: "Sale Date", checked: true },
+    { field: "inventoryinfo", header: "Info (Vehicle)", checked: true },
 ];
 
 interface DealsFilterOptions {
@@ -127,6 +128,7 @@ export const DealsDataTable = observer(
         const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
         const [dialogVisible, setDialogVisible] = useState<boolean>(false);
         const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+        const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(renderColumnsData);
 
         const searchFields = [
             {
@@ -368,6 +370,23 @@ export const DealsDataTable = observer(
         return (
             <div className='card-content'>
                 <div className='datatable-controls'>
+                    <span className='p-input-icon-right p-float-label datatable-controls__search'>
+                        <i className='icon adms-search' />
+                        <InputText
+                            value={globalSearch}
+                            onChange={(e) => setGlobalSearch(e.target.value)}
+                        />
+                        <label className='float-label'>Search</label>
+                    </span>
+
+                    <Button
+                        className='datatable-controls__search-button'
+                        label='Advanced search'
+                        severity='success'
+                        type='button'
+                        onClick={() => setDialogVisible(true)}
+                    />
+
                     <div className='contact-top-controls'>
                         <Button
                             className='contact-top-controls__button'
@@ -418,36 +437,36 @@ export const DealsDataTable = observer(
                         />
                         <label className='float-label'>Filter</label>
                     </span>
-                    <Button
-                        className='contact-top-controls__button m-r-20px ml-auto'
-                        label='Advanced search'
-                        severity='success'
-                        type='button'
-                        onClick={() => setDialogVisible(true)}
-                    />
-                    <span className='p-input-icon-right'>
-                        <i className='icon adms-search' />
-                        <InputText
-                            value={globalSearch}
-                            onChange={(e) => setGlobalSearch(e.target.value)}
-                        />
-                    </span>
-                    <MultiSelect
-                        optionLabel='header'
-                        className='w-full pb-0 h-full flex align-items-center column-picker'
-                        display='chip'
-                        pt={{
-                            header: {
-                                className: "column-picker__header",
-                            },
-                            wrapper: {
-                                className: "column-picker__wrapper",
-                                style: {
-                                    maxHeight: "500px",
+                    <span className='p-float-label'>
+                        <MultiSelect
+                            value={activeColumns}
+                            options={renderColumnsData}
+                            optionLabel='header'
+                            optionValue='field'
+                            className='deals__columns'
+                            display='chip'
+                            panelHeaderTemplate={(event) => (
+                                <DropdownHeaderPanel
+                                    columns={renderColumnsData}
+                                    activeColumns={activeColumns}
+                                    changeSettings={() => {}}
+                                    setActiveColumns={setActiveColumns}
+                                />
+                            )}
+                            pt={{
+                                header: {
+                                    className: "deals__columns-header",
                                 },
-                            },
-                        }}
-                    />
+                                wrapper: {
+                                    className: "deals__columns-wrapper",
+                                    style: {
+                                        maxHeight: "500px",
+                                    },
+                                },
+                            }}
+                        />
+                        <label className='float-label'>Columns</label>
+                    </span>
                 </div>
                 <div className='grid'>
                     <div className='col-12'>
