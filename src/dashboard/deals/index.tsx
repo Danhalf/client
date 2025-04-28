@@ -367,77 +367,87 @@ export const DealsDataTable = observer(
 
         return (
             <div className='card-content'>
-                <div className='grid datatable-controls'>
-                    <div className='col-2'>
-                        <span className='p-float-label'>
-                            <MultiSelect
-                                optionValue='value'
-                                optionLabel='name'
-                                value={dealSelectedGroup}
-                                options={FILTER_GROUP_LIST}
-                                optionGroupLabel='name'
-                                optionGroupChildren='options'
-                                panelHeaderTemplate={<></>}
-                                display='chip'
-                                className='deals__dropdown'
-                                onChange={(e) => {
-                                    e.stopPropagation();
-                                    setDealSelectedGroup(e.value);
-                                }}
-                                pt={{
-                                    wrapper: {
-                                        style: {
-                                            maxHeight: "625px",
-                                        },
-                                    },
-                                }}
-                            />
-                            <label className='float-label'>Filter</label>
-                        </span>
-                    </div>
-
-                    <div className='col-4'>
-                        <div className='contact-top-controls'>
-                            <Button
-                                className='contact-top-controls__button'
-                                icon='icon adms-add-item'
-                                severity='success'
-                                type='button'
-                                tooltip='Add new deal'
-                                onClick={handleCreateDeal}
-                            />
-                            <Button
-                                severity='success'
-                                type='button'
-                                icon='icon adms-print'
-                                tooltip='Print deals form'
-                                onClick={() => printTableData(true)}
-                            />
-                            <Button
-                                severity='success'
-                                type='button'
-                                icon='icon adms-download'
-                                tooltip='Download deals form'
-                                onClick={() => printTableData()}
-                            />
-                        </div>
-                    </div>
-                    <div className='col-6 text-right flex flex-nowrap'>
+                <div className='datatable-controls'>
+                    <div className='contact-top-controls'>
                         <Button
-                            className='contact-top-controls__button m-r-20px ml-auto'
-                            label='Advanced search'
+                            className='contact-top-controls__button'
+                            icon='icon adms-add-item'
                             severity='success'
                             type='button'
-                            onClick={() => setDialogVisible(true)}
+                            tooltip='Add new deal'
+                            onClick={handleCreateDeal}
                         />
-                        <span className='p-input-icon-right'>
-                            <i className='icon adms-search' />
-                            <InputText
-                                value={globalSearch}
-                                onChange={(e) => setGlobalSearch(e.target.value)}
-                            />
-                        </span>
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='icon adms-print'
+                            tooltip='Print deals form'
+                            onClick={() => printTableData(true)}
+                        />
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='icon adms-download'
+                            tooltip='Download deals form'
+                            onClick={() => printTableData()}
+                        />
                     </div>
+
+                    <span className='p-float-label'>
+                        <MultiSelect
+                            optionValue='value'
+                            optionLabel='name'
+                            value={dealSelectedGroup}
+                            options={FILTER_GROUP_LIST}
+                            optionGroupLabel='name'
+                            optionGroupChildren='options'
+                            panelHeaderTemplate={<></>}
+                            display='chip'
+                            className='deals__filter'
+                            onChange={(e) => {
+                                e.stopPropagation();
+                                setDealSelectedGroup(e.value);
+                            }}
+                            pt={{
+                                wrapper: {
+                                    style: {
+                                        maxHeight: "625px",
+                                    },
+                                },
+                            }}
+                        />
+                        <label className='float-label'>Filter</label>
+                    </span>
+                    <Button
+                        className='contact-top-controls__button m-r-20px ml-auto'
+                        label='Advanced search'
+                        severity='success'
+                        type='button'
+                        onClick={() => setDialogVisible(true)}
+                    />
+                    <span className='p-input-icon-right'>
+                        <i className='icon adms-search' />
+                        <InputText
+                            value={globalSearch}
+                            onChange={(e) => setGlobalSearch(e.target.value)}
+                        />
+                    </span>
+                    <MultiSelect
+                        optionLabel='header'
+                        className='w-full pb-0 h-full flex align-items-center column-picker'
+                        display='chip'
+                        pt={{
+                            header: {
+                                className: "column-picker__header",
+                            },
+                            wrapper: {
+                                className: "column-picker__wrapper",
+                                style: {
+                                    maxHeight: "500px",
+                                },
+                            },
+                        }}
+                    />
                 </div>
                 <div className='grid'>
                     <div className='col-12'>
@@ -495,15 +505,11 @@ export const DealsDataTable = observer(
 
 export const Deals = () => {
     return (
-        <div className='grid'>
-            <div className='col-12'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Deals</h2>
-                    </div>
-                    <DealsDataTable />
-                </div>
+        <div className='card deals'>
+            <div className='card-header'>
+                <h2 className='card-header__title uppercase m-0'>Deals</h2>
             </div>
+            <DealsDataTable />
         </div>
     );
 };
