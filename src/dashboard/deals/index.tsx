@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { ReportsColumn } from "common/models/reports";
 import { Deal } from "common/models/deals";
 import { Loader } from "dashboard/common/loader";
-import { MultiSelect } from "primereact/multiselect";
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { BaseResponseError } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import {
@@ -471,17 +471,31 @@ export const DealsDataTable = observer(
                             value={activeColumns}
                             options={renderColumnsData}
                             optionLabel='header'
-                            optionValue='field'
                             className='deals__columns'
                             display='chip'
-                            panelHeaderTemplate={(event) => (
+                            panelHeaderTemplate={() => (
                                 <DropdownHeaderPanel
                                     columns={renderColumnsData}
                                     activeColumns={activeColumns}
-                                    changeSettings={() => {}}
                                     setActiveColumns={setActiveColumns}
                                 />
                             )}
+                            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                                stopPropagation();
+                                const sortedValue = value.sort(
+                                    (a: TableColumnsList, b: TableColumnsList) => {
+                                        const firstIndex = renderColumnsData.findIndex(
+                                            (col) => col.field === a.field
+                                        );
+                                        const secondIndex = renderColumnsData.findIndex(
+                                            (col) => col.field === b.field
+                                        );
+                                        return firstIndex - secondIndex;
+                                    }
+                                );
+
+                                setActiveColumns(sortedValue);
+                            }}
                             pt={{
                                 header: {
                                     className: "deals__columns-header",
@@ -520,7 +534,7 @@ export const DealsDataTable = observer(
                                 rowClassName={() => "hover:text-primary cursor-pointer"}
                                 onRowClick={handleOnRowClick}
                             >
-                                {renderColumnsData.map(({ field, header }) => (
+                                {activeColumns.map(({ field, header }) => (
                                     <Column
                                         field={field}
                                         header={header}

@@ -1,4 +1,3 @@
-import { InventoryUserSettings } from "common/models/user";
 import { TableColumnsList } from "dashboard/deals";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
@@ -42,7 +41,6 @@ export enum AccordionDealItems {
 interface DropdownHeaderPanelProps extends Partial<MultiSelectPanelHeaderTemplateEvent> {
     columns: TableColumnsList[];
     activeColumns: TableColumnsList[];
-    changeSettings: (settings: Partial<InventoryUserSettings>) => void;
     setActiveColumns: (columns: TableColumnsList[]) => void;
 }
 
@@ -50,7 +48,6 @@ export const DropdownHeaderPanel = ({
     onCloseClick,
     columns,
     activeColumns,
-    changeSettings,
     setActiveColumns,
 }: DropdownHeaderPanelProps) => {
     return (
@@ -60,12 +57,8 @@ export const DropdownHeaderPanel = ({
                     onChange={() => {
                         if (columns.length === activeColumns.length) {
                             setActiveColumns(columns.filter(({ checked }) => checked));
-                            changeSettings({ activeColumns: [] });
                         } else {
                             setActiveColumns(columns);
-                            changeSettings({
-                                activeColumns: columns.map(({ field }) => field),
-                            });
                         }
                     }}
                     checked={columns.length === activeColumns.length}
@@ -77,7 +70,6 @@ export const DropdownHeaderPanel = ({
                 className='p-multiselect-close p-link'
                 onClick={(e) => {
                     setActiveColumns(columns.filter(({ checked }) => checked));
-                    changeSettings({ activeColumns: [] });
                     onCloseClick?.(e);
                 }}
             >
