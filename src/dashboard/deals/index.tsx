@@ -459,6 +459,7 @@ export const DealsDataTable = observer(
                             pt={{
                                 wrapper: {
                                     style: {
+                                        width: "230px",
                                         maxHeight: "625px",
                                     },
                                 },
@@ -503,6 +504,7 @@ export const DealsDataTable = observer(
                                 wrapper: {
                                     className: "deals__columns-wrapper",
                                     style: {
+                                        width: "230px",
                                         maxHeight: "500px",
                                     },
                                 },
