@@ -3,6 +3,7 @@
     --select-area-height: 191px;
     --control-button-width: 30px;
     --column-padding-bottom: 26px;
+    --tree-padding-left: 50px;
 
     @media screen and (max-width: 1670px) {
         --column-width: 300px;
@@ -18,9 +19,11 @@
 
     max-height: 70vh;
     display: flex;
+    justify-content: space-between;
+    overflow: scroll;
 
     .p-tree {
-        flex: 0 0 36%;
+        flex: 0 0 30%;
         padding: 0;
         height: 56vh;
         border: none;
@@ -31,7 +34,8 @@
             }
 
             .p-treenode-content {
-                padding-left: 50px;
+                border-radius: 5px;
+                padding-left: var(--tree-padding-left);
                 height: 50px;
                 :has(.report__list-item--new) {
                     position: relative;
@@ -48,6 +52,10 @@
                     }
                 }
 
+                .p-tree-toggler {
+                    margin: 0;
+                }
+
                 &.report__list-item--toggler-visible {
                     .p-tree-toggler {
                         visibility: visible;
@@ -61,7 +69,7 @@
             .p-treenode-children {
                 padding: 0;
                 .p-treenode-content {
-                    padding-left: calc(1rem + 50px);
+                    padding-left: calc(1.7rem + var(--tree-padding-left));
                 }
             }
 
