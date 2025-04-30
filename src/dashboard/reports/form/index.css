@@ -17,46 +17,59 @@
     }
 
     max-height: 70vh;
+    display: flex;
 
     .p-tree {
+        flex: 0 0 36%;
+        padding: 0;
         height: 56vh;
         border: none;
 
-        .p-treenode {
-            padding: 0;
-        }
+        .p-tree-container {
+            .p-treenode {
+                padding: 0;
+            }
 
-        .p-treenode-content {
-            :has(.report__list-item--new) {
-                position: relative;
+            .p-treenode-content {
+                padding-left: 50px;
+                height: 50px;
+                :has(.report__list-item--new) {
+                    position: relative;
 
-                &::before {
-                    content: "";
-                    position: absolute;
-                    top: 1.05rem;
-                    left: -1.5rem;
-                    width: 9px;
-                    height: 9px;
-                    border: 2px solid var(--admss-app-main-blue);
-                    border-radius: 50%;
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        top: 1.05rem;
+                        left: -1.5rem;
+                        width: 9px;
+                        height: 9px;
+                        border: 2px solid var(--admss-app-main-blue);
+                        border-radius: 50%;
+                    }
+                }
+
+                &.report__list-item--toggler-visible {
+                    .p-tree-toggler {
+                        visibility: visible;
+                    }
+                }
+
+                &:hover {
+                    background: var(--admss-app-light-blue);
+                }
+            }
+            .p-treenode-children {
+                padding: 0;
+                .p-treenode-content {
+                    padding-left: calc(1rem + 50px);
                 }
             }
 
-            &.report__list-item--toggler-visible {
-                .p-tree-toggler {
-                    visibility: visible;
-                }
-            }
-
-            &:hover {
+            .report__list-item--selected-container {
+                color: var(--admss-app-primary);
                 background: var(--admss-app-light-blue);
+                border-radius: 0;
             }
-        }
-
-        .report__list-item--selected-container {
-            color: var(--admss-app-primary);
-            background: var(--admss-app-light-blue);
-            border-radius: 0;
         }
     }
 
@@ -319,4 +332,12 @@
 
 .report__list-item.p-button.p-button-text:focus {
     box-shadow: none;
+}
+
+.report__title {
+    font-size: 20px;
+}
+
+.card.report {
+    padding: 40px 30px;
 }
