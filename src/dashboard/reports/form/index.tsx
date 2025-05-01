@@ -421,6 +421,7 @@ export const ReportForm = observer((): ReactElement => {
                                     <div
                                         onDragEnter={(e) => handleDragEnter(e, node)}
                                         onDragLeave={handleDragLeave}
+                                        className='w-full'
                                     >
                                         <NodeContent
                                             node={nodeData}
