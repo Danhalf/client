@@ -90,6 +90,7 @@ export const ReportForm = observer((): ReactElement => {
     const expandedForId = useRef<string | null>(null);
     const [confirmActive, setConfirmActive] = useState<boolean>(false);
     const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const [currentNodeOrder, setCurrentNodeOrder] = useState<number | null>(null);
 
     const getCollections = async () => {
         if (authUser) {
@@ -210,6 +211,10 @@ export const ReportForm = observer((): ReactElement => {
 
     const handleDragEnter = (event: React.DragEvent<HTMLDivElement>, node: TreeNode) => {
         const nodeData = node as TreeNodeEvent;
+        if (nodeData.data.document && !currentNodeOrder) {
+            setCurrentNodeOrder(nodeData.data.document.order);
+        }
+
         if (nodeData.type === NODE_TYPES.COLLECTION && nodeData.children?.length) {
             if (hoverTimerRef.current) {
                 clearTimeout(hoverTimerRef.current);
@@ -239,9 +244,13 @@ export const ReportForm = observer((): ReactElement => {
 
         const dragNode = event.dragNode as TreeNodeEvent | undefined;
         const dropNode = event.dropNode as TreeNodeEvent | undefined;
-        const dropIndex = event.dropIndex - 1 < 0 ? 0 : event.dropIndex - 1;
 
-        if (!dropNode) return;
+        let dropIndex = event.dropIndex;
+        if (currentNodeOrder !== null && currentNodeOrder !== undefined) {
+            if (event.dropIndex > currentNodeOrder) {
+                dropIndex = event.dropIndex - 1;
+            }
+        }
 
         if (
             dragNode?.type === NODE_TYPES.DOCUMENT &&
@@ -297,6 +306,7 @@ export const ReportForm = observer((): ReactElement => {
                 if (response?.error) {
                     showError(response.error);
                 } else {
+                    setCurrentNodeOrder(null);
                     showSuccess(TOAST_MESSAGES.REPORT_MOVED_SUCCESS);
                 }
             }
