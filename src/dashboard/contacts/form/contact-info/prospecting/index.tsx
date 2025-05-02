@@ -26,8 +26,8 @@ export const ContactsProspecting = observer((): ReactElement => {
     const [initialProspectList, setInitialProspectList] = useState<InventoryShortList[]>([]);
     const [prospectList, setProspectList] = useState<InventoryShortList[]>([]);
     const [showAddTaskDialog, setShowAddTaskDialog] = useState<boolean>(false);
-    const [prospect1Input, setProspectInput] = useState<InventoryShortList | null>(null);
-    const [prospect2Input, setProspectSecondInput] = useState<InventoryShortList | null>(null);
+    const [prospectInput, setProspectInput] = useState<InventoryShortList | null>(null);
+    const [prospectSecondInput, setProspectSecondInput] = useState<InventoryShortList | null>(null);
 
     const handleGetShortInventoryList = async () => {
         const response = await getShortInventoryList(authUser?.useruid ?? "");
@@ -99,7 +99,7 @@ export const ContactsProspecting = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <AutoCompleteDropdown
-                    value={prospect1Input}
+                    value={prospectInput}
                     field='name'
                     onChange={(e) => {
                         setProspectInput(e.target.value);
@@ -129,7 +129,7 @@ export const ContactsProspecting = observer((): ReactElement => {
             {anotherVehicle ? (
                 <div className='col-6'>
                     <AutoCompleteDropdown
-                        value={prospect2Input}
+                        value={prospectSecondInput}
                         field='name'
                         onChange={(e) => {
                             setProspectSecondInput(e.target.value);
