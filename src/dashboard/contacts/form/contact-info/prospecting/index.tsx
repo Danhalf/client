@@ -13,7 +13,8 @@ import { getShortInventoryList } from "http/services/inventory-service";
 import { TOAST_LIFETIME } from "common/settings";
 import { useToast } from "dashboard/common/toast";
 import { InventoryShortList } from "common/models/inventory";
-import { AutoComplete, AutoCompleteCompleteEvent } from "primereact/autocomplete";
+import { AutoCompleteCompleteEvent } from "primereact/autocomplete";
+import { AutoCompleteDropdown } from "dashboard/common/form/autocomplete";
 export const ContactsProspecting = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
@@ -97,19 +98,48 @@ export const ContactsProspecting = observer((): ReactElement => {
                 />
             </div>
             <div className='col-6'>
-                <span className='p-float-label'>
-                    <AutoComplete
-                        value={prospect1Input}
+                <AutoCompleteDropdown
+                    value={prospect1Input}
+                    field='name'
+                    onChange={(e) => {
+                        setProspectInput(e.target.value);
+                    }}
+                    onSelect={(e) => {
+                        const selectedProspect = initialProspectList.find(
+                            (prospect) => prospect.name === e.value.name
+                        );
+                        if (selectedProspect) {
+                            changeContactExtData("PROSPECT1_ID", selectedProspect.itemuid);
+                        }
+                    }}
+                    placeholder='Choose a Vehicle'
+                    className='w-full contacts-prospecting__dropdown'
+                    dropdown
+                    completeMethod={searchProspect}
+                    forceSelection
+                    suggestions={prospectList}
+                    label='Choose a Vehicle'
+                    clearButton
+                    onClear={() => {
+                        setProspectInput(null);
+                        changeContactExtData("PROSPECT1_ID", "");
+                    }}
+                />
+            </div>
+            {anotherVehicle ? (
+                <div className='col-6'>
+                    <AutoCompleteDropdown
+                        value={prospect2Input}
                         field='name'
                         onChange={(e) => {
-                            setProspectInput(e.target.value);
+                            setProspectSecondInput(e.target.value);
                         }}
                         onSelect={(e) => {
                             const selectedProspect = initialProspectList.find(
                                 (prospect) => prospect.name === e.value.name
                             );
                             if (selectedProspect) {
-                                changeContactExtData("PROSPECT1_ID", selectedProspect.itemuid);
+                                changeContactExtData("PROSPECT2_ID", selectedProspect.itemuid);
                             }
                         }}
                         placeholder='Choose a Vehicle'
@@ -118,36 +148,13 @@ export const ContactsProspecting = observer((): ReactElement => {
                         completeMethod={searchProspect}
                         forceSelection
                         suggestions={prospectList}
+                        label='Choose a Vehicle'
+                        onClear={() => {
+                            setProspectSecondInput(null);
+                            changeContactExtData("PROSPECT2_ID", "");
+                        }}
+                        clearButton
                     />
-                    <label className='float-label'>Choose a Vehicle</label>
-                </span>
-            </div>
-            {anotherVehicle ? (
-                <div className='col-6'>
-                    <span className='p-float-label'>
-                        <AutoComplete
-                            value={prospect2Input}
-                            field='name'
-                            onChange={(e) => {
-                                setProspectSecondInput(e.target.value);
-                            }}
-                            onSelect={(e) => {
-                                const selectedProspect = initialProspectList.find(
-                                    (prospect) => prospect.name === e.value
-                                );
-                                if (selectedProspect) {
-                                    changeContactExtData("PROSPECT2_ID", selectedProspect.itemuid);
-                                }
-                            }}
-                            placeholder='Choose a Vehicle'
-                            className='w-full contacts-prospecting__dropdown'
-                            dropdown
-                            completeMethod={searchProspect}
-                            forceSelection
-                            suggestions={prospectList}
-                        />
-                        <label className='float-label'>Choose a Vehicle</label>
-                    </span>
                 </div>
             ) : (
                 <div className='col-6'>
