@@ -18,7 +18,7 @@ export const AutoCompleteDropdown = ({
 }: AutoCompleteDropdownProps): ReactElement => {
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
-    const autoCompleteRef = useRef<any>(null);
+    const autoCompleteRef = useRef<AutoComplete>(null);
     const [dropdownWidth, setDropdownWidth] = useState<number>(0);
 
     useEffect(() => {
