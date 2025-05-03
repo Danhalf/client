@@ -18,6 +18,7 @@ export const AutoCompleteDropdown = ({
 }: AutoCompleteDropdownProps): ReactElement => {
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
+    const autoCompleteRef = useRef<any>(null);
     const [dropdownWidth, setDropdownWidth] = useState<number>(0);
 
     useEffect(() => {
@@ -34,8 +35,15 @@ export const AutoCompleteDropdown = ({
                     {...props}
                     dropdown={dropdown}
                     inputClassName='autocomplete-dropdown__input'
+                    ref={autoCompleteRef}
                     onShow={() => setIsDropdownVisible(true)}
                     onHide={() => setIsDropdownVisible(false)}
+                    onDropdownClick={() => {
+                        if (isDropdownVisible && autoCompleteRef.current) {
+                            autoCompleteRef.current.hide();
+                            setIsDropdownVisible(false);
+                        }
+                    }}
                     pt={{
                         dropdownButton: {
                             root: {
