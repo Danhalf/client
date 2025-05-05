@@ -29,8 +29,6 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 
 const COLLECTION_DRAG_DELAY = 1000;
 
-const COLLECTION_DRAG_DELAY = 1000;
-
 export const NodeContent = ({
     node,
     isSelected,
