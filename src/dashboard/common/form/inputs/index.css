@@ -31,7 +31,7 @@
 .radio {
     .p-radiobutton .p-radiobutton-box:not(.p-disabled):not(.p-highlight):hover {
         border-color: var(--admss-app-dark-green);
-        border-width: 4px;
+        border-width: 5px;
     }
 
     .radio-item__input {
@@ -51,8 +51,8 @@
     }
 
     .p-radiobutton-box {
-        width: 18px;
-        height: 18px;
+        width: 26px;
+        height: 26px;
         flex-shrink: 0;
         border-radius: 50%;
         display: inline-flex;
@@ -66,10 +66,12 @@
     }
 
     .radio-item__input {
-        .p-radiobutton-checked {
+        .p-radiobutton {
             display: inline-flex;
             justify-content: center;
             align-items: center;
+        }
+        .p-radiobutton-checked {
             padding: 4px;
             flex-shrink: 0;
             flex-basis: 24px;
@@ -79,19 +81,9 @@
         }
 
         .p-radiobutton-checked .p-radiobutton-box.p-highlight {
-            box-shadow: none;
-            position: relative;
-            &::before {
-                content: "";
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 70%;
-                height: 70%;
-                background-color: var(--admss-app-white);
-                border-radius: 50%;
-            }
+            box-shadow: inset 0 0 0 3px var(--admss-app-dark-green);
+            background-color: var(--admss-app-white);
+            border-color: var(--admss-app-dark-green);
         }
     }
 }
