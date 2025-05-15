@@ -121,19 +121,62 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         option: Partial<GeneralInventoryOptions>,
         newOrder?: number
     ) => {
-        const response = await setInventoryGroupOption(inventoryGroupID, {
-            ...option,
-            order: newOrder !== undefined ? newOrder : option.order,
+        const currentIndex = inventoryOptions.findIndex((item) => item.itemuid === option.itemuid);
+        const updatedOptions = inventoryOptions.map((item, index) => {
+            if (item.itemuid === option.itemuid) {
+                return {
+                    ...item,
+                    order: newOrder !== undefined ? newOrder : item.order,
+                };
+            }
+
+            if (
+                newOrder !== undefined &&
+                newOrder < currentIndex &&
+                index >= newOrder &&
+                index < currentIndex
+            ) {
+                return {
+                    ...item,
+                    order: (item.order ?? 0) + 1,
+                };
+            }
+
+            if (
+                newOrder !== undefined &&
+                newOrder > currentIndex &&
+                index > currentIndex &&
+                index <= newOrder
+            ) {
+                return {
+                    ...item,
+                    order: (item.order ?? 0) - 1,
+                };
+            }
+
+            return item;
         });
-        if (response?.error) {
+
+        try {
+            const response = await setInventoryGroupOption(inventoryGroupID, updatedOptions);
+            if (response?.error) {
+                throw new Error(response.error);
+            }
+
+            await handleGetInventoryOptionsGroupList();
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Options order updated successfully",
+                life: TOAST_LIFETIME,
+            });
+        } catch (error) {
             toast.current?.show({
                 severity: "error",
                 summary: "Error",
-                detail: "Failed to update order",
+                detail: "Failed to update options order",
                 life: TOAST_LIFETIME,
             });
-        } else {
-            await handleGetInventoryOptionsGroupList();
         }
     };
 
@@ -175,7 +218,8 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                 if (!originalItem) return null;
 
                 const isFirstColumn = layoutItem.x === 0;
-                const baseOrder = isFirstColumn ? 1 : Math.ceil(inventoryOptions.length / 2) + 1;
+                const itemsPerColumn = Math.ceil(inventoryOptions.length / 2);
+                const baseOrder = isFirstColumn ? 0 : itemsPerColumn;
                 const order = baseOrder + layoutItem.y;
 
                 return {
@@ -185,14 +229,25 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             })
             .filter(Boolean) as Partial<GeneralInventoryOptions>[];
 
-        const updatedOption = updatedOptions.find((opt) => opt.itemuid === newItem.i);
-        if (updatedOption) {
-            await handleChangeOrder(updatedOption, updatedOption.order);
+        try {
+            const response = await setInventoryGroupOption(inventoryGroupID, updatedOptions);
+            if (response?.error) {
+                return Promise.reject(response.error);
+            }
 
-            setInventoryOptions([...updatedOptions]);
+            await handleGetInventoryOptionsGroupList();
+        } catch (error) {
+            const errorMessage =
+                error instanceof Error ? error.message : "Failed to update options order";
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: errorMessage,
+                life: TOAST_LIFETIME,
+            });
+        } finally {
+            setIsLoading(false);
         }
-
-        setIsLoading(false);
     };
 
     const layouts = useMemo(() => {
