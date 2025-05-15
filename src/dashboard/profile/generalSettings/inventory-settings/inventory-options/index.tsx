@@ -77,7 +77,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             const isNew = option.itemuid === NEW_ITEM;
             const response = await setInventoryGroupOption(inventoryGroupID, option);
             if (response?.error) {
-                throw new Error(response.error);
+                return Promise.reject(response.error);
             }
 
             await handleGetInventoryOptionsGroupList();
@@ -160,21 +160,17 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         try {
             const response = await setInventoryGroupOption(inventoryGroupID, updatedOptions);
             if (response?.error) {
-                throw new Error(response.error);
+                return Promise.reject(response.error);
             }
 
             await handleGetInventoryOptionsGroupList();
-            toast.current?.show({
-                severity: "success",
-                summary: "Success",
-                detail: "Options order updated successfully",
-                life: TOAST_LIFETIME,
-            });
         } catch (error) {
+            const errorMessage =
+                error instanceof Error ? error.message : "Failed to update options order";
             toast.current?.show({
                 severity: "error",
                 summary: "Error",
-                detail: "Failed to update options order",
+                detail: errorMessage,
                 life: TOAST_LIFETIME,
             });
         }
