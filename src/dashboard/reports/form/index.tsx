@@ -257,6 +257,20 @@ export const ReportForm = observer((): ReactElement => {
                 if (idx !== -1) {
                     dropIndex = dragNode?.key === dropChild.key ? idx : idx - 1;
                 }
+        let dropIndex = 0;
+        if (dropNode?.type === NODE_TYPES.COLLECTION) {
+            const children = dropNode.children || [];
+            const documentChildren = children.filter(
+                (node) => (node as TreeNodeEvent).type === NODE_TYPES.DOCUMENT
+            );
+            const documentKeys = documentChildren.map((node) => node.key);
+
+            const dropChild = children[event.dropIndex];
+            if (dropChild) {
+                const idx = documentKeys.indexOf(dropChild.key);
+                if (idx !== -1) {
+                    dropIndex = dragNode?.key === dropChild.key ? idx : idx - 1;
+                }
             }
         }
 
@@ -299,6 +313,7 @@ export const ReportForm = observer((): ReactElement => {
             const collectionId = dragData.collectionId;
 
             if (dropIndex !== undefined) {
+                const order = dropIndex;
                 const response = await setReportOrder(
                     collectionId,
                     dragData.document.documentUID,
@@ -334,6 +349,7 @@ export const ReportForm = observer((): ReactElement => {
                         const orderResponse = await setReportOrder(
                             targetCollectionId,
                             reportId,
+                            dropIndex
                             dropIndex
                         );
                         if (orderResponse?.error) {
