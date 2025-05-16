@@ -243,10 +243,20 @@ export const ReportForm = observer((): ReactElement => {
         const dragNode = event.dragNode as TreeNodeEvent | undefined;
         const dropNode = event.dropNode as TreeNodeEvent | undefined;
 
-        let dropIndex = event.dropIndex;
-        if (currentNodeOrder !== null && currentNodeOrder !== undefined) {
-            if (event.dropIndex > currentNodeOrder) {
-                dropIndex = event.dropIndex - 1;
+        let dropIndex = 0;
+        if (dropNode?.type === NODE_TYPES.COLLECTION) {
+            const children = dropNode.children || [];
+            const documentChildren = children.filter(
+                (node) => (node as TreeNodeEvent).type === NODE_TYPES.DOCUMENT
+            );
+            const documentKeys = documentChildren.map((node) => node.key);
+
+            const dropChild = children[event.dropIndex];
+            if (dropChild) {
+                const idx = documentKeys.indexOf(dropChild.key);
+                if (idx !== -1) {
+                    dropIndex = dragNode?.key === dropChild.key ? idx : idx - 1;
+                }
             }
         }
 
@@ -287,15 +297,9 @@ export const ReportForm = observer((): ReactElement => {
             dragNode?.data?.collectionId === dropNode?.data?.collection?.itemUID
         ) {
             const collectionId = dragData.collectionId;
-            const currentCollectionsLength =
-                allCollections.find((col: ReportCollection) => col.itemUID === collectionId)
-                    ?.collections?.length || 0;
 
             if (dropIndex !== undefined) {
-                const order =
-                    dropIndex - currentCollectionsLength < 0
-                        ? 0
-                        : dropIndex - currentCollectionsLength;
+                const order = dropIndex;
                 const response = await setReportOrder(
                     collectionId,
                     dragData.document.documentUID,
@@ -328,20 +332,10 @@ export const ReportForm = observer((): ReactElement => {
                     showError(response.error);
                 } else {
                     if (dropIndex !== undefined) {
-                        const currentCollectionsLength =
-                            allCollections.find(
-                                (col: ReportCollection) => col.itemUID === targetCollectionId
-                            )?.collections?.length || 0;
-
-                        const order =
-                            dropIndex - currentCollectionsLength < 0
-                                ? 0
-                                : dropIndex - currentCollectionsLength;
-
                         const orderResponse = await setReportOrder(
                             targetCollectionId,
                             reportId,
-                            order
+                            dropIndex
                         );
                         if (orderResponse?.error) {
                             showError(orderResponse.error);
