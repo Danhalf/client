@@ -313,7 +313,6 @@ export const ReportForm = observer((): ReactElement => {
             const collectionId = dragData.collectionId;
 
             if (dropIndex !== undefined) {
-                const order = dropIndex;
                 const response = await setReportOrder(
                     collectionId,
                     dragData.document.documentUID,
