@@ -46,7 +46,7 @@ export const NodeContent = ({
     const isSimpleNode = node.type === NODE_TYPES.DOCUMENT;
 
     useEffect(() => {
-        const parent = ref.current?.closest(".p-treenode-content");
+        const parent = ref?.current?.closest(".p-treenode-content");
         if (parent) {
             if (isTogglerVisible) {
                 parent.classList.add("report__list-item--toggler-visible");
@@ -352,6 +352,17 @@ export const ReportForm = observer((): ReactElement => {
         if (dragNode?.type === NODE_TYPES.COLLECTION && dragData?.collection && dropIndex != null) {
             const sourceCollectionId = dragData.collection.itemUID;
             if (sourceCollectionId) {
+                const collectionNodes = allNodes.filter(
+                    (node) => (node as TreeNodeEvent).type === NODE_TYPES.COLLECTION
+                );
+                const dropChild = collectionNodes[event.dropIndex];
+                if (dropChild) {
+                    const idx = collectionNodes.findIndex((node) => node.key === dropChild.key);
+                    if (idx !== -1) {
+                        dropIndex = idx;
+                    }
+                }
+
                 const response = await setCollectionOrder(sourceCollectionId, dropIndex);
                 if (response && response.status === Status.ERROR) {
                     showError(response.error);
