@@ -25,6 +25,7 @@ import { useToast } from "dashboard/common/toast";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
+import { DeleteDealForm } from "dashboard/deals/form/delete-form";
 
 const STEP = "step";
 const EMPTY_INFO_MESSAGE = "N/A";
@@ -215,6 +216,9 @@ export const DealsForm = observer(() => {
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const formikRef = useRef<FormikProps<Partial<Deal> & Partial<DealExtData>>>(null);
     const [errorSections, setErrorSections] = useState<string[]>([]);
+    const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
+    const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
+    const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -546,6 +550,12 @@ export const DealsForm = observer(() => {
                                                         </div>
                                                         <PrintDealForms />
                                                     </div>
+                                                )}{" "}
+                                                {stepActiveIndex === deleteActiveIndex && (
+                                                    <DeleteDealForm
+                                                        attemptedSubmit={attemptedSubmit}
+                                                        isDeleteConfirm={isDeleteConfirm}
+                                                    />
                                                 )}
                                             </Form>
                                         </Formik>
