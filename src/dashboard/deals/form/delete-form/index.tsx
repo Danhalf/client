@@ -9,6 +9,12 @@ interface DeleteDealFormProps extends DropdownProps {
 
 export const DeleteDealForm = observer(
     ({ isDeleteConfirm, attemptedSubmit }: DeleteDealFormProps): ReactElement => {
-        return <div>DeleteForm</div>;
+        return (
+            <>
+                <div>DeleteDealForm</div>
+                <div>isDeleteConfirm: {isDeleteConfirm}</div>
+                <div>attemptedSubmit: {attemptedSubmit}</div>
+            </>
+        );
     }
 );
