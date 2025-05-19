@@ -3,6 +3,7 @@ import { QueryParams } from "common/models/query-params";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import {
     Deal,
+    DealDelete,
     DealFinance,
     DealPickupPayment,
     DealPrintFormResponse,
@@ -397,7 +398,7 @@ export const getDealDeleteReasonsList = async (useruid: string) => {
 
 export const deleteDeal = async (
     dealuid: string,
-    data: { reason: string; comment: string }
+    data: Partial<DealDelete>
 ): Promise<BaseResponseError | undefined> => {
     try {
         const response = await authorizedUserApiInstance.post<BaseResponseError>(
