@@ -177,3 +177,7 @@
         }
     }
 }
+
+.deal-form__title--danger {
+    color: var(--admss-app-red);
+}
