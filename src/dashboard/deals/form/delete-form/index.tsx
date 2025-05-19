@@ -1,16 +1,13 @@
-import { LS_APP_USER } from "common/constants/localStorage";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { BorderedCheckbox } from "dashboard/common/form/inputs";
 import { useToast } from "dashboard/common/toast";
-import { AuthUser } from "http/services/auth.service";
 import { deleteDeal, getDealDeleteReasonsList } from "http/services/deals.service";
 import { observer } from "mobx-react-lite";
 import { DropdownProps } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getKeyValue } from "services/local-storage.service";
 import { useStore } from "store/hooks";
 
 interface DeleteDealFormProps extends DropdownProps {
@@ -23,7 +20,9 @@ export const DeleteDealForm = observer(
         const toast = useToast();
         const navigate = useNavigate();
         const { id } = useParams();
+        const userStore = useStore().userStore;
         const store = useStore().dealStore;
+        const { authUser } = userStore;
 
         const [deleteDealAndRelatedOption, setDeleteDealAndRelatedOption] =
             useState<boolean>(false);
@@ -39,15 +38,13 @@ export const DeleteDealForm = observer(
         const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
         const [comment, setComment] = useState<string>("");
 
+        const handleGetDeleteReasonsList = async () => {
+            const res = await getDealDeleteReasonsList(authUser!.useruid);
+            Array.isArray(res) && setDeleteReasonsList(res);
+        };
+
         useEffect(() => {
-            const authUser: AuthUser = getKeyValue(LS_APP_USER);
-            if (authUser) {
-                getDealDeleteReasonsList(authUser.useruid).then(
-                    (res: string[] | BaseResponseError) => {
-                        Array.isArray(res) && setDeleteReasonsList(res);
-                    }
-                );
-            }
+            handleGetDeleteReasonsList();
         }, []);
 
         const handleDeleteDeal = () => {
