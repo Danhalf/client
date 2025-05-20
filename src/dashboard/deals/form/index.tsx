@@ -639,6 +639,9 @@ export const DealsForm = observer(() => {
             {confirmDeleteVisible && (
                 <ConfirmModal
                     visible={confirmDeleteVisible}
+                    className='deal-delete-modal'
+                    acceptLabel='Delete'
+                    rejectLabel='Cancel'
                     bodyMessage={deleteMessage}
                     confirmAction={() => setIsDeleteConfirm(true)}
                     onHide={() => setConfirmDeleteVisible(false)}
