@@ -75,10 +75,15 @@ export const DeleteDealForm = observer(({ isDeleteConfirm }: DeleteDealFormProps
                     toast.current?.show({
                         severity: "error",
                         summary: "Error",
-                        detail: error || "Error while deleting deal",
+                        detail: error,
                     });
                 } else {
                     navigate("/dashboard/deals");
+                    toast.current?.show({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "Deal deleted successfully!",
+                    });
                 }
             });
         }
@@ -219,65 +224,70 @@ export const DeleteDealForm = observer(({ isDeleteConfirm }: DeleteDealFormProps
                     <hr className='splitter__line flex-1' />
                 </div>
 
-                <div className='col-6'>
-                    <BorderedCheckbox
-                        name='Delete the deal and everything related to it'
-                        checked={deleteDealAndRelatedOption}
-                        onChange={({ checked }) =>
-                            handleCheckboxChange(DELETE_OPTION.DELETE_EVERYTHING, !!checked)
-                        }
-                    />
-                </div>
-                <div className='col-6'>
-                    <BorderedCheckbox
-                        name='Delete only the deal'
-                        checked={deleteDealOption}
-                        onChange={({ checked }) =>
-                            handleCheckboxChange(DELETE_OPTION.DELETE_ONLY_DEAL, !!checked)
-                        }
-                    />
-                </div>
-                <div className='col-6'>
-                    <BorderedCheckbox
-                        name='Delete the contact'
-                        checked={deleteContactOption}
-                        onChange={({ checked }) =>
-                            handleCheckboxChange(DELETE_OPTION.DELETE_CONTACT, !!checked)
-                        }
-                    />
-                </div>
-                <div className='col-6'>
-                    <BorderedCheckbox
-                        name='Delete the account'
-                        checked={deleteAccountOption}
-                        onChange={({ checked }) =>
-                            handleCheckboxChange(DELETE_OPTION.DELETE_ACCOUNT, !!checked)
-                        }
-                    />
-                </div>
-                <div className='col-6'>
-                    <BorderedCheckbox
-                        name='Delete the inventory'
-                        checked={deleteInventoryOption}
-                        onChange={({ checked }) => {
-                            handleCheckboxChange(DELETE_OPTION.DELETE_INVENTORY, !!checked);
-                            if (checked) {
-                                setSetInventoryAvailableOption(false);
+                <div className='grid col-12 p-0 row-gap-2 py-3'>
+                    <div className='col-6'>
+                        <BorderedCheckbox
+                            name='Delete the deal and everything related to it'
+                            checked={deleteDealAndRelatedOption}
+                            onChange={({ checked }) =>
+                                handleCheckboxChange(DELETE_OPTION.DELETE_EVERYTHING, !!checked)
                             }
-                        }}
-                    />
-                </div>
-                <div className='col-6'>
-                    <BorderedCheckbox
-                        name='Set the inventory to "Available for sale"'
-                        checked={setInventoryAvailableOption}
-                        onChange={({ checked }) => {
-                            handleCheckboxChange(DELETE_OPTION.SET_INVENTORY_AVAILABLE, !!checked);
-                            if (checked) {
-                                setDeleteInventoryOption(false);
+                        />
+                    </div>
+                    <div className='col-6'>
+                        <BorderedCheckbox
+                            name='Delete only the deal'
+                            checked={deleteDealOption}
+                            onChange={({ checked }) =>
+                                handleCheckboxChange(DELETE_OPTION.DELETE_ONLY_DEAL, !!checked)
                             }
-                        }}
-                    />
+                        />
+                    </div>
+                    <div className='col-6'>
+                        <BorderedCheckbox
+                            name='Delete the contact'
+                            checked={deleteContactOption}
+                            onChange={({ checked }) =>
+                                handleCheckboxChange(DELETE_OPTION.DELETE_CONTACT, !!checked)
+                            }
+                        />
+                    </div>
+                    <div className='col-6'>
+                        <BorderedCheckbox
+                            name='Delete the account'
+                            checked={deleteAccountOption}
+                            onChange={({ checked }) =>
+                                handleCheckboxChange(DELETE_OPTION.DELETE_ACCOUNT, !!checked)
+                            }
+                        />
+                    </div>
+                    <div className='col-6'>
+                        <BorderedCheckbox
+                            name='Delete the inventory'
+                            checked={deleteInventoryOption}
+                            onChange={({ checked }) => {
+                                handleCheckboxChange(DELETE_OPTION.DELETE_INVENTORY, !!checked);
+                                if (checked) {
+                                    setSetInventoryAvailableOption(false);
+                                }
+                            }}
+                        />
+                    </div>
+                    <div className='col-6'>
+                        <BorderedCheckbox
+                            name='Set the inventory to "Available for sale"'
+                            checked={setInventoryAvailableOption}
+                            onChange={({ checked }) => {
+                                handleCheckboxChange(
+                                    DELETE_OPTION.SET_INVENTORY_AVAILABLE,
+                                    !!checked
+                                );
+                                if (checked) {
+                                    setDeleteInventoryOption(false);
+                                }
+                            }}
+                        />
+                    </div>
                 </div>
                 <div className='col-12'>
                     <span className='p-float-label'>
