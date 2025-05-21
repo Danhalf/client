@@ -137,7 +137,7 @@ export const Reports = (): ReactElement => {
                 life: TOAST_LIFETIME,
             });
         } else {
-            handleGetUserReportCollections();
+            await handleGetUserReportCollections();
             toast.current?.show({
                 severity: "success",
                 summary: "Success",
@@ -176,7 +176,7 @@ export const Reports = (): ReactElement => {
                 life: TOAST_LIFETIME,
             });
         } else {
-            handleGetUserReportCollections();
+            await handleGetUserReportCollections();
             toast.current?.show({
                 severity: "success",
                 summary: "Success",
