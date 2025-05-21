@@ -6,7 +6,6 @@ import {
     moveReportToCollection,
     setCollectionOrder,
     setReportOrder,
-    updateCollection,
 } from "http/services/reports.service";
 import { Button } from "primereact/button";
 import { Tree, TreeDragDropEvent } from "primereact/tree";
@@ -137,7 +136,7 @@ export const Reports = (): ReactElement => {
                 life: TOAST_LIFETIME,
             });
         } else {
-            await handleGetUserReportCollections();
+            handleGetUserReportCollections();
             toast.current?.show({
                 severity: "success",
                 summary: "Success",
@@ -152,8 +151,7 @@ export const Reports = (): ReactElement => {
     const handleUpdateCollection = async (collectionUid: string, editCollectionName?: string) => {
         const finalName = collectionName || editCollectionName;
         if (!finalName) return;
-
-        const response = await updateCollection(authUser!.useruid, {
+        const response = await createReportCollection(authUser!.useruid, {
             name: finalName,
             documents: selectedReports,
             itemuid: collectionUid,
@@ -167,7 +165,7 @@ export const Reports = (): ReactElement => {
                 life: TOAST_LIFETIME,
             });
         } else {
-            await handleGetUserReportCollections();
+            handleGetUserReportCollections();
             toast.current?.show({
                 severity: "success",
                 summary: "Success",
@@ -187,12 +185,6 @@ export const Reports = (): ReactElement => {
         const target = event.target as HTMLElement;
         if (EDIT_COLLECTION_CLASSES.some((cls) => target.classList.contains(cls))) {
             event.stopPropagation();
-            const currentCollection = [...reportCollections, ...customCollections].find(
-                (col) => col.itemUID === collectionUid
-            );
-            if (currentCollection?.documents) {
-                setSelectedReports(currentCollection.documents as ReportDocument[]);
-            }
             setIsCollectionEditing(collectionUid);
         }
     };
