@@ -121,63 +121,61 @@ export const Reports = (): ReactElement => {
         ...buildTreeNodes(reportCollections, true),
     ];
 
-    const handleCreateCollection = () => {
+    const handleCreateCollection = async () => {
         if (!collectionName) return;
-        createReportCollection(authUser!.useruid, {
+        const response = await createReportCollection(authUser!.useruid, {
             name: collectionName,
             documents: newCollectionsReports,
-        }).then((response) => {
-            const { error } = response as BaseResponseError;
-            if (error && toast.current) {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                    life: TOAST_LIFETIME,
-                });
-            } else {
-                handleGetUserReportCollections();
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: "New collection is successfully created!",
-                    life: TOAST_LIFETIME,
-                });
-                setCollectionName("");
-                setNewCollectionsReports([]);
-            }
         });
+        const { error } = response as BaseResponseError;
+        if (error && toast.current) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: error,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            handleGetUserReportCollections();
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "New collection is successfully created!",
+                life: TOAST_LIFETIME,
+            });
+            setCollectionName("");
+            setNewCollectionsReports([]);
+        }
     };
 
-    const handleUpdateCollection = (collectionUid: string, editCollectionName?: string) => {
+    const handleUpdateCollection = async (collectionUid: string, editCollectionName?: string) => {
         const finalName = collectionName || editCollectionName;
         if (!finalName) return;
-        createReportCollection(authUser!.useruid, {
+        const response = await createReportCollection(authUser!.useruid, {
             name: finalName,
             documents: selectedReports,
             itemuid: collectionUid,
-        }).then((response) => {
-            const { error } = response as BaseResponseError;
-            if (error && toast.current) {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: error,
-                    life: TOAST_LIFETIME,
-                });
-            } else {
-                handleGetUserReportCollections();
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: "Collection is successfully updated!",
-                    life: TOAST_LIFETIME,
-                });
-                setCollectionName("");
-                setSelectedReports([]);
-                setIsCollectionEditing(null);
-            }
         });
+        const { error } = response as BaseResponseError;
+        if (error && toast.current) {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: error,
+                life: TOAST_LIFETIME,
+            });
+        } else {
+            handleGetUserReportCollections();
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Collection is successfully updated!",
+                life: TOAST_LIFETIME,
+            });
+            setCollectionName("");
+            setSelectedReports([]);
+            setIsCollectionEditing(null);
+        }
     };
 
     const handleCustomEditCollection = (
