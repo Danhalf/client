@@ -27,6 +27,11 @@ interface DealPrintCollection {
     [key: string]: DealPrintForm[];
 }
 
+type NewDealPickupPayment = Pick<
+    DealPickupPayment,
+    "itemuid" | "dealuid" | "paydate" | "amount" | "paid"
+>;
+
 export enum DEAL_DELETE_MESSAGES {
     DELETE_DEAL = "Do you really want to delete this deal? This action cannot be undone.",
     DELETE_DEAL_WITH_OPTIONS = "Do you really want to delete the deal with all related options you've selected? This action cannot be undone.",
@@ -258,38 +263,37 @@ export class DealStore {
                 value,
                 isNew,
             }: { key: keyof DealPickupPayment; value: string | number; isNew?: boolean }
+            {
+                key,
+                value,
+                isNew,
+            }: { key: keyof DealPickupPayment; value: string | number; isNew?: boolean }
         ) => {
             this._isFormChanged = true;
-
-            const currentPayment = this._dealPickupPayments.find((p) => p.itemuid === itemuid);
-            if (currentPayment) {
-                if (key === "paydate") {
-                    const date = new Date(value as string);
-                    date.setHours(12, 0, 0, 0);
-                    currentPayment[key] = date.getTime();
+            if (dealStore) {
+                if (isNew) {
+                    const newPayment: NewDealPickupPayment = {
+                        itemuid: "0",
+                        dealuid: this._dealID,
+                        paydate: key === "paydate" ? (value as string) : "",
+                        amount: key === "amount" ? (value as number) : 0,
+                        paid: key === "paid" ? (value as number) : 0,
+                    };
+                    this._dealPickupPayments = [
+                        ...this._dealPickupPayments,
+                        { ...newPayment, changed: true } as DealPickupPayment & {
+                            changed?: boolean;
+                        },
+                    ];
                 } else {
-                    (currentPayment as Record<typeof key, string | number>)[key] = value;
+                    const currentPayment = dealStore.dealPickupPayments.find(
+                        (p) => p.itemuid === itemuid
+                    );
+                    if (currentPayment) {
+                        (currentPayment as Record<typeof key, string | number>)[key] = value;
+                        currentPayment.changed = true;
+                    }
                 }
-                currentPayment.changed = true;
-            } else if (itemuid.startsWith(NEW_PAYMENT_LABEL)) {
-                const newPayment = {
-                    itemuid,
-                    dealuid: this._dealID,
-                    paydate:
-                        key === "paydate"
-                            ? (() => {
-                                  const date = new Date(value as string);
-                                  date.setHours(12, 0, 0, 0);
-                                  return date.getTime();
-                              })()
-                            : 0,
-                    amount: key === "amount" ? (value as number) : 0,
-                    paid: key === "paid" ? (value as number) : 0,
-                };
-                this._dealPickupPayments = [
-                    ...this._dealPickupPayments,
-                    { ...newPayment, changed: true } as DealPickupPayment & { changed?: boolean },
-                ];
             }
         }
     );
