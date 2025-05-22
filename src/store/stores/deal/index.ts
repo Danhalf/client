@@ -27,6 +27,11 @@ interface DealPrintCollection {
     [key: string]: DealPrintForm[];
 }
 
+type NewDealPickupPayment = Pick<
+    DealPickupPayment,
+    "itemuid" | "dealuid" | "paydate" | "amount" | "paid"
+>;
+
 export enum DEAL_DELETE_MESSAGES {
     DELETE_DEAL = "Do you really want to delete this deal? This action cannot be undone.",
     DELETE_DEAL_WITH_OPTIONS = "Do you really want to delete the deal with all related options you've selected? This action cannot be undone.",
@@ -250,17 +255,37 @@ export class DealStore {
     public changeDealPickupPayments = action(
         (
             itemuid: string,
-            { key, value }: { key: keyof DealPickupPayment; value: string | number }
+            {
+                key,
+                value,
+                isNew,
+            }: { key: keyof DealPickupPayment; value: string | number; isNew?: boolean }
         ) => {
             const dealStore = this.rootStore.dealStore;
             this._isFormChanged = true;
             if (dealStore) {
-                const currentPayment = dealStore.dealPickupPayments.find(
-                    (item) => item.itemuid === itemuid
-                );
-                if (currentPayment) {
-                    (currentPayment as Record<typeof key, string | number>)[key] = value;
-                    currentPayment.changed = true;
+                if (isNew) {
+                    const newPayment: NewDealPickupPayment = {
+                        itemuid: "0",
+                        dealuid: this._dealID,
+                        paydate: key === "paydate" ? (value as string) : "",
+                        amount: key === "amount" ? (value as number) : 0,
+                        paid: key === "paid" ? (value as number) : 0,
+                    };
+                    this._dealPickupPayments = [
+                        ...this._dealPickupPayments,
+                        { ...newPayment, changed: true } as DealPickupPayment & {
+                            changed?: boolean;
+                        },
+                    ];
+                } else {
+                    const currentPayment = dealStore.dealPickupPayments.find(
+                        (p) => p.itemuid === itemuid
+                    );
+                    if (currentPayment) {
+                        (currentPayment as Record<typeof key, string | number>)[key] = value;
+                        currentPayment.changed = true;
+                    }
                 }
             }
         }

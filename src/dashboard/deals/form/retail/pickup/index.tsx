@@ -49,7 +49,7 @@ export const DealRetailPickup = observer((): ReactElement => {
         } else {
             setLocalPayments(
                 Array.from({ length: EMPTY_PAYMENT_LENGTH }, (_, index) => ({
-                    itemuid: `empty-${index}`,
+                    itemuid: "0",
                     paydate: "",
                     amount: 0,
                     paid: 0,
@@ -62,7 +62,18 @@ export const DealRetailPickup = observer((): ReactElement => {
         setLocalPayments((prev: DealPickupPayment[]) =>
             prev.map((p: DealPickupPayment) => (p.itemuid === itemuid ? { ...p, [key]: value } : p))
         );
-        changeDealPickupPayments(itemuid, { key, value });
+        if (itemuid === "0") {
+            const payment = localPayments.find((p) => p.itemuid === itemuid);
+            if (payment) {
+                changeDealPickupPayments(itemuid, {
+                    key,
+                    value,
+                    isNew: true,
+                });
+            }
+        } else {
+            changeDealPickupPayments(itemuid, { key, value });
+        }
     };
 
     return (
