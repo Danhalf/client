@@ -27,11 +27,6 @@ interface DealPrintCollection {
     [key: string]: DealPrintForm[];
 }
 
-type NewDealPickupPayment = Pick<
-    DealPickupPayment,
-    "itemuid" | "dealuid" | "paydate" | "amount" | "paid"
->;
-
 export enum DEAL_DELETE_MESSAGES {
     DELETE_DEAL = "Do you really want to delete this deal? This action cannot be undone.",
     DELETE_DEAL_WITH_OPTIONS = "Do you really want to delete the deal with all related options you've selected? This action cannot be undone.",
@@ -51,7 +46,7 @@ export class DealStore {
     private _dealExtData: DealExtData = {} as DealExtData;
     private _dealFinance = {} as DealFinance;
     private _dealFinances: DealFinance = {} as DealFinance;
-    private _dealPickupPayments: (NewDealPickupPayment & { changed?: boolean })[] = [];
+    private _dealPickupPayments: (DealPickupPayment & { changed?: boolean })[] = [];
     private _dealID: string = "";
     private _dealType: number = 0;
     private _printList: DealPrintCollection = {};
@@ -268,21 +263,24 @@ export class DealStore {
 
             const currentPayment = this._dealPickupPayments.find((p) => p.itemuid === itemuid);
             if (currentPayment) {
-                (currentPayment as Record<typeof key, string | number>)[key] = value;
+                if (key === "paydate") {
+                    const date = new Date(value as string);
+                    currentPayment[key] = date.getTime();
+                } else {
+                    (currentPayment as Record<typeof key, string | number>)[key] = value;
+                }
                 currentPayment.changed = true;
             } else if (itemuid.startsWith(NEW_PAYMENT_LABEL)) {
-                const newPayment: NewDealPickupPayment = {
+                const newPayment = {
                     itemuid,
                     dealuid: this._dealID,
-                    paydate: key === "paydate" ? (value as string) : "",
+                    paydate: key === "paydate" ? new Date(value as string).getTime() : 0,
                     amount: key === "amount" ? (value as number) : 0,
                     paid: key === "paid" ? (value as number) : 0,
                 };
                 this._dealPickupPayments = [
                     ...this._dealPickupPayments,
-                    { ...newPayment, changed: true } as DealPickupPayment & {
-                        changed?: boolean;
-                    },
+                    { ...newPayment, changed: true } as DealPickupPayment & { changed?: boolean },
                 ];
             }
         }
@@ -358,10 +356,10 @@ export class DealStore {
                         ({
                             itemuid: `${NEW_PAYMENT_LABEL}${index}`,
                             dealuid: this._dealID,
-                            paydate: "",
+                            paydate: 0,
                             amount: 0,
                             paid: 0,
-                        }) as NewDealPickupPayment
+                        }) as DealPickupPayment
                 );
                 this._dealPickupPayments = [...response, ...emptyPayments];
             } else {
