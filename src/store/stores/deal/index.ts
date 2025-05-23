@@ -54,7 +54,7 @@ export class DealStore {
     private _dealExtData: DealExtData = {} as DealExtData;
     private _dealFinance = {} as DealFinance;
     private _dealFinances: DealFinance = {} as DealFinance;
-    private _dealPickupPayments: (DealPickupPayment & { changed?: boolean })[] = [];
+    private _dealPickupPayments: (NewDealPickupPayment & { changed?: boolean })[] = [];
     private _dealID: string = "";
     private _dealType: number = 0;
     private _printList: DealPrintCollection = {};
@@ -329,7 +329,6 @@ export class DealStore {
                     const id = itemuid.startsWith(NEW_PAYMENT_LABEL) ? "0" : itemuid;
                     setDealPayments(this._dealID, { itemuid: id, ...payment });
                 });
-            debugger;
             await Promise.race([dealResponse, financesResponse, paymentsResponse]).then(
                 (response) => (response ? this._dealID : undefined)
             );
@@ -370,10 +369,7 @@ export class DealStore {
                             paydate: "",
                             amount: 0,
                             paid: 0,
-                            created: "",
-                            updated: "",
-                            useruid: "",
-                        }) as DealPickupPayment
+                        }) as NewDealPickupPayment
                 );
                 this._dealPickupPayments = [...response, ...emptyPayments];
             } else {

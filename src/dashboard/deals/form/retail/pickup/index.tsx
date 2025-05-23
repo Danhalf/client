@@ -53,8 +53,7 @@ export const DealRetailPickup = observer((): ReactElement => {
                 <div className='pickup-header__item'>Paid</div>
             </div>
             <div className='pickup-body col-12'>
-                {dealPickupPayments.map((payment: DealPickupPayment) => (
-                {dealPickupPayments.map((payment: DealPickupPayment) => (
+                {dealPickupPayments.map((payment: Partial<DealPickupPayment>) => (
                     <div key={payment.itemuid} className='pickup-row'>
                         <div className='pickup-row__item'>
                             <DateInput
@@ -64,7 +63,7 @@ export const DealRetailPickup = observer((): ReactElement => {
                                 date={new Date(payment.paydate)}
                                 name={!payment.paydate ? "ХХ/ХХ/ХХХХ" : ""}
                                 onChange={(e) =>
-                                    handleChange(payment.itemuid, "paydate", e.value || "")
+                                    handleChange(payment?.itemuid || "", "paydate", e.value || "")
                                 }
                                 className={
                                     payment.paydate
@@ -79,9 +78,14 @@ export const DealRetailPickup = observer((): ReactElement => {
                                     placeholder='0.00'
                                     value={payment.amount}
                                     onChange={({ value }) =>
-                                        handleChange(payment.itemuid, "amount", Number(value) || 0)
+                                        handleChange(
+                                            payment?.itemuid || "",
+                                            "amount",
+                                            Number(value) || 0
+                                        )
                                     }
                                     className={
+                                        payment?.amount && payment.amount > 0
                                         payment?.amount && payment.amount > 0
                                             ? "pickup-input"
                                             : "pickup-input pickup-input--grey"
@@ -93,7 +97,7 @@ export const DealRetailPickup = observer((): ReactElement => {
                             <Checkbox
                                 checked={!!payment.paid}
                                 onChange={(e) =>
-                                    handleChange(payment.itemuid, "paid", e.checked ? 1 : 0)
+                                    handleChange(payment?.itemuid || "", "paid", e.checked ? 1 : 0)
                                 }
                             />
                         </div>
