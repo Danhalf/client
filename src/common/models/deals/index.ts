@@ -1,4 +1,4 @@
-import { BaseResponse } from "common/models/base-response";
+import { BaseResponse, BaseResponseError } from "common/models/base-response";
 import { PrintForm, TypeList } from "..";
 import { Status } from "../base-response";
 
@@ -437,4 +437,9 @@ export interface DealDelete {
     delete_trade1: 0 | 1;
     delete_trade2: 0 | 1;
     delete_account: 0 | 1;
+}
+
+export interface DealPaymentsTotal extends BaseResponseError {
+    total: number;
+    total_paid: number;
 }
