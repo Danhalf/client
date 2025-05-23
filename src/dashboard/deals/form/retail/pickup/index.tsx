@@ -7,8 +7,7 @@ import { getDealPaymentsTotal } from "http/services/deals.service";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
-import { DealPaymentsTotal, DealPickupPayment } from "common/models/deals";
-import { Status } from "common/models/base-response";
+import { DealPickupPayment } from "common/models/deals";
 
 export const DealRetailPickup = observer((): ReactElement => {
     const { id } = useParams();
@@ -42,37 +41,8 @@ export const DealRetailPickup = observer((): ReactElement => {
         }
     }, [toast, dealErrorMessage]);
 
-    useEffect(() => {
-        if (dealPickupPayments.length) {
-            setLocalPayments(dealPickupPayments);
-        } else {
-            setLocalPayments(
-                Array.from({ length: EMPTY_PAYMENT_LENGTH }, (_, index) => ({
-                    itemuid: "0",
-                    paydate: "",
-                    amount: 0,
-                    paid: 0,
-                })) as DealPickupPayment[]
-            );
-        }
-    }, [dealPickupPayments]);
-
     const handleChange = (itemuid: string, key: keyof DealPickupPayment, value: any) => {
-        setLocalPayments((prev: DealPickupPayment[]) =>
-            prev.map((p: DealPickupPayment) => (p.itemuid === itemuid ? { ...p, [key]: value } : p))
-        );
-        if (itemuid === "0") {
-            const payment = localPayments.find((p) => p.itemuid === itemuid);
-            if (payment) {
-                changeDealPickupPayments(itemuid, {
-                    key,
-                    value,
-                    isNew: true,
-                });
-            }
-        } else {
-            changeDealPickupPayments(itemuid, { key, value });
-        }
+        changeDealPickupPayments(itemuid, { key, value });
     };
 
     return (
@@ -83,6 +53,7 @@ export const DealRetailPickup = observer((): ReactElement => {
                 <div className='pickup-header__item'>Paid</div>
             </div>
             <div className='pickup-body col-12'>
+                {dealPickupPayments.map((payment: DealPickupPayment) => (
                 {dealPickupPayments.map((payment: DealPickupPayment) => (
                     <div key={payment.itemuid} className='pickup-row'>
                         <div className='pickup-row__item'>
