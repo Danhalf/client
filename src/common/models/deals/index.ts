@@ -410,7 +410,7 @@ export interface DealPickupPayment {
     dealuid: string;
     itemuid: string;
     paid: number;
-    paydate: string;
+    paydate: number | string;
     updated: string;
     useruid: string;
 }
