@@ -41,6 +41,9 @@ export enum DEAL_DELETE_MESSAGES {
     DELETE_DEAL_AVAILABLE_FOR_SALE = 'Do you really want to delete the deal with all related options you\'ve selected and set the inventory to "Available for sale"? This action cannot be undone.',
 }
 
+export const NEW_PAYMENT_LABEL = "new_";
+export const EMPTY_PAYMENT_LENGTH = 7;
+
 export class DealStore {
     public rootStore: RootStore;
     private _deal: DealItem = {} as DealItem;
@@ -261,32 +264,26 @@ export class DealStore {
                 isNew,
             }: { key: keyof DealPickupPayment; value: string | number; isNew?: boolean }
         ) => {
-            const dealStore = this.rootStore.dealStore;
             this._isFormChanged = true;
-            if (dealStore) {
-                if (isNew) {
-                    const newPayment: NewDealPickupPayment = {
-                        itemuid: "0",
-                        dealuid: this._dealID,
-                        paydate: key === "paydate" ? (value as string) : "",
-                        amount: key === "amount" ? (value as number) : 0,
-                        paid: key === "paid" ? (value as number) : 0,
-                    };
-                    this._dealPickupPayments = [
-                        ...this._dealPickupPayments,
-                        { ...newPayment, changed: true } as DealPickupPayment & {
-                            changed?: boolean;
-                        },
-                    ];
-                } else {
-                    const currentPayment = dealStore.dealPickupPayments.find(
-                        (p) => p.itemuid === itemuid
-                    );
-                    if (currentPayment) {
-                        (currentPayment as Record<typeof key, string | number>)[key] = value;
-                        currentPayment.changed = true;
-                    }
-                }
+
+            const currentPayment = this._dealPickupPayments.find((p) => p.itemuid === itemuid);
+            if (currentPayment) {
+                (currentPayment as Record<typeof key, string | number>)[key] = value;
+                currentPayment.changed = true;
+            } else if (itemuid.startsWith(NEW_PAYMENT_LABEL)) {
+                const newPayment: NewDealPickupPayment = {
+                    itemuid,
+                    dealuid: this._dealID,
+                    paydate: key === "paydate" ? (value as string) : "",
+                    amount: key === "amount" ? (value as number) : 0,
+                    paid: key === "paid" ? (value as number) : 0,
+                };
+                this._dealPickupPayments = [
+                    ...this._dealPickupPayments,
+                    { ...newPayment, changed: true } as DealPickupPayment & {
+                        changed?: boolean;
+                    },
+                ];
             }
         }
     );
@@ -323,6 +320,7 @@ export class DealStore {
                     const { changed, ...payment } = item;
                     setDealPayments(item.itemuid, payment);
                 });
+            debugger;
             await Promise.race([dealResponse, financesResponse, paymentsResponse]).then(
                 (response) => (response ? this._dealID : undefined)
             );
@@ -354,7 +352,21 @@ export class DealStore {
             this._dealErrorMessage = "";
             const response = await getDealPayments(dealuid);
             if (Array.isArray(response)) {
-                this._dealPickupPayments = response;
+                const emptyPayments = Array.from(
+                    { length: Math.max(0, EMPTY_PAYMENT_LENGTH - response.length) },
+                    (_, index) =>
+                        ({
+                            itemuid: `${NEW_PAYMENT_LABEL}${index}`,
+                            dealuid: this._dealID,
+                            paydate: "",
+                            amount: 0,
+                            paid: 0,
+                            created: "",
+                            updated: "",
+                            useruid: "",
+                        }) as DealPickupPayment
+                );
+                this._dealPickupPayments = [...response, ...emptyPayments];
             } else {
                 this._dealErrorMessage = response.error as string;
             }
