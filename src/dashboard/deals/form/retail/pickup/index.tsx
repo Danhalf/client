@@ -7,7 +7,8 @@ import { getDealPaymentsTotal } from "http/services/deals.service";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
-import { DealPickupPayment } from "common/models/deals";
+import { DealPaymentsTotal, DealPickupPayment } from "common/models/deals";
+import { Status } from "common/models/base-response";
 
 export const DealRetailPickup = observer((): ReactElement => {
     const { id } = useParams();
@@ -22,8 +23,9 @@ export const DealRetailPickup = observer((): ReactElement => {
             if (id) {
                 await getPickupPayments(id);
                 const data = await getDealPaymentsTotal(id);
-                if (typeof data === "number") {
-                    setTotalPayments(data);
+                if (data?.status === Status.OK) {
+                    const { total_paid } = data as DealPaymentsTotal;
+                    setTotalPayments(total_paid);
                 }
             }
         };
