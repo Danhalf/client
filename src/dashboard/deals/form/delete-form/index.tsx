@@ -35,16 +35,15 @@ export const DeleteDealForm = observer(
         const store = useStore().dealStore;
         const { authUser } = userStore;
 
-        const [deleteDealAndRelatedOption, setDeleteDealAndRelatedOption] =
-            useState<boolean>(false);
-        const [deleteDealOption, setDeleteDealOption] = useState<boolean>(true);
-        const [deleteContactOption, setDeleteContactOption] = useState<boolean>(false);
-        const [deleteAccountOption, setDeleteAccountOption] = useState<boolean>(false);
-        const [deleteInventoryOption, setDeleteInventoryOption] = useState<boolean>(false);
-        const [setInventoryAvailableOption, setSetInventoryAvailableOption] =
-            useState<boolean>(false);
-
-        const { deleteReason } = store;
+        const {
+            deleteDealAndRelatedOption,
+            deleteDealOption,
+            deleteContactOption,
+            deleteAccountOption,
+            deleteInventoryOption,
+            setInventoryAvailableOption,
+            deleteReason,
+        } = store;
 
         const [deleteReasonsList, setDeleteReasonsList] = useState<string[]>([]);
         const [comment, setComment] = useState<string>("");
@@ -101,26 +100,26 @@ export const DeleteDealForm = observer(
         const handleCheckboxChange = (option: DELETE_OPTION, checked: boolean) => {
             switch (option) {
                 case DELETE_OPTION.DELETE_EVERYTHING:
-                    setDeleteDealAndRelatedOption(checked);
+                    store.deleteDealAndRelatedOption = checked;
                     if (checked) {
-                        setDeleteDealOption(true);
-                        setDeleteContactOption(true);
-                        setDeleteAccountOption(true);
-                        setDeleteInventoryOption(true);
-                        setSetInventoryAvailableOption(false);
+                        store.deleteDealOption = true;
+                        store.deleteContactOption = true;
+                        store.deleteAccountOption = true;
+                        store.deleteInventoryOption = true;
+                        store.setInventoryAvailableOption = false;
                         store.deleteMessage = DEAL_DELETE_MESSAGES.DELETE_DEAL_WITH_OPTIONS;
                     } else {
-                        setDeleteDealOption(false);
-                        setDeleteContactOption(false);
-                        setDeleteAccountOption(false);
-                        setDeleteInventoryOption(false);
+                        store.deleteDealOption = false;
+                        store.deleteContactOption = false;
+                        store.deleteAccountOption = false;
+                        store.deleteInventoryOption = false;
                         store.deleteMessage = DEAL_DELETE_MESSAGES.DELETE_DEAL;
                     }
                     break;
                 case DELETE_OPTION.DELETE_ONLY_DEAL:
-                    setDeleteDealOption(checked);
+                    store.deleteDealOption = checked;
                     if (checked) {
-                        setDeleteDealAndRelatedOption(false);
+                        store.deleteDealAndRelatedOption = false;
                         if (deleteContactOption || deleteAccountOption) {
                             store.deleteMessage = DEAL_DELETE_MESSAGES.DELETE_DEAL_WITH_OPTIONS;
                         } else {
@@ -135,9 +134,9 @@ export const DeleteDealForm = observer(
                     }
                     break;
                 case DELETE_OPTION.DELETE_CONTACT:
-                    setDeleteContactOption(checked);
+                    store.deleteContactOption = checked;
                     if (checked) {
-                        setDeleteDealAndRelatedOption(false);
+                        store.deleteDealAndRelatedOption = false;
                         if (deleteDealOption) {
                             store.deleteMessage = DEAL_DELETE_MESSAGES.DELETE_DEAL_WITH_OPTIONS;
                         } else {
@@ -152,9 +151,9 @@ export const DeleteDealForm = observer(
                     }
                     break;
                 case DELETE_OPTION.DELETE_ACCOUNT:
-                    setDeleteAccountOption(checked);
+                    store.deleteAccountOption = checked;
                     if (checked) {
-                        setDeleteDealAndRelatedOption(false);
+                        store.deleteDealAndRelatedOption = false;
                         if (deleteDealOption) {
                             store.deleteMessage = DEAL_DELETE_MESSAGES.DELETE_DEAL_WITH_OPTIONS;
                         } else {
@@ -169,11 +168,11 @@ export const DeleteDealForm = observer(
                     }
                     break;
                 case DELETE_OPTION.DELETE_INVENTORY:
-                    setDeleteInventoryOption(checked);
+                    store.deleteInventoryOption = checked;
                     if (checked) {
-                        setDeleteDealAndRelatedOption(false);
-                        setDeleteDealOption(false);
-                        setSetInventoryAvailableOption(false);
+                        store.deleteDealAndRelatedOption = false;
+                        store.deleteDealOption = false;
+                        store.setInventoryAvailableOption = false;
                         store.deleteMessage = DEAL_DELETE_MESSAGES.DELETE_SELECTED_OPTIONS;
                     } else if (setInventoryAvailableOption) {
                         store.deleteMessage =
@@ -183,11 +182,11 @@ export const DeleteDealForm = observer(
                     }
                     break;
                 case DELETE_OPTION.SET_INVENTORY_AVAILABLE:
-                    setSetInventoryAvailableOption(checked);
+                    store.setInventoryAvailableOption = checked;
                     if (checked) {
-                        setDeleteDealAndRelatedOption(false);
-                        setDeleteDealOption(false);
-                        setDeleteInventoryOption(false);
+                        store.deleteDealAndRelatedOption = false;
+                        store.deleteDealOption = false;
+                        store.deleteInventoryOption = false;
                         if (deleteContactOption || deleteAccountOption) {
                             store.deleteMessage =
                                 DEAL_DELETE_MESSAGES.DELETE_OPTIONS_AVAILABLE_FOR_SALE;
@@ -280,7 +279,7 @@ export const DeleteDealForm = observer(
                                 onChange={({ checked }) => {
                                     handleCheckboxChange(DELETE_OPTION.DELETE_INVENTORY, !!checked);
                                     if (checked) {
-                                        setSetInventoryAvailableOption(false);
+                                        store.setInventoryAvailableOption = false;
                                     }
                                 }}
                             />
@@ -295,7 +294,7 @@ export const DeleteDealForm = observer(
                                         !!checked
                                     );
                                     if (checked) {
-                                        setDeleteInventoryOption(false);
+                                        store.deleteInventoryOption = false;
                                     }
                                 }}
                             />

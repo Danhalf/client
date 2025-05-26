@@ -208,6 +208,7 @@ export const DealsForm = observer(() => {
         isLoading,
         deleteMessage,
         deleteReason,
+        hasDeleteOptionsSelected,
     } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
@@ -624,9 +625,15 @@ export const DealsForm = observer(() => {
                                                 ? setConfirmDeleteVisible(true)
                                                 : setAttemptedSubmit(true)
                                         }
-                                        disabled={!deleteReason.length || !deleteMessage}
+                                        disabled={
+                                            !deleteReason.length ||
+                                            !deleteMessage ||
+                                            !hasDeleteOptionsSelected
+                                        }
                                         severity={
-                                            !deleteReason.length || !deleteMessage
+                                            !deleteReason.length ||
+                                            !deleteMessage ||
+                                            !hasDeleteOptionsSelected
                                                 ? "secondary"
                                                 : "danger"
                                         }

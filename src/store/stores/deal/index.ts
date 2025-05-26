@@ -54,6 +54,12 @@ export class DealStore {
     protected _isFormChanged = false;
     private _deleteMessage: string = DEAL_DELETE_MESSAGES.DELETE_DEAL;
     private _deleteReason: string = "";
+    private _deleteDealAndRelatedOption: boolean = false;
+    private _deleteDealOption: boolean = true;
+    private _deleteContactOption: boolean = false;
+    private _deleteAccountOption: boolean = false;
+    private _deleteInventoryOption: boolean = false;
+    private _setInventoryAvailableOption: boolean = false;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -118,6 +124,41 @@ export class DealStore {
 
     public get deleteReason() {
         return this._deleteReason;
+    }
+
+    public get deleteDealAndRelatedOption() {
+        return this._deleteDealAndRelatedOption;
+    }
+
+    public get deleteDealOption() {
+        return this._deleteDealOption;
+    }
+
+    public get deleteContactOption() {
+        return this._deleteContactOption;
+    }
+
+    public get deleteAccountOption() {
+        return this._deleteAccountOption;
+    }
+
+    public get deleteInventoryOption() {
+        return this._deleteInventoryOption;
+    }
+
+    public get setInventoryAvailableOption() {
+        return this._setInventoryAvailableOption;
+    }
+
+    public get hasDeleteOptionsSelected() {
+        return (
+            this._deleteDealAndRelatedOption ||
+            this._deleteDealOption ||
+            this._deleteContactOption ||
+            this._deleteAccountOption ||
+            this._deleteInventoryOption ||
+            this._setInventoryAvailableOption
+        );
     }
 
     public getDeal = async (itemuid: string) => {
@@ -319,6 +360,30 @@ export class DealStore {
 
     public set deleteReason(reason: string) {
         this._deleteReason = reason;
+    }
+
+    public set deleteDealAndRelatedOption(value: boolean) {
+        this._deleteDealAndRelatedOption = value;
+    }
+
+    public set deleteDealOption(value: boolean) {
+        this._deleteDealOption = value;
+    }
+
+    public set deleteContactOption(value: boolean) {
+        this._deleteContactOption = value;
+    }
+
+    public set deleteAccountOption(value: boolean) {
+        this._deleteAccountOption = value;
+    }
+
+    public set deleteInventoryOption(value: boolean) {
+        this._deleteInventoryOption = value;
+    }
+
+    public set setInventoryAvailableOption(value: boolean) {
+        this._setInventoryAvailableOption = value;
     }
 
     public clearDeal = () => {
