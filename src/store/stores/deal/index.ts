@@ -325,6 +325,7 @@ export class DealStore {
         this._deal = {} as DealItem;
         this._dealErrorMessage = "";
         this._dealID = "";
+        this._deleteReason = "";
         this._dealExtData = {} as DealExtData;
         this._dealFinance = {} as DealFinance;
         this._dealFinances = {} as DealFinance;

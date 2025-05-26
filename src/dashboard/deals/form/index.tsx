@@ -207,6 +207,7 @@ export const DealsForm = observer(() => {
         isFormChanged,
         isLoading,
         deleteMessage,
+        deleteReason,
     } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
@@ -221,6 +222,7 @@ export const DealsForm = observer(() => {
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
     const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
     const [confirmDeleteVisible, setConfirmDeleteVisible] = useState<boolean>(false);
+    const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -570,6 +572,7 @@ export const DealsForm = observer(() => {
                                                 {stepActiveIndex === deleteActiveIndex && (
                                                     <DeleteDealForm
                                                         isDeleteConfirm={isDeleteConfirm}
+                                                        attemptedSubmit={attemptedSubmit}
                                                     />
                                                 )}
                                             </Form>
@@ -616,7 +619,11 @@ export const DealsForm = observer(() => {
                                 </Button>
                                 {stepActiveIndex === deleteActiveIndex ? (
                                     <Button
-                                        onClick={() => setConfirmDeleteVisible(true)}
+                                        onClick={() =>
+                                            deleteReason.length
+                                                ? setConfirmDeleteVisible(true)
+                                                : setAttemptedSubmit(true)
+                                        }
                                         className='p-button form-nav__button deal__button deal__button--danger'
                                     >
                                         Delete
