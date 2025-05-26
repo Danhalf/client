@@ -624,7 +624,13 @@ export const DealsForm = observer(() => {
                                                 ? setConfirmDeleteVisible(true)
                                                 : setAttemptedSubmit(true)
                                         }
-                                        className='p-button form-nav__button deal__button deal__button--danger'
+                                        disabled={!deleteReason.length || !deleteMessage}
+                                        severity={
+                                            !deleteReason.length || !deleteMessage
+                                                ? "secondary"
+                                                : "danger"
+                                        }
+                                        className='p-button form-nav__button deal__button'
                                     >
                                         Delete
                                     </Button>
