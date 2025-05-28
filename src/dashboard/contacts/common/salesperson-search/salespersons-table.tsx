@@ -5,6 +5,7 @@ import { DataTableRowClickEvent } from "primereact/datatable";
 import { useState, useEffect } from "react";
 import { useStore } from "store/hooks";
 import { getContactsSalesmanList } from "http/services/contacts-service";
+import "./index.css";
 
 interface SalespersonsDataTableProps {
     onRowClick?: (username: string) => void;
@@ -13,9 +14,10 @@ interface SalespersonsDataTableProps {
 
 const renderColumns = [
     { field: "username", header: "Username" },
+    { field: "useruid", header: "User ID" },
     { field: "creatorusername", header: "Created By" },
-    { field: "created", header: "Created Date" },
-    { field: "enabled", header: "Status" },
+    { field: "createdbyuid", header: "Created By ID" },
+    { field: "created", header: "Created" },
 ];
 
 export const SalespersonsDataTable = ({ onRowClick, getFullInfo }: SalespersonsDataTableProps) => {
@@ -61,14 +63,14 @@ export const SalespersonsDataTable = ({ onRowClick, getFullInfo }: SalespersonsD
             loading={isLoading}
             onRowClick={handleOnRowClick}
             selectionMode='single'
-            className='p-datatable-sm'
+            className='p-datatable-sm salespersons-table'
         >
             {renderColumns.map((col) => (
                 <Column
+                    headerClassName='salespersons-column-header'
                     key={col.field}
                     field={col.field}
                     header={col.header}
-                    sortable
                     body={col.field === "enabled" ? statusBodyTemplate : undefined}
                 />
             ))}

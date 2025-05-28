@@ -82,7 +82,7 @@ export const SalespersonSearch = ({
                 {...props}
             />
             <Dialog
-                header={<div className='uppercase'>Choose a Salesperson</div>}
+                header={<div className='uppercase'>Choose a Contact</div>}
                 visible={dialogVisible}
                 style={{ width: "75vw", height: "75vh" }}
                 maximizable
