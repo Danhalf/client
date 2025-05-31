@@ -312,6 +312,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         emptyMessage='No expenses yet.'
                         reorderableColumns
                         resizableColumns
+                        showGridlines
                         scrollable
                         rowExpansionTemplate={rowExpansionTemplate}
                         expandedRows={expandedRows}
