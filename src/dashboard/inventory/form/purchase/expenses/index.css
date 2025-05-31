@@ -19,6 +19,12 @@
 }
 
 .purchase-expenses__table.p-datatable {
+    ::-webkit-scrollbar-track {
+        margin-top: 45px;
+    }
+    ::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+    }
     .p-datatable-wrapper {
         overflow-x: scroll;
     }
