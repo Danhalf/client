@@ -318,7 +318,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
                         pt={{
                             wrapper: {
-                                className: "overflow-x-hidden",
+                                className: "thin-scrollbar",
                                 style: {
                                     height: "232px",
                                 },
@@ -328,6 +328,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             bodyClassName='purchase-expenses__table-controls'
+                            frozen
                             body={(options) => {
                                 const isRowExpanded = expandedRows.some((item) => {
                                     return item === options;
@@ -393,6 +394,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
 
                         <Column
                             body={deleteTemplate}
+                            frozen
+                            alignFrozen='right'
                             pt={{
                                 root: {
                                     style: {

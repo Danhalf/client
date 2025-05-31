@@ -18,8 +18,13 @@
     align-items: center;
 }
 
-.purchase-expenses__table.p-datatable .p-column-header-content {
-    justify-content: center;
+.purchase-expenses__table.p-datatable {
+    .p-datatable-wrapper {
+        overflow-x: scroll;
+    }
+    .p-column-header-content {
+        justify-content: center;
+    }
 }
 
 .purchase-expenses__table.p-datatable .p-datatable-emptymessage {
