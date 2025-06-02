@@ -251,11 +251,15 @@ export const ReportForm = observer((): ReactElement => {
             );
             const documentKeys = documentChildren.map((node) => node.key);
 
-            const dropChild = children[event.dropIndex];
-            if (dropChild) {
-                const idx = documentKeys.indexOf(dropChild.key);
-                if (idx !== -1) {
-                    dropIndex = dragNode?.key === dropChild.key ? idx : idx - 1;
+            if (event.dropIndex >= children.length) {
+                dropIndex = documentChildren.length - 1;
+            } else {
+                const dropChild = children[event.dropIndex];
+                if (dropChild) {
+                    const idx = documentKeys.indexOf(dropChild.key);
+                    if (idx !== -1) {
+                        dropIndex = dragNode?.key === dropChild.key ? idx : idx - 1;
+                    }
                 }
             }
         }

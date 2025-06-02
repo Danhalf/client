@@ -54,6 +54,12 @@
 
                 .p-tree-toggler {
                     margin: 0;
+                    &[aria-label="Collapse"] {
+                        transform: rotate(180deg);
+                    }
+                    &[aria-label="Expand"] {
+                        transform: rotate(90deg);
+                    }
                 }
 
                 &.report__list-item--toggler-visible {
