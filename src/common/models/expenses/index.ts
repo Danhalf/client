@@ -11,13 +11,14 @@ export interface Expenses {
     id: number;
     itemuid: string;
     notbillable: 1 | 0;
-    operationdate: string;
+    operationdate: string | number;
     ponumber: string;
     type: number;
     type_name: string;
     updated: string;
     useruid: string;
     vendor: string;
+    vendor_name: string;
 }
 
 export interface ExpensesTotal {
