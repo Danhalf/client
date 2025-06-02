@@ -110,7 +110,6 @@ export const ReportForm = observer((): ReactElement => {
 
     const getCollections = async () => {
         if (authUser) {
-            getUserReportCollections();
             const response = await getUserFavoriteReportList(authUser.useruid);
             if (response && Array.isArray(response)) {
                 setFavoriteCollections(response);
