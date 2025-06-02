@@ -93,7 +93,7 @@
 
         .p-treenode .p-treenode-content.simple-node {
             .report__list-item {
-                padding-left: 37px;
+                padding-left: 14px;
             }
             .p-tree-toggler {
                 display: none;
@@ -367,4 +367,8 @@
 
 .card.report {
     padding: 40px 30px;
+}
+
+.p-treenode-content.deeply-nested-node {
+    margin-left: 22px;
 }

@@ -41,9 +41,24 @@ export const NodeContent = ({
     isTogglerVisible?: boolean;
 }) => {
     const ref = useRef<HTMLDivElement>(null);
+    const [isDeeplyNested, setIsDeeplyNested] = useState(false);
 
     const isNew = !!node.data?.document?.isNew;
     const isSimpleNode = node.type === NODE_TYPES.DOCUMENT;
+
+    const getNestingLevel = (element: Element | null): number => {
+        if (!element) return 0;
+        const parent = element.closest(".p-treenode");
+        if (!parent) return 0;
+        return 1 + getNestingLevel(parent.parentElement);
+    };
+
+    useEffect(() => {
+        const element = ref.current?.closest(".p-treenode-content");
+        const isDeeplyNestedNode =
+            node.type === NODE_TYPES.DOCUMENT && element ? getNestingLevel(element) >= 3 : false;
+        setIsDeeplyNested(isDeeplyNestedNode);
+    }, [node.type]);
 
     useEffect(() => {
         const parent = ref?.current?.closest(".p-treenode-content");
@@ -59,14 +74,17 @@ export const NodeContent = ({
             if (isSimpleNode) {
                 parent.classList.add("simple-node");
             }
+            if (isDeeplyNested) {
+                parent.classList.add("deeply-nested-node");
+            }
         }
-    }, [isSelected, isTogglerVisible, isSimpleNode]);
+    }, [isSelected, isTogglerVisible, isSimpleNode, isDeeplyNested]);
 
     return (
         <div className='w-full' ref={ref}>
             <Button
                 onClick={onClick}
-                className={`report__list-item w-full ${isNew ? "report__list-item--new" : ""}`}
+                className={`report__list-item w-full ${isNew ? "report__list-item--new" : ""} ${isDeeplyNested ? "deeply-nested" : ""}`}
                 text
             >
                 {node.label}
