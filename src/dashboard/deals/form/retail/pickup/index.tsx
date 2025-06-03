@@ -3,14 +3,14 @@ import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
-import { getDealPaymentsTotal } from "http/services/deals.service";
+import { getDealPaymentsTotal, deleteDealPayment } from "http/services/deals.service";
 import { useParams } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
 import { DealPaymentsTotal, DealPickupPayment } from "common/models/deals";
 import { Status } from "common/models/base-response";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { CalendarChangeEvent } from "primereact/calendar";
+import { NEW_PAYMENT_LABEL } from "store/stores/deal";
 
 export const DealRetailPickup = observer((): ReactElement => {
     const { id } = useParams();
@@ -21,6 +21,8 @@ export const DealRetailPickup = observer((): ReactElement => {
     const [totalPayments, setTotalPayments] = useState(0);
     const [confirmModalVisible, setConfirmModalVisible] = useState(false);
     const [dontShowAgain, setDontShowAgain] = useState(false);
+    const [currentPaymentItemuid, setCurrentPaymentItemuid] = useState<string | null>(null);
+    const [checkedMap, setCheckedMap] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
         const fetchData = async () => {
@@ -46,24 +48,66 @@ export const DealRetailPickup = observer((): ReactElement => {
         }
     }, [toast, dealErrorMessage]);
 
+    useEffect(() => {
+        setCheckedMap(Object.fromEntries(dealPickupPayments.map((p) => [p.itemuid, !!p.paydate])));
+    }, [dealPickupPayments]);
+
     const handleChange = (itemuid: string, key: keyof DealPickupPayment, value: any) => {
         changeDealPickupPayments(itemuid, { key, value });
     };
 
-    const handleConfirmClear = () => {
-        setConfirmModalVisible(false);
+    const clearPayment = (itemuid: string) => {
+        handleChange(itemuid, "paydate", "ХХ/ХХ/ХХХХ");
+        handleChange(itemuid, "amount", 0);
+        handleChange(itemuid, "paid", 0);
     };
 
-    const handleChangePayment = (event: CalendarChangeEvent, itemuid: string) => {
-        const { value, checked } = event;
-        if (checked) {
-            handleChange(itemuid, "paydate", value);
-        } else {
-            setConfirmModalVisible(true);
-            handleChange(itemuid, "paydate", null);
-            handleChange(itemuid, "amount", 0);
-            handleChange(itemuid, "paid", 0);
+    const handleConfirmClear = () => {
+        if (currentPaymentItemuid) {
+            setCheckedMap((prev) => ({ ...prev, [currentPaymentItemuid]: false }));
+            clearPayment(currentPaymentItemuid);
+            if (id && !currentPaymentItemuid.startsWith(NEW_PAYMENT_LABEL)) {
+                deleteDealPayment(currentPaymentItemuid).then(() => {
+                    store.getPickupPayments(id);
+                });
+            }
         }
+        setConfirmModalVisible(false);
+        setCurrentPaymentItemuid(null);
+    };
+
+    const handleModalHide = () => {
+        setConfirmModalVisible(false);
+        setCurrentPaymentItemuid(null);
+    };
+
+    const handleCheckboxChange = (itemuid: string, checked: boolean) => {
+        const payment = dealPickupPayments.find((p) => p.itemuid === itemuid);
+        if (
+            !checked &&
+            id &&
+            payment?.paydate &&
+            !dontShowAgain &&
+            !itemuid.startsWith(NEW_PAYMENT_LABEL)
+        ) {
+            setCurrentPaymentItemuid(itemuid);
+            setConfirmModalVisible(true);
+        } else {
+            setCheckedMap((prev) => ({ ...prev, [itemuid]: checked }));
+            if (!checked) {
+                clearPayment(itemuid);
+                if (id && !itemuid.startsWith(NEW_PAYMENT_LABEL)) {
+                    deleteDealPayment(itemuid).then(() => {
+                        store.getPickupPayments(id);
+                    });
+                }
+            }
+        }
+    };
+
+    const handleDateChange = (date: Date | null, itemuid: string) => {
+        handleChange(itemuid, "paydate", date ? date : "ХХ/ХХ/ХХХХ");
+        setCheckedMap((prev) => ({ ...prev, [itemuid]: !!date }));
     };
 
     return (
@@ -77,18 +121,34 @@ export const DealRetailPickup = observer((): ReactElement => {
                 {dealPickupPayments.map((payment: DealPickupPayment) => (
                     <div key={payment.itemuid} className='pickup-row'>
                         <div className='pickup-row__item'>
+                            <Checkbox
+                                checked={Boolean(checkedMap[payment.itemuid])}
+                                onChange={(e) =>
+                                    handleCheckboxChange(payment.itemuid, Boolean(e.checked))
+                                }
+                                className='pickup-checkbox'
+                            />
                             <DateInput
-                                checkbox
-                                checked={!!payment.paydate}
+                                date={
+                                    payment.paydate && payment.paydate !== "ХХ/ХХ/ХХХХ"
+                                        ? new Date(payment.paydate)
+                                        : undefined
+                                }
+                                onChange={(e) =>
+                                    handleDateChange(e.value as Date | null, payment.itemuid)
+                                }
                                 floatLabel={false}
-                                date={new Date(payment.paydate)}
-                                name={!payment.paydate ? "ХХ/ХХ/ХХХХ" : ""}
-                                onChange={(event) => handleChangePayment(event, payment.itemuid)}
+                                name={
+                                    !payment.paydate || payment.paydate === "ХХ/ХХ/ХХХХ"
+                                        ? "ХХ/ХХ/ХХХХ"
+                                        : ""
+                                }
                                 className={
                                     payment.paydate
                                         ? "pickup-input"
                                         : "pickup-input pickup-input--grey"
                                 }
+                                disabled={!checkedMap[payment.itemuid]}
                             />
                         </div>
                         <div className='pickup-row__item'>
@@ -124,30 +184,32 @@ export const DealRetailPickup = observer((): ReactElement => {
                     <label className='pickup-amount__label'>${totalPayments || "0.00"}</label>
                 </div>
             </div>
-            <ConfirmModal
-                visible={confirmModalVisible}
-                title='Clear Payment'
-                icon='pi-exclamation-triangle'
-                bodyMessage='Do you really want to delete 
-                this pickup payment? 
-                This process cannot be undone'
-                confirmAction={handleConfirmClear}
-                draggable={false}
-                rejectLabel='Cancel'
-                acceptLabel='Clear'
-                onHide={() => setConfirmModalVisible(false)}
-            >
-                <div className='flex align-items-center mt-3'>
-                    <Checkbox
-                        checked={dontShowAgain}
-                        onChange={(e) => setDontShowAgain(e.checked || false)}
-                        id='dontShowAgain'
-                    />
-                    <label htmlFor='dontShowAgain' className='ml-2'>
-                        Don't show this message again
-                    </label>
-                </div>
-            </ConfirmModal>
+            {id && (
+                <ConfirmModal
+                    visible={confirmModalVisible}
+                    title='Clear Payment'
+                    icon='pi-exclamation-triangle'
+                    bodyMessage='Do you really want to delete 
+                    this pickup payment? 
+                    This process cannot be undone'
+                    confirmAction={handleConfirmClear}
+                    draggable={false}
+                    rejectLabel='Cancel'
+                    acceptLabel='Clear'
+                    onHide={handleModalHide}
+                >
+                    <div className='flex align-items-center mt-3'>
+                        <Checkbox
+                            checked={dontShowAgain}
+                            onChange={(e) => setDontShowAgain(e.checked || false)}
+                            id='dontShowAgain'
+                        />
+                        <label htmlFor='dontShowAgain' className='ml-2'>
+                            Don't show this message again
+                        </label>
+                    </div>
+                </ConfirmModal>
+            )}
         </div>
     );
 });
