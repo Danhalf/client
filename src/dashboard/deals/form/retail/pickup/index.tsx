@@ -205,7 +205,7 @@ export const DealRetailPickup = observer((): ReactElement => {
                             id='dontShowAgain'
                         />
                         <label htmlFor='dontShowAgain' className='ml-2'>
-                            Don't show this message again
+                            Remember this choice
                         </label>
                     </div>
                 </ConfirmModal>
