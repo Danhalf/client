@@ -5,7 +5,7 @@ import { DataTableRowClickEvent } from "primereact/datatable";
 import { useState, useEffect } from "react";
 import { useStore } from "store/hooks";
 import { getContactsSalesmanList } from "http/services/contacts-service";
-import "./index.css";
+import { ROWS_PER_PAGE } from "common/settings";
 
 interface SalespersonsDataTableProps {
     onRowClick?: (username: string) => void;
@@ -13,28 +13,26 @@ interface SalespersonsDataTableProps {
 }
 
 const renderColumns = [
-    { field: "username", header: "Username" },
-    { field: "useruid", header: "User ID" },
-    { field: "creatorusername", header: "Created By" },
-    { field: "createdbyuid", header: "Created By ID" },
+    { field: "username", header: "Name" },
+    { field: "WorkPhone", header: "Work Phone" },
+    { field: "HomePhone", header: "Home Phone" },
+    { field: "Address", header: "Address" },
+    { field: "email", header: "E-mail" },
     { field: "created", header: "Created" },
 ];
 
 export const SalespersonsDataTable = ({ onRowClick, getFullInfo }: SalespersonsDataTableProps) => {
     const [salespersons, setSalespersons] = useState<SalespersonsList[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const { authUser } = useStore().userStore;
 
     useEffect(() => {
         if (authUser) {
-            setIsLoading(true);
             getContactsSalesmanList(authUser.useruid).then((response) => {
                 if (response && Array.isArray(response)) {
                     setSalespersons(response);
                 } else {
                     setSalespersons([]);
                 }
-                setIsLoading(false);
             });
         }
     }, [authUser]);
@@ -49,29 +47,33 @@ export const SalespersonsDataTable = ({ onRowClick, getFullInfo }: SalespersonsD
         }
     };
 
-    const statusBodyTemplate = (rowData: SalespersonsList) => {
-        return rowData.enabled === 1 ? "Active" : "Inactive";
-    };
-
     return (
         <DataTable
             value={salespersons}
             paginator
-            rows={10}
-            rowsPerPageOptions={[5, 10, 25, 50]}
+            rowsPerPageOptions={ROWS_PER_PAGE}
             tableStyle={{ minWidth: "50rem" }}
-            loading={isLoading}
             onRowClick={handleOnRowClick}
-            selectionMode='single'
-            className='p-datatable-sm salespersons-table'
+            className='p-datatable-sm'
+            showGridlines
+            scrollable
+            scrollHeight='70vh'
+            rowClassName={() => "hover:text-primary cursor-pointer"}
         >
             {renderColumns.map((col) => (
                 <Column
-                    headerClassName='salespersons-column-header'
+                    headerClassName='cursor-move'
                     key={col.field}
                     field={col.field}
                     header={col.header}
-                    body={col.field === "enabled" ? statusBodyTemplate : undefined}
+                    pt={{
+                        root: {
+                            style: {
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                            },
+                        },
+                    }}
                 />
             ))}
         </DataTable>
