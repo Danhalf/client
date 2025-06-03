@@ -9,6 +9,8 @@ import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
 import { DealPaymentsTotal, DealPickupPayment } from "common/models/deals";
 import { Status } from "common/models/base-response";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { CalendarChangeEvent } from "primereact/calendar";
 
 export const DealRetailPickup = observer((): ReactElement => {
     const { id } = useParams();
@@ -17,6 +19,8 @@ export const DealRetailPickup = observer((): ReactElement => {
     const { dealPickupPayments, getPickupPayments, changeDealPickupPayments, dealErrorMessage } =
         store;
     const [totalPayments, setTotalPayments] = useState(0);
+    const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+    const [dontShowAgain, setDontShowAgain] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -46,6 +50,22 @@ export const DealRetailPickup = observer((): ReactElement => {
         changeDealPickupPayments(itemuid, { key, value });
     };
 
+    const handleConfirmClear = () => {
+        setConfirmModalVisible(false);
+    };
+
+    const handleChangePayment = (event: CalendarChangeEvent, itemuid: string) => {
+        const { value, checked } = event;
+        if (checked) {
+            handleChange(itemuid, "paydate", value);
+        } else {
+            setConfirmModalVisible(true);
+            handleChange(itemuid, "paydate", null);
+            handleChange(itemuid, "amount", 0);
+            handleChange(itemuid, "paid", 0);
+        }
+    };
+
     return (
         <div className='grid deal-retail-pickup'>
             <div className='col-12 pickup-header'>
@@ -63,9 +83,7 @@ export const DealRetailPickup = observer((): ReactElement => {
                                 floatLabel={false}
                                 date={new Date(payment.paydate)}
                                 name={!payment.paydate ? "ХХ/ХХ/ХХХХ" : ""}
-                                onChange={(e) =>
-                                    handleChange(payment.itemuid, "paydate", e.value || "")
-                                }
+                                onChange={(event) => handleChangePayment(event, payment.itemuid)}
                                 className={
                                     payment.paydate
                                         ? "pickup-input"
@@ -106,6 +124,30 @@ export const DealRetailPickup = observer((): ReactElement => {
                     <label className='pickup-amount__label'>${totalPayments || "0.00"}</label>
                 </div>
             </div>
+            <ConfirmModal
+                visible={confirmModalVisible}
+                title='Clear Payment'
+                icon='pi-exclamation-triangle'
+                bodyMessage='Do you really want to delete 
+                this pickup payment? 
+                This process cannot be undone'
+                confirmAction={handleConfirmClear}
+                draggable={false}
+                rejectLabel='Cancel'
+                acceptLabel='Clear'
+                onHide={() => setConfirmModalVisible(false)}
+            >
+                <div className='flex align-items-center mt-3'>
+                    <Checkbox
+                        checked={dontShowAgain}
+                        onChange={(e) => setDontShowAgain(e.checked || false)}
+                        id='dontShowAgain'
+                    />
+                    <label htmlFor='dontShowAgain' className='ml-2'>
+                        Don't show this message again
+                    </label>
+                </div>
+            </ConfirmModal>
         </div>
     );
 });
