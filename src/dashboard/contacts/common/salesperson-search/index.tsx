@@ -34,7 +34,7 @@ export const SalespersonSearch = ({
             return;
         }
         getContactsSalesmanList(authUser!.useruid).then((response) => {
-            if (response?.length) {
+            if (response && Array.isArray(response)) {
                 const filteredOptions = response.filter((item) =>
                     item.username.toLowerCase().includes(searchValue.toLowerCase())
                 );

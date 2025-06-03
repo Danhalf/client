@@ -29,7 +29,7 @@ export const SalespersonsDataTable = ({ onRowClick, getFullInfo }: SalespersonsD
         if (authUser) {
             setIsLoading(true);
             getContactsSalesmanList(authUser.useruid).then((response) => {
-                if (response?.length) {
+                if (response && Array.isArray(response)) {
                     setSalespersons(response);
                 } else {
                     setSalespersons([]);
