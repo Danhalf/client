@@ -81,7 +81,7 @@
 
 .general-settings__buttons {
     display: flex;
-    height: 162px;
+    height: 150px;
     align-items: flex-end;
     justify-content: flex-end;
     gap: 25px;
