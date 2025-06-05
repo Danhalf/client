@@ -182,6 +182,37 @@ export const VehicleGeneral = observer((): ReactElement => {
         );
     };
 
+    const autoMakesModelOptionTemplate = (option: MakesListData) => {
+        const handleDeleteMake = async (event: React.MouseEvent<HTMLButtonElement>) => {
+            event.stopPropagation();
+            const response = await deleteInventoryMake(String(option?.id));
+            if (response?.error) {
+                toast?.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: response.error,
+                });
+            } else {
+                hangeGetAutoMakeModelList();
+            }
+        };
+        return (
+            <div className='flex align-items-center inventory-makes'>
+                <div className='inventory-makes__name'>{option.name}</div>
+                {!option.isdefault && (
+                    <Button
+                        icon='pi pi-times'
+                        className='p-button-text inventory-makes__delete-button'
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            handleDeleteMake(event);
+                        }}
+                    />
+                )}
+            </div>
+        );
+    };
+
     const handleVINchange = (vinInfo: VehicleDecodeInfo) => {
         if (vinInfo && inventory.GroupClassName !== EQUIPMENT) {
             if (allowOverwrite) {
@@ -489,6 +520,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     className={`vehicle-general__dropdown w-full ${
                         errors.Model ? "p-invalid" : ""
                     }`}
+                    itemTemplate={autoMakesModelOptionTemplate}
                     label='Model (required)'
                 />
                 <small className='p-error'>{errors.Model}</small>
