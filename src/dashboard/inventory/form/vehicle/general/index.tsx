@@ -3,6 +3,7 @@ import "./index.css";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import {
     deleteInventoryMake,
+    deleteInventoryModel,
     getAutoMakeModelList,
     getInventoryAutomakesList,
     getInventoryExteriorColorsList,
@@ -185,7 +186,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const autoMakesModelOptionTemplate = (option: MakesListData) => {
         const handleDeleteMake = async (event: React.MouseEvent<HTMLButtonElement>) => {
             event.stopPropagation();
-            const response = await deleteInventoryMake(String(option?.id));
+            const response = await deleteInventoryModel(String(option?.id));
             if (response?.error) {
                 toast?.current?.show({
                     severity: "error",
