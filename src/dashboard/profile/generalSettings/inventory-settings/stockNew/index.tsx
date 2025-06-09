@@ -36,7 +36,7 @@ export const SettingsStockNew = observer(() => {
                 <span className='p-float-label'>
                     <InputText
                         className='stock-new__input'
-                        value={settings.stocknumPrefix}
+                        value={settings.stocknumPrefix || ""}
                         onChange={(e) => {
                             changeSettings("stocknumPrefix", e.target.value);
                         }}
@@ -48,7 +48,7 @@ export const SettingsStockNew = observer(() => {
                 <span className='p-float-label'>
                     <InputText
                         className='stock-new__input'
-                        value={settings.stocknumSuffix}
+                        value={settings.stocknumSuffix || ""}
                         onChange={(e) => {
                             changeSettings("stocknumSuffix", e.target.value);
                         }}

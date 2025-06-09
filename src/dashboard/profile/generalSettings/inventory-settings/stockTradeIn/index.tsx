@@ -52,7 +52,7 @@ export const SettingsStockTradeIn = observer(() => {
                 <span className='p-float-label'>
                     <InputText
                         className='stock-trade-in__input'
-                        value={settings.stocknumtiPrefix}
+                        value={settings.stocknumtiPrefix || ""}
                         onChange={(e) => {
                             changeSettings("stocknumtiPrefix", e.target.value);
                         }}
@@ -64,7 +64,7 @@ export const SettingsStockTradeIn = observer(() => {
                 <span className='p-float-label'>
                     <InputText
                         className='stock-trade-in__input'
-                        value={settings.stocknumtiSuffix}
+                        value={settings.stocknumtiSuffix || ""}
                         onChange={(e) => {
                             changeSettings("stocknumtiSuffix", e.target.value);
                         }}
