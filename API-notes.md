@@ -1,4 +1,5 @@
-    GET :
+
+GET :
 
 + /api/v1/decoder/{id}/vin - VIN decoder - **не** используется
 + /api/v1/decoder/{id}/vindecode - VIN decoder from text - **используется в декодировании VIN внутри форм inventory (general), deal (trade1/2)**
@@ -7,7 +8,11 @@
 + /api/v1/decoder/{id}/task - get task info - **не** используется
 + /api/v1/decoder/tasks - list completed tasks - **не** используется
 + /api/v1/decoder/queue - list active tasks - **не** используется
-  POST :
+
+  ---
+  
+POST :
+  
 + /api/v1/decoder/{id}/vin - VIN decoder ( with details provided in json payload or as id, create task) - **не** используется
 + /api/v1/decoder/vinbarcode - decode barcode from VIN image ( create task) - **не** используется
 + /api/v1/decoder/barcode - decode barcode from dl back image ( create task) - **не** используется
