@@ -7,11 +7,21 @@ import { observer } from "mobx-react-lite";
 import { InputNumberProps } from "primereact/inputnumber";
 import { ReactElement, useState } from "react";
 import { CurrencyInput } from "dashboard/common/form/inputs";
+import { Checkbox } from "primereact/checkbox";
 
 interface DealProfitItemProps extends InputNumberProps {
-    numberSign?: "+" | "-";
+    numberSign?: "+" | "-" | "=";
+    currency?: "$" | "%";
     withInput?: boolean;
-    fieldName: string;
+    checkboxValue?: boolean;
+    checkboxOnChange?: (value: boolean) => void;
+    fieldName?: string;
+    justify?: "start" | "end" | "between";
+    includes?: boolean;
+    includeFirst?: boolean | undefined;
+    includeSecond?: boolean | undefined;
+    includeFirstOnChange?: (value: boolean) => void;
+    includeSecondOnChange?: (value: boolean) => void;
 }
 
 export const DealProfitItem = observer(
@@ -20,6 +30,15 @@ export const DealProfitItem = observer(
         numberSign,
         fieldName,
         withInput = false,
+        currency,
+        checkboxValue,
+        checkboxOnChange,
+        justify = "between",
+        includes = false,
+        includeFirst,
+        includeSecond,
+        includeFirstOnChange,
+        includeSecondOnChange,
         ...props
     }: DealProfitItemProps): ReactElement => {
         const [fieldChanged, setFieldChanged] = useState(false);
@@ -30,7 +49,16 @@ export const DealProfitItem = observer(
         };
 
         return (
-            <div className='deal-profit__item'>
+            <div className={`deal-profit__item ${props.className} justify-content-${justify}`}>
+                {checkboxValue !== undefined && checkboxOnChange !== undefined && (
+                    <Checkbox
+                        inputId={`${fieldName}-checkbox`}
+                        checked={checkboxValue}
+                        onChange={({ checked }) => {
+                            checkboxOnChange?.(!!checked);
+                        }}
+                    />
+                )}
                 <label className='deal-profit__label'>
                     {numberSign && <span className='deal-profit__sign'>({numberSign})</span>}
                     &nbsp;{title}
@@ -42,7 +70,40 @@ export const DealProfitItem = observer(
                         onChange={handleChange}
                     />
                 ) : (
-                    <div className='deal-profit__value'>{props.value}</div>
+                    <div className='deal-profit__value'>
+                        {currency && <span className='deal-profit__currency'>{currency}</span>}
+                        &nbsp;
+                        {currency
+                            ? props.value?.toLocaleString("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                              })
+                            : props.value}
+                    </div>
+                )}
+                {includes && (
+                    <div className='deal-profit__includes'>
+                        {includeFirst !== undefined && (
+                            <Checkbox
+                                inputId={`${fieldName}-includes-1`}
+                                checked={includeFirst}
+                                tooltip='Include in Commission1 Base'
+                                onChange={({ checked }) => {
+                                    includeFirstOnChange?.(!!checked);
+                                }}
+                            />
+                        )}
+                        {includeSecond !== undefined && (
+                            <Checkbox
+                                inputId={`${fieldName}-includes-2`}
+                                checked={includeSecond}
+                                tooltip='Include in Commission Base'
+                                onChange={({ checked }) => {
+                                    includeSecondOnChange?.(!!checked);
+                                }}
+                            />
+                        )}
+                    </div>
                 )}
             </div>
         );
