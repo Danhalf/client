@@ -39,9 +39,10 @@ export const DealWashout = observer((): ReactElement => {
 
     const activeIndex = (() => {
         switch (tabParam) {
-            case DealWashoutTabs.DEAL_PROFIT:
-                return 1;
             case DealWashoutTabs.INTEREST_PROFIT:
+                return 1;
+            case DealWashoutTabs.DEAL_PROFIT:
+                return 0;
             default:
                 return 0;
         }
@@ -138,9 +139,9 @@ export const DealWashout = observer((): ReactElement => {
                             </TabPanel>
                         </TabView>
                     </div>
-                    <div className='deal-washout__footer gap-3 ml-auto mr-3'>
+                    <div className='deal-washout__footer form-nav'>
                         <Button
-                            className='uppercase px-6 deal-washout__button'
+                            className='uppercase px-6 form-nav__button deal-washout__button'
                             onClick={() => navigate(-1)}
                             severity='danger'
                             outlined
@@ -151,7 +152,7 @@ export const DealWashout = observer((): ReactElement => {
                             type='button'
                             onClick={handleSaveWashout}
                             severity='success'
-                            className='uppercase px-6 deal-washout__button'
+                            className='uppercase px-6 form-nav__button deal-washout__button'
                         >
                             Save
                         </Button>

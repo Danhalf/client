@@ -1,0 +1,64 @@
+.deal-profit {
+    --input-height: 32px;
+}
+
+.profit-card__header {
+    border-bottom: 1px solid var(--admss-app-light-grey);
+    padding-bottom: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 8px 20px;
+    &.vehicle-profit__header {
+        border-radius: 6px 6px 0 0;
+        background-color: var(--admss-app-light-red);
+        color: var(--admss-app-red);
+    }
+}
+
+.profit-card {
+    .p-card-body,
+    .p-card-content {
+        padding: 0;
+    }
+    &.vehicle-profit {
+        box-shadow: 0 0 3px 0 var(--admss-app-red);
+    }
+}
+
+.vehicle-profit__body {
+    padding: 20px;
+}
+
+.vehicle-profit__inputs {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid var(--admss-app-light-grey);
+}
+
+.deal-profit__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 600;
+    height: var(--input-height);
+    .currency-item__input {
+        width: 140px;
+    }
+    .currency-item__input,
+    .p-inputtext,
+    .p-inputnumber {
+        height: var(--input-height);
+        font-size: 14px;
+        &:focus {
+            box-shadow: none;
+        }
+    }
+    .currency-item__icon {
+        width: var(--input-height);
+    }
+}

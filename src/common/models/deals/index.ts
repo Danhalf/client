@@ -383,7 +383,7 @@ export interface DealFinance {
     TradeAllowance: string;
     TradeInPayoff: string;
     TradeProfit: number;
-    VehicleProfit: number;
+    DealVehicleProfit: number;
     Warranty: string;
     WarrantyComm: number;
     WarrantyCost: number;
