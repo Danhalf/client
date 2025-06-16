@@ -150,6 +150,7 @@ export const DealFIProfit = () => {
                             <DealProfitItem
                                 title='Reserve:'
                                 value={0}
+                                currencySelect
                                 includes
                                 includeFirst={reserveFirst}
                                 includeSecond={reserveSecond}

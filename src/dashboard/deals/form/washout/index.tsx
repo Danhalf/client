@@ -22,16 +22,12 @@ export const DealWashout = observer((): ReactElement => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().dealStore;
-    const userStore = useStore().userStore;
     const toast = useToast();
-    const { authUser } = userStore;
-    const { deal, inventory } = store;
+    const { inventory, getDeal } = store;
 
     useEffect(() => {
         if (id) {
-            // getAccount(id);
-            // getAccountPaymentsInfo(id);
-            // getDrawers(authUser?.useruid!);
+            getDeal(id);
         }
     }, [id]);
 
@@ -72,17 +68,12 @@ export const DealWashout = observer((): ReactElement => {
     }, [tabParam, setSearchParams]);
 
     const handleSaveWashout = async () => {
-        // const result = await saveWashout();
-        // if (result?.error) {
         toast.current?.show({
             severity: "error",
             summary: "Error",
             detail: "Error on save washout",
             life: TOAST_LIFETIME,
         });
-        // } else {
-        //     navigate(`/dashboard/accounts/${id}`);
-        // }
     };
 
     return (

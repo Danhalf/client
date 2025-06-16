@@ -240,3 +240,14 @@
         }
     }
 }
+
+.totals-profit {
+    box-shadow: 0 0 3px 0 var(--admss-app-dark-blue);
+    background-color: var(--admss-app-focus-blue);
+    .totals-profit__header {
+        background-color: var(--admss-app-dark-blue);
+        text-transform: uppercase;
+        color: var(--admss-app-white);
+        font-weight: 600;
+    }
+}
