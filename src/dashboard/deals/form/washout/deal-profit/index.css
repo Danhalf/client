@@ -15,6 +15,7 @@
 }
 
 .profit-card {
+    overflow: hidden;
     .p-card-body,
     .p-card-content {
         padding: 0;
@@ -74,6 +75,27 @@
         font-size: 14px;
         &:focus {
             box-shadow: none;
+        }
+    }
+    .deal-profit__currency-select {
+        width: 54px;
+        height: var(--input-height);
+        margin-left: auto;
+        margin-right: 10px;
+        font-size: 14px;
+        .p-dropdown-trigger {
+            height: var(--input-height);
+            width: 24px;
+        }
+        .p-dropdown-label {
+            height: var(--input-height);
+            line-height: 1;
+        }
+        .p-inputtext {
+            text-overflow: initial;
+            font-size: 14px;
+            height: var(--input-height);
+            align-items: center;
         }
     }
     .currency-item__icon {
@@ -155,6 +177,65 @@
                 .currency-item {
                     margin-left: auto;
                 }
+            }
+        }
+    }
+}
+
+.fi-profit {
+    box-shadow: 0 0 3px 0 var(--admss-app-green);
+    .fi-profit__header {
+        background-color: var(--admss-app-focus-light-green);
+        color: var(--admss-app-green);
+        font-weight: 600;
+    }
+
+    .fi-profit__costs {
+        display: flex;
+        flex: 0 0 63%;
+        max-width: 63%;
+        gap: 10px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        .fi-profit__info,
+        .fi-profit__inputs {
+            width: 47.5%;
+        }
+        .fi-profit__loan-costs {
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            gap: 10px;
+            .deal-profit__item {
+                margin-left: auto;
+                width: 60%;
+                .currency-item {
+                    margin-left: auto;
+                }
+            }
+            .fi-profit__loan-costs-title {
+                font-weight: 800;
+                color: var(--admss-app-main-blue);
+            }
+        }
+    }
+    .fi-profit__total {
+        border-left: 1px solid var(--admss-app-lightest-grey);
+        padding-left: 1%;
+        flex: 1;
+    }
+
+    .fi-profit__info,
+    .fi-profit__inputs,
+    .fi-profit__total {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .fi-profit__total {
+        .deal-profit__item {
+            .deal-profit__value {
+                margin-left: auto;
             }
         }
     }

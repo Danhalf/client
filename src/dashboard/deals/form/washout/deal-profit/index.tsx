@@ -8,10 +8,17 @@ import { InputNumberProps } from "primereact/inputnumber";
 import { ReactElement, useState } from "react";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
+import { ComboBox } from "dashboard/common/form/dropdown";
+
+enum CURRENCY_OPTIONS {
+    DOLLAR = "$",
+    PERCENT = "%",
+}
 
 interface DealProfitItemProps extends InputNumberProps {
     numberSign?: "+" | "-" | "=";
-    currency?: "$" | "%";
+    currency?: CURRENCY_OPTIONS | string;
+    currencySelect?: boolean;
     withInput?: boolean;
     checkboxValue?: boolean;
     checkboxOnChange?: (value: boolean) => void;
@@ -31,6 +38,7 @@ export const DealProfitItem = observer(
         fieldName,
         withInput = false,
         currency,
+        currencySelect = false,
         checkboxValue,
         checkboxOnChange,
         justify = "between",
@@ -42,6 +50,9 @@ export const DealProfitItem = observer(
         ...props
     }: DealProfitItemProps): ReactElement => {
         const [fieldChanged, setFieldChanged] = useState(false);
+        const [currencySelectValue, setCurrencySelectValue] = useState<CURRENCY_OPTIONS>(
+            CURRENCY_OPTIONS.DOLLAR
+        );
 
         const handleChange = (event: any) => {
             setFieldChanged(true);
@@ -49,7 +60,9 @@ export const DealProfitItem = observer(
         };
 
         return (
-            <div className={`deal-profit__item ${props.className} justify-content-${justify}`}>
+            <div
+                className={`deal-profit__item ${props?.className || ""} justify-content-${justify}`}
+            >
                 {checkboxValue !== undefined && checkboxOnChange !== undefined && (
                     <Checkbox
                         inputId={`${fieldName}-checkbox`}
@@ -64,11 +77,23 @@ export const DealProfitItem = observer(
                     &nbsp;{title}
                 </label>
                 {withInput ? (
-                    <CurrencyInput
-                        className={`deal-profit__input ${fieldChanged ? "input-change" : ""}`}
-                        {...props}
-                        onChange={handleChange}
-                    />
+                    <>
+                        {currencySelect && (
+                            <ComboBox
+                                options={Object.values(CURRENCY_OPTIONS)}
+                                value={currencySelectValue}
+                                onChange={(e) => {
+                                    setCurrencySelectValue(e.value as CURRENCY_OPTIONS);
+                                }}
+                                className={`deal-profit__currency-select`}
+                            />
+                        )}
+                        <CurrencyInput
+                            className={`deal-profit__input ${fieldChanged ? "input-change" : ""}`}
+                            {...props}
+                            onChange={handleChange}
+                        />
+                    </>
                 ) : (
                     <div className='deal-profit__value'>
                         {currency && <span className='deal-profit__currency'>{currency}</span>}

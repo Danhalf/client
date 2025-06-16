@@ -175,7 +175,19 @@
 
 .p-tabview .p-tabview-nav li.p-highlight.deal-washout__tab-header .p-tabview-nav-link {
     color: var(--admss-app-main-blue);
+    border: none;
     border-bottom: 2px solid var(--admss-app-main-blue);
+}
+
+.p-tabview .p-tabview-nav li.deal-washout__tab-header {
+    .p-tabview-nav-link {
+        color: var(--admss-app-blue-text);
+        font-weight: 600;
+    }
+    &:hover .p-tabview-nav-link {
+        color: var(--admss-app-main-blue);
+        background-color: var(--admss-app-focus-light-green);
+    }
 }
 
 .deal-washout__footer {
