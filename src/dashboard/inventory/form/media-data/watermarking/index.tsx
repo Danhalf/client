@@ -98,6 +98,8 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                     />
                     <Button
                         icon='icon adms-close'
+                        tooltip='Delete block'
+                        tooltipOptions={{ position: "mouse" }}
                         className='watermarking__remove-button'
                         text
                         onClick={() => handleDeleteTextBlock(blockIndex)}
