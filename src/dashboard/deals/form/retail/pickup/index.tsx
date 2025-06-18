@@ -205,7 +205,15 @@ export const DealRetailPickup = observer((): ReactElement => {
                     className='pickup-delete-dialog'
                     title='Are you sure?'
                     icon='pi-times-circle'
-                    bodyMessage={`Do you really want to delete this pickup payment?\nThis process cannot be undone.`}
+                    bodyMessage={
+                        <>
+                            Do you really want to delete
+                            <br />
+                            this pickup payment?
+                            <br />
+                            This process cannot be undone.
+                        </>
+                    }
                     confirmAction={handleConfirmClear}
                     draggable={false}
                     rejectLabel='Cancel'

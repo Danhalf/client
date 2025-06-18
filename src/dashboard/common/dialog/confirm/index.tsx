@@ -1,11 +1,11 @@
-import { useRef } from "react";
+import { useRef, ReactNode } from "react";
 import { ConfirmDialog, ConfirmDialogProps } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import { Checkbox } from "primereact/checkbox";
 import "./index.css";
 
 interface ConfirmModalProps extends ConfirmDialogProps {
-    bodyMessage?: string;
+    bodyMessage?: string | ReactNode;
     title?: string;
     icon?: string;
     confirmAction?: () => void;
@@ -59,11 +59,11 @@ export const ConfirmModal = ({
                     <div className='text-center w-full confirm-body'>
                         {bodyMessage || "Please confirm to proceed moving forward."}
                         {showCheckbox && (
-                            <div className='flex align-items-center mt-3'>
+                            <div className='confirm-checkbox'>
                                 <Checkbox
                                     checked={checkboxChecked}
                                     onChange={(e) => onCheckboxChange?.(e.checked || false)}
-                                    id='confirmCheckbox'
+                                    inputId='confirmCheckbox'
                                 />
                                 <label htmlFor='confirmCheckbox' className='ml-2'>
                                     {checkboxLabel}
