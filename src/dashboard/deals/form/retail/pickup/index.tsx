@@ -202,28 +202,20 @@ export const DealRetailPickup = observer((): ReactElement => {
             {id && (
                 <ConfirmModal
                     visible={confirmModalVisible}
-                    title='Clear Payment'
-                    icon='pi-exclamation-triangle'
-                    bodyMessage='Do you really want to delete 
-                    this pickup payment? 
-                    This process cannot be undone'
+                    className='pickup-delete-dialog'
+                    title='Are you sure?'
+                    icon='pi-times-circle'
+                    bodyMessage={`Do you really want to delete this pickup payment?\nThis process cannot be undone.`}
                     confirmAction={handleConfirmClear}
                     draggable={false}
                     rejectLabel='Cancel'
-                    acceptLabel='Clear'
+                    acceptLabel='Delete'
                     onHide={handleModalHide}
-                >
-                    <div className='flex align-items-center mt-3'>
-                        <Checkbox
-                            checked={dontShowAgain}
-                            onChange={(e) => setDontShowAgain(e.checked || false)}
-                            id='dontShowAgain'
-                        />
-                        <label htmlFor='dontShowAgain' className='ml-2'>
-                            Remember this choice
-                        </label>
-                    </div>
-                </ConfirmModal>
+                    showCheckbox={true}
+                    checkboxLabel='Remember this choice'
+                    checkboxChecked={dontShowAgain}
+                    onCheckboxChange={setDontShowAgain}
+                />
             )}
         </div>
     );
