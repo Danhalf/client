@@ -10,8 +10,10 @@ import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ImagePreview } from "dashboard/inventory/form/media-data/watermarking/preview";
+import { useParams } from "react-router-dom";
 
 export const InventoryMediaWatermarking = observer((): ReactElement => {
+    const { id } = useParams();
     const [settingsStore, inventoryStore] = [
         useStore().generalSettingsStore,
         useStore().inventoryStore,
@@ -21,11 +23,18 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
         changeSettings,
         watermarkImage,
         postProcessing,
+        getSettings,
         changePostProcessing,
         restoreDefaultSettings,
     } = settingsStore;
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
+
+    useEffect(() => {
+        if (id) {
+            getSettings();
+        }
+    }, [id]);
 
     useEffect(() => {
         if (watermarkImage && watermarkImage?.size) {
@@ -207,7 +216,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
     return (
         <div className='settings-form watermarking'>
             <div className='grid align-items-center mt-0'>
-                <div className='col-6'>
+                <div className='col-6 flex align-items-center'>
                     <Checkbox
                         inputId='enableWatermark'
                         name='enableWatermark'
