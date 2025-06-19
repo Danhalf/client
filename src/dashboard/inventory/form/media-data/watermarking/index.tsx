@@ -24,6 +24,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
         watermarkImage,
         postProcessing,
         getSettings,
+        getPostProcessing,
         changePostProcessing,
         restoreDefaultSettings,
     } = settingsStore;
@@ -33,6 +34,7 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
     useEffect(() => {
         if (id) {
             getSettings();
+            getPostProcessing();
         }
     }, [id]);
 
@@ -213,6 +215,14 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
         ));
     };
 
+    const hasWatermarkSettings = !!(
+        settings.watermarkenabled ||
+        settings.logoenabled ||
+        settings.logoposX ||
+        settings.logoposY ||
+        settings.logomediauid
+    );
+
     return (
         <div className='settings-form watermarking'>
             <div className='grid align-items-center mt-0'>
@@ -237,8 +247,8 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                         onClick={handleRestoreDefault}
                         outlined
                         type='button'
-                        severity={hasChanges ? "danger" : "secondary"}
-                        disabled={!hasChanges}
+                        severity={hasChanges || hasWatermarkSettings ? "danger" : "secondary"}
+                        disabled={!hasChanges && !hasWatermarkSettings}
                     />
                     <Button
                         label='Preview'
@@ -246,8 +256,8 @@ export const InventoryMediaWatermarking = observer((): ReactElement => {
                         onClick={handlePreview}
                         outlined
                         type='button'
-                        severity={hasChanges ? "success" : "secondary"}
-                        disabled={!hasChanges}
+                        severity={hasChanges || hasWatermarkSettings ? "success" : "secondary"}
+                        disabled={!hasChanges && !hasWatermarkSettings}
                     />
                 </div>
 
