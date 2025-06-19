@@ -54,8 +54,8 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
     const handleSaveOption = async (option: Partial<GeneralInventoryOptions>) => {
         if (!option.name) {
             toast.current?.show({
-                severity: "warn",
-                summary: "Warning",
+                severity: "error",
+                summary: "Error",
                 detail: "Option name is required",
                 life: TOAST_LIFETIME,
             });
@@ -64,8 +64,8 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
 
         if (!option.itemuid) {
             toast.current?.show({
-                severity: "warn",
-                summary: "Warning",
+                severity: "error",
+                summary: "Error",
                 detail: "Option UID is required",
                 life: TOAST_LIFETIME,
             });
@@ -342,7 +342,6 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                                     </div>
                                 ))}
                         </div>
-                        {}
                         <div className='inventory-content'>
                             <ResponsiveReactGridLayout
                                 className='layout relative'
