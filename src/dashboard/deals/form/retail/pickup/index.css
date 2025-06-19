@@ -89,3 +89,16 @@
         }
     }
 }
+
+.pickup-delete-dialog {
+    .p-dialog-content {
+        padding: 30px 70px;
+        padding-bottom: 0;
+    }
+    .p-dialog-footer {
+        padding-top: 20px;
+        .p-button {
+            height: 60px;
+        }
+    }
+}

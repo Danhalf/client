@@ -62,14 +62,30 @@ export const DealRetailPickup = observer((): ReactElement => {
         handleChange(itemuid, "paid", 0);
     };
 
-    const handleConfirmClear = () => {
+    const handleDeletePayment = async (itemuid: string) => {
+        const response = await deleteDealPayment(itemuid);
+        if (response?.error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: response?.error,
+            });
+        } else {
+            await store.getPickupPayments(id);
+            toast.current?.show({
+                severity: "success",
+                summary: "Success",
+                detail: "Payment deleted successfully",
+            });
+        }
+    };
+
+    const handleConfirmClear = async () => {
         if (currentPaymentItemuid) {
             setCheckedMap((prev) => ({ ...prev, [currentPaymentItemuid]: false }));
             clearPayment(currentPaymentItemuid);
             if (id && !currentPaymentItemuid.startsWith(NEW_PAYMENT_LABEL)) {
-                deleteDealPayment(currentPaymentItemuid).then(() => {
-                    store.getPickupPayments(id);
-                });
+                await handleDeletePayment(currentPaymentItemuid);
             }
         }
         setConfirmModalVisible(false);
@@ -81,7 +97,7 @@ export const DealRetailPickup = observer((): ReactElement => {
         setCurrentPaymentItemuid(null);
     };
 
-    const handleCheckboxChange = (itemuid: string, checked: boolean) => {
+    const handleCheckboxChange = async (itemuid: string, checked: boolean) => {
         const payment = dealPickupPayments.find((p) => p.itemuid === itemuid);
         if (
             !checked &&
@@ -97,9 +113,7 @@ export const DealRetailPickup = observer((): ReactElement => {
             if (!checked) {
                 clearPayment(itemuid);
                 if (id && !itemuid.startsWith(NEW_PAYMENT_LABEL)) {
-                    deleteDealPayment(itemuid).then(() => {
-                        store.getPickupPayments(id);
-                    });
+                    await handleDeletePayment(itemuid);
                 }
             }
         }
@@ -143,6 +157,7 @@ export const DealRetailPickup = observer((): ReactElement => {
                                         ? "ХХ/ХХ/ХХХХ"
                                         : ""
                                 }
+                                emptyDate
                                 className={
                                     payment.paydate
                                         ? "pickup-input"
@@ -187,28 +202,28 @@ export const DealRetailPickup = observer((): ReactElement => {
             {id && (
                 <ConfirmModal
                     visible={confirmModalVisible}
-                    title='Clear Payment'
-                    icon='pi-exclamation-triangle'
-                    bodyMessage='Do you really want to delete 
-                    this pickup payment? 
-                    This process cannot be undone'
+                    className='pickup-delete-dialog'
+                    title='Are you sure?'
+                    icon='pi-times-circle'
+                    bodyMessage={
+                        <>
+                            Do you really want to delete
+                            <br />
+                            this pickup payment?
+                            <br />
+                            This process cannot be undone.
+                        </>
+                    }
                     confirmAction={handleConfirmClear}
                     draggable={false}
                     rejectLabel='Cancel'
-                    acceptLabel='Clear'
+                    acceptLabel='Delete'
                     onHide={handleModalHide}
-                >
-                    <div className='flex align-items-center mt-3'>
-                        <Checkbox
-                            checked={dontShowAgain}
-                            onChange={(e) => setDontShowAgain(e.checked || false)}
-                            id='dontShowAgain'
-                        />
-                        <label htmlFor='dontShowAgain' className='ml-2'>
-                            Remember this choice
-                        </label>
-                    </div>
-                </ConfirmModal>
+                    showCheckbox={true}
+                    checkboxLabel='Remember this choice'
+                    checkboxChecked={dontShowAgain}
+                    onCheckboxChange={setDontShowAgain}
+                />
             )}
         </div>
     );
