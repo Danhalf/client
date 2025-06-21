@@ -4,13 +4,38 @@ import { Checkbox } from "primereact/checkbox";
 import { InputNumberChangeEvent } from "primereact/inputnumber";
 import { useState } from "react";
 
+enum MISC_COST_OPTIONS {
+    COMMISSION1 = "commission1",
+    COMMISSION = "commission",
+}
+
 export const DealTotalsProfit = () => {
     const [miscCostFirstText, setMiscCostFirstText] = useState<string>("");
     const [miscCostSecondText, setMiscCostSecondText] = useState<string>("");
     const [miscCostFirstValue, setMiscCostFirstValue] = useState<number>(0);
     const [miscCostSecondValue, setMiscCostSecondValue] = useState<number>(0);
-    const [miscCostFirstCommission, setMiscCostFirstCommission] = useState<boolean>(false);
-    const [miscCostSecondCommission, setMiscCostSecondCommission] = useState<boolean>(false);
+
+    const [firstMiscSelectedOption, setFirstMiscSelectedOption] =
+        useState<MISC_COST_OPTIONS | null>(null);
+
+    const [secondMiscSelectedOption, setSecondMiscSelectedOption] =
+        useState<MISC_COST_OPTIONS | null>(null);
+
+    const handleFirstMiscSelection = (optionId: MISC_COST_OPTIONS) => {
+        if (firstMiscSelectedOption === optionId) {
+            setFirstMiscSelectedOption(null);
+        } else {
+            setFirstMiscSelectedOption(optionId);
+        }
+    };
+
+    const handleSecondMiscSelection = (optionId: MISC_COST_OPTIONS) => {
+        if (secondMiscSelectedOption === optionId) {
+            setSecondMiscSelectedOption(null);
+        } else {
+            setSecondMiscSelectedOption(optionId);
+        }
+    };
 
     return (
         <Card className='profit-card totals-profit'>
@@ -48,21 +73,21 @@ export const DealTotalsProfit = () => {
                         />
                         <div className='deal-profit__includes'>
                             <Checkbox
-                                inputId={`misc-cost-first-commission1`}
-                                checked={miscCostFirstCommission}
+                                inputId='misc-cost-first-commission1'
+                                checked={firstMiscSelectedOption === MISC_COST_OPTIONS.COMMISSION1}
                                 tooltip='Include in Commission1 Base'
-                                onChange={() => {
-                                    setMiscCostFirstCommission(!miscCostFirstCommission);
-                                }}
+                                onChange={() =>
+                                    handleFirstMiscSelection(MISC_COST_OPTIONS.COMMISSION1)
+                                }
                             />
 
                             <Checkbox
-                                inputId={`misc-cost-first-commission`}
-                                checked={miscCostSecondCommission}
+                                inputId='misc-cost-first-commission'
+                                checked={firstMiscSelectedOption === MISC_COST_OPTIONS.COMMISSION}
                                 tooltip='Include in Commission Base'
-                                onChange={() => {
-                                    setMiscCostSecondCommission(miscCostSecondCommission);
-                                }}
+                                onChange={() =>
+                                    handleFirstMiscSelection(MISC_COST_OPTIONS.COMMISSION)
+                                }
                             />
                         </div>
                     </div>
@@ -84,20 +109,20 @@ export const DealTotalsProfit = () => {
                         />
                         <div className='deal-profit__includes'>
                             <Checkbox
-                                inputId={`misc-cost-second-commission`}
-                                checked={miscCostSecondCommission}
-                                tooltip='Include in Commission Base'
-                                onChange={() => {
-                                    setMiscCostSecondCommission(miscCostSecondCommission);
-                                }}
+                                inputId='misc-cost-second-commission1'
+                                checked={secondMiscSelectedOption === MISC_COST_OPTIONS.COMMISSION1}
+                                tooltip='Include in Commission1 Base'
+                                onChange={() =>
+                                    handleSecondMiscSelection(MISC_COST_OPTIONS.COMMISSION1)
+                                }
                             />
                             <Checkbox
-                                inputId={`misc-cost-second-commission`}
-                                checked={miscCostSecondCommission}
+                                inputId='misc-cost-second-commission'
+                                checked={secondMiscSelectedOption === MISC_COST_OPTIONS.COMMISSION}
                                 tooltip='Include in Commission Base'
-                                onChange={() => {
-                                    setMiscCostSecondCommission(miscCostSecondCommission);
-                                }}
+                                onChange={() =>
+                                    handleSecondMiscSelection(MISC_COST_OPTIONS.COMMISSION)
+                                }
                             />
                         </div>
                     </div>
