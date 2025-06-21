@@ -144,10 +144,10 @@ export const DealProfit = () => {
             <div className='col-6'>
                 <DealProfitCommission />
             </div>
-            <div className='col-9'>
+            <div className='fi-wrapper'>
                 <DealFIProfit />
             </div>
-            <div className='col-3'>
+            <div className='totals-wrapper'>
                 <DealTotalsProfit />
             </div>
         </div>

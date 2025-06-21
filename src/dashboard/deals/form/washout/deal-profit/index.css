@@ -250,4 +250,83 @@
         color: var(--admss-app-white);
         font-weight: 600;
     }
+
+    .totals-content {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        .totals-content__info {
+            display: flex;
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 30px;
+            padding: 10px 15px;
+            justify-content: space-between;
+            align-items: center;
+            .totals-content__info-title,
+            .totals-content__info-value {
+                font-weight: 600;
+                font-size: 14px;
+            }
+            .totals-content__info-value {
+                margin-left: auto;
+                padding-right: 15%;
+            }
+            &.totals-content__info--red {
+                border-color: var(--admss-app-red);
+                color: var(--admss-app-red);
+                background-color: var(--admss-app-light-red);
+            }
+            &.totals-content__info--green {
+                border-color: var(--admss-app-warning-green);
+                color: var(--admss-app-warning-green);
+                background-color: var(--admss-app-light-green);
+            }
+            &.totals-content__info--blue {
+                border-color: var(--admss-app-main-blue);
+                color: var(--admss-app-main-blue);
+                background-color: var(--admss-app-white-blue);
+            }
+        }
+        .totals-misc {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            .currency-item__input {
+                align-items: center;
+            }
+            .totals-misc__input {
+                height: 32px;
+                max-width: 140px;
+                flex: 1 1 140px;
+            }
+            .p-inputtext,
+            .currency-item__icon {
+                height: 32px;
+            }
+            .currency-item__icon {
+                line-height: 0;
+                width: 30px;
+            }
+        }
+        .deal-profit__includes {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: nowrap;
+        }
+    }
+}
+
+.fi-wrapper {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 70%;
+}
+
+.totals-wrapper {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 30%;
 }
