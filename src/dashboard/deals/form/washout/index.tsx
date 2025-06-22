@@ -9,7 +9,6 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { DealProfit } from "dashboard/deals/form/washout/deal-profit";
 import { InterestProfit } from "dashboard/deals/form/washout/interest-profit";
-import { getDealWashout } from "http/services/deals.service";
 
 export enum DealWashoutTabs {
     DEAL_PROFIT = "deal-profit",
@@ -24,7 +23,7 @@ export const DealWashout = observer((): ReactElement => {
     const [searchParams, setSearchParams] = useSearchParams();
     const store = useStore().dealStore;
     const toast = useToast();
-    const { inventory, getDeal } = store;
+    const { inventory, getDeal, getDealWashout } = store;
 
     useEffect(() => {
         if (id) {

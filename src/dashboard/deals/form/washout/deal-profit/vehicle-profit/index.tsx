@@ -1,8 +1,11 @@
 import { Card } from "primereact/card";
 import { DealProfitItem } from "..";
 import { useState } from "react";
+import { useStore } from "store/hooks";
 
 export const DealVehicleProfit = () => {
+    const { dealWashout, changeDealWashout } = useStore().dealStore;
+
     const [includeOverallowanceFirst, setIncludeOverallowanceFirst] = useState<boolean>(false);
     const [includeOverallowanceSecond, setIncludeOverallowanceSecond] = useState<boolean>(false);
     const [includeVehicleProfitFirst, setIncludeVehicleProfitFirst] = useState<boolean>(false);
@@ -57,8 +60,10 @@ export const DealVehicleProfit = () => {
                         includes
                         justify='start'
                         currency='$'
-                        value={0}
-                        onChange={({ value }) => {}}
+                        value={Number(dealWashout.VehicleCost) || 0}
+                        onChange={({ value }) => {
+                            changeDealWashout("VehicleCost", String(value));
+                        }}
                     />
                     <DealProfitItem
                         numberSign='-'
@@ -66,8 +71,10 @@ export const DealVehicleProfit = () => {
                         includes
                         justify='start'
                         currency='$'
-                        value={0}
-                        onChange={({ value }) => {}}
+                        value={Number(dealWashout.Expenses) || 0}
+                        onChange={({ value }) => {
+                            changeDealWashout("Expenses", String(value));
+                        }}
                     />
                     <DealProfitItem
                         numberSign='-'
@@ -79,8 +86,10 @@ export const DealVehicleProfit = () => {
                         includeSecondOnChange={setIncludeOverallowanceSecond}
                         justify='start'
                         currency='$'
-                        value={0}
-                        onChange={({ value }) => {}}
+                        value={Number(dealWashout.Overllowance) || 0}
+                        onChange={({ value }) => {
+                            changeDealWashout("Overllowance", String(value));
+                        }}
                     />
                     <div className='splitter my-0'>
                         <hr className='splitter__line flex-1' />
