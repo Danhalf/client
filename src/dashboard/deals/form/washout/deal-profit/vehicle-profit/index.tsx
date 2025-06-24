@@ -1,5 +1,5 @@
 import { Card } from "primereact/card";
-import { DealProfitItem } from "..";
+import { DealProfitItem, INCLUDE_OPTIONS } from "..";
 import { useState } from "react";
 import { useStore } from "store/hooks";
 import { Button } from "primereact/button";
@@ -7,10 +7,8 @@ import { Button } from "primereact/button";
 export const DealVehicleProfit = () => {
     const { dealWashout, changeDealWashout } = useStore().dealStore;
 
-    const [includeOverallowanceFirst, setIncludeOverallowanceFirst] = useState<boolean>(false);
-    const [includeOverallowanceSecond, setIncludeOverallowanceSecond] = useState<boolean>(false);
-    const [includeVehicleProfitFirst, setIncludeVehicleProfitFirst] = useState<boolean>(false);
-    const [includeVehicleProfitSecond, setIncludeVehicleProfitSecond] = useState<boolean>(false);
+    const [includeOverallowance, setIncludeOverallowance] = useState<INCLUDE_OPTIONS | null>(null);
+    const [includeVehicleProfit, setIncludeVehicleProfit] = useState<INCLUDE_OPTIONS | null>(null);
 
     return (
         <Card className='profit-card vehicle-profit'>
@@ -86,10 +84,8 @@ export const DealVehicleProfit = () => {
                         numberSign='-'
                         title='Overallowance:'
                         includes
-                        includeFirst={includeOverallowanceFirst}
-                        includeSecond={includeOverallowanceSecond}
-                        includeFirstOnChange={setIncludeOverallowanceFirst}
-                        includeSecondOnChange={setIncludeOverallowanceSecond}
+                        includeCheckbox={includeOverallowance}
+                        includeCheckboxOnChange={setIncludeOverallowance}
                         justify='start'
                         currency='$'
                         value={Number(dealWashout.Overllowance) || 0}
@@ -106,10 +102,8 @@ export const DealVehicleProfit = () => {
                         currency='$'
                         className='deal-profit__item--blue'
                         includes
-                        includeFirst={includeVehicleProfitFirst}
-                        includeSecond={includeVehicleProfitSecond}
-                        includeFirstOnChange={setIncludeVehicleProfitFirst}
-                        includeSecondOnChange={setIncludeVehicleProfitSecond}
+                        includeCheckbox={includeVehicleProfit}
+                        includeCheckboxOnChange={setIncludeVehicleProfit}
                         value={0}
                         onChange={({ value }) => {}}
                     />

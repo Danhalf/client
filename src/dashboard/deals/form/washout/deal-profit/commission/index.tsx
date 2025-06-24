@@ -2,7 +2,7 @@ import { ComboBox } from "dashboard/common/form/dropdown";
 import { Card } from "primereact/card";
 import { Checkbox } from "primereact/checkbox";
 import { useState } from "react";
-import { DealProfitItem } from "..";
+import { DealProfitItem, INCLUDE_OPTIONS } from "..";
 import { Button } from "primereact/button";
 
 const COMMISSION_2_OPTIONS = ["Figure After Commission", "Figure Before Commission"];
@@ -13,9 +13,9 @@ export const DealProfitCommission = () => {
     const [managerOverride, setManagerOverride] = useState<boolean>(false);
     const [s1, setS1] = useState<boolean>(false);
     const [s2, setS2] = useState<boolean>(false);
-    const [includeManagerOverrideFirst, setIncludeManagerOverrideFirst] = useState<boolean>(false);
-    const [includeManagerOverrideSecond, setIncludeManagerOverrideSecond] =
-        useState<boolean>(false);
+    const [includeManagerOverride, setIncludeManagerOverride] = useState<INCLUDE_OPTIONS | null>(
+        null
+    );
 
     return (
         <Card className='profit-card profit-commission'>
@@ -63,10 +63,8 @@ export const DealProfitCommission = () => {
                         withInput
                         justify='start'
                         includes
-                        includeFirst={includeManagerOverrideFirst}
-                        includeSecond={includeManagerOverrideSecond}
-                        includeFirstOnChange={setIncludeManagerOverrideFirst}
-                        includeSecondOnChange={setIncludeManagerOverrideSecond}
+                        includeCheckbox={includeManagerOverride}
+                        includeCheckboxOnChange={setIncludeManagerOverride}
                         checkboxValue={managerOverride}
                         checkboxOnChange={setManagerOverride}
                         fieldName='managerOverride'
