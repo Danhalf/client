@@ -32,6 +32,15 @@
 }
 
 .vehicle-profit {
+    position: relative;
+    .vehicle-profit__expenses-button {
+        position: absolute;
+        top: 65px;
+        right: 20px;
+        height: 45px;
+        width: 45px;
+        z-index: 1;
+    }
     .vehicle-profit__inputs {
         display: flex;
         flex-direction: column;
@@ -114,6 +123,15 @@
     --commission-settings-width: 35%;
     --commission-worksheet-width: 65%;
     box-shadow: 0 0 3px 0 var(--admss-app-warning-blue);
+    position: relative;
+    .profit-commission__salesman-button {
+        position: absolute;
+        bottom: 80px;
+        right: 20px;
+        height: 45px;
+        width: 45px;
+        z-index: 1;
+    }
     .profit-commission__header {
         padding: 0;
         display: flex;
@@ -126,6 +144,7 @@
             padding: 8px 20px;
             background-color: var(--admss-app-focus-blue);
             flex: 0 0 var(--commission-settings-width);
+            white-space: nowrap;
             max-width: var(--commission-settings-width);
         }
         .profit-commission__header-subtitle {
@@ -145,6 +164,7 @@
                 display: flex;
                 align-items: center;
                 gap: 10px;
+                font-size: 14px;
             }
             .commission-settings__label {
                 display: inline-flex;
@@ -254,7 +274,7 @@
     .totals-content {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 7px;
         width: 100%;
         .totals-content__info {
             display: flex;
@@ -289,17 +309,38 @@
                 background-color: var(--admss-app-white-blue);
             }
         }
-        .totals-misc {
+        .totals-misc,
+        .totals-info {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            width: 100%;
             gap: 10px;
+            font-size: 14px;
             .currency-item__input {
                 align-items: center;
             }
-            .totals-misc__input {
+            .totals-misc__input,
+            .totals-info__title,
+            .totals-info__input {
+                font-size: 14px;
                 height: 32px;
                 max-width: 140px;
                 flex: 1 1 140px;
+            }
+
+            .totals-info__title {
+                display: flex;
+                align-items: center;
+                flex: 0 0 140px;
+            }
+
+            .currency-item {
+                .p-inputtext {
+                    max-width: 110px;
+                    font-size: 14px;
+                    flex: 1 1 110px;
+                }
             }
             .p-inputtext,
             .currency-item__icon {
@@ -308,6 +349,24 @@
             .currency-item__icon {
                 line-height: 0;
                 width: 30px;
+            }
+        }
+
+        .totals-summary {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            .totals-summary__title {
+                font-size: 16px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                flex: 0 0 140px;
+            }
+            .totals-summary__value {
+                font-size: 16px;
+                font-weight: 600;
+                margin-left: 15%;
             }
         }
         .deal-profit__includes {
@@ -320,13 +379,14 @@
 }
 
 .fi-wrapper {
-    flex: 0 0 auto;
+    flex: 1 0 auto;
     padding: 0.5rem;
     width: 70%;
 }
 
 .totals-wrapper {
-    flex: 0 0 auto;
+    flex: 0 0 375px;
     padding: 0.5rem;
     width: 30%;
+    max-width: 375px;
 }

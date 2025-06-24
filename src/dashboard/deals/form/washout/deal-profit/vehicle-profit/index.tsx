@@ -2,6 +2,7 @@ import { Card } from "primereact/card";
 import { DealProfitItem } from "..";
 import { useState } from "react";
 import { useStore } from "store/hooks";
+import { Button } from "primereact/button";
 
 export const DealVehicleProfit = () => {
     const { dealWashout, changeDealWashout } = useStore().dealStore;
@@ -15,6 +16,11 @@ export const DealVehicleProfit = () => {
         <Card className='profit-card vehicle-profit'>
             <div className='profit-card__header vehicle-profit__header'>Vehicle Profit</div>
             <div className='profit-card__body vehicle-profit__body'>
+                <Button
+                    icon='pi pi-plus'
+                    tooltip='Expenses'
+                    className='vehicle-profit__expenses-button'
+                />
                 <div className='vehicle-profit__inputs'>
                     <DealProfitItem
                         title='Trade 1 Allowance:'

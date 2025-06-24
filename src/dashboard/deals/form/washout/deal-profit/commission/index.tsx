@@ -3,6 +3,7 @@ import { Card } from "primereact/card";
 import { Checkbox } from "primereact/checkbox";
 import { useState } from "react";
 import { DealProfitItem } from "..";
+import { Button } from "primereact/button";
 
 const COMMISSION_2_OPTIONS = ["Figure After Commission", "Figure Before Commission"];
 
@@ -108,6 +109,11 @@ export const DealProfitCommission = () => {
                         onChange={({ value }) => {}}
                     />
                 </div>
+                <Button
+                    icon='pi pi-user-plus'
+                    tooltip='Select Salesman'
+                    className='profit-commission__salesman-button'
+                />
             </div>
         </Card>
     );

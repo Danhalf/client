@@ -51,7 +51,7 @@ export const DealTotalsProfit = () => {
                         <span className='totals-content__info-value'>$0.00</span>
                     </div>
                     <div className='totals-content__info totals-content__info--blue'>
-                        <span className='totals-content__info-title'>(+) F&amp;I Profit:</span>
+                        <span className='totals-content__info-title'>(-) Commissions:</span>
                         <span className='totals-content__info-value'>$0.00</span>
                     </div>
 
@@ -126,21 +126,89 @@ export const DealTotalsProfit = () => {
                             />
                         </div>
                     </div>
-                    <div className='totals-row'>
-                        <span>(+) Reserve Refund from Finance Co.:</span>
-                        <span>$0.00</span>
+
+                    <div className='totals-row totals-info'>
+                        <span className='totals-info__title'>
+                            (+) Reserve Refund from Finance Co.:
+                        </span>
+                        <CurrencyInput
+                            name='Reserve Refund from Finance Co.'
+                            value={0}
+                            className='totals-info__input'
+                            onChange={(e: InputNumberChangeEvent) => {}}
+                        />
+                        <div className='deal-profit__includes'>
+                            <Checkbox
+                                inputId='misc-cost-second-commission1'
+                                checked={secondMiscSelectedOption === MISC_COST_OPTIONS.COMMISSION1}
+                                tooltip='Include in Commission1 Base'
+                                onChange={() =>
+                                    handleSecondMiscSelection(MISC_COST_OPTIONS.COMMISSION1)
+                                }
+                            />
+                            <Checkbox
+                                inputId='misc-cost-second-commission'
+                                checked={secondMiscSelectedOption === MISC_COST_OPTIONS.COMMISSION}
+                                tooltip='Include in Commission Base'
+                                onChange={() =>
+                                    handleSecondMiscSelection(MISC_COST_OPTIONS.COMMISSION)
+                                }
+                            />
+                        </div>
                     </div>
-                    <div className='totals-row'>
-                        <span>(+) Vehicle Pack:</span>
-                        <span>$0.00</span>
+
+                    <div className='totals-row totals-info'>
+                        <span className='totals-info__title'>(+) Vehicle Pack:</span>
+                        <span className='totals-info__value'>$0.00</span>
+                        <div className='deal-profit__includes'>
+                            <Checkbox
+                                inputId='misc-cost-second-commission1'
+                                checked={secondMiscSelectedOption === MISC_COST_OPTIONS.COMMISSION1}
+                                tooltip='Include in Commission1 Base'
+                                onChange={() =>
+                                    handleSecondMiscSelection(MISC_COST_OPTIONS.COMMISSION1)
+                                }
+                            />
+                            <Checkbox
+                                inputId='misc-cost-second-commission'
+                                checked={secondMiscSelectedOption === MISC_COST_OPTIONS.COMMISSION}
+                                tooltip='Include in Commission Base'
+                                onChange={() =>
+                                    handleSecondMiscSelection(MISC_COST_OPTIONS.COMMISSION)
+                                }
+                            />
+                        </div>
                     </div>
-                    <div className='totals-row'>
-                        <span>(+) Doc Fee:</span>
-                        <span>$0.00</span>
+                    <div className='totals-row totals-info'>
+                        <span className='totals-info__title'>(+) Doc Fee:</span>
+                        <span className='totals-info__value'>$0.00</span>
+                        <div className='deal-profit__includes'>
+                            <Checkbox
+                                inputId='misc-cost-second-commission1'
+                                checked={secondMiscSelectedOption === MISC_COST_OPTIONS.COMMISSION1}
+                                tooltip='Include in Commission1 Base'
+                                onChange={() =>
+                                    handleSecondMiscSelection(MISC_COST_OPTIONS.COMMISSION1)
+                                }
+                            />
+                            <Checkbox
+                                inputId='misc-cost-second-commission'
+                                checked={secondMiscSelectedOption === MISC_COST_OPTIONS.COMMISSION}
+                                tooltip='Include in Commission Base'
+                                onChange={() =>
+                                    handleSecondMiscSelection(MISC_COST_OPTIONS.COMMISSION)
+                                }
+                            />
+                        </div>
                     </div>
-                    <div className='totals-row totals-total-profit'>
-                        <span>(=) Total Profit:</span>
-                        <span>$0.00</span>
+
+                    <div className='splitter my-0'>
+                        <hr className='splitter__line flex-1' />
+                    </div>
+
+                    <div className='totals-row totals-summary'>
+                        <span className='totals-summary__title'>(=) Total Profit:</span>
+                        <span className='totals-summary__value'>$0.00</span>
                     </div>
                 </div>
             </div>
