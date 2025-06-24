@@ -77,6 +77,9 @@
     &.deal-profit__item--blue {
         color: var(--admss-app-main-blue);
     }
+    &.deal-profit__item--bold {
+        font-weight: 700;
+    }
     .currency-item__input,
     .p-inputtext,
     .p-inputnumber {
@@ -121,7 +124,9 @@
 
 .profit-commission {
     --commission-settings-width: 35%;
+    --commission-settings-header-width: 35.5%;
     --commission-worksheet-width: 65%;
+    --commission-worksheet-header-width: 64.5%;
     box-shadow: 0 0 3px 0 var(--admss-app-warning-blue);
     position: relative;
     .profit-commission__salesman-button {
@@ -143,15 +148,15 @@
         .profit-commission__header-title {
             padding: 8px 20px;
             background-color: var(--admss-app-focus-blue);
-            flex: 0 0 var(--commission-settings-width);
+            flex: 0 0 var(--commission-settings-header-width);
             white-space: nowrap;
-            max-width: var(--commission-settings-width);
+            max-width: var(--commission-settings-header-width);
         }
         .profit-commission__header-subtitle {
             padding: 8px 20px;
             background-color: var(--admss-app-focus-blue);
-            flex: 0 0 var(--commission-worksheet-width);
-            max-width: var(--commission-worksheet-width);
+            flex: 0 0 var(--commission-worksheet-header-width);
+            max-width: var(--commission-worksheet-header-width);
         }
     }
 
@@ -160,6 +165,9 @@
         display: flex;
         gap: 10px;
         .commission-settings {
+            padding-right: 10px;
+            margin-right: 10px;
+            border-right: 1px solid var(--admss-app-focus-blue);
             .commission-settings__checkbox {
                 display: flex;
                 align-items: center;
