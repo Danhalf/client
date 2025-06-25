@@ -2,8 +2,9 @@ import { Card } from "primereact/card";
 import { DealProfitItem, INCLUDE_OPTIONS } from "..";
 import { useState } from "react";
 import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
-export const DealFIProfit = () => {
+export const DealFIProfit = observer(() => {
     const { dealWashout, changeDealWashout } = useStore().dealStore;
 
     const [warrantyProfit, setWarrantyProfit] = useState<INCLUDE_OPTIONS | null>(null);
@@ -263,4 +264,4 @@ export const DealFIProfit = () => {
             </div>
         </Card>
     );
-};
+});
