@@ -3,12 +3,22 @@ import { DealProfitItem, INCLUDE_OPTIONS } from "..";
 import { useState } from "react";
 import { useStore } from "store/hooks";
 import { Button } from "primereact/button";
+import { useLocation, useNavigate } from "react-router-dom";
+import { INVENTORY_STEPS } from "dashboard/inventory/form";
 
 export const DealVehicleProfit = () => {
-    const { dealWashout, changeDealWashout } = useStore().dealStore;
+    const { dealWashout, inventory, changeDealWashout } = useStore().dealStore;
+    const inventoryStore = useStore().inventoryStore;
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
 
     const [includeOverallowance, setIncludeOverallowance] = useState<INCLUDE_OPTIONS | null>(null);
     const [includeVehicleProfit, setIncludeVehicleProfit] = useState<INCLUDE_OPTIONS | null>(null);
+
+    const handleNavigateToExpenses = () => {
+        inventoryStore.memoRoute = pathname;
+        navigate(`/dashboard/inventory/${inventory.itemuid}?step=${INVENTORY_STEPS.EXPENSES}`);
+    };
 
     return (
         <Card className='profit-card vehicle-profit'>
@@ -18,6 +28,7 @@ export const DealVehicleProfit = () => {
                     icon='pi pi-plus'
                     tooltip='Expenses'
                     className='vehicle-profit__expenses-button'
+                    onClick={handleNavigateToExpenses}
                 />
                 <div className='vehicle-profit__inputs'>
                     <DealProfitItem
