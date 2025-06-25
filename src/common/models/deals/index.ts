@@ -457,11 +457,12 @@ export interface DealWashout extends BaseResponseError {
     BHPHCollectedInterest: string;
     BuyRate: string;
     BuyRateTermInterest: string;
+    CashPrice: string;
     CL: string;
     CL_Cost: string;
     CL_Profit: string;
     CollectedInterestOther: string;
-    Comm2Options: number;
+    Comm2Options: 0 | 1;
     Commission1: string;
     Commission2: string;
     CommissionBase: string;
@@ -470,6 +471,7 @@ export interface DealWashout extends BaseResponseError {
     ContractRate: string;
     Discount: string;
     DocFee: string;
+    FIProfitTotal: string;
     ExpectedInterest: string;
     Expenses: string;
     Gap: string;
@@ -493,6 +495,10 @@ export interface DealWashout extends BaseResponseError {
     TotalCollectedInterest: string;
     TotalDealCost: string;
     TotalInterest: string;
+    Trade1Allowance: string;
+    Trade1ACV: string;
+    Trade2Allowance: string;
+    Trade2ACV: string;
     VIN: string;
     VSI: string;
     VSI_Cost: string;

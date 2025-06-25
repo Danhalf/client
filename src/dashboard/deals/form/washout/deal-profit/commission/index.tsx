@@ -4,11 +4,17 @@ import { Checkbox } from "primereact/checkbox";
 import { useState } from "react";
 import { DealProfitItem, INCLUDE_OPTIONS } from "..";
 import { Button } from "primereact/button";
+import { useStore } from "store/hooks";
+import { observer } from "mobx-react-lite";
 
-const COMMISSION_2_OPTIONS = ["Figure After Commission", "Figure Before Commission"];
+const COMMISSION_2_OPTIONS = [
+    { label: "Figure Before Commission", value: 0 },
+    { label: "Figure After Commission", value: 1 },
+];
 
-export const DealProfitCommission = () => {
-    const [commission2Options, setCommission2Options] = useState<string>(COMMISSION_2_OPTIONS[0]);
+export const DealProfitCommission = observer(() => {
+    const { dealWashout, changeDealWashout } = useStore().dealStore;
+
     const [defaultCommission, setDefaultCommission] = useState<boolean>(false);
     const [managerOverride, setManagerOverride] = useState<boolean>(false);
     const [s1, setS1] = useState<boolean>(false);
@@ -29,9 +35,11 @@ export const DealProfitCommission = () => {
                         <div className='commission-settings__label'>Commission 2 Options:</div>
                         <ComboBox
                             options={COMMISSION_2_OPTIONS}
-                            value={commission2Options}
+                            optionLabel='label'
+                            optionValue='value'
+                            value={dealWashout.Comm2Options}
                             onChange={({ value }) => {
-                                setCommission2Options(value);
+                                changeDealWashout("Comm2Options", value);
                             }}
                             className='commission-settings__input w-full'
                         />
@@ -51,15 +59,17 @@ export const DealProfitCommission = () => {
                     <DealProfitItem
                         title='Commission Base:'
                         className='deal-profit__item--blue'
-                        value={0}
+                        value={Number(dealWashout.CommissionBase) || 0}
                         currency='$'
                         justify='start'
                         fieldName='commissionBase'
-                        onChange={({ value }) => {}}
+                        onChange={({ value }) => {
+                            changeDealWashout("CommissionBase", String(value));
+                        }}
                     />
                     <DealProfitItem
                         title='Manager Override:'
-                        value={0}
+                        value={Number(dealWashout.CommissionMgr) || 0}
                         withInput
                         justify='start'
                         includes
@@ -68,29 +78,35 @@ export const DealProfitCommission = () => {
                         checkboxValue={managerOverride}
                         checkboxOnChange={setManagerOverride}
                         fieldName='managerOverride'
-                        onChange={({ value }) => {}}
+                        onChange={({ value }) => {
+                            changeDealWashout("CommissionMgr", String(value));
+                        }}
                     />
                     <DealProfitItem
                         title='S1: (None Selected)'
-                        value={0}
+                        value={Number(dealWashout.Commission1) || 0}
                         withInput
                         justify='start'
                         includes
                         checkboxValue={s1}
                         checkboxOnChange={setS1}
                         fieldName='s1'
-                        onChange={({ value }) => {}}
+                        onChange={({ value }) => {
+                            changeDealWashout("Commission1", String(value));
+                        }}
                     />
                     <DealProfitItem
                         title='S2: (None Selected)'
-                        value={0}
+                        value={Number(dealWashout.Commission2) || 0}
                         withInput
                         justify='start'
                         includes
                         checkboxValue={s2}
                         checkboxOnChange={setS2}
                         fieldName='s2'
-                        onChange={({ value }) => {}}
+                        onChange={({ value }) => {
+                            changeDealWashout("Commission2", String(value));
+                        }}
                     />
 
                     <div className='splitter my-0'>
@@ -99,12 +115,14 @@ export const DealProfitCommission = () => {
 
                     <DealProfitItem
                         title='(=) Commission Profit:'
-                        value={0}
+                        value={Number(dealWashout.CommissionTotal) || 0}
                         currency='$'
                         justify='start'
                         className='deal-profit__item--blue'
                         fieldName='commissionProfit'
-                        onChange={({ value }) => {}}
+                        onChange={({ value }) => {
+                            changeDealWashout("CommissionTotal", String(value));
+                        }}
                     />
                 </div>
                 <Button
@@ -115,4 +133,4 @@ export const DealProfitCommission = () => {
             </div>
         </Card>
     );
-};
+});
