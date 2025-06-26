@@ -22,6 +22,7 @@ import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { MakesListData } from "common/models/inventory";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { InputMask } from "primereact/inputmask";
 
 export const DealRetailTradeFirst = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -45,7 +46,8 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
         changeDeal,
         changeDealExtData,
     } = store;
-    const { values, errors, setFieldValue } = useFormikContext<PartialDeal>();
+    const { values, errors, setFieldValue, setFieldTouched, handleBlur } =
+        useFormikContext<PartialDeal>();
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
@@ -497,15 +499,23 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
 
             <div className='col-3 relative'>
                 <span className='p-float-label'>
-                    <InputText
-                        className={`'deal-trade__text-input w-full' ${
+                    <InputMask
+                        type='tel'
+                        mask='999-999-9999'
+                        value={values.Trade1_Lien_Phone}
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("Trade1_Lien_Phone", value);
+                            value &&
+                                changeDealExtData({
+                                    key: "Trade1_Lien_Phone",
+                                    value: value ?? "",
+                                });
+                            setFieldTouched("Trade1_Lien_Phone", true, true);
+                        }}
+                        className={`deal-trade__text-input w-full ${
                             errors.Trade1_Lien_Phone ? "p-invalid" : ""
                         }`}
-                        value={values.Trade1_Lien_Phone}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("Trade1_Lien_Phone", value);
-                            changeDealExtData({ key: "Trade1_Lien_Phone", value });
-                        }}
+                        onBlur={handleBlur}
                     />
                     <label className='float-label'>Phone Number</label>
                 </span>
