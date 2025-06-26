@@ -448,6 +448,7 @@ export interface DealWashout extends BaseResponseError {
     AH: string;
     AH_Cost: string;
     AH_Profit: string;
+    AH_Type: 0 | 1;
     Accessory: string;
     Accessory_Cost: string;
     Accessory_Profit: string;
@@ -461,6 +462,7 @@ export interface DealWashout extends BaseResponseError {
     CL: string;
     CL_Cost: string;
     CL_Profit: string;
+    CL_Type: 0 | 1;
     CollectedInterestOther: string;
     Comm2Options: 0 | 1;
     Commission1: string;
@@ -490,6 +492,7 @@ export interface DealWashout extends BaseResponseError {
     PurchaseCost: string;
     Reserve: string;
     ReserveRefund: string;
+    Reserve_Type: 0 | 1;
     StockNo: string;
     TotalCollected: string;
     TotalCollectedInterest: string;
@@ -503,6 +506,7 @@ export interface DealWashout extends BaseResponseError {
     VSI: string;
     VSI_Cost: string;
     VSI_Profit: string;
+    VSI_Type: 0 | 1;
     VehicleCost: string;
     VehiclePack: string;
     VehicleProfit: string;
