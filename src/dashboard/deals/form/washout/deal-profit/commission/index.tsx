@@ -6,6 +6,7 @@ import { DealProfitItem, INCLUDE_OPTIONS } from "..";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { SalesmanSelectDialog } from "./salesman-select-dialog";
 
 const COMMISSION_2_OPTIONS = [
     { label: "Figure Before Commission", value: 0 },
@@ -22,6 +23,10 @@ export const DealProfitCommission = observer(() => {
     const [includeManagerOverride, setIncludeManagerOverride] = useState<INCLUDE_OPTIONS | null>(
         null
     );
+    const [salesmanSelectDialogVisible, setSalesmanSelectDialogVisible] = useState<boolean>(false);
+    const [manager, setManager] = useState<string>("");
+    const [salesmanFirst, setSalesmanFirst] = useState<string>("");
+    const [salesmanSecond, setSalesmanSecond] = useState<string>("");
 
     return (
         <Card className='profit-card profit-commission'>
@@ -129,8 +134,21 @@ export const DealProfitCommission = observer(() => {
                     icon='pi pi-user-plus'
                     tooltip='Select Salesman'
                     className='profit-commission__salesman-button'
+                    onClick={() => setSalesmanSelectDialogVisible(true)}
                 />
             </div>
+            {salesmanSelectDialogVisible && (
+                <SalesmanSelectDialog
+                    manager={manager}
+                    salesmanFirst={salesmanFirst}
+                    salesmanSecond={salesmanSecond}
+                    onManagerChange={setManager}
+                    onSalesmanFirstChange={setSalesmanFirst}
+                    onSalesmanSecondChange={setSalesmanSecond}
+                    visible={salesmanSelectDialogVisible}
+                    onHide={() => setSalesmanSelectDialogVisible(false)}
+                />
+            )}
         </Card>
     );
 });

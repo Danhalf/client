@@ -106,6 +106,9 @@ export const DealProfitItem = observer(
                             />
                         )}
                         <CurrencyInput
+                            currencyIcon={
+                                currency === CURRENCY_OPTIONS.PERCENT ? "percent" : "dollar"
+                            }
                             className={`deal-profit__input ${fieldChanged ? "input-change" : ""}`}
                             {...props}
                             onChange={handleChange}
