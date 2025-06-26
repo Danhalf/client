@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement } from "react";
+import { ReactElement, useState } from "react";
 import "./index.css";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InputText } from "primereact/inputtext";
@@ -7,6 +7,7 @@ import { BorderedCheckbox, CurrencyInput, DateInput } from "dashboard/common/for
 import { InputTextarea } from "primereact/inputtextarea";
 import { useStore } from "store/hooks";
 import { InputNumber } from "primereact/inputnumber";
+import { InputMask } from "primereact/inputmask";
 
 const [MIN_LIMIT, MAX_LIMIT] = [0, 1000000];
 
@@ -32,6 +33,7 @@ export const DealRetailInsurance = observer((): ReactElement => {
         },
         changeDealExtData,
     } = store;
+    const [errors, setErrors] = useState<{ Agent_Phone_No?: string }>({});
     return (
         <div className='grid deal-insurance row-gap-2'>
             <div className='col-6'>
@@ -138,17 +140,25 @@ export const DealRetailInsurance = observer((): ReactElement => {
                     <label className='float-label'>Agent's Address</label>
                 </span>
             </div>
-            <div className='col-3'>
+
+            <div className='col-3 relative'>
                 <span className='p-float-label'>
-                    <InputText
-                        value={Agent_Phone_No}
+                    <InputMask
+                        mask='999-999-9999'
+                        value={Agent_Phone_No ?? ""}
                         onChange={({ target: { value } }) => {
-                            changeDealExtData({ key: "Agent_Phone_No", value });
+                            if (value?.match(/[a-zA-Z]/)) {
+                                setErrors({ Agent_Phone_No: "Phone number must be numbers only" });
+                            } else {
+                                setErrors({ Agent_Phone_No: "" });
+                            }
+                            changeDealExtData({ key: "Agent_Phone_No", value: value ?? "" });
                         }}
                         className='deal-insurance__text-input w-full'
                     />
                     <label className='float-label'>Phone Number</label>
                 </span>
+                <small className='p-error'>{errors.Agent_Phone_No}</small>
             </div>
 
             <hr className='form-line' />
