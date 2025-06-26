@@ -14,7 +14,7 @@ import { useFormikContext } from "formik";
 import { InputNumber } from "primereact/inputnumber";
 import { Checkbox } from "primereact/checkbox";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
-import { CurrencyInput, DateInput } from "dashboard/common/form/inputs";
+import { CurrencyInput, DateInput, PhoneInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { PartialDeal } from "dashboard/deals/form";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
@@ -22,7 +22,6 @@ import { VehicleDecodeInfo } from "http/services/vin-decoder.service";
 import { MakesListData } from "common/models/inventory";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
-import { InputMask } from "primereact/inputmask";
 
 export const DealRetailTradeFirst = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -46,8 +45,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
         changeDeal,
         changeDealExtData,
     } = store;
-    const { values, errors, setFieldValue, setFieldTouched, handleBlur } =
-        useFormikContext<PartialDeal>();
+    const { values, errors, setFieldValue, setFieldTouched } = useFormikContext<PartialDeal>();
 
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
@@ -487,39 +485,26 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                             errors.Trade1_Lien_Address ? "p-invalid" : ""
                         }`}
                         value={values.Trade1_Lien_Address}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("Trade1_Lien_Address", value);
+                        onChange={async ({ target: { value } }) => {
+                            await setFieldValue("Trade1_Lien_Address", value);
+                            setFieldTouched("Trade1_Lien_Address", true);
                             changeDealExtData({ key: "Trade1_Lien_Address", value });
                         }}
+                        onBlur={() => setFieldTouched("Trade1_Lien_Address", true, true)}
                     />
                     <label className='float-label'>Mailing address</label>
                 </span>
                 <small className='p-error'>{errors.Trade1_Lien_Address}</small>
             </div>
 
-            <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputMask
-                        type='tel'
-                        mask='999-999-9999'
-                        value={values.Trade1_Lien_Phone}
-                        onChange={async ({ target: { value } }) => {
-                            await setFieldValue("Trade1_Lien_Phone", value);
-                            value &&
-                                changeDealExtData({
-                                    key: "Trade1_Lien_Phone",
-                                    value: value ?? "",
-                                });
-                            setFieldTouched("Trade1_Lien_Phone", true, true);
-                        }}
-                        className={`deal-trade__text-input w-full ${
-                            errors.Trade1_Lien_Phone ? "p-invalid" : ""
-                        }`}
-                        onBlur={handleBlur}
-                    />
-                    <label className='float-label'>Phone Number</label>
-                </span>
-                <small className='p-error'>{errors.Trade1_Lien_Phone}</small>
+            <div className='col-3'>
+                <PhoneInput
+                    name='Phone Number'
+                    value={values.Trade1_Lien_Phone}
+                    onChange={({ target: { value } }) => {
+                        changeDealExtData({ key: "Trade1_Lien_Phone", value: value ?? "" });
+                    }}
+                />
             </div>
             <div className='col-6'>
                 <CompanySearch
