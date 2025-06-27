@@ -17,6 +17,7 @@ import {
     setInventoryGroupOption,
 } from "http/services/settings.service";
 import { Loader } from "dashboard/common/loader";
+import { Status } from "common/models/base-response";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -75,8 +76,14 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
         try {
             const isNew = option.itemuid === NEW_ITEM;
             const response = await setInventoryGroupOption(inventoryGroupID, option);
-            if (response?.error) {
-                return Promise.reject(response.error);
+            if (response?.error || response?.status === Status.ERROR) {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: response?.error,
+                    life: TOAST_LIFETIME,
+                });
+                return;
             }
 
             await handleGetInventoryOptionsGroupList();
@@ -85,7 +92,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             toast.current?.show({
                 severity: "success",
                 summary: "Success",
-                detail: isNew ? "Option created successfully" : "Option updated successfully",
+                detail: `Option ${isNew ? "created" : "updated"} successfully`,
                 life: TOAST_LIFETIME,
             });
         } catch (error) {
