@@ -86,7 +86,8 @@ export class ReportStore {
             if (response?.status === Status.OK) {
                 const report = response as ReportInfo;
                 this._report = report;
-                await this.getUserReportCollections();
+
+                await this.getUserReportCollections(false);
 
                 const allCollections = [
                     ...this._customCollections.flatMap((c) => [c, ...(c.collections || [])]),
@@ -121,7 +122,11 @@ export class ReportStore {
         }
     });
 
-    getUserReportCollections = async () => {
+    getUserReportCollections = action(async (force: boolean = false) => {
+        if (this._allCollections.length > 0 && !force) {
+            return;
+        }
+
         const useruid = this.rootStore.userStore.authUser?.useruid!;
         const response = await getUserReportCollectionsContent(useruid);
         if (Array.isArray(response)) {
@@ -145,7 +150,7 @@ export class ReportStore {
         } else {
             this._allCollections = [];
         }
-    };
+    });
 
     public changeReport = action((key: keyof ReportInfo, value: string | number) => {
         this._report[key] = value as never;
@@ -182,6 +187,7 @@ export class ReportStore {
                         if (response?.status === Status.OK) {
                             uid = (response as ReportInfo).itemuid;
                             this._currentID = uid;
+                            return;
                         } else {
                             const { error } = response as BaseResponseError;
                             throw new Error(error);
