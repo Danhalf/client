@@ -80,6 +80,7 @@ const tabFields: Partial<Record<AccordionDealItems, (keyof PartialDeal)[]>> = {
         "SaleID",
     ],
     [AccordionDealItems.ODOMETER]: ["OdometerReading", "OdomDigits"],
+    [AccordionDealItems.LIENS]: ["First_Lien_Phone_Num"],
     [AccordionDealItems.FIRST_TRADE]: [
         "Trade1_Make",
         "Trade1_Model",
@@ -356,10 +357,16 @@ export const DealsForm = observer(() => {
                 });
                 setErrorSections(currentSectionsWithErrors);
 
+                const firstErrorKey = Object.keys(errors)[0];
+                const firstErrorMessage = errors[firstErrorKey as keyof typeof errors];
+
                 toast.current?.show({
                     severity: "error",
                     summary: "Validation Error",
-                    detail: "Please fill in all required fields.",
+                    detail:
+                        typeof firstErrorMessage === "string"
+                            ? firstErrorMessage
+                            : "Please fill in all required fields.",
                     life: TOAST_LIFETIME,
                 });
             }
