@@ -22,6 +22,7 @@ import { ContactUser } from "common/models/contact";
 import { Inventory } from "common/models/inventory";
 import { useLocation, useParams } from "react-router-dom";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { parseDateFromServer } from "common/helpers";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
@@ -226,7 +227,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("dateeffective")}
                     className={`${errors.dateeffective && "p-invalid"}`}
                     name='Sale date (required)'
-                    date={values.dateeffective}
+                    date={parseDateFromServer(values.dateeffective)}
                     emptyDate
                     onChange={({ value }) => {
                         setFieldValue("dateeffective", value);
@@ -240,7 +241,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("datepurchase")}
                     className={`${errors.datepurchase && "p-invalid"}`}
                     name='First operated (required)'
-                    date={values.datepurchase}
+                    date={parseDateFromServer(values.datepurchase)}
                     emptyDate
                     onChange={({ value }) => {
                         setFieldValue("datepurchase", value);
