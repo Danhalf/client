@@ -104,6 +104,7 @@ export const DealGeneralSale = observer((): ReactElement => {
         setFieldValue(
             "contactinfo",
             contact.companyName ||
+                contact.businessName ||
                 `${contact.firstName} ${contact.lastName}`.trim() ||
                 contact.userName
         );
@@ -111,6 +112,7 @@ export const DealGeneralSale = observer((): ReactElement => {
             key: "contactinfo",
             value:
                 contact.companyName ||
+                contact.businessName ||
                 `${contact.firstName} ${contact.lastName}`.trim() ||
                 contact.userName,
         });
