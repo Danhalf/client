@@ -102,6 +102,7 @@ export class InventoryStore {
     private _deleteReason: string = "";
     private _memoRoute: string = "";
     private _activeTab: number | null = null;
+    private _isErasingNeeded: boolean = true;
     private _inventoryLoaded: boolean = false;
     protected _tabLength: number = 0;
 
@@ -216,6 +217,10 @@ export class InventoryStore {
 
     public get inventoryLoaded() {
         return this._inventoryLoaded;
+    }
+
+    public get isErasingNeeded() {
+        return this._isErasingNeeded;
     }
 
     public getInventory = async () => {
@@ -885,6 +890,10 @@ export class InventoryStore {
         this._memoRoute = state;
     }
 
+    public set isErasingNeeded(state: boolean) {
+        this._isErasingNeeded = state;
+    }
+
     public clearMedia = () => {
         this._inventoryImagesID = [];
         this._images = [];
@@ -899,17 +908,22 @@ export class InventoryStore {
     };
 
     public clearInventory = () => {
-        this._inventory = {} as Inventory;
-        this._inventoryAudit = initialAuditState as Audit;
-        this._inventoryGroupID = "";
-        this._inventoryOptions = [];
-        this._inventoryExtData = {} as InventoryExtData;
-        this._exportWeb = {} as InventoryWebInfo;
-        this._exportWebHistory = [] as InventoryExportWebHistory[];
-        this._printList = [] as InventoryPrintForm[];
-        this._isFormChanged = false;
-        this._formErrorMessage = "";
-        this._deleteReason = "";
-        this.clearMedia();
+        // eslint-disable-next-line no-console
+        console.log("clearInventory", this._isErasingNeeded);
+        if (this._isErasingNeeded) {
+            this._isErasingNeeded = true;
+            this._inventory = {} as Inventory;
+            this._inventoryAudit = initialAuditState as Audit;
+            this._inventoryGroupID = "";
+            this._inventoryOptions = [];
+            this._inventoryExtData = {} as InventoryExtData;
+            this._exportWeb = {} as InventoryWebInfo;
+            this._exportWebHistory = [] as InventoryExportWebHistory[];
+            this._printList = [] as InventoryPrintForm[];
+            this._isFormChanged = false;
+            this._formErrorMessage = "";
+            this._deleteReason = "";
+            this.clearMedia();
+        }
     };
 }
