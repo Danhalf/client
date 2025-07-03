@@ -489,7 +489,7 @@ export class InventoryStore {
     });
 
     private saveInventoryMedia = action(
-        async (mediaType: MediaType): Promise<Status | undefined> => {
+        async (mediaType: MediaType): Promise<{ status: Status; savedItems?: MediaItem[] }> => {
             try {
                 this._isLoading = true;
                 const currentMt = new Map([
@@ -498,6 +498,8 @@ export class InventoryStore {
                     [MediaType.mtAudio, this._uploadFileAudios],
                     [MediaType.mtDocument, this._uploadFileDocuments],
                 ]);
+
+                const savedItems: MediaItem[] = [];
                 const uploadPromises = (currentMt.get(mediaType) || { file: [] }).file.map(
                     async (file) => {
                         const formData = new FormData();
@@ -513,20 +515,38 @@ export class InventoryStore {
                                     formData
                                 )) as InventorySetResponse;
                                 if (uploadMediaResponse?.status === Status.OK) {
-                                    await setMediaItemData(this._inventoryID, {
-                                        mediaitemuid: uploadMediaResponse.itemuid,
-                                        contenttype: (currentMt.get(mediaType) as UploadMediaItem)
-                                            .data.contenttype,
-                                        notes: (currentMt.get(mediaType) as UploadMediaItem).data
-                                            .notes,
-                                        type: mediaType,
-                                    }).then((response) => {
-                                        if (response?.status === Status.ERROR) {
-                                            const { error } = response as BaseResponseError;
-                                            this._formErrorMessage =
-                                                error || "Failed to upload file";
+                                    const mediaDataResponse = await setMediaItemData(
+                                        this._inventoryID,
+                                        {
+                                            mediaitemuid: uploadMediaResponse.itemuid,
+                                            contenttype: (
+                                                currentMt.get(mediaType) as UploadMediaItem
+                                            ).data.contenttype,
+                                            notes: (currentMt.get(mediaType) as UploadMediaItem)
+                                                .data.notes,
+                                            type: mediaType,
                                         }
-                                    });
+                                    );
+
+                                    if (mediaDataResponse?.status === Status.ERROR) {
+                                        const { error } = mediaDataResponse as BaseResponseError;
+                                        this._formErrorMessage = error || "Failed to upload file";
+                                    } else {
+                                        const savedItem: MediaItem = {
+                                            src: URL.createObjectURL(file),
+                                            itemuid: uploadMediaResponse.itemuid,
+                                            mediauid: uploadMediaResponse.itemuid,
+                                            info: {
+                                                contenttype: (
+                                                    currentMt.get(mediaType) as UploadMediaItem
+                                                ).data.contenttype,
+                                                notes: (currentMt.get(mediaType) as UploadMediaItem)
+                                                    .data.notes,
+                                                created: new Date().toISOString(),
+                                            },
+                                        };
+                                        savedItems.push(savedItem);
+                                    }
                                 }
                             }
                         } finally {
@@ -538,9 +558,9 @@ export class InventoryStore {
 
                 await Promise.all(uploadPromises);
 
-                return Status.OK;
+                return { status: Status.OK, savedItems };
             } catch (error) {
-                return undefined;
+                return { status: Status.ERROR };
             } finally {
                 this._isLoading = false;
             }
@@ -554,11 +574,14 @@ export class InventoryStore {
 
             const existingLink = this._links.find(
                 (link) =>
-                    link.info && (link.info as any).mediaurl === this._uploadFileLinks.mediaurl
+                    link.info &&
+                    (link.info as any).mediaurl === this._uploadFileLinks.mediaurl &&
+                    (link.info as any).contenttype === this._uploadFileLinks.contenttype &&
+                    (link.info as any).notes === this._uploadFileLinks.notes
             );
 
             if (existingLink) {
-                this._formErrorMessage = "A link with this URL already exists";
+                this._formErrorMessage = "A link with this URL, category, and notes already exists";
                 return Status.ERROR;
             }
 
@@ -595,33 +618,42 @@ export class InventoryStore {
 
     public saveInventoryImages = action(async (): Promise<Status | undefined> => {
         try {
-            this._images = [];
-            await this.saveInventoryMedia(MediaType.mtPhoto);
-            this._uploadFileImages = initialMediaItem;
-            this.fetchImages();
-            return Status.OK;
+            const { status, savedItems } = await this.saveInventoryMedia(MediaType.mtPhoto);
+            if (status === Status.OK) {
+                this._uploadFileImages = initialMediaItem;
+                if (savedItems) {
+                    this._images = [...this._images, ...savedItems];
+                }
+            }
+            return status;
         } catch (error) {
             return undefined;
         }
     });
     public saveInventoryVideos = action(async (): Promise<Status | undefined> => {
         try {
-            this._videos = [];
-            await this.saveInventoryMedia(MediaType.mtVideo);
-            this._uploadFileVideos = initialMediaItem;
-            this.fetchVideos();
-            return Status.OK;
+            const { status, savedItems } = await this.saveInventoryMedia(MediaType.mtVideo);
+            if (status === Status.OK) {
+                this._uploadFileVideos = initialMediaItem;
+                if (savedItems) {
+                    this._videos = [...this._videos, ...savedItems];
+                }
+            }
+            return status;
         } catch (error) {
             return undefined;
         }
     });
     public saveInventoryAudios = action(async (): Promise<Status | undefined> => {
         try {
-            this._audios = [];
-            await this.saveInventoryMedia(MediaType.mtAudio);
-            this._uploadFileAudios = initialMediaItem;
-            this.fetchAudios();
-            return Status.OK;
+            const { status, savedItems } = await this.saveInventoryMedia(MediaType.mtAudio);
+            if (status === Status.OK) {
+                this._uploadFileAudios = initialMediaItem;
+                if (savedItems) {
+                    this._audios = [...this._audios, ...savedItems];
+                }
+            }
+            return status;
         } catch (error) {
             return undefined;
         }
@@ -629,11 +661,14 @@ export class InventoryStore {
 
     public saveInventoryDocuments = action(async (): Promise<Status | undefined> => {
         try {
-            this._documents = [];
-            await this.saveInventoryMedia(MediaType.mtDocument);
-            this._uploadFileDocuments = initialMediaItem;
-            this.fetchDocuments();
-            return Status.OK;
+            const { status, savedItems } = await this.saveInventoryMedia(MediaType.mtDocument);
+            if (status === Status.OK) {
+                this._uploadFileDocuments = initialMediaItem;
+                if (savedItems) {
+                    this._documents = [...this._documents, ...savedItems];
+                }
+            }
+            return status;
         } catch (error) {
             return undefined;
         }
@@ -643,6 +678,7 @@ export class InventoryStore {
         try {
             const result = await this.saveInventoryMediaLink();
             if (result === Status.OK) {
+                this._uploadFileLinks = initialMediaLink;
                 await this.fetchLinks();
             }
             return undefined;
@@ -908,8 +944,6 @@ export class InventoryStore {
     };
 
     public clearInventory = () => {
-        // eslint-disable-next-line no-console
-        console.log("clearInventory", this._isErasingNeeded);
         if (this._isErasingNeeded) {
             this._isErasingNeeded = true;
             this._inventory = {} as Inventory;
