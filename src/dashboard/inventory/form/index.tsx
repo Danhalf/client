@@ -46,7 +46,10 @@ type PartialInventory = Pick<
     | "TypeOfFuel_id"
 >;
 
-type PartialInventoryExtData = Pick<InventoryExtData, "purPurchaseEmail" | "purPurchasePhone">;
+type PartialInventoryExtData = Pick<
+    InventoryExtData,
+    "purPurchaseEmail" | "purPurchasePhone" | "titleHolderPhone" | "titlePrevPhone"
+>;
 
 const tabFields: Partial<
     Record<AccordionItems, (keyof PartialInventory)[] | (keyof PartialInventoryExtData)[]>
@@ -62,6 +65,7 @@ const tabFields: Partial<
     ],
     [AccordionItems.DESCRIPTION]: ["TypeOfFuel_id"],
     [AccordionItems.PURCHASES]: ["purPurchaseEmail", "purPurchasePhone"],
+    [AccordionItems.TITLE]: ["titleHolderPhone", "titlePrevPhone"],
 };
 
 const MIN_YEAR = 1970;
@@ -219,6 +223,12 @@ export const InventoryForm = observer(() => {
             TypeOfFuel_id: Yup.string().trim().required("Data is required."),
             purPurchaseEmail: Yup.string().email("Invalid email address"),
             purPurchasePhone: Yup.string().test("is-valid-phone", "Invalid phone number", (value) =>
+                PHONE_NUMBER_REGEX.test(value || "")
+            ),
+            titleHolderPhone: Yup.string().test("is-valid-phone", "Invalid phone number", (value) =>
+                PHONE_NUMBER_REGEX.test(value || "")
+            ),
+            titlePrevPhone: Yup.string().test("is-valid-phone", "Invalid phone number", (value) =>
                 PHONE_NUMBER_REGEX.test(value || "")
             ),
         });
@@ -558,6 +568,10 @@ export const InventoryForm = observer(() => {
                                                         inventoryExtData?.purPurchaseEmail || "",
                                                     purPurchasePhone:
                                                         inventoryExtData?.purPurchasePhone || "",
+                                                    titleHolderPhone:
+                                                        inventoryExtData?.titleHolderPhone || "",
+                                                    titlePrevPhone:
+                                                        inventoryExtData?.titlePrevPhone || "",
                                                 } as PartialInventory
                                             }
                                             enableReinitialize
