@@ -478,6 +478,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                         })
                     }
                     emptyDate
+                    checkboxWithLabel
                     name='PO Good Thru'
                 />
             </div>
