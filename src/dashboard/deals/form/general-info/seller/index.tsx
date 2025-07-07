@@ -9,12 +9,9 @@ import { getContactsSalesmanList } from "http/services/contacts-service";
 
 enum DealGeneralSellerKeys {
     FIRST_SALES_PERSON_ID = "salesperson1uid",
-    FIRST_SALES_PERSON_NAME = "salesperson1name",
     SECOND_SALES_PERSON_ID = "salesperson2uid",
-    SECOND_SALES_PERSON_NAME = "salesperson2name",
     DIFFERENT_SELLER = "differentSeller",
     DIFFERENT_SELLER_ID = "differentSellerUID",
-    DIFFERENT_SELLER_NAME = "differentSellerInfo",
 }
 
 export const DealGeneralSeller = observer((): ReactElement => {
@@ -24,7 +21,7 @@ export const DealGeneralSeller = observer((): ReactElement => {
     const [salespersonList, setSalespersonList] = useState<SalespersonsList[]>([]);
 
     const {
-        deal: { salesperson1name, salesperson2name, differentSeller, differentSellerInfo },
+        deal: { salesperson1uid, salesperson2uid, differentSeller, differentSellerUID },
         changeDeal,
     } = store;
 
@@ -44,9 +41,9 @@ export const DealGeneralSeller = observer((): ReactElement => {
             <div className='col-6'>
                 <ComboBox
                     options={salespersonList}
-                    optionLabel='name'
+                    optionLabel='username'
                     optionValue='useruid'
-                    value={salesperson1name}
+                    value={salesperson1uid}
                     onChange={(event) => {
                         changeDeal({
                             key: DealGeneralSellerKeys.FIRST_SALES_PERSON_ID,
@@ -59,9 +56,9 @@ export const DealGeneralSeller = observer((): ReactElement => {
             <div className='col-6'>
                 <ComboBox
                     options={salespersonList}
-                    optionLabel='name'
+                    optionLabel='username'
                     optionValue='useruid'
-                    value={salesperson2name}
+                    value={salesperson2uid}
                     onChange={(event) => {
                         changeDeal({
                             key: DealGeneralSellerKeys.SECOND_SALES_PERSON_ID,
@@ -90,9 +87,9 @@ export const DealGeneralSeller = observer((): ReactElement => {
                 <div className='col-6'>
                     <ComboBox
                         options={salespersonList}
-                        optionLabel='name'
+                        optionLabel='username'
                         optionValue='useruid'
-                        value={differentSellerInfo}
+                        value={differentSellerUID}
                         onChange={(event) => {
                             changeDeal({
                                 key: DealGeneralSellerKeys.DIFFERENT_SELLER_ID,

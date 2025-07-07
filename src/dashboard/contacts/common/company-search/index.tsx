@@ -10,7 +10,7 @@ import { getKeyValue } from "services/local-storage.service";
 import { DropdownProps } from "primereact/dropdown";
 import { ContactsDataTable } from "dashboard/contacts";
 
-const FIELD: keyof ContactUser = "userName";
+const FIELD: keyof ContactUser = "companyName";
 
 interface CompanySearchProps extends DropdownProps {
     onRowClick?: (companyName: string) => void;
