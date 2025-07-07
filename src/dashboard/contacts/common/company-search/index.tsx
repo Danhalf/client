@@ -64,7 +64,14 @@ export const CompanySearch = ({
         user &&
             getContacts(user.useruid, params).then((response) => {
                 if (response?.length) {
-                    setOptions(response);
+                    const optionsWithName = response.map((contact) => ({
+                        ...contact,
+                        name:
+                            contact.companyName ||
+                            contact.businessName ||
+                            `${contact.firstName} ${contact.lastName}`,
+                    }));
+                    setOptions(optionsWithName);
                 } else {
                     setOptions([]);
                 }
@@ -86,8 +93,8 @@ export const CompanySearch = ({
             <SearchInput
                 name={name}
                 title={name}
-                optionValue={onChangeGetFullInfo ? undefined : returnedField || FIELD}
-                optionLabel={FIELD}
+                optionValue={returnedField || FIELD}
+                optionLabel='name'
                 options={options}
                 onInputChange={handleCompanyInputChange}
                 value={value}
