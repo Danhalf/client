@@ -50,7 +50,7 @@ export const DealGeneralSeller = observer((): ReactElement => {
                             value: event.target.value,
                         });
                     }}
-                    name='Salesman 1'
+                    label='Salesman 1'
                 />
             </div>
             <div className='col-6'>
@@ -65,7 +65,7 @@ export const DealGeneralSeller = observer((): ReactElement => {
                             value: event.target.value,
                         });
                     }}
-                    name='Salesman 2'
+                    label='Salesman 2'
                 />
             </div>
 
@@ -96,7 +96,7 @@ export const DealGeneralSeller = observer((): ReactElement => {
                                 value: event.target.value,
                             });
                         }}
-                        name='Seller'
+                        label='Seller'
                     />
                 </div>
             )}
