@@ -46,7 +46,8 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { errors, values, validateField, setFieldValue } = useFormikContext<Contact>();
+    const { errors, values, validateField, setFieldValue, setFieldTouched } =
+        useFormikContext<Contact>();
 
     const [savedFirstName, setSavedFirstName] = useState<string>(contact.firstName || "");
     const [savedLastName, setSavedLastName] = useState<string>(contact.lastName || "");
@@ -131,6 +132,11 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                     ["Buyer_Date_Of_Birth", dobTimestamp],
                     ["Buyer_DL_Exp_Date", expTimestamp],
                 ]);
+
+                if (firstName || lastName || middleName) {
+                    setFieldValue("businessName", "");
+                    changeContact("businessName", "");
+                }
             } else {
                 const fieldsToUpdate = {
                     firstName,
@@ -381,6 +387,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                 setFieldValue("middleName", value, true).then(() => {
                                     changeContact("middleName", value);
                                     validateField("middleName");
+                                    setFieldTouched("middleName", true, true);
                                 });
                             }}
                             tooltip={

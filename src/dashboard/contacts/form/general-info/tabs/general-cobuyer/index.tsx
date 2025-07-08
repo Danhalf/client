@@ -20,7 +20,8 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contactExtData, changeContactExtData } = store;
 
-    const { errors, setFieldValue, validateField } = useFormikContext<ContactExtData>();
+    const { errors, setFieldValue, validateField, setFieldTouched } =
+        useFormikContext<ContactExtData>();
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -159,6 +160,11 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
                 const expTimestamp = parseCustomDate(exp);
                 changeContactExtData("CoBuyer_DL_Exp_Date", expTimestamp);
+
+                if (firstName || lastName || middleName) {
+                    setFieldValue("CoBuyer_Emp_Company", "");
+                    changeContactExtData("CoBuyer_Emp_Company", "");
+                }
             } else {
                 const fieldsToUpdate = {
                     CoBuyer_First_Name: firstName,
@@ -302,6 +308,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                         setFieldValue("CoBuyer_Middle_Name", value, true).then(() => {
                             changeContactExtData("CoBuyer_Middle_Name", value);
                             validateField("CoBuyer_Middle_Name");
+                            setFieldTouched("CoBuyer_Middle_Name", true, true);
                         });
                     }}
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
