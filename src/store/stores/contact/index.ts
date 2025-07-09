@@ -2,13 +2,24 @@ import { getInventoryMediaItem } from "http/services/media.service";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { Contact, ContactExtData, ContactOFAC, ContactProspect } from "common/models/contact";
 import { MediaType } from "common/models/enums";
-import { CreateMediaItemRecordResponse, InventorySetResponse } from "common/models/inventory";
+import {
+    CreateMediaItemRecordResponse,
+    InventorySetResponse,
+    InventoryMediaItemID,
+    MediaItem,
+    UploadMediaItem,
+    InventoryMedia,
+} from "common/models/inventory";
 import {
     deleteContactFrontDL,
     deleteContactBackDL,
     getContactInfo,
     setContactDL,
     setContact,
+    getContactMediaItemList,
+    getContactMediaItem,
+    uploadContactMedia,
+    deleteContactMedia,
 } from "http/services/contacts-service";
 import { createMediaItemRecord, uploadInventoryMedia } from "http/services/media.service";
 import { action, makeAutoObservable } from "mobx";
@@ -20,6 +31,14 @@ enum DLSides {
 }
 
 export type DLSide = DLSides.FRONT | DLSides.BACK;
+
+const initialMediaItem: UploadMediaItem = {
+    file: [],
+    data: {
+        contenttype: MediaType.mtUnknown,
+        notes: "",
+    },
+};
 
 export class ContactStore {
     public rootStore: RootStore;
@@ -45,6 +64,11 @@ export class ContactStore {
     private _deleteReason: string = "";
     private _activeTab: number | null = null;
     private _tabLength: number = 0;
+
+    // Documents related properties
+    private _contactDocumentsID: Partial<InventoryMediaItemID>[] = [];
+    private _uploadFileDocuments: UploadMediaItem = initialMediaItem;
+    private _documents: MediaItem[] = [];
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -136,6 +160,14 @@ export class ContactStore {
             ...this._contact,
             extdata: this.contactExtData,
         };
+    }
+
+    public get documents() {
+        return this._documents;
+    }
+
+    public get uploadFileDocuments() {
+        return this._uploadFileDocuments;
     }
 
     public getContact = async (itemuid: string) => {
@@ -522,4 +554,161 @@ export class ContactStore {
         this._coBuyerContactOFAC = {} as ContactOFAC;
         this._deleteReason = "";
     };
+
+    private getContactMedia = async (): Promise<Status> => {
+        try {
+            const mediaList = await getContactMediaItemList(this._contactID);
+            if (mediaList) {
+                (mediaList as InventoryMedia[]).forEach((media) => {
+                    if (media.type === MediaType.mtDocument) {
+                        this._contactDocumentsID.push({
+                            itemuid: media.itemuid,
+                            mediauid: media.mediauid,
+                            inventoryuid: media.inventoryuid,
+                        });
+                    }
+                });
+            }
+            return Status.OK;
+        } catch (error) {
+            return Status.ERROR;
+        }
+    };
+
+    private async fetchContactMedia(
+        mediaType: MediaType,
+        mediaArray: MediaItem[],
+        contactMediaID: Partial<InventoryMediaItemID>[]
+    ) {
+        try {
+            const result: MediaItem[] = [...mediaArray];
+
+            await Promise.all(
+                contactMediaID.map(async ({ mediauid, itemuid }, index: number) => {
+                    if (mediauid && itemuid) {
+                        const responseSrc = await getContactMediaItem(mediauid);
+                        if (responseSrc) {
+                            result[index] = {
+                                info: result[index].info,
+                                itemuid,
+                                mediauid,
+                                src: responseSrc as string,
+                            };
+                        }
+                    }
+                })
+            );
+
+            if (mediaType === MediaType.mtDocument) {
+                this._documents = result;
+            }
+        } catch (error) {
+        } finally {
+            this._isLoading = false;
+        }
+    }
+
+    public fetchDocuments = action(async () => {
+        this._documents = [];
+        this._contactDocumentsID = [];
+        await this.getContactMedia();
+        await this.fetchContactMedia(
+            MediaType.mtDocument,
+            this._documents,
+            this._contactDocumentsID
+        );
+    });
+
+    private saveContactMedia = action(
+        async (mediaType: MediaType): Promise<{ status: Status; savedItems?: MediaItem[] }> => {
+            try {
+                const { file, data } = this._uploadFileDocuments;
+                if (!file.length) {
+                    return { status: Status.ERROR };
+                }
+
+                const mediaItemRecord = await createMediaItemRecord(mediaType);
+                if (!mediaItemRecord || mediaItemRecord.status === Status.ERROR) {
+                    return { status: Status.ERROR };
+                }
+
+                const formData = new FormData();
+                file.forEach((f) => {
+                    formData.append("files", f);
+                });
+
+                const uploadResponse = await uploadContactMedia(
+                    (mediaItemRecord as CreateMediaItemRecordResponse).itemUID,
+                    formData
+                );
+
+                if (!uploadResponse || uploadResponse.status === Status.ERROR) {
+                    return { status: Status.ERROR };
+                }
+
+                const mediaItems: MediaItem[] = [];
+                for (let i = 0; i < file.length; i++) {
+                    const mediaItem = {
+                        itemuid: (mediaItemRecord as CreateMediaItemRecordResponse).itemUID,
+                        mediauid: (uploadResponse as InventorySetResponse).itemuid,
+                        src: URL.createObjectURL(file[i]),
+                        info: {
+                            contenttype: data.contenttype || MediaType.mtUnknown,
+                            notes: data.notes || "",
+                            created: new Date().toISOString(),
+                            updated: new Date().toISOString(),
+                            useruid: this.rootStore.userStore.authUser?.useruid || "",
+                        },
+                    };
+                    mediaItems.push(mediaItem);
+                }
+
+                return { status: Status.OK, savedItems: mediaItems };
+            } catch (error) {
+                return { status: Status.ERROR };
+            }
+        }
+    );
+
+    public saveContactDocuments = action(async (): Promise<Status | undefined> => {
+        try {
+            const { status, savedItems } = await this.saveContactMedia(MediaType.mtDocument);
+            if (status === Status.OK) {
+                this._uploadFileDocuments = initialMediaItem;
+                if (savedItems) {
+                    this._documents = [...this._documents, ...savedItems];
+                }
+            }
+            return status;
+        } catch (error) {
+            return undefined;
+        }
+    });
+
+    public removeContactMedia = action(
+        async (mediauid: string, cb: () => void): Promise<Status | undefined> => {
+            try {
+                this._isLoading = true;
+                await deleteContactMedia(mediauid);
+
+                await cb();
+
+                return Status.OK;
+            } catch (error) {
+                return undefined;
+            } finally {
+                this._isLoading = false;
+            }
+        }
+    );
+
+    public clearContactMedia = () => {
+        this._documents = [];
+        this._contactDocumentsID = [];
+        this._uploadFileDocuments = initialMediaItem;
+    };
+
+    public set uploadFileDocuments(files: UploadMediaItem) {
+        this._uploadFileDocuments = files;
+    }
 }
