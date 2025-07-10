@@ -3,7 +3,6 @@ import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
-import { DropdownChangeEvent } from "primereact/dropdown";
 import {
     FileUpload,
     FileUploadUploadEvent,
@@ -20,7 +19,6 @@ import { Checkbox } from "primereact/checkbox";
 import { Image } from "primereact/image";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
-import { ComboBox } from "dashboard/common/form/dropdown";
 
 const limitations: MediaLimitations = {
     formats: ["PDF", "PNG", "JPEG", "TIFF"],
@@ -51,16 +49,6 @@ export const ContactsDocuments = observer((): ReactElement => {
             clearContactMedia();
         };
     }, []);
-
-    const handleCategorySelect = (e: DropdownChangeEvent) => {
-        store.uploadFileDocuments = {
-            ...store.uploadFileDocuments,
-            data: {
-                ...store.uploadFileDocuments.data,
-                contenttype: e.target.value,
-            },
-        };
-    };
 
     const handleCommentaryChange = (e: ChangeEvent<HTMLInputElement>) => {
         store.uploadFileDocuments = {
@@ -94,12 +82,10 @@ export const ContactsDocuments = observer((): ReactElement => {
         callback();
     };
 
-    const handleUploadFiles = () => {
-        saveContactDocuments().then((res) => {
-            if (res) {
-                fileUploadRef.current?.clear();
-            }
-        });
+    const handleUploadFiles = async () => {
+        await saveContactDocuments();
+        setTotalCount(0);
+        fileUploadRef.current?.clear();
     };
 
     const handleCheckedChange = (index?: number) => {
@@ -223,15 +209,6 @@ export const ContactsDocuments = observer((): ReactElement => {
                 className='col-12'
             />
             <div className='col-12 mt-4 media-input'>
-                <ComboBox
-                    className='media-input__dropdown'
-                    placeholder='Category'
-                    optionLabel={"name"}
-                    optionValue={"id"}
-                    options={[...CATEGORIES]}
-                    value={uploadFileDocuments?.data?.contenttype || 0}
-                    onChange={handleCategorySelect}
-                />
                 <InputText
                     className='media-input__text'
                     placeholder='Comment'
@@ -243,6 +220,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                     disabled={!totalCount || isLoading}
                     className='p-button media-input__button'
                     onClick={handleUploadFiles}
+                    type='button'
                 >
                     Save
                 </Button>
@@ -302,12 +280,13 @@ export const ContactsDocuments = observer((): ReactElement => {
                                         <span className='document-info__text'>{info?.created}</span>
                                     </div>
                                 </div>
-                                <button
+                                <Button
                                     className='media-documents__close'
+                                    type='button'
                                     onClick={() => handleDeleteDocument(itemuid)}
                                 >
                                     <i className='pi pi-times' />
-                                </button>
+                                </Button>
                             </div>
                         );
                     })

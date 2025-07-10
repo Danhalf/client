@@ -633,8 +633,8 @@ export class ContactStore {
                 }
 
                 const formData = new FormData();
-                file.forEach((f) => {
-                    formData.append("files", f);
+                file.forEach((file) => {
+                    formData.append("files", file);
                 });
 
                 const uploadResponse = await uploadContactMedia(
@@ -655,8 +655,7 @@ export class ContactStore {
                         info: {
                             contenttype: data.contenttype || MediaType.mtUnknown,
                             notes: data.notes || "",
-                            created: new Date().toISOString(),
-                            updated: new Date().toISOString(),
+
                             useruid: this.rootStore.userStore.authUser?.useruid || "",
                         },
                     };
@@ -672,7 +671,7 @@ export class ContactStore {
 
     public saveContactDocuments = action(async (): Promise<Status | undefined> => {
         try {
-            const { status, savedItems } = await this.saveContactMedia(MediaType.mtDocument);
+            const { status, savedItems } = await this.saveContactMedia(MediaType.mtPhoto);
             if (status === Status.OK) {
                 this._uploadFileDocuments = initialMediaItem;
                 if (savedItems) {

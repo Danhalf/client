@@ -64,6 +64,9 @@
 .media-input {
     display: flex;
     justify-content: space-between;
+
+    gap: 25px;
+    padding: 0;
 }
 
 .media-input__dropdown,
