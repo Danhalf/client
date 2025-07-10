@@ -152,7 +152,7 @@
 
 .media-documents__item {
     display: flex;
-    width: 48%;
+    width: 32%;
     box-shadow: 1px 1px 5px 0px rgba(41, 93, 194, 0.5);
     padding: 15px;
     align-items: center;

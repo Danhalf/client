@@ -1,12 +1,17 @@
 import { getInventoryMediaItem } from "http/services/media.service";
 import { BaseResponseError, Status } from "common/models/base-response";
-import { Contact, ContactExtData, ContactOFAC, ContactProspect } from "common/models/contact";
+import {
+    Contact,
+    ContactExtData,
+    ContactMediaItem,
+    ContactOFAC,
+    ContactProspect,
+} from "common/models/contact";
 import { MediaType } from "common/models/enums";
 import {
     CreateMediaItemRecordResponse,
     InventorySetResponse,
     InventoryMediaItemID,
-    MediaItem,
     UploadMediaItem,
     InventoryMedia,
 } from "common/models/inventory";
@@ -20,6 +25,7 @@ import {
     getContactMediaItem,
     uploadContactMedia,
     deleteContactMedia,
+    setContactMediaItemData,
 } from "http/services/contacts-service";
 import { createMediaItemRecord, uploadInventoryMedia } from "http/services/media.service";
 import { action, makeAutoObservable } from "mobx";
@@ -65,10 +71,10 @@ export class ContactStore {
     private _activeTab: number | null = null;
     private _tabLength: number = 0;
 
-    // Documents related properties
     private _contactDocumentsID: Partial<InventoryMediaItemID>[] = [];
     private _uploadFileDocuments: UploadMediaItem = initialMediaItem;
-    private _documents: MediaItem[] = [];
+    private _documents: Partial<ContactMediaItem>[] = [];
+    private _formErrorMessage: string = "";
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -168,6 +174,10 @@ export class ContactStore {
 
     public get uploadFileDocuments() {
         return this._uploadFileDocuments;
+    }
+
+    public get formErrorMessage() {
+        return this._formErrorMessage;
     }
 
     public getContact = async (itemuid: string) => {
@@ -560,7 +570,7 @@ export class ContactStore {
             const mediaList = await getContactMediaItemList(this._contactID);
             if (mediaList) {
                 (mediaList as InventoryMedia[]).forEach((media) => {
-                    if (media.type === MediaType.mtDocument) {
+                    if (media.type === MediaType.mtPhoto || media.type === MediaType.mtDocument) {
                         this._contactDocumentsID.push({
                             itemuid: media.itemuid,
                             mediauid: media.mediauid,
@@ -577,32 +587,29 @@ export class ContactStore {
 
     private async fetchContactMedia(
         mediaType: MediaType,
-        mediaArray: MediaItem[],
+        mediaArray: Partial<ContactMediaItem>[],
         contactMediaID: Partial<InventoryMediaItemID>[]
     ) {
         try {
-            const result: MediaItem[] = [...mediaArray];
-
+            const result: Partial<ContactMediaItem>[] = [...mediaArray];
             await Promise.all(
                 contactMediaID.map(async ({ mediauid, itemuid }, index: number) => {
                     if (mediauid && itemuid) {
                         const responseSrc = await getContactMediaItem(mediauid);
                         if (responseSrc) {
                             result[index] = {
-                                info: result[index].info,
+                                src: responseSrc as string,
                                 itemuid,
                                 mediauid,
-                                src: responseSrc as string,
                             };
                         }
                     }
                 })
             );
 
-            if (mediaType === MediaType.mtDocument) {
+            if (mediaType === MediaType.mtPhoto || mediaType === MediaType.mtDocument) {
                 this._documents = result;
             }
-        } catch (error) {
         } finally {
             this._isLoading = false;
         }
@@ -612,59 +619,72 @@ export class ContactStore {
         this._documents = [];
         this._contactDocumentsID = [];
         await this.getContactMedia();
-        await this.fetchContactMedia(
-            MediaType.mtDocument,
-            this._documents,
-            this._contactDocumentsID
-        );
+        await this.fetchContactMedia(MediaType.mtPhoto, this._documents, this._contactDocumentsID);
+        debugger;
     });
 
     private saveContactMedia = action(
-        async (mediaType: MediaType): Promise<{ status: Status; savedItems?: MediaItem[] }> => {
+        async (
+            mediaType: MediaType
+        ): Promise<{ status: Status; savedItems?: Partial<ContactMediaItem>[] }> => {
             try {
+                this._isLoading = true;
                 const { file, data } = this._uploadFileDocuments;
                 if (!file.length) {
                     return { status: Status.ERROR };
                 }
 
-                const mediaItemRecord = await createMediaItemRecord(mediaType);
-                if (!mediaItemRecord || mediaItemRecord.status === Status.ERROR) {
-                    return { status: Status.ERROR };
-                }
+                const savedItems: Partial<ContactMediaItem>[] = [];
+                const uploadPromises = file.map(async (file) => {
+                    const formData = new FormData();
+                    formData.append("file", file);
 
-                const formData = new FormData();
-                file.forEach((file) => {
-                    formData.append("files", file);
+                    try {
+                        const createMediaResponse = (await createMediaItemRecord(
+                            mediaType
+                        )) as CreateMediaItemRecordResponse;
+                        if (createMediaResponse?.status === Status.OK) {
+                            const uploadMediaResponse = (await uploadContactMedia(
+                                createMediaResponse.itemUID,
+                                formData
+                            )) as InventorySetResponse;
+                            if (uploadMediaResponse?.status === Status.OK) {
+                                const mediaDataResponse = await setContactMediaItemData(
+                                    this._contactID,
+                                    {
+                                        mediaitemuid: uploadMediaResponse.itemuid,
+                                        contenttype: data.contenttype,
+                                        notes: data.notes,
+                                        type: mediaType,
+                                    }
+                                );
+
+                                if (mediaDataResponse?.status === Status.ERROR) {
+                                    const { error } = mediaDataResponse as BaseResponseError;
+                                    this._formErrorMessage = error || "Failed to upload file";
+                                } else {
+                                    const savedItem: Partial<ContactMediaItem> = {
+                                        itemuid: uploadMediaResponse.itemuid,
+                                        mediauid: uploadMediaResponse.itemuid,
+                                        notes: data.notes,
+                                    };
+                                    savedItems.push(savedItem);
+                                }
+                            }
+                        }
+                    } finally {
+                        this._isLoading = false;
+                        this._formErrorMessage = "";
+                    }
                 });
 
-                const uploadResponse = await uploadContactMedia(
-                    (mediaItemRecord as CreateMediaItemRecordResponse).itemUID,
-                    formData
-                );
+                await Promise.all(uploadPromises);
 
-                if (!uploadResponse || uploadResponse.status === Status.ERROR) {
-                    return { status: Status.ERROR };
-                }
-
-                const mediaItems: MediaItem[] = [];
-                for (let i = 0; i < file.length; i++) {
-                    const mediaItem = {
-                        itemuid: (mediaItemRecord as CreateMediaItemRecordResponse).itemUID,
-                        mediauid: (uploadResponse as InventorySetResponse).itemuid,
-                        src: URL.createObjectURL(file[i]),
-                        info: {
-                            contenttype: data.contenttype || MediaType.mtUnknown,
-                            notes: data.notes || "",
-
-                            useruid: this.rootStore.userStore.authUser?.useruid || "",
-                        },
-                    };
-                    mediaItems.push(mediaItem);
-                }
-
-                return { status: Status.OK, savedItems: mediaItems };
+                return { status: Status.OK, savedItems };
             } catch (error) {
                 return { status: Status.ERROR };
+            } finally {
+                this._isLoading = false;
             }
         }
     );
@@ -705,6 +725,7 @@ export class ContactStore {
         this._documents = [];
         this._contactDocumentsID = [];
         this._uploadFileDocuments = initialMediaItem;
+        this._formErrorMessage = "";
     };
 
     public set uploadFileDocuments(files: UploadMediaItem) {

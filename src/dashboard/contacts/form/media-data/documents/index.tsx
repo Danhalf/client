@@ -12,22 +12,23 @@ import {
 } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
-import { MediaLimitations } from "common/models/inventory";
 import { useStore } from "store/hooks";
-import { CATEGORIES } from "common/constants/media-categories";
-import { Checkbox } from "primereact/checkbox";
 import { Image } from "primereact/image";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
+import { useToast } from "dashboard/common/toast";
+import { ContactDocumentsLimitations } from "common/models/contact";
 
-const limitations: MediaLimitations = {
+const limitations: ContactDocumentsLimitations = {
     formats: ["PDF", "PNG", "JPEG", "TIFF"],
     maxSize: 8,
     maxUpload: 16,
+    maxUploadedDocuments: 50,
 };
 
 export const ContactsDocuments = observer((): ReactElement => {
     const store = useStore().contactStore;
+    const toast = useToast();
     const {
         saveContactDocuments,
         uploadFileDocuments,
@@ -36,11 +37,10 @@ export const ContactsDocuments = observer((): ReactElement => {
         removeContactMedia,
         fetchDocuments,
         clearContactMedia,
+        formErrorMessage,
     } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
-    const [checked, setChecked] = useState<boolean>(true);
-    const [documentChecked, setDocumentChecked] = useState<boolean[]>([]);
 
     useEffect(() => {
         fetchDocuments();
@@ -49,6 +49,16 @@ export const ContactsDocuments = observer((): ReactElement => {
             clearContactMedia();
         };
     }, []);
+
+    useEffect(() => {
+        if (formErrorMessage) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: formErrorMessage,
+            });
+        }
+    }, [formErrorMessage, toast]);
 
     const handleCommentaryChange = (e: ChangeEvent<HTMLInputElement>) => {
         store.uploadFileDocuments = {
@@ -82,28 +92,19 @@ export const ContactsDocuments = observer((): ReactElement => {
         callback();
     };
 
-    const handleUploadFiles = async () => {
-        await saveContactDocuments();
-        setTotalCount(0);
-        fileUploadRef.current?.clear();
-    };
-
-    const handleCheckedChange = (index?: number) => {
-        const updatedDocumentChecked = [...documentChecked];
-
-        if (index === undefined && !checked) {
-            setChecked(true);
-            const allChecked = updatedDocumentChecked.map(() => true);
-            setDocumentChecked(allChecked);
-        } else if (index === undefined && checked) {
-            setChecked(false);
-            const allUnchecked = updatedDocumentChecked.map(() => false);
-            setDocumentChecked(allUnchecked);
-        } else if (index !== undefined) {
-            const updatedCheckboxState = [...updatedDocumentChecked];
-            updatedCheckboxState[index] = !updatedCheckboxState[index];
-            setDocumentChecked(updatedCheckboxState);
+    const handleUploadFiles = () => {
+        if (formErrorMessage) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: formErrorMessage,
+            });
         }
+        saveContactDocuments().then((res) => {
+            if (res) {
+                fileUploadRef.current?.clear();
+            }
+        });
     };
 
     const handleDeleteDocument = (mediauid: string) => {
@@ -227,20 +228,20 @@ export const ContactsDocuments = observer((): ReactElement => {
             </div>
             <div className='media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded documents</h2>
+                <span
+                    className={`media-uploaded__label mx-2 uploaded-count ${
+                        documents?.length && "uploaded-count--blue"
+                    }`}
+                >
+                    ({documents?.length || 0}/{limitations.maxUploadedDocuments})
+                </span>
                 <hr className='media-uploaded__line flex-1' />
             </div>
             <div className='media-documents'>
-                {documents.length ? (
-                    documents.map(({ itemuid, src, info }, index: number) => {
+                {documents?.length ? (
+                    documents.map(({ itemuid, src, notes, created }, index: number) => {
                         return (
                             <div key={itemuid} className='media-documents__item'>
-                                {checked && (
-                                    <Checkbox
-                                        checked={documentChecked[index]}
-                                        onChange={() => handleCheckedChange(index)}
-                                        className='media-uploaded__checkbox'
-                                    />
-                                )}
                                 <Image
                                     src={src}
                                     alt='contact-document'
@@ -255,35 +256,23 @@ export const ContactsDocuments = observer((): ReactElement => {
                                 <div className='media-documents__info document-info'>
                                     <div className='document-info__item'>
                                         <span className='document-info__icon'>
-                                            <i className='pi pi-th-large' />
-                                        </span>
-                                        <span className='document-info__text--bold'>
-                                            {
-                                                CATEGORIES.find(
-                                                    (category) => category.id === info?.contenttype
-                                                )?.name
-                                            }
-                                        </span>
-                                    </div>
-                                    <div className='document-info__item'>
-                                        <span className='document-info__icon'>
                                             <span className='document-info__icon'>
                                                 <i className='pi pi-comment' />
                                             </span>
                                         </span>
-                                        <span className='document-info__text'>{info?.notes}</span>
+                                        <span className='document-info__text'>{notes}</span>
                                     </div>
                                     <div className='document-info__item'>
                                         <span className='document-info__icon'>
                                             <i className='pi pi-calendar' />
                                         </span>
-                                        <span className='document-info__text'>{info?.created}</span>
+                                        <span className='document-info__text'>{created}</span>
                                     </div>
                                 </div>
                                 <Button
                                     className='media-documents__close'
                                     type='button'
-                                    onClick={() => handleDeleteDocument(itemuid)}
+                                    onClick={() => handleDeleteDocument(itemuid || "")}
                                 >
                                     <i className='pi pi-times' />
                                 </Button>
