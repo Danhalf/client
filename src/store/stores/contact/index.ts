@@ -11,7 +11,6 @@ import { MediaType } from "common/models/enums";
 import {
     CreateMediaItemRecordResponse,
     InventorySetResponse,
-    InventoryMediaItemID,
     UploadMediaItem,
     InventoryMedia,
 } from "common/models/inventory";
@@ -71,7 +70,7 @@ export class ContactStore {
     private _activeTab: number | null = null;
     private _tabLength: number = 0;
 
-    private _contactDocumentsID: Partial<InventoryMediaItemID>[] = [];
+    private _contactDocumentsID: Partial<InventoryMedia>[] = [];
     private _uploadFileDocuments: UploadMediaItem = initialMediaItem;
     private _documents: Partial<ContactMediaItem>[] = [];
     private _formErrorMessage: string = "";
@@ -571,11 +570,7 @@ export class ContactStore {
             if (mediaList) {
                 (mediaList as InventoryMedia[]).forEach((media) => {
                     if (media.type === MediaType.mtPhoto || media.type === MediaType.mtDocument) {
-                        this._contactDocumentsID.push({
-                            itemuid: media.itemuid,
-                            mediauid: media.mediauid,
-                            inventoryuid: media.inventoryuid,
-                        });
+                        this._contactDocumentsID.push(media);
                     }
                 });
             }
@@ -588,7 +583,7 @@ export class ContactStore {
     private async fetchContactMedia(
         mediaType: MediaType,
         mediaArray: Partial<ContactMediaItem>[],
-        contactMediaID: Partial<InventoryMediaItemID>[]
+        contactMediaID: Partial<InventoryMedia>[]
     ) {
         try {
             const result: Partial<ContactMediaItem>[] = [...mediaArray];
@@ -597,10 +592,12 @@ export class ContactStore {
                     if (mediauid && itemuid) {
                         const responseSrc = await getContactMediaItem(mediauid);
                         if (responseSrc) {
+                            const originalMediaData = this._contactDocumentsID[index];
                             result[index] = {
                                 src: responseSrc as string,
                                 itemuid,
                                 mediauid,
+                                ...originalMediaData,
                             };
                         }
                     }
@@ -619,8 +616,11 @@ export class ContactStore {
         this._documents = [];
         this._contactDocumentsID = [];
         await this.getContactMedia();
-        await this.fetchContactMedia(MediaType.mtPhoto, this._documents, this._contactDocumentsID);
-        debugger;
+        await this.fetchContactMedia(
+            MediaType.mtDocument,
+            this._documents,
+            this._contactDocumentsID
+        );
     });
 
     private saveContactMedia = action(
