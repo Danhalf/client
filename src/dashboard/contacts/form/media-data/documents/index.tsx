@@ -14,10 +14,10 @@ import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { useStore } from "store/hooks";
 import { Image } from "primereact/image";
-import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { useToast } from "dashboard/common/toast";
 import { ContactDocumentsLimitations } from "common/models/contact";
+import { Loader } from "dashboard/common/loader";
 
 const limitations: ContactDocumentsLimitations = {
     formats: ["PDF", "PNG", "JPEG", "TIFF"],
@@ -33,7 +33,6 @@ export const ContactsDocuments = observer((): ReactElement => {
         saveContactDocuments,
         uploadFileDocuments,
         documents,
-        isLoading,
         removeContactMedia,
         fetchDocuments,
         clearContactMedia,
@@ -41,9 +40,15 @@ export const ContactsDocuments = observer((): ReactElement => {
     } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        fetchDocuments();
+        setIsLoading(true);
+        const handleFetchDocuments = async () => {
+            await fetchDocuments();
+            setIsLoading(false);
+        };
+        handleFetchDocuments();
 
         return () => {
             clearContactMedia();
@@ -79,6 +84,7 @@ export const ContactsDocuments = observer((): ReactElement => {
     };
 
     const onTemplateUpload = (e: FileUploadUploadEvent) => {
+        setIsLoading(true);
         setTotalCount(e.files.length);
     };
 
@@ -197,7 +203,6 @@ export const ContactsDocuments = observer((): ReactElement => {
 
     return (
         <div className='media grid'>
-            {isLoading && <Loader overlay />}
             <FileUpload
                 ref={fileUploadRef}
                 multiple
@@ -241,6 +246,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                 <hr className='media-uploaded__line flex-1' />
             </div>
             <div className='media-documents'>
+                {isLoading && <Loader />}
                 {documents?.length ? (
                     documents.map(({ itemuid, src, notes, created }, index: number) => {
                         return (
@@ -272,13 +278,13 @@ export const ContactsDocuments = observer((): ReactElement => {
                                         <span className='document-info__text'>{created}</span>
                                     </div>
                                 </div>
-                                <Button
+                                <button
                                     className='media-documents__close'
                                     type='button'
                                     onClick={() => handleDeleteDocument(itemuid || "")}
                                 >
                                     <i className='pi pi-times' />
-                                </Button>
+                                </button>
                             </div>
                         );
                     })
