@@ -92,7 +92,8 @@ export const ContactsDocuments = observer((): ReactElement => {
         callback();
     };
 
-    const handleUploadFiles = () => {
+    const handleUploadFiles = async () => {
+        setIsLoading(true);
         if (formErrorMessage) {
             toast.current?.show({
                 severity: "error",
@@ -100,11 +101,13 @@ export const ContactsDocuments = observer((): ReactElement => {
                 detail: formErrorMessage,
             });
         }
-        saveContactDocuments().then((res) => {
-            if (res) {
-                fileUploadRef.current?.clear();
-            }
-        });
+        const response = await saveContactDocuments();
+
+        if (response) {
+            fileUploadRef.current?.clear();
+            fetchDocuments();
+            setIsLoading(false);
+        }
     };
 
     const handleDeleteDocument = (mediauid: string) => {
@@ -217,7 +220,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                     onChange={handleCommentaryChange}
                 />
                 <Button
-                    severity={totalCount ? "success" : "secondary"}
+                    severity={totalCount && !isLoading ? "success" : "secondary"}
                     disabled={!totalCount || isLoading}
                     className='p-button media-input__button'
                     onClick={handleUploadFiles}
