@@ -105,6 +105,7 @@ export const DealGeneralSale = observer((): ReactElement => {
         setFieldValue(
             "contactinfo",
             contact.companyName ||
+                contact.businessName ||
                 `${contact.firstName} ${contact.lastName}`.trim() ||
                 contact.userName
         );
@@ -112,6 +113,7 @@ export const DealGeneralSale = observer((): ReactElement => {
             key: "contactinfo",
             value:
                 contact.companyName ||
+                contact.businessName ||
                 `${contact.firstName} ${contact.lastName}`.trim() ||
                 contact.userName,
         });
@@ -235,7 +237,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("dateeffective")}
                     className={`${errors.dateeffective && "p-invalid"}`}
                     name='Sale date (required)'
-                    date={values.dateeffective}
+                    date={parseDateFromServer(values.dateeffective)}
                     emptyDate
                     onChange={({ value }) => {
                         setFieldValue("dateeffective", value);
@@ -249,7 +251,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("datepurchase")}
                     className={`${errors.datepurchase && "p-invalid"}`}
                     name='First operated (required)'
-                    date={values.datepurchase}
+                    date={parseDateFromServer(values.datepurchase)}
                     emptyDate
                     onChange={({ value }) => {
                         setFieldValue("datepurchase", value);
