@@ -707,7 +707,6 @@ export class ContactStore {
     public removeContactMedia = action(
         async (mediauid: string, cb: () => void): Promise<Status | undefined> => {
             try {
-                this._isLoading = true;
                 await deleteContactMedia(mediauid);
 
                 await cb();
