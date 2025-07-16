@@ -65,15 +65,10 @@ export class DealStore {
     private _deleteAccountOption: boolean = false;
     private _deleteInventoryOption: boolean = false;
     private _setInventoryAvailableOption: boolean = false;
-    private _addToInventory: AddToInventory = AddToInventory.ALL_DISABLED;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
-    }
-
-    public get addToInventory() {
-        return this._addToInventory;
     }
 
     public get deal() {
