@@ -7,6 +7,7 @@ import {
     DealFinance,
     DealPickupPayment,
     DealPrintForm,
+    AddToInventory,
 } from "common/models/deals";
 import { Inventory } from "common/models/inventory";
 import {
@@ -64,10 +65,15 @@ export class DealStore {
     private _deleteAccountOption: boolean = false;
     private _deleteInventoryOption: boolean = false;
     private _setInventoryAvailableOption: boolean = false;
+    private _addToInventory: AddToInventory = AddToInventory.ALL_DISABLED;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
+    }
+
+    public get addToInventory() {
+        return this._addToInventory;
     }
 
     public get deal() {
@@ -385,6 +391,24 @@ export class DealStore {
             }
         } finally {
             this._isLoading = false;
+        }
+    });
+
+    public changeAddToInventory = action((value: AddToInventory) => {
+        this._isFormChanged = true;
+        switch (value) {
+            case AddToInventory.ALL_DISABLED:
+                this._deal.addToInventory = AddToInventory.ALL_DISABLED;
+                break;
+            case AddToInventory.TRADE_FIRST_ENABLED:
+                this._deal.addToInventory = AddToInventory.TRADE_FIRST_ENABLED;
+                break;
+            case AddToInventory.TRADE_SECOND_ENABLED:
+                this._deal.addToInventory = AddToInventory.TRADE_SECOND_ENABLED;
+                break;
+            default:
+                this._deal.addToInventory = AddToInventory.ALL_ENABLED;
+                break;
         }
     });
 
