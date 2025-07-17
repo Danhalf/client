@@ -23,6 +23,7 @@ import { Inventory } from "common/models/inventory";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { Button } from "primereact/button";
+import { parseDateFromServer } from "common/helpers";
 
 export const DealGeneralSale = observer((): ReactElement => {
     const { values, errors, setFieldValue, getFieldProps } = useFormikContext<PartialDeal>();
