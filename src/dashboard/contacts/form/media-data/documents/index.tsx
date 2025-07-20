@@ -18,6 +18,7 @@ import { emptyTemplate } from "dashboard/common/form/upload";
 import { useToast } from "dashboard/common/toast";
 import { ContactDocumentsLimitations } from "common/models/contact";
 import { Loader } from "dashboard/common/loader";
+import { Status } from "common/models/base-response";
 
 const limitations: ContactDocumentsLimitations = {
     formats: ["PDF", "PNG", "JPEG", "TIFF"],
@@ -116,8 +117,34 @@ export const ContactsDocuments = observer((): ReactElement => {
         }
     };
 
-    const handleDeleteDocument = (mediauid: string) => {
-        removeContactMedia(mediauid, fetchDocuments);
+    const handleDeleteDocument = async (mediauid: string) => {
+        try {
+            setIsLoading(true);
+            const result = await removeContactMedia(mediauid, () => {});
+
+            if (result === Status.OK) {
+                await fetchDocuments();
+                toast.current?.show({
+                    severity: "success",
+                    summary: "Success",
+                    detail: "Document deleted successfully",
+                });
+            } else {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: formErrorMessage || "Failed to delete document",
+                });
+            }
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Failed to delete document",
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const itemTemplate = (inFile: object, props: ItemTemplateOptions) => {
@@ -231,7 +258,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                     onClick={handleUploadFiles}
                     type='button'
                 >
-                    Save
+                    {isLoading ? "Saving..." : "Save"}
                 </Button>
             </div>
             <div className='media__uploaded media-uploaded'>
@@ -247,7 +274,7 @@ export const ContactsDocuments = observer((): ReactElement => {
             </div>
             <div className='media-documents'>
                 {isLoading && <Loader />}
-                {documents?.length ? (
+                {!isLoading && documents?.length ? (
                     documents.map(({ itemuid, src, notes, created }, index: number) => {
                         return (
                             <div key={itemuid} className='media-documents__item'>
@@ -281,6 +308,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                                 <button
                                     className='media-documents__close'
                                     type='button'
+                                    disabled={isLoading}
                                     onClick={() => handleDeleteDocument(itemuid || "")}
                                 >
                                     <i className='pi pi-times' />
@@ -288,9 +316,9 @@ export const ContactsDocuments = observer((): ReactElement => {
                             </div>
                         );
                     })
-                ) : (
+                ) : !isLoading ? (
                     <div className='w-full text-center'>No documents added yet.</div>
-                )}
+                ) : null}
             </div>
         </div>
     );
