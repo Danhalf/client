@@ -642,11 +642,11 @@ export class ContactStore {
     });
 
     public removeContactMedia = action(
-        async (mediauid: string, cb: () => void): Promise<Status | undefined> => {
+        async (mediauid: string, cb?: () => void): Promise<Status | undefined> => {
             try {
                 await deleteContactMedia(mediauid);
 
-                await cb();
+                await cb?.();
 
                 return Status.OK;
             } catch (error) {

@@ -27,6 +27,9 @@ const limitations: ContactDocumentsLimitations = {
     maxUploadedDocuments: 50,
 };
 
+const SUCCESS_MESSAGE = "Document deleted successfully";
+const ERROR_MESSAGE = "Failed to delete document";
+
 export const ContactsDocuments = observer((): ReactElement => {
     const store = useStore().contactStore;
     const toast = useToast();
@@ -120,27 +123,27 @@ export const ContactsDocuments = observer((): ReactElement => {
     const handleDeleteDocument = async (mediauid: string) => {
         try {
             setIsLoading(true);
-            const result = await removeContactMedia(mediauid, () => {});
+            const result = await removeContactMedia(mediauid);
 
             if (result === Status.OK) {
                 await fetchDocuments();
                 toast.current?.show({
                     severity: "success",
                     summary: "Success",
-                    detail: "Document deleted successfully",
+                    detail: SUCCESS_MESSAGE,
                 });
             } else {
                 toast.current?.show({
                     severity: "error",
                     summary: "Error",
-                    detail: formErrorMessage || "Failed to delete document",
+                    detail: formErrorMessage || ERROR_MESSAGE,
                 });
             }
         } catch (error) {
             toast.current?.show({
                 severity: "error",
                 summary: "Error",
-                detail: "Failed to delete document",
+                detail: ERROR_MESSAGE,
             });
         } finally {
             setIsLoading(false);
