@@ -65,7 +65,9 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     };
 
     useEffect(() => {
-        handleGetTypeList();
+        if (!typeList.length) {
+            handleGetTypeList();
+        }
     }, [id]);
 
     const handleScanDL = () => {
