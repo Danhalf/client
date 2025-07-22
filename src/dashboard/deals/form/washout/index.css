@@ -19,6 +19,28 @@
         right: 40px;
         color: var(--admss-app-medium-grey);
     }
+
+    .washout-footer {
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .washout-footer__controls {
+            display: flex;
+            gap: 25px;
+            .p-button {
+                width: 70px;
+                height: 70px;
+            }
+        }
+
+        .washout-footer__buttons {
+            display: flex;
+            gap: 25px;
+        }
+    }
 }
 
 .deal-washout .p-tabview-nav-content {
