@@ -1,9 +1,23 @@
 .deal-washout {
     --input-regular: 40px;
     --input-small: 30px;
+    --washout-height: 70vh;
 
     .info-section__title {
         color: var(--admss-app-main-blue);
+    }
+
+    .card {
+        padding: 40px;
+
+        .card-header {
+            padding-top: 0;
+        }
+    }
+    .p-button.close-button {
+        top: 40px;
+        right: 40px;
+        color: var(--admss-app-medium-grey);
     }
 }
 
@@ -15,6 +29,8 @@
     display: flex;
     flex-direction: column;
     border-radius: 8px;
+    height: var(--washout-height);
+    overflow-y: auto;
 }
 
 .deal-washout__title {
