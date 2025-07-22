@@ -157,8 +157,7 @@ export const InventoryForm = observer(() => {
                 } catch (error) {
                     resolve(true);
                 }
-            },
-            500
+            }
         );
 
         const debouncedCheckVINAvailability = debounce(
