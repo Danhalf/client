@@ -267,9 +267,10 @@ export class ContactStore {
             keyOrEntries:
                 | keyof Omit<Contact, "extdata">
                 | [keyof Omit<Contact, "extdata">, string | number][],
-            value?: string | number,
+            value?: string | number | undefined,
             isContactChanged: boolean = true
         ) => {
+            if (value === undefined) value = "";
             const pushToChangedFields = (key: keyof Omit<Contact, "extdata">) => {
                 if (!this._changedContactFields.includes(key)) {
                     this._changedContactFields.push(key);
@@ -297,6 +298,7 @@ export class ContactStore {
                     this._changedCoBayerContactFields.push(key);
                 }
             };
+            if (value === undefined) value = "";
             pushToChangedFields(key);
             return (this._coBayerContact[key] = value as never);
         }
@@ -312,6 +314,7 @@ export class ContactStore {
                     this._changedContactExtDataFields.push(key);
                 }
             };
+            if (value === undefined) value = "";
             this._isContactChanged = true;
 
             if (Array.isArray(keyOrEntries)) {
