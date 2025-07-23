@@ -422,7 +422,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                             value={values.VIN}
                             onChange={async ({ target: { value } }) => {
                                 await setFieldValue("VIN", value);
-                                await setFieldTouched("VIN", true, true);
+                                await setFieldTouched("VIN", true, false);
                                 changeInventory({ key: "VIN", value });
                                 validateField("VIN");
                             }}
@@ -446,7 +446,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         value={values.StockNo}
                         onChange={async ({ target: { value } }) => {
                             await setFieldValue("StockNo", value);
-                            await setFieldTouched("StockNo", true, true);
+                            await setFieldTouched("StockNo", true, false);
                             changeInventory({ key: "StockNo", value });
                             validateField("StockNo");
                         }}
