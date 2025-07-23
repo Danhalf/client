@@ -162,52 +162,48 @@ export const InventoryForm = observer(() => {
         return "";
     }, [inventory]);
 
-    const debouncedCheckStockNoAvailability = useRef(
-        debounce(async (value: string, resolve: (exists: boolean) => void) => {
-            if (!value || initialStockNo === value) {
-                resolve(true);
-                return;
-            }
-            try {
-                const res = (await checkStockNoAvailability(
-                    value
-                )) as unknown as InventoryStockNumber;
-                resolve(!(res && res.status === Status.OK && res.exists));
-            } catch (error) {
-                resolve(true);
-            }
-        }, 500)
-    ).current;
-
-    const debouncedCheckVINAvailability = useRef(
-        debounce(async (value: string, resolve: (exists: boolean) => void) => {
-            if (!value || initialVIN === value) {
-                resolve(true);
-                return;
-            }
-            try {
-                const res = (await getVINCheck(value)) as unknown as InventoryStockNumber;
-                resolve(!(res && res.status === Status.OK && res.exists));
-            } catch (error) {
-                resolve(true);
-            }
-        }, 500)
-    ).current;
-
     const InventoryFormSchema = ({
         initialVIN,
         initialStockNo,
-        debouncedCheckStockNoAvailability,
-        debouncedCheckVINAvailability,
     }: {
         initialVIN?: string;
         initialStockNo?: string;
-        debouncedCheckStockNoAvailability: (
-            value: string,
-            resolve: (exists: boolean) => void
-        ) => void;
-        debouncedCheckVINAvailability: (value: string, resolve: (exists: boolean) => void) => void;
     }): Yup.ObjectSchema<Partial<PartialInventory>> => {
+        const debouncedCheckStockNoAvailability = debounce(
+            async (value: string, resolve: (exists: boolean) => void) => {
+                if (!value || initialStockNo === value) {
+                    resolve(true);
+                    return;
+                }
+
+                try {
+                    const res = (await checkStockNoAvailability(
+                        value
+                    )) as unknown as InventoryStockNumber;
+                    resolve(!(res && res.status === Status.OK && res.exists));
+                } catch (error) {
+                    resolve(true);
+                }
+            }
+        );
+
+        const debouncedCheckVINAvailability = debounce(
+            async (value: string, resolve: (exists: boolean) => void) => {
+                if (!value || initialVIN === value) {
+                    resolve(true);
+                    return;
+                }
+
+                try {
+                    const res = (await getVINCheck(value)) as unknown as InventoryStockNumber;
+                    resolve(!(res && res.status === Status.OK && res.exists));
+                } catch (error) {
+                    resolve(true);
+                }
+            },
+            500
+        );
+
         return Yup.object().shape({
             VIN: Yup.string()
                 .trim()
@@ -269,22 +265,6 @@ export const InventoryForm = observer(() => {
             ),
         });
     };
-
-    const validationSchema = useMemo(
-        () =>
-            InventoryFormSchema({
-                initialVIN,
-                initialStockNo,
-                debouncedCheckStockNoAvailability,
-                debouncedCheckVINAvailability,
-            }),
-        [
-            initialVIN,
-            initialStockNo,
-            debouncedCheckStockNoAvailability,
-            debouncedCheckVINAvailability,
-        ]
-    );
 
     useEffect(() => {
         accordionSteps.forEach((step, index) => {
@@ -416,31 +396,6 @@ export const InventoryForm = observer(() => {
     };
 
     const handleSaveInventoryForm = () => {
-        // Force all fields as touched before validation
-        const allFields = [
-            "VIN",
-            "Make",
-            "Model",
-            "Year",
-            "locationuid",
-            "GroupClassName",
-            "StockNo",
-            "TypeOfFuel_id",
-            "purPurchaseEmail",
-            "purPurchasePhone",
-            "titleHolderPhone",
-            "titlePrevPhone",
-        ];
-        formikRef.current?.setTouched(
-            allFields.reduce(
-                (acc, key) => {
-                    acc[key] = true;
-                    return acc;
-                },
-                {} as Record<string, boolean>
-            ),
-            true
-        );
         formikRef.current?.validateForm().then((errors) => {
             if (!Object.keys(errors).length) {
                 formikRef.current?.submitForm();
@@ -631,7 +586,10 @@ export const InventoryForm = observer(() => {
                                     <div className='flex flex-grow-1'>
                                         <Formik
                                             innerRef={formikRef}
-                                            validationSchema={validationSchema}
+                                            validationSchema={InventoryFormSchema({
+                                                initialVIN,
+                                                initialStockNo,
+                                            })}
                                             initialValues={
                                                 {
                                                     VIN: inventory?.VIN || "",

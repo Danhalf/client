@@ -43,15 +43,8 @@ export const VehicleGeneral = observer((): ReactElement => {
     const { authUser } = userStore;
     const { inventory, currentLocation, changeInventory, inventoryAudit, changeInventoryAudit } =
         store;
-    const {
-        values,
-        errors,
-        touched,
-        setFieldValue,
-        getFieldProps,
-        validateField,
-        setFieldTouched,
-    } = useFormikContext<Inventory>();
+    const { values, errors, setFieldValue, getFieldProps, validateField, setFieldTouched } =
+        useFormikContext<Inventory>();
 
     const [initialAutoMakesList, setInitialAutoMakesList] = useState<MakesListData[]>([]);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
@@ -350,13 +343,11 @@ export const VehicleGeneral = observer((): ReactElement => {
                     }}
                     placeholder='Location name'
                     className={`w-full vehicle-general__dropdown ${
-                        touched.locationuid &&
-                        inventory.locationuid === "" &&
-                        "p-inputwrapper-filled"
+                        inventory.locationuid === "" && "p-inputwrapper-filled"
                     } ${errors.locationuid ? "p-invalid" : ""}`}
                     label='Location name (required)'
                 />
-                <small className='p-error'>{touched.locationuid && errors.locationuid}</small>
+                <small className='p-error'>{errors.locationuid}</small>
             </div>
             <div className='col-3 relative'>
                 <ComboBox
@@ -374,11 +365,11 @@ export const VehicleGeneral = observer((): ReactElement => {
                     }}
                     placeholder='Group class'
                     className={`w-full vehicle-general__dropdown ${
-                        touched.GroupClassName && errors.GroupClassName ? "p-invalid" : ""
+                        errors.GroupClassName ? "p-invalid" : ""
                     }`}
                     label='Inventory group (required)'
                 />
-                <small className='p-error'>{touched.GroupClassName && errors.GroupClassName}</small>
+                <small className='p-error'>{errors.GroupClassName}</small>
             </div>
 
             <div className='col-12'>
@@ -393,7 +384,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                                 setFieldValue("VIN", value);
                                 changeInventory({ key: "VIN", value });
                             }}
-                            className={`w-full ${touched.VIN && errors.VIN ? "p-invalid" : ""}`}
+                            className={`w-full ${errors.VIN ? "p-invalid" : ""}`}
                         />
                         <label className='float-label'>VIN (required)</label>
                     </span>
@@ -437,9 +428,9 @@ export const VehicleGeneral = observer((): ReactElement => {
                             }}
                             onAction={handleVINchange}
                             disabled={inventory.GroupClassName === "equipment"}
-                            className={`w-full ${touched.VIN && errors.VIN ? "p-invalid" : ""}`}
+                            className={`w-full ${errors.VIN ? "p-invalid" : ""}`}
                         />
-                        <small className='p-error'>{touched.VIN && errors.VIN}</small>
+                        <small className='p-error'>{errors.VIN}</small>
                     </div>
                 </>
             )}
@@ -449,7 +440,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     <InputText
                         className={
                             "vehicle-general__text-input w-full" +
-                            (touched.StockNo && errors.StockNo ? " p-invalid" : "")
+                            (errors.StockNo ? " p-invalid" : "")
                         }
                         name='StockNo'
                         value={values.StockNo}
@@ -495,13 +486,14 @@ export const VehicleGeneral = observer((): ReactElement => {
                         selectedItemTemplate={selectedAutoMakesTemplate}
                         placeholder='Make (required)'
                         className={`vehicle-general__dropdown w-full ${
-                            touched.Make && errors.Make ? "p-invalid" : ""
+                            errors.Make ? "p-invalid" : ""
                         }`}
                         panelClassName='vehicle-general__panel'
                     />
                     <label className='float-label'>Make (required)</label>
                 </span>
-                <small className='p-error'>{touched.Make && errors.Make}</small>
+
+                <small className='p-error'>{errors.Make}</small>
             </div>
 
             <div className='col-6 relative'>
@@ -518,12 +510,12 @@ export const VehicleGeneral = observer((): ReactElement => {
                     }}
                     placeholder='Model (required)'
                     className={`vehicle-general__dropdown w-full ${
-                        touched.Model && errors.Model ? "p-invalid" : ""
+                        errors.Model ? "p-invalid" : ""
                     }`}
                     itemTemplate={(option) => handleDeleteInventoryRecord(option, true)}
                     label='Model (required)'
                 />
-                <small className='p-error'>{touched.Model && errors.Model}</small>
+                <small className='p-error'>{errors.Model}</small>
             </div>
             <div className='col-3'>
                 <span className='p-float-label'>
@@ -543,7 +535,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     <InputNumber
                         {...getFieldProps("Year")}
                         className={`vehicle-general__text-input w-full ${
-                            touched.Year && errors.Year ? "p-invalid" : ""
+                            errors.Year ? "p-invalid" : ""
                         }`}
                         useGrouping={false}
                         value={parseInt(values.Year) || null}
@@ -565,7 +557,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     />
                     <label className='float-label'>Year (required)</label>
                 </span>
-                <small className='p-error'>{touched.Year && errors.Year}</small>
+                <small className='p-error'>{errors.Year}</small>
             </div>
 
             <div className='col-3 relative'>
