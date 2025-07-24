@@ -142,8 +142,12 @@ export const LinksMedia = observer((): ReactElement => {
     };
 
     const handleNavigateToLink = (url: string) => {
-        if (url) {
-            window.open(url, "_blank");
+        if (isValidUrl(url)) {
+            let finalUrl = url;
+            if (!/^https?:\/\//i.test(url)) {
+                finalUrl = "https://" + url;
+            }
+            window.open(finalUrl, "_blank");
         } else {
             toast.current?.show({
                 severity: "error",
