@@ -3,7 +3,9 @@ import { QueryParams } from "common/models/query-params";
 import { BaseResponse, BaseResponseError, Status } from "common/models/base-response";
 import {
     Deal,
+    DealDelete,
     DealFinance,
+    DealPaymentsTotal,
     DealPickupPayment,
     DealPrintFormResponse,
     HowToKnow,
@@ -131,7 +133,10 @@ export const setDeal = async (
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error || "Error while set deal",
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while set deal",
             };
         }
     }
@@ -236,24 +241,28 @@ export const setDealPayments = async (
 
         return request.data;
     } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while setting deal payments",
-        };
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while setting deal payments",
+            };
+        }
     }
 };
 
 export const getDealPaymentsTotal = async (dealuid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<any>(
+        const request = await authorizedUserApiInstance.get<DealPaymentsTotal>(
             `deals/${dealuid || 0}/ppaymenttotal`
         );
         return request.data;
     } catch (error) {
-        return {
-            status: Status.ERROR,
-            error: "Error while getting deal payments total",
-        };
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while getting deal payments total",
+            };
+        }
     }
 };
 
@@ -311,26 +320,125 @@ export const getDealPrintFormTemplate = async (
     }
 };
 
-export const getHowToKnowList = async (itemuid: string) => {
+export const getHowToKnowList = async (useruid: string) => {
     try {
         const request = await authorizedUserApiInstance.get<HowToKnow[]>(
-            `user/${itemuid}/howtoknow`
+            `user/${useruid}/howtoknow`
         );
         if (request.status === 200) {
             return request.data;
         } else {
             throw new Error("Error while getting how to know list");
         }
-    } catch (error: Error | BaseResponseError | unknown) {
-        if (error instanceof Error) {
+    } catch (error) {
+        if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.message,
+                error: error.response?.data.error || "Error while getting how to know list",
             };
         }
+    }
+};
+
+export const setHowToKnow = async (
+    useruid: string,
+    howToKnowData: Partial<HowToKnow>
+): Promise<BaseResponseError | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `user/${useruid}/howtoknow`,
+            howToKnowData
+        );
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while setting how to know item",
+            };
+        }
+    }
+};
+
+export const deleteHowToKnow = async (itemuid: string): Promise<BaseResponseError | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponse>(
+            `user/${itemuid}/deletehowtoknow`
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while deleting how to know item",
+            };
+        }
+    }
+};
+
+export const getDealDeleteReasonsList = async (useruid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.get<string[] | BaseResponseError>(
+            `deals/${useruid}/listdeletionreasons`
+        );
+        return request.data;
+    } catch (error) {
         return {
             status: Status.ERROR,
-            error: error,
+            error: "Error while getting deal delete reasons list",
         };
+    }
+};
+
+export const deleteDeal = async (
+    dealuid: string,
+    data: Partial<DealDelete>
+): Promise<BaseResponseError | undefined> => {
+    try {
+        const response = await authorizedUserApiInstance.post<BaseResponseError>(
+            `deals/${dealuid}/delete`,
+            data
+        );
+
+        if (response.status === 200) {
+            return response.data;
+        }
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error:
+                    error.response?.data.info ||
+                    error.response?.data.error ||
+                    "Error while deleting deal",
+            };
+        }
+    }
+};
+
+export const deleteDealPayment = async (itemuid: string) => {
+    try {
+        const request = await authorizedUserApiInstance.post<BaseResponseError | undefined>(
+            `deals/${itemuid}/deleteppayment`
+        );
+        return request.data;
+    } catch (error) {
+        if (isAxiosError(error)) {
+            return {
+                status: Status.ERROR,
+                error: error.response?.data.error || "Error while deleting payment",
+            };
+        }
     }
 };

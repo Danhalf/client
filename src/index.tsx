@@ -14,8 +14,7 @@ import { DealsForm } from "dashboard/deals/form";
 import { Home } from "dashboard/home";
 import Inventory from "dashboard/inventory";
 import { InventoryForm } from "dashboard/inventory/form";
-import { NotFound } from "not-found";
-import SignIn from "sign/sign-in";
+import { SignIn } from "sign/sign-in";
 import ProtectedRoute from "http/routes/ProtectedRoute";
 import { GeneralSettings } from "dashboard/profile/generalSettings";
 import { Reports } from "dashboard/reports";
@@ -24,6 +23,9 @@ import { ReportForm } from "dashboard/reports/form";
 import { PrintForTestDrive } from "dashboard/test-drive";
 import { AccountTakePayment } from "dashboard/accounts/take-payment-form";
 import { Tasks } from "dashboard/tasks";
+import { ErrorBoundary } from "http/routes/ErrorBoundary";
+import { ToastProvider } from "dashboard/common/toast";
+import { ServiceUpdate } from "services/service-update";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -32,9 +34,13 @@ const AppRouter = (): ReactElement => {
         {
             path: "/",
             element: <App />,
-            errorElement: <NotFound />,
+            errorElement: <ErrorBoundary />,
             children: [
                 { path: "", element: <SignIn /> },
+                {
+                    path: "service-update",
+                    element: <ServiceUpdate />,
+                },
                 {
                     path: "dashboard",
                     element: <Dashboard />,
@@ -154,7 +160,11 @@ const AppRouter = (): ReactElement => {
 
     const router: RemixRouter = createBrowserRouter(routes);
 
-    return <RouterProvider router={router} />;
+    return (
+        <ToastProvider>
+            <RouterProvider router={router} />
+        </ToastProvider>
+    );
 };
 
 root.render(<AppRouter />);

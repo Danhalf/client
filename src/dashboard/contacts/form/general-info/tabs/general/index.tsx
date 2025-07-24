@@ -1,10 +1,15 @@
 import { observer } from "mobx-react-lite";
-import { Dropdown } from "primereact/dropdown";
 import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
-import { Contact, ContactOFAC, ContactType } from "common/models/contact";
+import {
+    Contact,
+    ContactExtData,
+    ContactOFAC,
+    ContactType,
+    ScanBarcodeDL,
+} from "common/models/contact";
 import {
     checkContactOFAC,
     getContactsTypeList,
@@ -17,57 +22,175 @@ import { Button } from "primereact/button";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
-import { BUYER_ID } from "dashboard/contacts/form/general-info";
 import { TextInput } from "dashboard/common/form/inputs";
+import { parseCustomDate } from "common/helpers";
+import { SexList } from "common/constants/contract-options";
+import { ComboBox } from "dashboard/common/form/dropdown";
+import { Loader } from "dashboard/common/loader";
 
-const enum TOOLTIP_MESSAGE {
+export const enum TOOLTIP_MESSAGE {
     PERSON = "You can input either a person or a business name. If you entered a business name but intended to enter personal details, clear the business name field, and the fields for entering personal data will become active.",
     BUSINESS = "You can input either a person or a business name. If you entered a personal data but intended to enter business name, clear the personal data fields, and the field for entering business name will become active.",
     ONLY_BUSINESS = "The type of contact you have selected requires entering only the business name",
 }
 
+type ContactUpdate = Pick<
+    Contact,
+    "firstName" | "lastName" | "middleName" | "ZIP" | "city" | "streetAddress" | "state"
+>;
+
 export const ContactsGeneralInfo = observer((): ReactElement => {
     const { id } = useParams();
     const [typeList, setTypeList] = useState<ContactType[]>([]);
     const store = useStore().contactStore;
-    const { contact, contactFullInfo, contactType, changeContact } = store;
+    const { contact, contactExtData, contactType, changeContact, changeContactExtData } = store;
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { errors, values, setFieldValue } = useFormikContext<Contact>();
+    const { errors, values, validateField, setFieldValue, setFieldTouched } =
+        useFormikContext<Contact>();
 
     const [savedFirstName, setSavedFirstName] = useState<string>(contact.firstName || "");
     const [savedLastName, setSavedLastName] = useState<string>(contact.lastName || "");
     const [savedMiddleName, setSavedMiddleName] = useState<string>(contact.middleName || "");
     const [savedBusinessName, setSavedBusinessName] = useState<string>(contact.businessName || "");
     const prevTypeRef = useRef<number | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleGetTypeList = async () => {
+        setIsLoading(true);
+        const response = await getContactsTypeList(id || "0");
+        if (response && Array.isArray(response)) {
+            setTypeList(response);
+        } else {
+            setTypeList([]);
+        }
+        setIsLoading(false);
+    };
 
     useEffect(() => {
-        getContactsTypeList(id || "0").then((response) => {
-            if (response) {
-                const types = response as ContactType[];
-                setTypeList(types);
-            }
-        });
+        if (!typeList.length) {
+            handleGetTypeList();
+        }
     }, [id]);
 
     const handleScanDL = () => {
         fileInputRef.current?.click();
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file) {
-            scanContactDL(file).then((response) => {
-                if (response?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: response.error,
-                        life: TOAST_LIFETIME,
-                    });
+        if (!file) return;
+
+        store.isLoading = true;
+
+        try {
+            const response = await scanContactDL(file);
+
+            if (!response) {
+                await Promise.reject("No response from server");
+                return;
+            }
+
+            if (response.status === Status.ERROR) {
+                await Promise.reject(response.error || "Failed to scan DL");
+                return;
+            }
+
+            const { contact: scannedContact } = response as ScanBarcodeDL;
+
+            if (!scannedContact) {
+                await Promise.reject("Failed to parse driver license data");
+                return;
+            }
+
+            const {
+                firstName,
+                lastName,
+                middleName,
+                ZIP,
+                city,
+                streetAddress,
+                state,
+                sex,
+                dl_number,
+                dob,
+                exp,
+            } = scannedContact;
+
+            if (allowOverwrite) {
+                changeContact([
+                    ["firstName", firstName],
+                    ["lastName", lastName],
+                    ["middleName", middleName],
+                    ["ZIP", ZIP],
+                    ["city", city],
+                    ["streetAddress", streetAddress],
+                    ["state", state],
+                ]);
+
+                const [dobTimestamp, expTimestamp] = [parseCustomDate(dob), parseCustomDate(exp)];
+
+                changeContactExtData([
+                    ["Buyer_DL_State", state],
+                    ["Buyer_Sex", SexList.find((item) => item?.id === Number(sex))?.name || ""],
+                    ["Buyer_Driver_License_Num", dl_number],
+                    ["Buyer_Date_Of_Birth", dobTimestamp],
+                    ["Buyer_DL_Exp_Date", expTimestamp],
+                ]);
+
+                if (firstName || lastName || middleName) {
+                    setFieldValue("businessName", "");
+                    changeContact("businessName", "");
                 }
+            } else {
+                const fieldsToUpdate = {
+                    firstName,
+                    lastName,
+                    middleName,
+                    ZIP,
+                    city,
+                    streetAddress,
+                    state,
+                    sex: SexList.find((item) => item?.id === Number(sex))?.name || "",
+                    dl_number,
+                };
+
+                const updates = (
+                    Object.entries(fieldsToUpdate) as [keyof ContactUpdate, string | number][]
+                ).filter(([key]) => !contact[key]);
+
+                const extDataFieldsToUpdate = {
+                    Buyer_DL_State: state,
+                    Buyer_Sex: SexList.find((item) => item?.id === Number(sex))?.name || "",
+                    Buyer_Driver_License_Num: dl_number,
+                    Buyer_Date_Of_Birth: parseCustomDate(dob),
+                    Buyer_DL_Exp_Date: parseCustomDate(exp),
+                };
+
+                const extDataUpdates = (
+                    Object.entries(extDataFieldsToUpdate) as [
+                        keyof ContactExtData,
+                        string | number,
+                    ][]
+                ).filter(([key]) => !contactExtData?.[key]);
+
+                !!updates.length && changeContact(updates);
+                !!extDataUpdates.length && changeContactExtData(extDataUpdates);
+            }
+            handleOfacCheck();
+        } catch (error) {
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail:
+                    error instanceof Error
+                        ? error.message
+                        : "Failed to parse date from driver license",
+                life: TOAST_LIFETIME,
             });
+        } finally {
+            store.isLoading = false;
             event.target.value = "";
         }
     };
@@ -75,8 +198,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const isBusinessNameRequired = useMemo(() => {
         return REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type);
     }, [contact.type]);
-
-    const isControlDisabled = useMemo(() => contact.type !== BUYER_ID, [contact.type]);
 
     const shouldDisableNameFields = useMemo(() => {
         return (
@@ -147,10 +268,10 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     }, [shouldDisableBusinessName, contact.type]);
 
     const handleOfacCheck = () => {
-        if (!contactFullInfo.firstName || !contactFullInfo.lastName) {
+        if (!contact?.firstName || !contact.lastName) {
             return;
         }
-        checkContactOFAC(id, { ...contactFullInfo }).then((response) => {
+        checkContactOFAC(id, { ...contact, extdata: contactExtData }).then((response) => {
             if (response?.status === Status.ERROR) {
                 toast.current?.show({
                     severity: "error",
@@ -164,83 +285,79 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
         });
     };
 
-    return (
+    return isLoading ? (
+        <Loader className='contact-form__loader' />
+    ) : (
         <div className='grid general-info row-gap-2'>
             <div className='col-12 grid'>
                 <div className='col-4 relative pr-0 pb-0'>
-                    <span className='p-float-label'>
-                        <Dropdown
-                            optionLabel='name'
-                            optionValue='id'
-                            value={contact.type || 0}
-                            options={typeList}
-                            onChange={(e) => {
-                                store.contactType = e.value;
-                                setFieldValue("type", e.value);
-                                changeContact("type", e.value);
-                            }}
-                            className={`w-full general-info__dropdown ${
-                                errors.type ? "p-invalid" : ""
-                            }`}
-                            pt={{
-                                wrapper: {
-                                    style: { height: "auto", maxHeight: "none" },
-                                },
-                            }}
-                        />
-                        <label className='float-label'>Type (required)</label>
-                    </span>
+                    <ComboBox
+                        optionLabel='name'
+                        optionValue='id'
+                        value={contact.type || 0}
+                        options={typeList}
+                        onChange={(e) => {
+                            store.contactType = e.value;
+                            setFieldValue("type", e.value);
+                            changeContact("type", e.value);
+                        }}
+                        className={`w-full general-info__dropdown ${
+                            errors.type ? "p-invalid" : ""
+                        }`}
+                        label='Type (required)'
+                        pt={{
+                            wrapper: {
+                                style: { height: "auto", maxHeight: "none" },
+                            },
+                        }}
+                    />
+
                     <small className='p-error'>{errors.type}</small>
                 </div>
             </div>
             {!!contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (
-                <>
-                    <div className='col-3'>
+                <div className='col-12 flex gap-4'>
+                    <Button
+                        type='button'
+                        label='Scan driver license'
+                        className='general-info__button'
+                        tooltip='Data received from the DL’s backside will fill in related fields'
+                        outlined
+                        onClick={handleScanDL}
+                    />
+                    <input
+                        type='file'
+                        accept='image/*'
+                        style={{ display: "none" }}
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                    />
+                    <div className='general-info-overwrite pb-3'>
+                        <Checkbox
+                            checked={allowOverwrite}
+                            inputId='general-info-overwrite'
+                            className='general-info-overwrite__checkbox'
+                            onChange={() => setAllowOverwrite(!allowOverwrite)}
+                        />
+                        <label
+                            htmlFor='general-info-overwrite'
+                            className='general-info-overwrite__label'
+                        >
+                            Overwrite data
+                        </label>
                         <Button
-                            type='button'
-                            label='Scan driver license'
-                            className='general-info__button'
-                            tooltip='Data received from the DL’s backside will fill in related fields'
+                            text
+                            tooltip='Data received from the DL’s backside will overwrite user-entered data'
+                            icon='icon adms-help'
                             outlined
-                            onClick={handleScanDL}
-                        />
-                        <input
-                            type='file'
-                            accept='image/*'
-                            style={{ display: "none" }}
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
+                            type='button'
+                            className='general-info-overwrite__icon'
+                            tooltipOptions={{
+                                className: "overwrite-tooltip",
+                            }}
                         />
                     </div>
-                    <div className='col-9'>
-                        <div className='general-info-overwrite pb-3'>
-                            <Checkbox
-                                checked={allowOverwrite}
-                                disabled={isControlDisabled}
-                                inputId='general-info-overwrite'
-                                className='general-info-overwrite__checkbox'
-                                onChange={() => setAllowOverwrite(!allowOverwrite)}
-                            />
-                            <label
-                                htmlFor='general-info-overwrite'
-                                className='general-info-overwrite__label'
-                            >
-                                Overwrite data
-                            </label>
-                            <Button
-                                text
-                                tooltip='Data received from the DL’s backside will overwrite user-entered data'
-                                icon='icon adms-help'
-                                outlined
-                                type='button'
-                                className='general-info-overwrite__icon'
-                                tooltipOptions={{
-                                    className: "overwrite-tooltip",
-                                }}
-                            />
-                        </div>
-                    </div>
-                </>
+                </div>
             ) : null}
             {contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (
                 <>
@@ -249,8 +366,10 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             className={`general-info__text-input ${errors.firstName ? "p-invalid" : ""}`}
                             value={contact.firstName || ""}
                             onChange={({ target: { value } }) => {
-                                setFieldValue("firstName", value);
-                                changeContact("firstName", value);
+                                setFieldValue("firstName", value, true).then(() => {
+                                    changeContact("firstName", value);
+                                    validateField("firstName");
+                                });
                             }}
                             onBlur={handleOfacCheck}
                             name={`First Name${!shouldDisableNameFields ? " (required)" : ""}`}
@@ -264,18 +383,20 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             disabled={shouldDisableNameFields}
                             clearButton
                         />
-
                         <small className='p-error'>{errors.firstName}</small>
                     </div>
 
                     <div className='col-4 relative'>
                         <TextInput
                             name='Middle Name'
-                            className='general-info__text-input w-full'
+                            className={`general-info__text-input ${errors.middleName ? "p-invalid" : ""}`}
                             value={contact.middleName || ""}
                             onChange={({ target: { value } }) => {
-                                changeContact("middleName", value);
-                                setFieldValue("middleName", value);
+                                setFieldValue("middleName", value, true).then(() => {
+                                    changeContact("middleName", value);
+                                    validateField("middleName");
+                                    setFieldTouched("middleName", true, true);
+                                });
                             }}
                             tooltip={
                                 isBusinessNameRequired
@@ -287,6 +408,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             disabled={shouldDisableNameFields}
                             clearButton
                         />
+                        <small className='p-error'>{errors.middleName}</small>
                     </div>
 
                     <div className='col-4 relative'>
@@ -295,8 +417,10 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             className={`general-info__text-input ${errors.lastName ? "p-invalid" : ""}`}
                             value={contact.lastName || ""}
                             onChange={({ target: { value } }) => {
-                                setFieldValue("lastName", value);
-                                changeContact("lastName", value);
+                                setFieldValue("lastName", value, true).then(() => {
+                                    changeContact("lastName", value);
+                                    validateField("lastName");
+                                });
                             }}
                             onBlur={handleOfacCheck}
                             disabled={shouldDisableNameFields}
@@ -309,7 +433,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             }
                             clearButton
                         />
-
                         <small className='p-error'>{errors.lastName}</small>
                     </div>
                 </>

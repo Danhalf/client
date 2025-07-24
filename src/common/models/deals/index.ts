@@ -1,11 +1,18 @@
-import { BaseResponse } from "common/models/base-response";
-import { PrintForm, TypeList } from "..";
-import { Status } from "../base-response";
+import { BaseResponse, BaseResponseError } from "common/models/base-response";
+import { PrintForm, TypeList } from "common/models";
+import { Status } from "common/models/base-response";
+
+export enum AddToInventory {
+    ALL_DISABLED = 0,
+    TRADE_FIRST_ENABLED = 1,
+    TRADE_SECOND_ENABLED = 2,
+    ALL_ENABLED = 3,
+}
 
 export interface Deal {
     accountInfo: string;
     accountuid: string;
-    addToInventory: number;
+    addToInventory: AddToInventory;
     contactinfo: string;
     contactuid: string;
     created: string;
@@ -26,7 +33,9 @@ export interface Deal {
     name: string;
     price: string;
     salesperson1uid: string;
+    salesperson1name: string;
     salesperson2uid: string;
+    salesperson2name: string;
     saletype: number;
     status: string;
     updated: string;
@@ -410,15 +419,36 @@ export interface DealPickupPayment {
     dealuid: string;
     itemuid: string;
     paid: number;
-    paydate: string;
+    paydate: number | string;
     updated: string;
     useruid: string;
 }
 
 export interface HowToKnow {
     created: string;
-    updated: string;
-    itemuid: string;
-    useruid: string;
     description: string;
+    isdefault: 0 | 1;
+    itemuid: string;
+    updated: string;
+    useruid: string;
+}
+
+export interface DealDelete {
+    status: string;
+    error: string;
+    description: string;
+    comment: string;
+    reason: string;
+    delete_buyer: 0 | 1;
+    delete_vehicle: 0 | 1;
+    send_back: 0 | 1;
+    delete_quote: 0 | 1;
+    delete_trade1: 0 | 1;
+    delete_trade2: 0 | 1;
+    delete_account: 0 | 1;
+}
+
+export interface DealPaymentsTotal extends BaseResponseError {
+    total: number;
+    total_paid: number;
 }
