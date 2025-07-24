@@ -133,7 +133,6 @@ export const InventoryForm = observer(() => {
         currentLocation,
         deleteReason,
         memoRoute,
-        isLoading,
     } = store;
     const navigate = useNavigate();
     const [inventorySections, setInventorySections] = useState<InventorySection[]>([]);
@@ -472,10 +471,8 @@ export const InventoryForm = observer(() => {
         }
     };
 
-    return isLoading ? (
-        <Loader overlay />
-    ) : (
-        <Suspense>
+    return (
+        <Suspense fallback={<Loader className='inventory-loader' />}>
             <div className='grid relative'>
                 <Button
                     icon='pi pi-times'
@@ -640,7 +637,11 @@ export const InventoryForm = observer(() => {
                                                                 {item.itemLabel}
                                                             </div>
                                                             {stepActiveIndex === item.itemIndex && (
-                                                                <Suspense fallback={<Loader />}>
+                                                                <Suspense
+                                                                    fallback={
+                                                                        <Loader className='inventory-loader' />
+                                                                    }
+                                                                >
                                                                     {item.component}
                                                                 </Suspense>
                                                             )}
