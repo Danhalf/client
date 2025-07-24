@@ -364,7 +364,12 @@ export const LinksMedia = observer((): ReactElement => {
                         >
                             <Column body={linkControlTemplate} />
                             <Column header='#' body={numberColumnTemplate} />
-                            <Column field='info.mediaurl' header='URL' style={{ width: "70%" }} />
+                            <Column
+                                className='media-links__url-ellipsis'
+                                field='info.mediaurl'
+                                header='URL'
+                                style={{ width: "70%", maxWidth: "34vw" }}
+                            />
                             <Column body={actionColumnTemplate} />
                         </DataTable>
                     ) : (
