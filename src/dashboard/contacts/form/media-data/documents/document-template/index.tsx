@@ -5,6 +5,7 @@ import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
 import { useState } from "react";
 import { Status } from "common/models/base-response";
+import { convertDateToLocale } from "common/helpers";
 
 interface ContactDocumentTemplateProps extends Partial<HTMLDivElement> {
     document: Partial<ContactMediaItem>;
@@ -75,7 +76,7 @@ export const ContactDocumentTemplate = ({
                     <span className='document-info__icon'>
                         <i className='pi pi-calendar' />
                     </span>
-                    <span className='document-info__text'>{created}</span>
+                    <span className='document-info__text'>{convertDateToLocale(created)}</span>
                 </div>
             </figcaption>
             <button
