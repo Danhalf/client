@@ -19,6 +19,7 @@ import { useToast } from "dashboard/common/toast";
 import { ContactDocumentsLimitations } from "common/models/contact";
 import { Loader } from "dashboard/common/loader";
 import { Status } from "common/models/base-response";
+import { TruncatedText } from "dashboard/common/display";
 
 const limitations: ContactDocumentsLimitations = {
     formats: ["PDF", "PNG", "JPEG", "TIFF"],
@@ -284,8 +285,8 @@ export const ContactsDocuments = observer((): ReactElement => {
                                 <Image
                                     src={src}
                                     alt='contact-document'
-                                    width='75'
-                                    height='75'
+                                    width='40'
+                                    height='40'
                                     pt={{
                                         image: {
                                             className: "media-documents__image",
@@ -299,7 +300,11 @@ export const ContactsDocuments = observer((): ReactElement => {
                                                 <i className='pi pi-comment' />
                                             </span>
                                         </span>
-                                        <span className='document-info__text'>{notes}</span>
+                                        <TruncatedText
+                                            className='document-info__text'
+                                            text={notes || ""}
+                                            withTooltip
+                                        />
                                     </div>
                                     <div className='document-info__item'>
                                         <span className='document-info__icon'>

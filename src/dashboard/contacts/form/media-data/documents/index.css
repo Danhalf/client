@@ -161,6 +161,7 @@
     align-items: center;
     border-radius: 5px;
     position: relative;
+    height: 72px;
 }
 
 .document-info {
@@ -170,6 +171,8 @@
     flex-direction: column;
     gap: 7px;
     justify-content: space-around;
+    overflow: hidden;
+    width: 100%;
 }
 
 .document-info__item {
@@ -199,6 +202,14 @@
 
 .document-info__icon {
     color: var(--admss-app-primary-main-green);
+}
+
+.document-info__text {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 2rem;
 }
 
 .document-info__text--bold {
