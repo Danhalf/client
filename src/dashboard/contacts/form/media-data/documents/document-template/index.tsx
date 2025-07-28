@@ -6,6 +6,7 @@ import { useToast } from "dashboard/common/toast";
 import { useState } from "react";
 import { Status } from "common/models/base-response";
 import { convertDateToLocale } from "common/helpers";
+import { MediaType } from "common/models/enums";
 
 interface ContactDocumentTemplateProps extends Partial<HTMLDivElement> {
     document: Partial<ContactMediaItem>;
@@ -15,7 +16,7 @@ const SUCCESS_MESSAGE = "Document deleted successfully";
 const ERROR_MESSAGE = "Failed to delete document";
 
 export const ContactDocumentTemplate = ({
-    document: { itemuid, src, notes, created },
+    document: { itemuid, src, notes, created, type },
 }: ContactDocumentTemplateProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const { removeContactMedia, fetchDocuments, formErrorMessage } = useStore().contactStore;
@@ -50,19 +51,27 @@ export const ContactDocumentTemplate = ({
             setIsLoading(false);
         }
     };
+
     return (
         <figure key={itemuid} className='media-documents__item'>
-            <Image
-                src={src}
-                alt='contact-document'
-                width='40'
-                height='40'
-                pt={{
-                    image: {
-                        className: "media-documents__image",
-                    },
-                }}
-            />
+            {type === MediaType.mtPhoto && (
+                <Image
+                    src={src}
+                    alt='contact-document'
+                    width='40'
+                    height='40'
+                    pt={{
+                        image: {
+                            className: "media-documents__image",
+                        },
+                    }}
+                />
+            )}
+            {type === MediaType.mtDocument && (
+                <div className='media-documents__icon'>
+                    <i className='pi pi-file-pdf' />
+                </div>
+            )}
             <figcaption className='media-documents__info document-info'>
                 <div className='document-info__item'>
                     <span className='document-info__icon'>

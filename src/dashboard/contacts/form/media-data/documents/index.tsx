@@ -26,6 +26,10 @@ const limitations: ContactDocumentsLimitations = {
     maxUploadedDocuments: 50,
 };
 
+const isPdf = (file: File) => {
+    return file.type === "application/pdf" || file.name?.toLowerCase().includes(".pdf");
+};
+
 export const ContactsDocuments = observer((): ReactElement => {
     const store = useStore().contactStore;
     const toast = useToast();
@@ -120,14 +124,20 @@ export const ContactsDocuments = observer((): ReactElement => {
         return (
             <div className='flex align-items-center presentation'>
                 <div className='flex align-items-center'>
-                    <img
-                        alt={file.name}
-                        src={URL.createObjectURL(file)}
-                        role='presentation'
-                        width={29}
-                        height={29}
-                        className='presentation__document'
-                    />
+                    {isPdf(file) ? (
+                        <div className='presentation__icon'>
+                            <i className='pi pi-file-pdf' />
+                        </div>
+                    ) : (
+                        <img
+                            alt={file.name}
+                            src={URL.createObjectURL(file)}
+                            role='presentation'
+                            width={29}
+                            height={29}
+                            className='presentation__document'
+                        />
+                    )}
                     <span className='presentation__label flex flex-column text-left ml-3'>
                         {file.name}
                     </span>
