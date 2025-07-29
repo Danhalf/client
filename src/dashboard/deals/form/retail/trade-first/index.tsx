@@ -23,6 +23,7 @@ import { MakesListData } from "common/models/inventory";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { AddToInventory, DealExtData } from "common/models/deals";
+import { useLocation } from "react-router-dom";
 
 export const DealRetailTradeFirst = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -49,7 +50,8 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
         changeAddToInventory,
     } = store;
     const { values, errors, setFieldValue, setFieldTouched } = useFormikContext<PartialDeal>();
-
+    const { pathname, search } = useLocation();
+    const currentPath = pathname + search;
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
@@ -495,6 +497,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
 
             <div className='col-6'>
                 <CompanySearch
+                    originalPath={currentPath}
                     name='Lienholder Name'
                     value={Trade1_Lien_Name}
                     onChange={({ target: { value } }) =>
@@ -539,6 +542,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <CompanySearch
+                    originalPath={currentPath}
                     value={Trade1_Lien_Contact}
                     onChange={({ target: { value } }) =>
                         changeDealExtData({ key: "Trade1_Lien_Contact", value })
