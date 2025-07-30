@@ -381,6 +381,34 @@ export const DealsForm = observer(() => {
         }
     };
 
+    const handleSubmit = async () => {
+        const response = await saveDeal();
+        const res = response as BaseResponseError;
+        if (typeof res === "string" || !res) {
+            navigate(`/dashboard/deals`);
+        }
+
+        if (res?.error) {
+            if (Array.isArray(res?.errors)) {
+                res?.errors.forEach((error) => {
+                    toast.current?.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: error.message,
+                    });
+                });
+            } else {
+                toast.current?.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: res?.error,
+                });
+            }
+        } else {
+            navigate(`/dashboard/deals`);
+        }
+    };
+
     return isLoading ? (
         <Loader overlay />
     ) : (
@@ -550,25 +578,7 @@ export const DealsForm = observer(() => {
                                             validationSchema={DealFormSchema}
                                             validateOnChange={false}
                                             validateOnBlur={false}
-                                            onSubmit={() => {
-                                                saveDeal().then((response) => {
-                                                    const res = response as BaseResponseError;
-                                                    if (res?.status === Status.ERROR) {
-                                                        toast.current?.show({
-                                                            severity: "error",
-                                                            summary: "Error",
-                                                            detail: res?.error,
-                                                        });
-                                                    } else {
-                                                        navigate(`/dashboard/deals`);
-                                                        toast.current?.show({
-                                                            severity: "success",
-                                                            summary: "Success",
-                                                            detail: "Deal saved successfully",
-                                                        });
-                                                    }
-                                                });
-                                            }}
+                                            onSubmit={handleSubmit}
                                         >
                                             <Form name='dealForm' className='w-full'>
                                                 {dealsSections.map((section) =>
