@@ -187,14 +187,6 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     value: Trade1_Mileage || vinInfo.mileage,
                 });
             }
-            handleChangeFormValue({
-                key: "Trade1_Make",
-                value: values.Trade1_Make || vinInfo.Make,
-            });
-            handleChangeFormValue({
-                key: "Trade1_Model",
-                value: values.Trade1_Model || vinInfo.Model,
-            });
         }
     };
 

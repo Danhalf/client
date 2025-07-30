@@ -186,14 +186,6 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     value: Trade2_Mileage || vinInfo.mileage,
                 });
             }
-            handleChangeFormValue({
-                key: "Trade2_Make",
-                value: values.Trade2_Make || vinInfo.Make,
-            });
-            handleChangeFormValue({
-                key: "Trade2_Model",
-                value: values.Trade2_Model || vinInfo.Model,
-            });
         }
     };
 
