@@ -19,12 +19,10 @@ export const ComboBox = ({
 
     const dropdownListItem = (option: unknown) => {
         const optionLabel = props?.optionLabel;
-        let text = "";
+        let text = String(option);
 
         if (optionLabel && typeof option === "object" && option !== null) {
             text = String((option as Record<string, unknown>)[optionLabel] || "");
-        } else {
-            text = String(option);
         }
 
         return <TruncatedText className='combo-box__list-item' withTooltip text={text} />;
