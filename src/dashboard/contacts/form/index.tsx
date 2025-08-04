@@ -48,6 +48,7 @@ export type PartialContact = Pick<
 
 const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>> = {
     [ContactAccordionItems.BUYER]: ["firstName", "lastName", "type", "businessName"],
+    [ContactAccordionItems.CO_BUYER]: ["CoBuyer_First_Name", "CoBuyer_Last_Name"],
     [ContactAccordionItems.CONTACTS]: ["email1", "email2", "phone1", "phone2"],
     [ContactAccordionItems.COMPANY]: ["Buyer_Emp_Ext", "Buyer_Emp_Phone"],
 };
@@ -129,15 +130,37 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             message: "Invalid phone number.",
             excludeEmptyString: false,
         }),
-    CoBuyer_First_Name: Yup.string().matches(LETTERS_NUMBERS_SIGNS_REGEX, {
-        message: handleValidationMessage("First name"),
-    }),
-    CoBuyer_Middle_Name: Yup.string().matches(LETTERS_NUMBERS_SIGNS_REGEX, {
-        message: handleValidationMessage("Middle name"),
-    }),
-    CoBuyer_Last_Name: Yup.string().matches(LETTERS_NUMBERS_SIGNS_REGEX, {
-        message: handleValidationMessage("Last name"),
-    }),
+    CoBuyer_First_Name: Yup.string()
+        .trim()
+        .test("coBuyerFirstNameRequired", "Data is required.", function (value) {
+            const { type } = this.parent;
+            if (type === BUYER_ID) {
+                return !!value?.trim();
+            }
+            return true;
+        })
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("First name"),
+            excludeEmptyString: true,
+        }),
+    CoBuyer_Middle_Name: Yup.string()
+        .trim()
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("Middle name"),
+        }),
+    CoBuyer_Last_Name: Yup.string()
+        .trim()
+        .test("coBuyerLastNameRequired", "Data is required.", function (value) {
+            const { type } = this.parent;
+            if (type === BUYER_ID) {
+                return !!value?.trim();
+            }
+            return true;
+        })
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("Last name"),
+            excludeEmptyString: true,
+        }),
 });
 
 const DialogBody = (): ReactElement => {
