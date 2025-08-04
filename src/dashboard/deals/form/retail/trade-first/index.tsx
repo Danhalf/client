@@ -39,6 +39,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             Trade1_OdomNotActual,
             Trade1_Allowance,
             Trade1_Lien_Payoff,
+            Trade1_Lien_Per_Diem,
             Trade1_Lien_Payoff_Good_Through,
             Trade1_Lien_Name,
             Trade1_Lien_Contact,
@@ -151,7 +152,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 });
                 handleChangeFormValue({
                     key: "Trade1_BodyStyle",
-                    value: vinInfo.BodyStyle || Trade1_BodyStyle,
+                    value: vinInfo.BodyStyle_id || Trade1_BodyStyle,
                 });
                 handleChangeFormValue({
                     key: "Trade1_Color",
@@ -176,7 +177,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 });
                 handleChangeFormValue({
                     key: "Trade1_BodyStyle",
-                    value: Trade1_BodyStyle || vinInfo.BodyStyle,
+                    value: Trade1_BodyStyle || vinInfo.BodyStyle_id,
                 });
                 handleChangeFormValue({
                     key: "Trade1_Color",
@@ -340,7 +341,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             <div className='col-3'>
                 <ComboBox
                     optionLabel='name'
-                    optionValue='name'
+                    optionValue='id'
                     value={Trade1_BodyStyle}
                     onChange={({ target: { value } }) => {
                         changeDealExtData({ key: "Trade1_BodyStyle", value });
@@ -444,12 +445,12 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <CurrencyInput
-                    value={Number(Trade1_Lien_Payoff) || 0}
+                    value={Number(Trade1_Lien_Per_Diem) || 0}
                     onChange={({ value }) => {
-                        changeDealExtData({ key: "Trade1_Lien_Payoff", value: value || 0 });
+                        changeDealExtData({ key: "Trade1_Lien_Per_Diem", value: value || 0 });
                     }}
                     labelPosition='top'
-                    title='Payoff Amount'
+                    title='Per Diem'
                 />
             </div>
             <div className='col-3'>
