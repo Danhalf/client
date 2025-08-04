@@ -2,10 +2,14 @@ import { Steps } from "primereact/steps";
 import { ReactElement, Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
-import { ContactAccordionItems, ContactItem, ContactSection } from "../common/step-navigation";
+import {
+    ContactAccordionItems,
+    ContactItem,
+    ContactSection,
+} from "dashboard/contacts/common/step-navigation";
 import { useNavigate, useParams } from "react-router-dom";
 import { BUYER_ID, generalBuyerInfo, generalCoBuyerInfo } from "./general-info";
-import { ContactInfoData } from "./contact-info";
+import { ContactInfoData } from "dashboard/contacts/form/contact-info";
 import { useStore } from "store/hooks";
 import { useLocation } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
@@ -18,8 +22,8 @@ import { TOAST_LIFETIME } from "common/settings";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { DashboardDialog } from "dashboard/common/dialog";
-import { ContactMediaData } from "./media-data";
-import { DeleteForm } from "./delete-form";
+import { ContactMediaData } from "dashboard/contacts/form/media-data";
+import { DeleteForm } from "dashboard/contacts/form/delete-form";
 import { truncateText } from "common/helpers";
 import { Tooltip } from "primereact/tooltip";
 import { LETTERS_NUMBERS_SIGNS_REGEX, PHONE_NUMBER_REGEX } from "common/constants/regex";
