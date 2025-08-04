@@ -180,7 +180,6 @@ export const ContactForm = observer((): ReactElement => {
         isContactChanged,
         memoRoute,
         deleteReason,
-        isLoading,
         activeTab,
         tabLength,
     } = store;
@@ -406,9 +405,7 @@ export const ContactForm = observer((): ReactElement => {
         );
     };
 
-    return isLoading ? (
-        <Loader overlay />
-    ) : (
+    return (
         <Suspense>
             <div className='grid relative'>
                 <Button
@@ -570,7 +567,11 @@ export const ContactForm = observer((): ReactElement => {
                                                                 </div>
                                                                 {stepActiveIndex ===
                                                                     item.itemIndex && (
-                                                                    <Suspense fallback={<Loader />}>
+                                                                    <Suspense
+                                                                        fallback={
+                                                                            <Loader className='contact-form__loader' />
+                                                                        }
+                                                                    >
                                                                         {item.component}
                                                                     </Suspense>
                                                                 )}
