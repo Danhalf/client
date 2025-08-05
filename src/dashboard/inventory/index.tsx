@@ -31,7 +31,12 @@ import {
     getUserSettings,
     setUserSettings,
 } from "http/services/auth-user.service";
-import { FilterOptions, TableColumnsList, columns, filterOptions } from "./common/data-table";
+import {
+    FilterOptions,
+    TableColumnsList,
+    columns,
+    filterOptions,
+} from "dashboard/inventory/common/data-table";
 import {
     InventoryUserSettings,
     ServerUserSettings,
@@ -51,6 +56,7 @@ import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
+import { INVENTORY_PAGE } from "common/constants/links";
 
 const DATA_FIELD = "data-field";
 
@@ -58,6 +64,7 @@ interface InventoriesProps {
     onRowClick?: (companyName: string) => void;
     returnedField?: keyof Inventory;
     getFullInfo?: (inventory: Inventory) => void;
+    originalPath?: string;
 }
 
 interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
@@ -66,6 +73,7 @@ export default function Inventories({
     onRowClick,
     returnedField,
     getFullInfo,
+    originalPath,
 }: InventoriesProps): ReactElement {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
@@ -92,6 +100,7 @@ export default function Inventories({
     const dataTableRef = useRef<DataTable<Inventory[]>>(null);
     const [columnWidths, setColumnWidths] = useState<{ field: string; width: number }[]>([]);
     const store = useStore().inventoryStore;
+    const { clearInventory } = store;
     const toast = useToast();
 
     const navigate = useNavigate();
@@ -138,7 +147,11 @@ export default function Inventories({
             });
         }
         return () => {
-            store.memoRoute = "";
+            store.isErasingNeeded = true;
+            if (originalPath) {
+                store.memoRoute = originalPath;
+            }
+            clearInventory();
         };
     }, []);
 
@@ -577,6 +590,10 @@ export default function Inventories({
         },
     ];
 
+    const handleAddNewInventory = () => {
+        navigate(INVENTORY_PAGE.CREATE());
+    };
+
     const header = (
         <div className='grid datatable-controls'>
             <div className='flex justify-content-between align-items-center gap-3'>
@@ -606,7 +623,7 @@ export default function Inventories({
                         severity='success'
                         type='button'
                         tooltip='Add new inventory'
-                        onClick={() => navigate("create")}
+                        onClick={handleAddNewInventory}
                     >
                         New
                     </Button>

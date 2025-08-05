@@ -748,3 +748,23 @@
     width: 4px;
     height: 4px;
 }
+
+.p-inputtext + .float-label,
+.combo-box + .float-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    width: 90%;
+}
+
+.combo-box + .float-label {
+    width: calc(100% - 50px);
+}
+
+figure {
+    margin-block-start: 0;
+    margin-block-end: 0;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+}

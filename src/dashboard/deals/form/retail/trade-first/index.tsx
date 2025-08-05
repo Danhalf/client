@@ -23,6 +23,7 @@ import { MakesListData } from "common/models/inventory";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { AddToInventory, DealExtData } from "common/models/deals";
+import { useLocation } from "react-router-dom";
 
 export const DealRetailTradeFirst = observer((): ReactElement => {
     const store = useStore().dealStore;
@@ -38,6 +39,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             Trade1_OdomNotActual,
             Trade1_Allowance,
             Trade1_Lien_Payoff,
+            Trade1_Lien_Per_Diem,
             Trade1_Lien_Payoff_Good_Through,
             Trade1_Lien_Name,
             Trade1_Lien_Contact,
@@ -49,7 +51,8 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
         changeAddToInventory,
     } = store;
     const { values, errors, setFieldValue, setFieldTouched } = useFormikContext<PartialDeal>();
-
+    const { pathname, search } = useLocation();
+    const currentPath = pathname + search;
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [colorList, setColorList] = useState<ListData[]>([]);
@@ -149,7 +152,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 });
                 handleChangeFormValue({
                     key: "Trade1_BodyStyle",
-                    value: vinInfo.BodyStyle || Trade1_BodyStyle,
+                    value: vinInfo.BodyStyle_id || Trade1_BodyStyle,
                 });
                 handleChangeFormValue({
                     key: "Trade1_Color",
@@ -174,7 +177,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                 });
                 handleChangeFormValue({
                     key: "Trade1_BodyStyle",
-                    value: Trade1_BodyStyle || vinInfo.BodyStyle,
+                    value: Trade1_BodyStyle || vinInfo.BodyStyle_id,
                 });
                 handleChangeFormValue({
                     key: "Trade1_Color",
@@ -185,14 +188,6 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
                     value: Trade1_Mileage || vinInfo.mileage,
                 });
             }
-            handleChangeFormValue({
-                key: "Trade1_Make",
-                value: values.Trade1_Make || vinInfo.Make,
-            });
-            handleChangeFormValue({
-                key: "Trade1_Model",
-                value: values.Trade1_Model || vinInfo.Model,
-            });
         }
     };
 
@@ -346,7 +341,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             <div className='col-3'>
                 <ComboBox
                     optionLabel='name'
-                    optionValue='name'
+                    optionValue='id'
                     value={Trade1_BodyStyle}
                     onChange={({ target: { value } }) => {
                         changeDealExtData({ key: "Trade1_BodyStyle", value });
@@ -450,12 +445,12 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             </div>
             <div className='col-3'>
                 <CurrencyInput
-                    value={Number(Trade1_Lien_Payoff) || 0}
+                    value={Number(Trade1_Lien_Per_Diem) || 0}
                     onChange={({ value }) => {
-                        changeDealExtData({ key: "Trade1_Lien_Payoff", value: value || 0 });
+                        changeDealExtData({ key: "Trade1_Lien_Per_Diem", value: value || 0 });
                     }}
                     labelPosition='top'
-                    title='Payoff Amount'
+                    title='Per Diem'
                 />
             </div>
             <div className='col-3'>
@@ -495,6 +490,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
 
             <div className='col-6'>
                 <CompanySearch
+                    originalPath={currentPath}
                     name='Lienholder Name'
                     value={Trade1_Lien_Name}
                     onChange={({ target: { value } }) =>
@@ -539,6 +535,7 @@ export const DealRetailTradeFirst = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <CompanySearch
+                    originalPath={currentPath}
                     value={Trade1_Lien_Contact}
                     onChange={({ target: { value } }) =>
                         changeDealExtData({ key: "Trade1_Lien_Contact", value })

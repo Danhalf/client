@@ -24,6 +24,7 @@ interface DashboardRadioProps {
 }
 
 interface CurrencyInputProps extends InputNumberProps {
+    currencyIcon?: "dollar" | "percent";
     labelPosition?: LabelPosition;
     coloredEmptyValue?: boolean;
 }
@@ -63,6 +64,9 @@ interface DateInputProps extends CalendarProps {
 interface TextInputProps extends InputTextProps {
     colWidth?: Range<1, 13>;
     clearButton?: boolean;
+    ref?: React.RefObject<HTMLInputElement>;
+    wrapperClassName?: string;
+    infoText?: string;
 }
 
 interface PhoneInputProps extends Omit<InputMaskProps, "onChange" | "onBlur"> {
@@ -134,6 +138,7 @@ export const CurrencyInput = ({
     value,
     title,
     labelPosition = "left",
+    currencyIcon = "dollar",
     coloredEmptyValue = false,
     ...props
 }: CurrencyInputProps) => {
@@ -155,7 +160,16 @@ export const CurrencyInput = ({
                 {title}
             </label>
             <div className='currency-item__input flex justify-content-center'>
-                <div className='currency-item__icon input-icon input-icon-left'>$</div>
+                {currencyIcon === "dollar" && (
+                    <div className='currency-item__icon input-icon input-icon-left'>
+                        <i className='icon adms-dollar-sign' />
+                    </div>
+                )}
+                {currencyIcon === "percent" && (
+                    <div className='currency-item__icon input-icon input-icon-left'>
+                        <i className='icon adms-percentage' />
+                    </div>
+                )}
                 <InputNumber
                     inputId={uniqueId}
                     minFractionDigits={2}
@@ -199,7 +213,7 @@ export const PercentInput = ({
                     name={name}
                     inputClassName={`${props.value ? "percent-item__input--filled" : "percent-item__input--empty"}`}
                     {...props}
-                    value={!emptyValue && props.value ? props.value : 0}
+                    value={props.value ? props.value : 0}
                     pt={{
                         root: {
                             id: name,
@@ -419,6 +433,9 @@ export const TextInput = ({
     name,
     colWidth,
     clearButton,
+    ref,
+    wrapperClassName,
+    infoText,
     ...props
 }: TextInputProps): ReactElement => {
     const [value, setValue] = useState<string>(props.value || "");
@@ -439,14 +456,17 @@ export const TextInput = ({
             } as React.ChangeEvent<HTMLInputElement>);
         }
     };
+
     const content = (
-        <span className='p-float-label relative'>
+        <span className={`p-float-label relative ${wrapperClassName || ""}`}>
             <InputText
+                ref={ref}
                 id={uniqueId}
                 className='w-full'
                 style={{ height: `${props.height || 50}px` }}
                 tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
                 value={value.trim()}
+                aria-describedby={`${uniqueId}-info`}
                 onChange={(e) => {
                     props.onChange && props.onChange(e);
                     setValue(e.target.value);
@@ -468,6 +488,11 @@ export const TextInput = ({
                     className='clear-input-button'
                     onClick={handleClear}
                 />
+            )}
+            {infoText && (
+                <small className='input-help' id={`${uniqueId}-info`}>
+                    {infoText}
+                </small>
             )}
             <label htmlFor={uniqueId} className='float-label'>
                 {name}

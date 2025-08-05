@@ -2,10 +2,14 @@ import { Steps } from "primereact/steps";
 import { ReactElement, Suspense, useEffect, useRef, useState } from "react";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Button } from "primereact/button";
-import { ContactAccordionItems, ContactItem, ContactSection } from "../common/step-navigation";
+import {
+    ContactAccordionItems,
+    ContactItem,
+    ContactSection,
+} from "dashboard/contacts/common/step-navigation";
 import { useNavigate, useParams } from "react-router-dom";
 import { BUYER_ID, generalBuyerInfo, generalCoBuyerInfo } from "./general-info";
-import { ContactInfoData } from "./contact-info";
+import { ContactInfoData } from "dashboard/contacts/form/contact-info";
 import { useStore } from "store/hooks";
 import { useLocation } from "react-router-dom";
 import { Loader } from "dashboard/common/loader";
@@ -18,11 +22,11 @@ import { TOAST_LIFETIME } from "common/settings";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { DashboardDialog } from "dashboard/common/dialog";
-import { ContactMediaData } from "./media-data";
-import { DeleteForm } from "./delete-form";
+import { ContactMediaData } from "dashboard/contacts/form/media-data";
+import { DeleteForm } from "dashboard/contacts/form/delete-form";
 import { truncateText } from "common/helpers";
 import { Tooltip } from "primereact/tooltip";
-import { LETTERS_ONLY_REGEX, PHONE_NUMBER_REGEX } from "common/constants/regex";
+import { LETTERS_NUMBERS_SIGNS_REGEX, PHONE_NUMBER_REGEX } from "common/constants/regex";
 const STEP = "step";
 
 export type PartialContact = Pick<
@@ -48,14 +52,15 @@ export type PartialContact = Pick<
 
 const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>> = {
     [ContactAccordionItems.BUYER]: ["firstName", "lastName", "type", "businessName"],
+    [ContactAccordionItems.CO_BUYER]: ["CoBuyer_First_Name", "CoBuyer_Last_Name"],
     [ContactAccordionItems.CONTACTS]: ["email1", "email2", "phone1", "phone2"],
     [ContactAccordionItems.COMPANY]: ["Buyer_Emp_Ext", "Buyer_Emp_Phone"],
 };
 
 export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
 
-const handleOnlyLettersMessage = (text: string) => {
-    return `${text || "This field"} must contain only letters.`;
+const handleValidationMessage = (text: string) => {
+    return `${text || "This field"} does not match the required format.`;
 };
 
 export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.object().shape({
@@ -68,14 +73,14 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             }
             return true;
         })
-        .matches(LETTERS_ONLY_REGEX, {
-            message: handleOnlyLettersMessage("First name"),
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("First name"),
             excludeEmptyString: true,
         }),
     middleName: Yup.string()
         .trim()
-        .matches(LETTERS_ONLY_REGEX, {
-            message: handleOnlyLettersMessage("Middle name"),
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("Middle name"),
         }),
     lastName: Yup.string()
         .trim()
@@ -86,8 +91,8 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             }
             return true;
         })
-        .matches(LETTERS_ONLY_REGEX, {
-            message: handleOnlyLettersMessage("Last name"),
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("Last name"),
             excludeEmptyString: true,
         }),
     businessName: Yup.string()
@@ -103,7 +108,11 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             }
             return true;
         }),
-    type: Yup.number().default(0).required("Data is required."),
+    type: Yup.number()
+        .test("typeRequired", "Data is required.", function (value) {
+            return value !== 0 && value !== null && value !== undefined;
+        })
+        .required("Data is required."),
     email1: Yup.string().email("Invalid email address."),
     email2: Yup.string().email("Invalid email address."),
     phone1: Yup.string()
@@ -125,15 +134,37 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             message: "Invalid phone number.",
             excludeEmptyString: false,
         }),
-    CoBuyer_First_Name: Yup.string().matches(LETTERS_ONLY_REGEX, {
-        message: handleOnlyLettersMessage("First name"),
-    }),
-    CoBuyer_Middle_Name: Yup.string().matches(LETTERS_ONLY_REGEX, {
-        message: handleOnlyLettersMessage("Middle name"),
-    }),
-    CoBuyer_Last_Name: Yup.string().matches(LETTERS_ONLY_REGEX, {
-        message: handleOnlyLettersMessage("Last name"),
-    }),
+    CoBuyer_First_Name: Yup.string()
+        .trim()
+        .test("coBuyerFirstNameRequired", "Data is required.", function (value) {
+            const { type } = this.parent;
+            if (type === BUYER_ID) {
+                return !!value?.trim();
+            }
+            return true;
+        })
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("First name"),
+            excludeEmptyString: true,
+        }),
+    CoBuyer_Middle_Name: Yup.string()
+        .trim()
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("Middle name"),
+        }),
+    CoBuyer_Last_Name: Yup.string()
+        .trim()
+        .test("coBuyerLastNameRequired", "Data is required.", function (value) {
+            const { type } = this.parent;
+            if (type === BUYER_ID) {
+                return !!value?.trim();
+            }
+            return true;
+        })
+        .matches(LETTERS_NUMBERS_SIGNS_REGEX, {
+            message: handleValidationMessage("Last name"),
+            excludeEmptyString: true,
+        }),
 });
 
 const DialogBody = (): ReactElement => {
@@ -176,7 +207,6 @@ export const ContactForm = observer((): ReactElement => {
         isContactChanged,
         memoRoute,
         deleteReason,
-        isLoading,
         activeTab,
         tabLength,
     } = store;
@@ -402,9 +432,7 @@ export const ContactForm = observer((): ReactElement => {
         );
     };
 
-    return isLoading ? (
-        <Loader overlay />
-    ) : (
+    return (
         <Suspense>
             <div className='grid relative'>
                 <Button
@@ -524,7 +552,7 @@ export const ContactForm = observer((): ReactElement => {
                                                     firstName: contact?.firstName || "",
                                                     middleName: contact?.middleName || "",
                                                     lastName: contact?.lastName || "",
-                                                    type: contact?.type || 0,
+                                                    type: contact?.type || null,
                                                     businessName: contact?.businessName || "",
                                                     email1: contact?.email1 || "",
                                                     email2: contact?.email2 || "",
@@ -566,7 +594,11 @@ export const ContactForm = observer((): ReactElement => {
                                                                 </div>
                                                                 {stepActiveIndex ===
                                                                     item.itemIndex && (
-                                                                    <Suspense fallback={<Loader />}>
+                                                                    <Suspense
+                                                                        fallback={
+                                                                            <Loader className='contact-form__loader' />
+                                                                        }
+                                                                    >
                                                                         {item.component}
                                                                     </Suspense>
                                                                 )}

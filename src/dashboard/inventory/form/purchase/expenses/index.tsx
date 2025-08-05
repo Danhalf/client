@@ -29,6 +29,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     const { id } = useParams();
     const toast = useToast();
     const userStore = useStore().userStore;
+    const inventoryStore = useStore().inventoryStore;
     const { authUser } = userStore;
     const [expensesTypeList, setExpensesTypeList] = useState<ListData[]>([]);
     const [expensesVendorList, setExpensesVendorList] = useState<Contact[]>([]);
@@ -105,6 +106,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
     }, [getExpenses]);
 
     const handleClearExpense = () => {
+        inventoryStore.isFormChanged = true;
         setCurrentEditExpense({} as Expenses);
     };
 
@@ -128,6 +130,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
             });
         } else {
             handleClearExpense();
+            inventoryStore.isFormChanged = true;
             getExpenses();
             toast?.current?.show({
                 severity: "success",
@@ -149,6 +152,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
             });
         } else {
             getExpenses();
+            inventoryStore.isFormChanged = true;
             handleClearExpense();
             toast?.current?.show({
                 severity: "success",
@@ -197,6 +201,11 @@ export const PurchaseExpenses = observer((): ReactElement => {
         setExpandedRows([...expandedRows, data]);
     };
 
+    const handleChangeExpense = (field: keyof Expenses, value: string | number | null) => {
+        if (value === undefined) return;
+        currentEditExpense && setCurrentEditExpense({ ...currentEditExpense, [field]: value });
+    };
+
     return (
         <>
             <div className='grid purchase-expenses'>
@@ -207,12 +216,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             date={Date.parse(String(currentEditExpense?.operationdate))}
                             emptyDate
                             onChange={({ value }) =>
-                                value &&
-                                currentEditExpense &&
-                                setCurrentEditExpense({
-                                    ...currentEditExpense,
-                                    operationdate: String(new Date(`${value}`)),
-                                })
+                                handleChangeExpense("operationdate", String(new Date(`${value}`)))
                             }
                         />
                     </div>
@@ -222,11 +226,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             optionValue='index'
                             options={expensesTypeList}
                             value={currentEditExpense?.type}
-                            onChange={({ value }) =>
-                                value &&
-                                currentEditExpense &&
-                                setCurrentEditExpense({ ...currentEditExpense, type: value })
-                            }
+                            onChange={({ value }) => handleChangeExpense("type", value)}
                             className='w-full purchase-expenses__dropdown'
                             label='Type'
                         />
@@ -237,12 +237,8 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             optionValue='contactuid'
                             filter
                             options={expensesVendorList}
-                            value={currentEditExpense?.vendor || ""}
-                            onChange={({ value }) =>
-                                value &&
-                                currentEditExpense &&
-                                setCurrentEditExpense({ ...currentEditExpense, vendor: value })
-                            }
+                            value={currentEditExpense?.vendor}
+                            onChange={({ value }) => handleChangeExpense("vendor", value)}
                             className='w-full purchase-expenses__dropdown'
                             label='Vendor'
                         />
@@ -252,11 +248,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             labelPosition='top'
                             title='Amount'
                             value={currentEditExpense?.amount || 0}
-                            onChange={({ value }) =>
-                                value &&
-                                currentEditExpense &&
-                                setCurrentEditExpense({ ...currentEditExpense, amount: value })
-                            }
+                            onChange={({ value }) => handleChangeExpense("amount", value)}
                             pt={{
                                 input: {
                                     root: {
@@ -270,10 +262,10 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <BorderedCheckbox
                             checked={!!currentEditExpense?.notbillable}
                             onChange={() =>
-                                setCurrentEditExpense({
-                                    ...currentEditExpense,
-                                    notbillable: !currentEditExpense?.notbillable ? 1 : 0,
-                                })
+                                handleChangeExpense(
+                                    "notbillable",
+                                    !currentEditExpense?.notbillable ? 1 : 0
+                                )
                             }
                             name='Not Billable'
                         />
@@ -285,9 +277,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                             className='purchase-expenses__text-area'
                             value={currentEditExpense?.comment || ""}
                             onChange={({ target: { value } }) =>
-                                value &&
-                                currentEditExpense &&
-                                setCurrentEditExpense({ ...currentEditExpense, comment: value })
+                                handleChangeExpense("comment", value)
                             }
                         />
                         <label className='float-label'>Notes</label>
