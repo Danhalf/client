@@ -1,7 +1,6 @@
 import "./index.css";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState, useRef } from "react";
-import { InputText } from "primereact/inputtext";
 import { Tooltip } from "primereact/tooltip";
 import { Loader } from "dashboard/common/loader";
 import { useToast } from "dashboard/common/toast";
@@ -10,6 +9,7 @@ import { getHowToKnowList, setHowToKnow, deleteHowToKnow } from "http/services/d
 import { HowToKnow } from "common/models/deals";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
+import { TextInput } from "dashboard/common/form/inputs";
 
 const NEW_ITEM = "new";
 const DESCRIPTION_MAX_LENGTH = 127;
@@ -153,20 +153,12 @@ export const SettingsOther = (): ReactElement => {
                                 <div className='col-10 flex align-items-center p-0'>
                                     {editedItem.itemuid === item.itemuid ? (
                                         <div className='flex row-edit'>
-                                            <InputText
-                                                type='text'
+                                            <TextInput
+                                                wrapperClassName='row-edit__input-wrapper'
                                                 maxLength={DESCRIPTION_MAX_LENGTH}
-                                                tooltip={
-                                                    editedItem?.description?.length ===
-                                                    DESCRIPTION_MAX_LENGTH
-                                                        ? `Max ${DESCRIPTION_MAX_LENGTH} characters`
-                                                        : ""
-                                                }
-                                                tooltipOptions={{
-                                                    position: "mouse",
-                                                }}
                                                 value={editedItem.description || ""}
-                                                className='row-edit__input'
+                                                className='row-edit__input validated-input'
+                                                infoText={`${DESCRIPTION_MAX_LENGTH}`}
                                                 onChange={(e) =>
                                                     setEditedItem({
                                                         ...editedItem,
@@ -257,10 +249,12 @@ export const SettingsOther = (): ReactElement => {
                             <div className='settings-other__row'>
                                 <div className='col-10 flex align-items-center p-0'>
                                     <div className='flex row-edit'>
-                                        <InputText
-                                            type='text'
+                                        <TextInput
                                             value={editedItem.description || ""}
+                                            wrapperClassName='row-edit__input-wrapper'
+                                            infoText={`${DESCRIPTION_MAX_LENGTH}`}
                                             className='row-edit__input'
+                                            maxLength={DESCRIPTION_MAX_LENGTH}
                                             onChange={(e) =>
                                                 setEditedItem({
                                                     ...editedItem,
