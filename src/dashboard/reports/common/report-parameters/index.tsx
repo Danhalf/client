@@ -35,8 +35,12 @@ export const reportDownloadForm = async (
     };
 
     if (!!params.AskForStartAndEndDates || withDate) {
-        payload.from_date = params.from_date ? new Date(params.from_date).getTime() : undefined;
-        payload.to_date = params.to_date ? new Date(params.to_date).getTime() : undefined;
+        payload.from_date = params.from_date
+            ? new Date(params.from_date).getTime()
+            : new Date().getTime();
+        payload.to_date = params.to_date
+            ? new Date(params.to_date).getTime()
+            : new Date().getTime();
     }
 
     const response = await setReportDocumentTemplate(params.itemUID || "0", payload);
@@ -85,8 +89,8 @@ export const ReportParameters = ({
         const response = await reportDownloadForm(
             {
                 action: download ? DIALOG_ACTION.DOWNLOAD : DIALOG_ACTION.PREVIEW,
-                from_date: startDate ? new Date(Number(startDate)) : undefined,
-                to_date: endDate ? new Date(Number(endDate)) : undefined,
+                from_date: startDate ? new Date(Number(startDate)) : new Date().getTime(),
+                to_date: endDate ? new Date(Number(endDate)) : new Date().getTime(),
                 ...report,
             },
             true
