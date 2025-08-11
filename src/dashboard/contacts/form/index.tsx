@@ -377,6 +377,10 @@ export const ContactForm = observer((): ReactElement => {
                 setValidateOnMount(true);
                 formikRef.current?.setErrors(allErrors);
 
+                Object.keys(allErrors).forEach((field) => {
+                    formikRef.current?.setFieldTouched(field, true, false);
+                });
+
                 const sectionsWithErrors = Object.keys(allErrors);
                 const currentSectionsWithErrors: string[] = [];
                 Object.entries(tabFields).forEach(([key, value]) => {

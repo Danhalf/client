@@ -14,6 +14,7 @@ import { useFormikContext } from "formik";
 import { parseCustomDate } from "common/helpers";
 import { SexList } from "common/constants/contract-options";
 import { TOOLTIP_MESSAGE } from "dashboard/contacts/form/general-info/tabs/general";
+import { ERROR_MESSAGES } from "common/constants/error-messagess";
 
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -228,7 +229,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
             <div className='col-4 relative'>
                 <TextInput
-                    className={`general-info__text-input w-full ${store.isCoBuyerFieldsFilled && errors.CoBuyer_First_Name ? "p-invalid" : ""}`}
+                    className={`general-info__text-input w-full ${store.isCoBuyerFieldsFilled && (!contactExtData.CoBuyer_First_Name || !contactExtData.CoBuyer_First_Name.trim()) ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_First_Name || ""}
                     onChange={({ target: { value } }) => {
                         setFieldValue("CoBuyer_First_Name", value, true).then(() => {
@@ -243,7 +244,11 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     clearButton
                 />
                 <small className='p-error'>
-                    {store.isCoBuyerFieldsFilled && errors.CoBuyer_First_Name}
+                    {store.isCoBuyerFieldsFilled &&
+                    (!contactExtData.CoBuyer_First_Name ||
+                        !contactExtData.CoBuyer_First_Name.trim())
+                        ? ERROR_MESSAGES.REQUIRED
+                        : ""}
                 </small>
             </div>
 
@@ -269,7 +274,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
             <div className='col-4 relative'>
                 <TextInput
                     name={`Last Name${store.isCoBuyerFieldsFilled ? " (required)" : ""}`}
-                    className={`general-info__text-input w-full ${store.isCoBuyerFieldsFilled && errors.CoBuyer_Last_Name ? "p-invalid" : ""}`}
+                    className={`general-info__text-input w-full ${store.isCoBuyerFieldsFilled && (!contactExtData.CoBuyer_Last_Name || !contactExtData.CoBuyer_Last_Name.trim()) ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Last_Name || ""}
                     onChange={({ target: { value } }) => {
                         setFieldValue("CoBuyer_Last_Name", value, true).then(() => {
@@ -283,7 +288,10 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     clearButton
                 />
                 <small className='p-error'>
-                    {store.isCoBuyerFieldsFilled && errors.CoBuyer_Last_Name}
+                    {store.isCoBuyerFieldsFilled &&
+                    (!contactExtData.CoBuyer_Last_Name || !contactExtData.CoBuyer_Last_Name.trim())
+                        ? ERROR_MESSAGES.REQUIRED
+                        : ""}
                 </small>
             </div>
 
