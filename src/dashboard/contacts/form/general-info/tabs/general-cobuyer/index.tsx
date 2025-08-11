@@ -14,7 +14,7 @@ import { useFormikContext } from "formik";
 import { parseCustomDate } from "common/helpers";
 import { SexList } from "common/constants/contract-options";
 import { TOOLTIP_MESSAGE } from "dashboard/contacts/form/general-info/tabs/general";
-import { ERROR_MESSAGES } from "common/constants/error-messagess";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();

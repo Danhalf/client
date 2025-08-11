@@ -27,7 +27,7 @@ import { DeleteForm } from "dashboard/contacts/form/delete-form";
 import { truncateText } from "common/helpers";
 import { Tooltip } from "primereact/tooltip";
 import { LETTERS_NUMBERS_SIGNS_REGEX, PHONE_NUMBER_REGEX } from "common/constants/regex";
-import { ERROR_MESSAGES } from "common/constants/error-messagess";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 const STEP = "step";
 
 export type PartialContact = Pick<
