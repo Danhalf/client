@@ -189,7 +189,7 @@ export class ContactStore {
         return this._formErrorMessage;
     }
 
-    public get isCoBuyerNameRequired() {
+    public get isCoBuyerFieldsFilled() {
         const coBuyerFields = [
             this._contactExtData.CoBuyer_Middle_Name,
             this._contactExtData.CoBuyer_Res_Address,
@@ -207,7 +207,7 @@ export class ContactStore {
             this._contactExtData.CoBuyer_Date_Of_Birth,
             this._contactExtData.CoBuyer_Sex,
         ];
-        return !coBuyerFields.some((field) => field?.trim());
+        return coBuyerFields.some((field) => field && typeof field === "string" && field.trim());
     }
 
     public getContact = async (itemuid: string) => {

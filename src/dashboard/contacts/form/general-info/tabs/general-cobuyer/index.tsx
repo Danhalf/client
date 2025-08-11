@@ -228,7 +228,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
             <div className='col-4 relative'>
                 <TextInput
-                    className={`general-info__text-input w-full ${errors.CoBuyer_First_Name ? "p-invalid" : ""}`}
+                    className={`general-info__text-input w-full ${store.isCoBuyerFieldsFilled && errors.CoBuyer_First_Name ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_First_Name || ""}
                     onChange={({ target: { value } }) => {
                         setFieldValue("CoBuyer_First_Name", value, true).then(() => {
@@ -237,12 +237,14 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                         });
                     }}
                     onBlur={handleOfacCheck}
-                    name={`First Name${contactExtData.CoBuyer_Last_Name?.trim() || contactExtData.CoBuyer_Middle_Name?.trim() ? " (required)" : ""}`}
+                    name={`First Name${store.isCoBuyerFieldsFilled ? " (required)" : ""}`}
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
                     disabled={shouldDisableNameFields}
                     clearButton
                 />
-                <small className='p-error'>{errors.CoBuyer_First_Name}</small>
+                <small className='p-error'>
+                    {store.isCoBuyerFieldsFilled && errors.CoBuyer_First_Name}
+                </small>
             </div>
 
             <div className='col-4 relative'>
@@ -266,8 +268,8 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
             <div className='col-4 relative'>
                 <TextInput
-                    name={`Last Name${contactExtData.CoBuyer_First_Name?.trim() || contactExtData.CoBuyer_Middle_Name?.trim() ? " (required)" : ""}`}
-                    className={`general-info__text-input w-full ${errors.CoBuyer_Last_Name ? "p-invalid" : ""}`}
+                    name={`Last Name${store.isCoBuyerFieldsFilled ? " (required)" : ""}`}
+                    className={`general-info__text-input w-full ${store.isCoBuyerFieldsFilled && errors.CoBuyer_Last_Name ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Last_Name || ""}
                     onChange={({ target: { value } }) => {
                         setFieldValue("CoBuyer_Last_Name", value, true).then(() => {
@@ -280,7 +282,9 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     disabled={shouldDisableNameFields}
                     clearButton
                 />
-                <small className='p-error'>{errors.CoBuyer_Last_Name}</small>
+                <small className='p-error'>
+                    {store.isCoBuyerFieldsFilled && errors.CoBuyer_Last_Name}
+                </small>
             </div>
 
             <div className='col-4 relative'>

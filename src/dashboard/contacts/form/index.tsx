@@ -333,7 +333,7 @@ export const ContactForm = observer((): ReactElement => {
         formikRef.current?.validateForm().then(async (errors) => {
             const coBuyerValidationErrors: Record<string, string> = {};
 
-            if (!store.isCoBuyerNameRequired) {
+            if (store.isCoBuyerFieldsFilled) {
                 coBuyerValidationErrors.CoBuyer_First_Name = ERROR_MESSAGES.REQUIRED;
                 coBuyerValidationErrors.CoBuyer_Last_Name = ERROR_MESSAGES.REQUIRED;
             }
