@@ -207,6 +207,7 @@ export const ContactForm = observer((): ReactElement => {
         getContact,
         clearContact,
         saveContact,
+        changeContact,
         isContactChanged,
         memoRoute,
         deleteReason,
@@ -334,6 +335,14 @@ export const ContactForm = observer((): ReactElement => {
     const handleSaveContactForm = () => {
         formikRef.current?.validateForm().then(async (errors) => {
             const coBuyerValidationErrors: Record<string, string> = {};
+
+            if (REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type)) {
+                changeContact([
+                    ["firstName", ""],
+                    ["lastName", ""],
+                    ["middleName", ""],
+                ]);
+            }
 
             if (store.isCoBuyerFieldsFilled && contactType === BUYER_ID) {
                 const hasCoBuyerName =
