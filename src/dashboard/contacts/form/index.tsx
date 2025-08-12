@@ -135,10 +135,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         .trim()
         .test("coBuyerFirstNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
             const { CoBuyer_Last_Name, CoBuyer_Middle_Name, type } = this.parent;
-            if (
-                !REQUIRED_COMPANY_TYPE_INDEXES.includes(type) &&
-                (CoBuyer_Last_Name?.trim() || CoBuyer_Middle_Name?.trim())
-            ) {
+            if (type === BUYER_ID && (CoBuyer_Last_Name?.trim() || CoBuyer_Middle_Name?.trim())) {
                 return !!value?.trim();
             }
             return true;
@@ -156,10 +153,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         .trim()
         .test("coBuyerLastNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
             const { CoBuyer_First_Name, CoBuyer_Middle_Name, type } = this.parent;
-            if (
-                !REQUIRED_COMPANY_TYPE_INDEXES.includes(type) &&
-                (CoBuyer_First_Name?.trim() || CoBuyer_Middle_Name?.trim())
-            ) {
+            if (type === BUYER_ID && (CoBuyer_First_Name?.trim() || CoBuyer_Middle_Name?.trim())) {
                 return !!value?.trim();
             }
             return true;
@@ -432,7 +426,7 @@ export const ContactForm = observer((): ReactElement => {
                     contact.businessName?.trim() &&
                     !contact.firstName?.trim() &&
                     !contact.lastName?.trim() &&
-                    REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type || 0);
+                    REQUIRED_COMPANY_TYPE_INDEXES.includes(contact.type);
 
                 const hasCoBuyerBusinessNameOnly =
                     contactType === BUYER_ID &&
