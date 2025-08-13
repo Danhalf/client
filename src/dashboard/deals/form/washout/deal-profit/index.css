@@ -5,12 +5,13 @@
 .profit-card__header {
     padding-bottom: 10px;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 700;
     padding: 8px 20px;
+    text-transform: uppercase;
     &.vehicle-profit__header {
         border-radius: 6px 6px 0 0;
-        background-color: var(--admss-app-light-red);
-        color: var(--admss-app-red);
+        background-color: var(--admss-app-light-purple);
+        color: var(--admss-app-deep-purple);
     }
 }
 
@@ -21,7 +22,7 @@
         padding: 0;
     }
     &.vehicle-profit {
-        box-shadow: 0 0 3px 0 var(--admss-app-red);
+        box-shadow: 0 0 3px 0 var(--admss-app-deep-purple);
     }
 }
 
@@ -53,6 +54,18 @@
         flex-direction: column;
         gap: 10px;
     }
+    .vehicle-profit__button {
+        background-color: var(--admss-app-deep-purple);
+        color: var(--admss-app-white);
+        border-color: var(--admss-app-deep-purple);
+        font-size: 18px;
+        font-weight: 700;
+        text-transform: uppercase;
+        &:hover {
+            background-color: var(--admss-app-deep-purple);
+            color: var(--admss-app-white);
+        }
+    }
 }
 
 .deal-profit__item {
@@ -67,6 +80,9 @@
     }
     &.deal-profit__item--blue {
         color: var(--admss-app-main-blue);
+    }
+    &.deal-profit__item--purple {
+        color: var(--admss-app-deep-purple);
     }
     &.deal-profit__item--bold {
         font-weight: 700;
@@ -114,15 +130,24 @@
 }
 
 .profit-commission {
-    box-shadow: 0 0 3px 0 var(--admss-app-warning-blue);
+    box-shadow: 0 0 3px 0 var(--admss-app-dusty-blue);
     position: relative;
     .profit-commission__salesman-button {
-        position: absolute;
-        bottom: 80px;
-        right: 20px;
-        height: 45px;
-        width: 45px;
-        z-index: 1;
+        width: 100%;
+        text-transform: uppercase;
+        background-color: var(--admss-app-dusty-blue);
+        border-color: var(--admss-app-dusty-blue);
+        margin-bottom: 20px;
+        font-weight: 700;
+        font-size: 18px;
+        &:hover {
+            background-color: var(--admss-app-dusty-blue);
+            border-color: var(--admss-app-dusty-blue);
+            color: var(--admss-app-white);
+        }
+    }
+    .profit-commission__worksheet {
+        width: 100%;
     }
     .profit-commission__header {
         padding: 0;
@@ -131,17 +156,17 @@
         justify-content: space-between;
         align-items: center;
         gap: 4px;
-        color: var(--admss-app-warning-blue);
+        color: var(--admss-app-dusty-blue);
         .profit-commission__header-title {
             padding: 8px 20px;
-            background-color: var(--admss-app-focus-blue);
+            background-color: var(--admss-app-light-dusty-blue);
             flex: 0 0 100%;
             white-space: nowrap;
             max-width: 100%;
         }
         .profit-commission__header-subtitle {
             padding: 8px 20px;
-            background-color: var(--admss-app-focus-blue);
+            background-color: var(--admss-app-light-dusty-blue);
             flex: 0 0 100%;
             max-width: 100%;
         }

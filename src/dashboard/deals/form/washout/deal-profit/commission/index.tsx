@@ -62,12 +62,6 @@ export const DealProfitCommission = observer(() => {
                     />
                 </div>
             </div>
-            <Button
-                icon='pi pi-user-plus'
-                tooltip='Select Salesman'
-                className='profit-commission__salesman-button'
-                onClick={() => setSalesmanSelectDialogVisible(true)}
-            />
 
             <div className='profit-card__header profit-commission__header'>
                 <div className='profit-commission__header-subtitle'>Commission Worksheet</div>
@@ -75,6 +69,12 @@ export const DealProfitCommission = observer(() => {
 
             <div className='profit-card__body profit-commission__body'>
                 <div className='profit-commission__worksheet'>
+                    <Button
+                        icon='adms-salesman'
+                        label='Select Salesman'
+                        className='profit-commission__salesman-button'
+                        onClick={() => setSalesmanSelectDialogVisible(true)}
+                    />
                     <DealProfitItem
                         title='Commission Base:'
                         className='profit-commission__item--blue'
