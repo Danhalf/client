@@ -83,7 +83,6 @@ export const DealVehicleProfit = observer(() => {
                 <div className='vehicle-profit__info profit-info'>
                     <DealProfitItem
                         title='Cash Price:'
-                        justify='start'
                         includes
                         currency='$'
                         value={Number(dealWashout.CashPrice) || 0}
@@ -95,7 +94,6 @@ export const DealVehicleProfit = observer(() => {
                         numberSign='-'
                         title='Vehicle Cost:'
                         includes
-                        justify='start'
                         currency='$'
                         value={Number(dealWashout.VehicleCost) || 0}
                         onChange={({ value }) => {
@@ -106,7 +104,6 @@ export const DealVehicleProfit = observer(() => {
                         numberSign='-'
                         title='Expenses:'
                         includes
-                        justify='start'
                         currency='$'
                         value={Number(dealWashout.Expenses) || 0}
                         onChange={({ value }) => {
@@ -119,7 +116,6 @@ export const DealVehicleProfit = observer(() => {
                         includes
                         includeCheckbox={includeOverallowance}
                         includeCheckboxOnChange={setIncludeOverallowance}
-                        justify='start'
                         currency='$'
                         value={Number(dealWashout.Overllowance) || 0}
                         onChange={({ value }) => {

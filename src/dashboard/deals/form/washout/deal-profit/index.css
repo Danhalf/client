@@ -1,5 +1,36 @@
 .deal-profit {
     --input-height: 32px;
+
+    .deal-profit__item {
+        .deal-profit__label {
+            min-width: 15%;
+        }
+
+        .deal-profit__value {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .deal-profit__includes {
+            position: relative;
+            padding: 30px 6px;
+            width: 58px;
+            flex: 0 0 58px;
+
+            &::before {
+                content: "";
+                position: absolute;
+                font-weight: 700;
+                letter-spacing: 0.1em;
+                white-space: nowrap;
+                bottom: 0;
+                right: 0;
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
 }
 
 .profit-card__header {
@@ -31,6 +62,36 @@
 }
 
 .vehicle-profit {
+    .deal-profit__item {
+        &:first-child .deal-profit__includes::before {
+            content: "A B";
+            color: var(--admss-app-deep-purple);
+            padding: 0 15px;
+            width: calc(100% - 30px);
+            border-radius: 6px 6px 0 0;
+        }
+        &:last-child .deal-profit__includes::before {
+            padding-bottom: 0px;
+            border-radius: 0 0 6px 6px;
+        }
+
+        .deal-profit__includes {
+            &::before {
+                background-color: var(--admss-app-light-purple);
+            }
+        }
+
+        .deal-profit__label {
+            flex: 0 0 35%;
+        }
+        .deal-profit__value {
+            flex: 0 0 42%;
+            text-align: right;
+            display: inline-flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+    }
     position: relative;
     .vehicle-profit__button {
         margin: 20px 0;
@@ -130,6 +191,9 @@
 }
 
 .profit-commission {
+    .deal-profit__includes::before {
+        background-color: var(--admss-app-light-dusty-blue);
+    }
     box-shadow: 0 0 3px 0 var(--admss-app-dusty-blue);
     position: relative;
     .profit-commission__salesman-button {

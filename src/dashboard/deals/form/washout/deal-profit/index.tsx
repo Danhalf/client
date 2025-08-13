@@ -10,6 +10,7 @@ import { DealProfitCommission } from "dashboard/deals/form/washout/deal-profit/c
 import { DealVehicleProfit } from "dashboard/deals/form/washout/deal-profit/vehicle-profit";
 import { DealProfitFinanceWorksheet } from "dashboard/deals/form/washout/deal-profit/finance-worksheet";
 import { DealInterestProfit } from "dashboard/deals/form/washout/deal-profit/interest-profit";
+import { TruncatedText } from "dashboard/common/display";
 
 export enum CURRENCY_OPTIONS {
     DOLLAR = "$",
@@ -94,10 +95,10 @@ export const DealProfitItem = observer(
                         }}
                     />
                 )}
-                <label className='deal-profit__label'>
+                <span className='deal-profit__label'>
                     {numberSign && <span className='deal-profit__sign'>({numberSign})</span>}
                     &nbsp;{title}
-                </label>
+                </span>
                 {withInput ? (
                     <>
                         {currencySelectValue !== undefined && (
@@ -126,9 +127,14 @@ export const DealProfitItem = observer(
                         {currency && <span className='deal-profit__currency'>{currency}</span>}
                         &nbsp;
                         {currency
-                            ? props.value?.toLocaleString("en-US", {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
+                            ? TruncatedText({
+                                  withTooltip: true,
+                                  text:
+                                      props.value?.toLocaleString("en-US", {
+                                          minimumFractionDigits: 2,
+                                          maximumFractionDigits: 2,
+                                      }) || "",
+                                  className: "deal-profit__value-text",
                               })
                             : props.value}
                     </div>
