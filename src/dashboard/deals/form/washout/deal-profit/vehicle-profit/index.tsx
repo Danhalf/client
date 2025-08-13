@@ -2,10 +2,11 @@ import { Card } from "primereact/card";
 import { DealProfitItem, INCLUDE_OPTIONS } from "..";
 import { useState } from "react";
 import { useStore } from "store/hooks";
-import { Button } from "primereact/button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { INVENTORY_STEPS } from "dashboard/inventory/form";
 import { observer } from "mobx-react-lite";
+import { Button } from "primereact/button";
+import { CurrencyInput } from "dashboard/common/form/inputs";
 
 export const DealVehicleProfit = observer(() => {
     const { dealWashout, inventory, changeDealWashout } = useStore().dealStore;
@@ -24,52 +25,62 @@ export const DealVehicleProfit = observer(() => {
     return (
         <Card className='profit-card vehicle-profit'>
             <div className='profit-card__header vehicle-profit__header'>Vehicle Profit</div>
-            <div className='profit-card__body vehicle-profit__body'>
-                <Button
-                    icon='pi pi-plus'
-                    tooltip='Expenses'
-                    className='vehicle-profit__expenses-button'
-                    onClick={handleNavigateToExpenses}
-                />
-                <div className='vehicle-profit__inputs'>
-                    <DealProfitItem
-                        title='Trade 1 Allowance:'
+            <article className='profit-card__body vehicle-profit__body'>
+                <div className='vehicle-profit__trade profit-trade'>
+                    <h4 className='profit-trade__title'>Trade 1:</h4>
+                    <CurrencyInput
+                        title='Allowance'
+                        labelPosition='top'
                         value={Number(dealWashout.Trade1Allowance) || 0}
-                        withInput
-                        fieldName='Trade1Allowance'
+                        wrapperClassName='profit-trade__input'
                         onChange={({ value }) => {
                             changeDealWashout("Trade1Allowance", String(value));
                         }}
                     />
-                    <DealProfitItem
-                        title='Trade 1 ACV:'
+                    <CurrencyInput
+                        title='ACV'
+                        labelPosition='top'
                         value={Number(dealWashout.Trade1ACV) || 0}
-                        withInput
-                        fieldName='Trade1ACV'
+                        wrapperClassName='profit-trade__input'
                         onChange={({ value }) => {
                             changeDealWashout("Trade1ACV", String(value));
                         }}
                     />
-                    <DealProfitItem
-                        title='Trade 2 Allowance:'
+                </div>
+                <div className='vehicle-profit__trade profit-trade'>
+                    <h4 className='profit-trade__title'>Trade 2:</h4>
+                    <CurrencyInput
+                        title='Allowance'
+                        labelPosition='top'
                         value={Number(dealWashout.Trade2Allowance) || 0}
-                        withInput
-                        fieldName='Trade2Allowance'
+                        wrapperClassName='profit-trade__input'
                         onChange={({ value }) => {
                             changeDealWashout("Trade2Allowance", String(value));
                         }}
                     />
-                    <DealProfitItem
-                        title='Trade 2 ACV:'
+                    <CurrencyInput
+                        title='ACV'
+                        labelPosition='top'
                         value={Number(dealWashout.Trade2ACV) || 0}
-                        withInput
-                        fieldName='Trade2ACV'
+                        wrapperClassName='profit-trade__input'
                         onChange={({ value }) => {
                             changeDealWashout("Trade2ACV", String(value));
                         }}
                     />
                 </div>
-                <div className='vehicle-profit__info'>
+
+                <div className='splitter my-0'>
+                    <hr className='splitter__line flex-1' />
+                </div>
+
+                <Button
+                    icon='icon adms-expenses'
+                    label='Expenses'
+                    className='vehicle-profit__button'
+                    onClick={handleNavigateToExpenses}
+                />
+
+                <div className='vehicle-profit__info profit-info'>
                     <DealProfitItem
                         title='Cash Price:'
                         justify='start'
@@ -132,7 +143,7 @@ export const DealVehicleProfit = observer(() => {
                         }}
                     />
                 </div>
-            </div>
+            </article>
         </Card>
     );
 });

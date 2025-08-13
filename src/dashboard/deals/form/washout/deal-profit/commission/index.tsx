@@ -1,4 +1,3 @@
-import { ComboBox } from "dashboard/common/form/dropdown";
 import { Card } from "primereact/card";
 import { Checkbox } from "primereact/checkbox";
 import { useState } from "react";
@@ -7,10 +6,13 @@ import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { SalesmanSelectDialog } from "dashboard/deals/form/washout/deal-profit/commission/salesman-select-dialog";
 import { DealProfitItem, INCLUDE_OPTIONS } from "dashboard/deals/form/washout/deal-profit/index";
+import { DashboardRadio } from "dashboard/common/form/inputs";
+import { RadioButtonProps } from "primereact/radiobutton";
 
-const COMMISSION_2_OPTIONS = [
-    { label: "Figure Before Commission", value: 0 },
-    { label: "Figure After Commission", value: 1 },
+const COMMISSION_2_OPTIONS: RadioButtonProps[] = [
+    { name: "figureAfterCommission", title: "Figure After Commission", value: 0 },
+    { name: "splitCommission1InHalf", title: "Split Commission 1 in half", value: 1 },
+    { name: "figureSeparately", title: "Figure Separately", value: 2 },
 ];
 
 export const DealProfitCommission = observer(() => {
@@ -36,19 +38,16 @@ export const DealProfitCommission = observer(() => {
             </div>
             <div className='profit-card__body profit-commission__body'>
                 <div className='profit-commission__settings commission-settings'>
-                    <div className='commission-settings__item'>
-                        <div className='commission-settings__label'>Commission 2 Options:</div>
-                        <ComboBox
-                            options={COMMISSION_2_OPTIONS}
-                            optionLabel='label'
-                            optionValue='value'
-                            value={dealWashout.Comm2Options}
-                            onChange={({ value }) => {
-                                changeDealWashout("Comm2Options", value);
-                            }}
-                            className='commission-settings__input w-full'
-                        />
-                    </div>
+                    <div className='commission-settings__label'>Commission 2 Options:</div>
+
+                    <DashboardRadio
+                        radioArray={COMMISSION_2_OPTIONS}
+                        wrapperClassName='commission-settings__radio'
+                        initialValue={dealWashout.Comm2Options}
+                        onChange={(value) => {
+                            changeDealWashout("Comm2Options", String(value));
+                        }}
+                    />
                     <div className='commission-settings__checkbox mt-2'>
                         <Checkbox
                             inputId='set-default'
