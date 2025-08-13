@@ -2,11 +2,11 @@ import { ComboBox } from "dashboard/common/form/dropdown";
 import { Card } from "primereact/card";
 import { Checkbox } from "primereact/checkbox";
 import { useState } from "react";
-import { DealProfitItem, INCLUDE_OPTIONS } from "..";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { SalesmanSelectDialog } from "./salesman-select-dialog";
+import { SalesmanSelectDialog } from "dashboard/deals/form/washout/deal-profit/commission/salesman-select-dialog";
+import { DealProfitItem, INCLUDE_OPTIONS } from "dashboard/deals/form/washout/deal-profit/index";
 
 const COMMISSION_2_OPTIONS = [
     { label: "Figure Before Commission", value: 0 },
@@ -17,22 +17,22 @@ export const DealProfitCommission = observer(() => {
     const { dealWashout, changeDealWashout } = useStore().dealStore;
 
     const [defaultCommission, setDefaultCommission] = useState<boolean>(false);
+
+    const [salesmanSelectDialogVisible, setSalesmanSelectDialogVisible] = useState<boolean>(false);
+    const [manager, setManager] = useState<string>("");
+    const [salesmanFirst, setSalesmanFirst] = useState<string>("");
+    const [salesmanSecond, setSalesmanSecond] = useState<string>("");
     const [managerOverride, setManagerOverride] = useState<boolean>(false);
     const [s1, setS1] = useState<boolean>(false);
     const [s2, setS2] = useState<boolean>(false);
     const [includeManagerOverride, setIncludeManagerOverride] = useState<INCLUDE_OPTIONS | null>(
         null
     );
-    const [salesmanSelectDialogVisible, setSalesmanSelectDialogVisible] = useState<boolean>(false);
-    const [manager, setManager] = useState<string>("");
-    const [salesmanFirst, setSalesmanFirst] = useState<string>("");
-    const [salesmanSecond, setSalesmanSecond] = useState<string>("");
 
     return (
         <Card className='profit-card profit-commission'>
             <div className='profit-card__header profit-commission__header'>
                 <div className='profit-commission__header-title'>Commission Settings</div>
-                <div className='profit-commission__header-subtitle'>Commission Worksheet</div>
             </div>
             <div className='profit-card__body profit-commission__body'>
                 <div className='profit-commission__settings commission-settings'>
@@ -60,10 +60,23 @@ export const DealProfitCommission = observer(() => {
                         <label htmlFor='set-default'>Set this as the Default</label>
                     </div>
                 </div>
-                <div className='profit-commission__worksheet commission-worksheet'>
+            </div>
+            <Button
+                icon='pi pi-user-plus'
+                tooltip='Select Salesman'
+                className='profit-commission__salesman-button'
+                onClick={() => setSalesmanSelectDialogVisible(true)}
+            />
+
+            <div className='profit-card__header profit-commission__header'>
+                <div className='profit-commission__header-subtitle'>Commission Worksheet</div>
+            </div>
+
+            <div className='profit-card__body profit-commission__body'>
+                <div className='profit-commission__worksheet'>
                     <DealProfitItem
                         title='Commission Base:'
-                        className='deal-profit__item--blue'
+                        className='profit-commission__item--blue'
                         value={Number(dealWashout.CommissionBase) || 0}
                         currency='$'
                         justify='start'
@@ -123,20 +136,15 @@ export const DealProfitCommission = observer(() => {
                         value={Number(dealWashout.CommissionTotal) || 0}
                         currency='$'
                         justify='start'
-                        className='deal-profit__item--blue'
+                        className='profit-commission__item--blue'
                         fieldName='commissionProfit'
                         onChange={({ value }) => {
                             changeDealWashout("CommissionTotal", String(value));
                         }}
                     />
                 </div>
-                <Button
-                    icon='pi pi-user-plus'
-                    tooltip='Select Salesman'
-                    className='profit-commission__salesman-button'
-                    onClick={() => setSalesmanSelectDialogVisible(true)}
-                />
             </div>
+
             {salesmanSelectDialogVisible && (
                 <SalesmanSelectDialog
                     manager={manager}

@@ -1,7 +1,3 @@
-import { DealTotalsProfit } from "./totals-profit";
-import { DealProfitCommission } from "./commission";
-import { DealFIProfit } from "./FI-profit";
-import { DealVehicleProfit } from "./vehicle-profit";
 import "./index.css";
 import { observer } from "mobx-react-lite";
 import { InputNumberProps } from "primereact/inputnumber";
@@ -9,6 +5,11 @@ import { ReactElement, useState } from "react";
 import { CurrencyInput } from "dashboard/common/form/inputs";
 import { Checkbox } from "primereact/checkbox";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { DealTotalsProfit } from "dashboard/deals/form/washout/deal-profit/totals-profit";
+import { DealProfitCommission } from "dashboard/deals/form/washout/deal-profit/commission";
+import { DealVehicleProfit } from "dashboard/deals/form/washout/deal-profit/vehicle-profit";
+import { DealProfitFinanceWorksheet } from "dashboard/deals/form/washout/deal-profit/finance-worksheet";
+import { DealInterestProfit } from "dashboard/deals/form/washout/deal-profit/interest-profit";
 
 export enum CURRENCY_OPTIONS {
     DOLLAR = "$",
@@ -164,14 +165,17 @@ export const DealProfitItem = observer(
 export const DealProfit = () => {
     return (
         <div className='deal-profit grid'>
-            <div className='col-6'>
+            <div className='col-3'>
                 <DealVehicleProfit />
             </div>
-            <div className='col-6'>
+            <div className='col-4'>
                 <DealProfitCommission />
             </div>
+            <div className='col-5'>
+                <DealProfitFinanceWorksheet />
+            </div>
             <div className='fi-wrapper'>
-                <DealFIProfit />
+                <DealInterestProfit />
             </div>
             <div className='totals-wrapper'>
                 <DealTotalsProfit />
