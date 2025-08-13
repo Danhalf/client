@@ -22,6 +22,7 @@ interface DashboardRadioProps {
     initialValue?: string | number | null;
     onChange?: (value: string | number) => void;
     wrapperClassName?: string;
+    children?: React.ReactNode;
 }
 
 interface CurrencyInputProps extends InputNumberProps {
@@ -93,6 +94,7 @@ export const DashboardRadio = ({
     disabled,
     wrapperClassName,
     onChange,
+    children,
 }: DashboardRadioProps): ReactElement => {
     const [radioValue, setRadioValue] = useState<string>("");
 
@@ -108,7 +110,7 @@ export const DashboardRadio = ({
     }, [initialValue]);
 
     return (
-        <div
+        <section
             className={`flex flex-wrap row-gap-3 justify-content-between radio ${wrapperClassName || ""}`}
         >
             {radioArray.map(({ name, title, value }) => {
@@ -134,7 +136,8 @@ export const DashboardRadio = ({
                     </div>
                 );
             })}
-        </div>
+            {children}
+        </section>
     );
 };
 

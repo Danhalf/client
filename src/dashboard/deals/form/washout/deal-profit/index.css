@@ -161,6 +161,12 @@
                     width: 48%;
                 }
             }
+            .commission-settings__checkbox {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                width: 48%;
+            }
         }
     }
 }

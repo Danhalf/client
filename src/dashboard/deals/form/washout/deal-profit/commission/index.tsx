@@ -47,17 +47,19 @@ export const DealProfitCommission = observer(() => {
                         onChange={(value) => {
                             changeDealWashout("Comm2Options", String(value));
                         }}
+                        children={
+                            <div className='commission-settings__checkbox'>
+                                <Checkbox
+                                    inputId='set-default'
+                                    checked={defaultCommission}
+                                    onChange={({ checked }) => {
+                                        setDefaultCommission(!!checked);
+                                    }}
+                                />
+                                <label htmlFor='set-default'>Set this as the Default</label>
+                            </div>
+                        }
                     />
-                    <div className='commission-settings__checkbox mt-2'>
-                        <Checkbox
-                            inputId='set-default'
-                            checked={defaultCommission}
-                            onChange={({ checked }) => {
-                                setDefaultCommission(!!checked);
-                            }}
-                        />
-                        <label htmlFor='set-default'>Set this as the Default</label>
-                    </div>
                 </div>
             </div>
             <Button
