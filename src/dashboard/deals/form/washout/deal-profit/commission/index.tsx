@@ -79,8 +79,8 @@ export const DealProfitCommission = observer(() => {
                         title='Commission Base:'
                         className='profit-commission__item--blue'
                         value={Number(dealWashout.CommissionBase) || 0}
+                        includes
                         currency='$'
-                        justify='start'
                         fieldName='commissionBase'
                         onChange={({ value }) => {
                             changeDealWashout("CommissionBase", String(value));
@@ -90,7 +90,6 @@ export const DealProfitCommission = observer(() => {
                         title='Manager Override:'
                         value={Number(dealWashout.CommissionMgr) || 0}
                         withInput
-                        justify='start'
                         includes
                         includeCheckbox={includeManagerOverride}
                         includeCheckboxOnChange={setIncludeManagerOverride}
@@ -105,7 +104,6 @@ export const DealProfitCommission = observer(() => {
                         title='S1: (None Selected)'
                         value={Number(dealWashout.Commission1) || 0}
                         withInput
-                        justify='start'
                         includes
                         checkboxValue={s1}
                         checkboxOnChange={setS1}
@@ -118,7 +116,6 @@ export const DealProfitCommission = observer(() => {
                         title='S2: (None Selected)'
                         value={Number(dealWashout.Commission2) || 0}
                         withInput
-                        justify='start'
                         includes
                         checkboxValue={s2}
                         checkboxOnChange={setS2}
@@ -136,9 +133,9 @@ export const DealProfitCommission = observer(() => {
                         title='(=) Commission Profit:'
                         value={Number(dealWashout.CommissionTotal) || 0}
                         currency='$'
-                        justify='start'
                         className='profit-commission__item--blue'
                         fieldName='commissionProfit'
+                        includes
                         onChange={({ value }) => {
                             changeDealWashout("CommissionTotal", String(value));
                         }}

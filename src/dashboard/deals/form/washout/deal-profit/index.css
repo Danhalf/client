@@ -1,6 +1,21 @@
 .deal-profit {
     --input-height: 32px;
 
+    .profit-card {
+        .deal-profit__item {
+            &:first-child .deal-profit__includes::before {
+                content: "A B";
+                padding: 0 15px;
+                width: calc(100% - 30px);
+                border-radius: 6px 6px 0 0;
+            }
+        }
+
+        .splitter__line {
+            margin: 0;
+        }
+    }
+
     .deal-profit__item {
         .deal-profit__label {
             min-width: 15%;
@@ -64,11 +79,7 @@
 .vehicle-profit {
     .deal-profit__item {
         &:first-child .deal-profit__includes::before {
-            content: "A B";
             color: var(--admss-app-deep-purple);
-            padding: 0 15px;
-            width: calc(100% - 30px);
-            border-radius: 6px 6px 0 0;
         }
         &:last-child .deal-profit__includes::before {
             padding-bottom: 0px;
@@ -212,6 +223,31 @@
     }
     .profit-commission__worksheet {
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .splitter__line {
+            border-color: var(--admss-app-dusty-blue);
+            z-index: 1;
+        }
+
+        .deal-profit__item {
+            padding-top: 10px;
+            margin-top: 10px;
+
+            &:nth-child(2) .deal-profit__includes::before {
+                content: "A B";
+                padding: 0 15px;
+                color: var(--admss-app-dusty-blue);
+                width: calc(100% - 30px);
+                border-radius: 6px 6px 0 0;
+            }
+            &:last-child .deal-profit__includes::before {
+                padding-bottom: 10px;
+                border-radius: 0 0 6px 6px;
+            }
+        }
     }
     .profit-commission__header {
         padding: 0;
@@ -240,6 +276,19 @@
         font-size: 16px;
         display: flex;
         gap: 10px;
+
+        .deal-profit__label {
+            flex: 0 0 48%;
+        }
+
+        .deal-profit__value {
+            flex: 0 0 36%;
+            text-align: right;
+            display: inline-flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
         .commission-settings {
             display: flex;
             flex-direction: column;
