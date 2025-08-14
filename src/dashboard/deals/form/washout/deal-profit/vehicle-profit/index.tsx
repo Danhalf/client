@@ -24,7 +24,7 @@ export const DealVehicleProfit = observer(() => {
 
     return (
         <Card className='profit-card vehicle-profit'>
-            <div className='profit-card__header vehicle-profit__header'>Vehicle Profit</div>
+            <h3 className='profit-card__header vehicle-profit__header'>Vehicle Profit</h3>
             <article className='profit-card__body vehicle-profit__body'>
                 <div className='vehicle-profit__trade profit-trade'>
                     <h4 className='profit-trade__title'>Trade 1:</h4>
@@ -122,9 +122,11 @@ export const DealVehicleProfit = observer(() => {
                             changeDealWashout("Overllowance", String(value));
                         }}
                     />
+
                     <div className='splitter my-0'>
                         <hr className='splitter__line flex-1' />
                     </div>
+
                     <DealProfitItem
                         numberSign='='
                         title='Vehicle Profit:'

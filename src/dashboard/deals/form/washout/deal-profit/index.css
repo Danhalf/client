@@ -1,18 +1,46 @@
 .deal-profit {
     --input-height: 32px;
+    --vehicle-profit-color: var(--admss-app-light-purple);
+    --vehicle-profit-accent-color: var(--admss-app-deep-purple);
+
+    --commission-color: var(--admss-app-light-dusty-blue);
+    --commission-accent-color: var(--admss-app-dusty-blue);
+
+    --finance-color: var(--admss-app-light-red);
+    --finance-accent-color: var(--admss-app-red);
+
+    --interest-color: var(--admss-app-light-green);
+    --interest-accent-color: var(--admss-app-green);
+
+    --totals-color: var(--admss-app-focus-blue);
+    --totals-accent-color: var(--admss-app-dark-blue);
 
     .profit-card {
         .deal-profit__item {
+            &:first-child {
+                margin-top: 20px;
+            }
             &:first-child .deal-profit__includes::before {
                 content: "A B";
                 padding: 0 15px;
+                height: 120%;
                 width: calc(100% - 30px);
                 border-radius: 6px 6px 0 0;
             }
+            &:last-child .deal-profit__includes::before {
+                top: -10px;
+                height: 100%;
+                border-radius: 0 0 6px 6px;
+            }
+        }
+
+        .profit-card__body {
+            padding-bottom: 30px;
         }
 
         .splitter__line {
             margin: 0;
+            z-index: 1;
         }
     }
 
@@ -31,6 +59,9 @@
             padding: 30px 6px;
             width: 58px;
             flex: 0 0 58px;
+            .p-checkbox-box {
+                z-index: 1;
+            }
 
             &::before {
                 content: "";
@@ -42,22 +73,26 @@
                 right: 0;
                 display: block;
                 width: 100%;
-                height: 100%;
+                height: 90%;
             }
         }
     }
 }
 
 .profit-card__header {
-    padding-bottom: 10px;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
     font-size: 18px;
     font-weight: 700;
-    padding: 8px 20px;
+    padding: 10px 20px;
+    height: 50px;
     text-transform: uppercase;
     &.vehicle-profit__header {
         border-radius: 6px 6px 0 0;
-        background-color: var(--admss-app-light-purple);
-        color: var(--admss-app-deep-purple);
+        background-color: var(--vehicle-profit-color);
+        color: var(--vehicle-profit-accent-color);
     }
 }
 
@@ -68,7 +103,7 @@
         padding: 0;
     }
     &.vehicle-profit {
-        box-shadow: 0 0 3px 0 var(--admss-app-deep-purple);
+        box-shadow: 0 0 3px 0 var(--vehicle-profit-accent-color);
     }
 }
 
@@ -79,16 +114,20 @@
 .vehicle-profit {
     .deal-profit__item {
         &:first-child .deal-profit__includes::before {
-            color: var(--admss-app-deep-purple);
+            color: var(--vehicle-profit-accent-color);
         }
         &:last-child .deal-profit__includes::before {
             padding-bottom: 0px;
             border-radius: 0 0 6px 6px;
         }
 
+        .splitter__line {
+            border-color: var(--vehicle-profit-accent-color);
+        }
+
         .deal-profit__includes {
             &::before {
-                background-color: var(--admss-app-light-purple);
+                background-color: var(--vehicle-profit-color);
             }
         }
 
@@ -127,14 +166,14 @@
         gap: 10px;
     }
     .vehicle-profit__button {
-        background-color: var(--admss-app-deep-purple);
+        background-color: var(--vehicle-profit-accent-color);
         color: var(--admss-app-white);
-        border-color: var(--admss-app-deep-purple);
+        border-color: var(--vehicle-profit-accent-color);
         font-size: 18px;
         font-weight: 700;
         text-transform: uppercase;
         &:hover {
-            background-color: var(--admss-app-deep-purple);
+            background-color: var(--vehicle-profit-accent-color);
             color: var(--admss-app-white);
         }
     }
@@ -154,7 +193,7 @@
         color: var(--admss-app-main-blue);
     }
     &.deal-profit__item--purple {
-        color: var(--admss-app-deep-purple);
+        color: var(--vehicle-profit-accent-color);
     }
     &.deal-profit__item--bold {
         font-weight: 700;
@@ -203,21 +242,20 @@
 
 .profit-commission {
     .deal-profit__includes::before {
-        background-color: var(--admss-app-light-dusty-blue);
+        background-color: var(--commission-color);
     }
-    box-shadow: 0 0 3px 0 var(--admss-app-dusty-blue);
+    box-shadow: 0 0 3px 0 var(--commission-accent-color);
     position: relative;
     .profit-commission__salesman-button {
         width: 100%;
         text-transform: uppercase;
-        background-color: var(--admss-app-dusty-blue);
-        border-color: var(--admss-app-dusty-blue);
-        margin-bottom: 20px;
+        background-color: var(--commission-accent-color);
+        border-color: var(--commission-accent-color);
         font-weight: 700;
         font-size: 18px;
         &:hover {
-            background-color: var(--admss-app-dusty-blue);
-            border-color: var(--admss-app-dusty-blue);
+            background-color: var(--commission-accent-color);
+            border-color: var(--commission-accent-color);
             color: var(--admss-app-white);
         }
     }
@@ -228,8 +266,7 @@
         gap: 10px;
 
         .splitter__line {
-            border-color: var(--admss-app-dusty-blue);
-            z-index: 1;
+            border-color: var(--commission-accent-color);
         }
 
         .deal-profit__item {
@@ -239,7 +276,7 @@
             &:nth-child(2) .deal-profit__includes::before {
                 content: "A B";
                 padding: 0 15px;
-                color: var(--admss-app-dusty-blue);
+                color: var(--commission-accent-color);
                 width: calc(100% - 30px);
                 border-radius: 6px 6px 0 0;
             }
@@ -256,20 +293,10 @@
         justify-content: space-between;
         align-items: center;
         gap: 4px;
-        color: var(--admss-app-dusty-blue);
-        .profit-commission__header-title {
-            padding: 8px 20px;
-            background-color: var(--admss-app-light-dusty-blue);
-            flex: 0 0 100%;
-            white-space: nowrap;
-            max-width: 100%;
-        }
-        .profit-commission__header-subtitle {
-            padding: 8px 20px;
-            background-color: var(--admss-app-light-dusty-blue);
-            flex: 0 0 100%;
-            max-width: 100%;
-        }
+        color: var(--commission-accent-color);
+        background-color: var(--commission-color);
+        padding: 8px 20px;
+        white-space: nowrap;
     }
 
     .profit-commission__body {
@@ -309,11 +336,119 @@
     }
 }
 
+.profit-finance {
+    box-shadow: 0 0 3px 0 var(--finance-accent-color);
+
+    .profit-finance__header {
+        background-color: var(--finance-color);
+        color: var(--finance-accent-color);
+    }
+
+    .splitter__line {
+        border-color: var(--finance-accent-color);
+    }
+
+    .deal-profit__includes::before {
+        background-color: var(--finance-color);
+    }
+
+    .finance-worksheet {
+        display: flex;
+        justify-content: space-between;
+        .finance-profit__info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 0 0 40%;
+        }
+        .finance-profit__inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 0 0 55%;
+        }
+    }
+
+    .finance-loan {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 0 0 40%;
+
+        .deal-profit__label {
+            flex: 0 0 40%;
+            white-space: nowrap;
+        }
+        .deal-profit__value {
+            flex: 0 0 55%;
+        }
+
+        .deal-profit__currency-select {
+            margin-left: 0;
+        }
+
+        .deal-profit__includes {
+            margin-left: auto;
+            &::before {
+                color: var(--finance-accent-color);
+            }
+        }
+
+        .profit-card__body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+
+    .vertical-splitter {
+        height: 246px;
+        width: 1px;
+        background-color: var(--finance-color);
+    }
+}
+
+.interest-profit {
+    box-shadow: 0 0 3px 0 var(--interest-accent-color);
+    padding: 0;
+    .profit-card__header.interest-profit__header {
+        background-color: var(--interest-color);
+        color: var(--interest-accent-color);
+    }
+    .interest-profit__body {
+        display: flex;
+        justify-content: space-between;
+
+        .deal-profit__item {
+            .deal-profit__includes::before {
+                background-color: var(--interest-color);
+            }
+            &:first-child .deal-profit__includes::before {
+                color: var(--interest-accent-color);
+            }
+        }
+
+        .interest-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 0 0 46%;
+        }
+
+        .interest-results {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 0 0 46%;
+        }
+    }
+}
+
 .totals-profit {
-    box-shadow: 0 0 3px 0 var(--admss-app-dark-blue);
-    background-color: var(--admss-app-focus-blue);
+    box-shadow: 0 0 3px 0 var(--totals-accent-color);
+    background-color: var(--totals-color);
     .totals-profit__header {
-        background-color: var(--admss-app-dark-blue);
+        background-color: var(--totals-accent-color);
         text-transform: uppercase;
         color: var(--admss-app-white);
         font-weight: 600;

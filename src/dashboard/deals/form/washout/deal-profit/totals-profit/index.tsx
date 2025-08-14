@@ -42,8 +42,8 @@ export const DealTotalsProfit = observer(() => {
 
     return (
         <Card className='profit-card totals-profit'>
-            <div className='profit-card__header totals-profit__header'>Totals</div>
-            <div className='profit-card__body totals-profit__body'>
+            <h3 className='profit-card__header totals-profit__header'>Totals</h3>
+            <article className='profit-card__body totals-profit__body'>
                 <div className='totals-content'>
                     <div className='totals-content__info totals-content__info--red'>
                         <span className='totals-content__info-title'>Vehicle Profit:</span>
@@ -232,7 +232,7 @@ export const DealTotalsProfit = observer(() => {
                         </span>
                     </div>
                 </div>
-            </div>
+            </article>
         </Card>
     );
 });

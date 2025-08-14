@@ -33,10 +33,9 @@ export const DealProfitCommission = observer(() => {
 
     return (
         <Card className='profit-card profit-commission'>
-            <div className='profit-card__header profit-commission__header'>
-                <div className='profit-commission__header-title'>Commission Settings</div>
-            </div>
-            <div className='profit-card__body profit-commission__body'>
+            <h3 className='profit-card__header profit-commission__header'>Commission Settings</h3>
+
+            <article className='profit-card__body profit-commission__body'>
                 <div className='profit-commission__settings commission-settings'>
                     <div className='commission-settings__label'>Commission 2 Options:</div>
 
@@ -61,13 +60,11 @@ export const DealProfitCommission = observer(() => {
                         }
                     />
                 </div>
-            </div>
+            </article>
 
-            <div className='profit-card__header profit-commission__header'>
-                <div className='profit-commission__header-subtitle'>Commission Worksheet</div>
-            </div>
+            <h3 className='profit-card__header profit-commission__header'>Commission Worksheet</h3>
 
-            <div className='profit-card__body profit-commission__body'>
+            <article className='profit-card__body profit-commission__body'>
                 <div className='profit-commission__worksheet'>
                     <Button
                         icon='adms-salesman'
@@ -141,7 +138,7 @@ export const DealProfitCommission = observer(() => {
                         }}
                     />
                 </div>
-            </div>
+            </article>
 
             {salesmanSelectDialogVisible && (
                 <SalesmanSelectDialog

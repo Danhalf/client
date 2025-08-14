@@ -18,11 +18,9 @@ export const DealInterestProfit = observer(() => {
 
     return (
         <Card className='profit-card interest-profit'>
-            <div className='profit-card__header interest-profit__header'>Interest Profit</div>
-            <div className='profit-card__body interest-profit__body'>
-                <div className='interest-profit__costs'></div>
-
-                <div className='interest-profit__total'>
+            <h3 className='profit-card__header interest-profit__header'>Interest Profit</h3>
+            <article className='profit-card__body interest-profit__body'>
+                <div className='interest-profit__controls interest-controls'>
                     <DealProfitItem
                         title='Warranty Profit:'
                         value={Number(dealWashout.Warranty_Profit) || 0}
@@ -67,6 +65,9 @@ export const DealInterestProfit = observer(() => {
                         includeCheckbox={ahProfit}
                         includeCheckboxOnChange={setAhProfit}
                     />
+                </div>
+
+                <div className='interest-profit__results interest-results'>
                     <DealProfitItem
                         title='VSI Profit:'
                         value={Number(dealWashout.VSI_Profit) || 0}
@@ -76,9 +77,6 @@ export const DealInterestProfit = observer(() => {
                         includeCheckbox={vsiProfit}
                         includeCheckboxOnChange={setVsiProfit}
                     />
-                    <div className='splitter my-0'>
-                        <hr className='splitter__line flex-1' />
-                    </div>
 
                     <DealProfitItem
                         title='Interest Markup:'
@@ -114,7 +112,7 @@ export const DealInterestProfit = observer(() => {
                         includeCheckboxOnChange={setNetFIProfit}
                     />
                 </div>
-            </div>
+            </article>
         </Card>
     );
 });
