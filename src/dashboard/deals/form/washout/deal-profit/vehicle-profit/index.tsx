@@ -69,7 +69,7 @@ export const DealVehicleProfit = observer(() => {
                     />
                 </div>
 
-                <div className='splitter my-0'>
+                <div className='splitter my-0 pt-3'>
                     <hr className='splitter__line flex-1' />
                 </div>
 

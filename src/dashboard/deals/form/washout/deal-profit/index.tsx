@@ -107,6 +107,7 @@ export const DealProfitItem = observer(
                                 optionLabel='label'
                                 optionValue='value'
                                 value={currencySelectValue}
+                                required
                                 onChange={(e) => {
                                     onCurrencySelect?.(e.value as 0 | 1);
                                 }}

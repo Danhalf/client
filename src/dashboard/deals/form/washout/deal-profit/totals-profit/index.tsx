@@ -45,19 +45,19 @@ export const DealTotalsProfit = observer(() => {
             <h3 className='profit-card__header totals-profit__header'>Totals</h3>
             <article className='profit-card__body totals-profit__body'>
                 <section className='totals-profit__info totals-info'>
-                    <div className='totals-info__item totals-info__item--red'>
+                    <div className='totals-info__item totals-info__item--vehicle'>
                         <span className='totals-info__title'>Vehicle Profit:</span>
                         <span className='totals-info__value'>
                             {getCurrencyValue(dealWashout.VehicleProfit)}
                         </span>
                     </div>
-                    <div className='totals-info__item totals-info__item--green'>
+                    <div className='totals-info__item totals-info__item--finance'>
                         <span className='totals-info__title'>(+) F&amp;I Profit:</span>
                         <span className='totals-info__value'>
                             {getCurrencyValue(dealWashout.FIProfitTotal)}
                         </span>
                     </div>
-                    <div className='totals-info__item totals-info__item--blue'>
+                    <div className='totals-info__item totals-info__item--commission'>
                         <span className='totals-info__title'>(-) Commissions:</span>
                         <span className='totals-info__value'>
                             {getCurrencyValue(dealWashout.CommissionTotal)}
@@ -228,10 +228,11 @@ export const DealTotalsProfit = observer(() => {
                     </div>
 
                     <div className='totals-row totals-summary'>
-                        <span className='totals-summary__title'>(=) Total Profit:</span>
-                        <span className='totals-summary__value'>
+                        <span className='totals-summary__title'>(=) Net F&I Profit:</span>
+                        <span className='totals-summary__value pl-3'>
                             {getCurrencyValue(dealWashout.TotalDealCost, true)}
                         </span>
+                        <div className='deal-profit__includes' />
                     </div>
                 </section>
             </article>

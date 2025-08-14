@@ -74,7 +74,7 @@ export const DealProfitCommission = observer(() => {
                     />
                     <DealProfitItem
                         title='Commission Base:'
-                        className='profit-commission__item--blue'
+                        className='deal-profit__item--blue'
                         value={Number(dealWashout.CommissionBase) || 0}
                         includes
                         currency='$'
@@ -130,7 +130,7 @@ export const DealProfitCommission = observer(() => {
                         title='(=) Commission Profit:'
                         value={Number(dealWashout.CommissionTotal) || 0}
                         currency='$'
-                        className='profit-commission__item--blue'
+                        className='deal-profit__item--blue'
                         fieldName='commissionProfit'
                         includes
                         onChange={({ value }) => {

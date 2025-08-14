@@ -13,7 +13,6 @@ export const DealInterestProfit = observer(() => {
     const [clProfit, setClProfit] = useState<INCLUDE_OPTIONS | null>(null);
     const [ahProfit, setAhProfit] = useState<INCLUDE_OPTIONS | null>(null);
     const [vsiProfit, setVsiProfit] = useState<INCLUDE_OPTIONS | null>(null);
-    const [netFIProfit, setNetFIProfit] = useState<INCLUDE_OPTIONS | null>(null);
     const [interestMarkup, setInterestMarkup] = useState<INCLUDE_OPTIONS | null>(null);
 
     return (
@@ -67,6 +66,8 @@ export const DealInterestProfit = observer(() => {
                     />
                 </div>
 
+                <div className='vertical-splitter' />
+
                 <div className='interest-profit__results interest-results'>
                     <DealProfitItem
                         title='VSI Profit:'
@@ -77,6 +78,10 @@ export const DealInterestProfit = observer(() => {
                         includeCheckbox={vsiProfit}
                         includeCheckboxOnChange={setVsiProfit}
                     />
+
+                    <div className='splitter my-0'>
+                        <hr className='splitter__line flex-1' />
+                    </div>
 
                     <DealProfitItem
                         title='Interest Markup:'
@@ -106,10 +111,8 @@ export const DealInterestProfit = observer(() => {
                         title='Net F&I Profit:'
                         value={Number(dealWashout.NetFI_Profit) || 0}
                         currency='$'
-                        className='deal-profit__item--blue'
+                        className='deal-profit__item--green'
                         includes
-                        includeCheckbox={netFIProfit}
-                        includeCheckboxOnChange={setNetFIProfit}
                     />
                 </div>
             </article>

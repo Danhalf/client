@@ -16,7 +16,24 @@
     --totals-text-color: var(--admss-app-blue-violet);
     --totals-accent-color: var(--admss-app-light-blue-violet);
 
+    .p-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 45px;
+        .p-button-icon {
+            padding-top: 4px;
+            font-size: 26px;
+        }
+        .p-button-label {
+            flex-grow: 0;
+        }
+    }
+
     .profit-card {
+        .p-card-body {
+            width: 100%;
+        }
         .deal-profit__item,
         .totals-row {
             &:first-child {
@@ -31,13 +48,52 @@
             }
             &:last-child .deal-profit__includes::before {
                 top: -10px;
-                height: 100%;
+                height: 90%;
                 border-radius: 0 0 6px 6px;
             }
         }
 
         .profit-card__body {
             padding-bottom: 30px;
+
+            .currency-item {
+                .currency-item__input {
+                    height: 32px;
+                }
+
+                .input-icon {
+                    height: 32px;
+                    width: 32px;
+                }
+            }
+
+            .radio-item,
+            .radio-item__input {
+                font-size: 12px;
+                font-weight: 400;
+                height: 32px;
+            }
+
+            .radio-item {
+                .p-radiobutton-box {
+                    width: 16px;
+                    height: 16px;
+                }
+
+                .radio-item__input {
+                    width: 32px;
+                    .p-radiobutton-checked .p-radiobutton-box.p-highlight {
+                        box-shadow: inset 0 0 0 1px var(--admss-app-dark-green);
+                    }
+                }
+            }
+
+            .p-inputtext {
+                font-size: 14px;
+                height: 32px;
+                max-width: 140px;
+                flex: 1 1 140px;
+            }
         }
 
         .splitter__line {
@@ -62,6 +118,7 @@
             padding: 30px 6px;
             width: 58px;
             flex: 0 0 58px;
+            margin-left: auto;
             .p-checkbox-box {
                 z-index: 1;
             }
@@ -114,7 +171,78 @@
     padding: 20px;
 }
 
+.deal-profit__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 600;
+    height: var(--input-height);
+    .currency-item__input {
+        width: 140px;
+    }
+    &.deal-profit__item--blue {
+        color: var(--admss-app-dusty-blue);
+    }
+    &.deal-profit__item--purple {
+        color: var(--vehicle-profit-accent-color);
+    }
+    &.deal-profit__item--green {
+        color: var(--interest-accent-color);
+    }
+    &.deal-profit__item--bold {
+        font-weight: 700;
+    }
+    .currency-item__input,
+    .p-inputtext,
+    .p-inputnumber {
+        height: var(--input-height);
+        font-size: 14px;
+        &:focus {
+            box-shadow: none;
+        }
+    }
+    .deal-profit__currency-select {
+        width: 54px;
+        height: var(--input-height);
+        margin-left: auto;
+        margin-right: 10px;
+        font-size: 14px;
+        .p-dropdown-trigger {
+            height: var(--input-height);
+            width: 24px;
+        }
+        .p-dropdown-label {
+            height: var(--input-height);
+            line-height: 1;
+        }
+        .p-inputtext {
+            text-overflow: initial;
+            font-size: 14px;
+            height: var(--input-height);
+            align-items: center;
+        }
+    }
+    .currency-item__icon {
+        width: var(--input-height);
+    }
+    .deal-profit__includes {
+        display: flex;
+        margin-left: 15px;
+        align-items: center;
+        justify-content: space-between;
+        width: 45px;
+    }
+}
+
 .vehicle-profit {
+    .splitter__line {
+        border-color: var(--vehicle-profit-accent-color);
+    }
+
+    .vehicle-profit__body {
+        padding-top: 0;
+    }
     .deal-profit__item {
         &:first-child .deal-profit__includes::before {
             color: var(--vehicle-profit-accent-color);
@@ -122,10 +250,6 @@
         &:last-child .deal-profit__includes::before {
             padding-bottom: 0px;
             border-radius: 0 0 6px 6px;
-        }
-
-        .splitter__line {
-            border-color: var(--vehicle-profit-accent-color);
         }
 
         .deal-profit__includes {
@@ -182,67 +306,6 @@
     }
 }
 
-.deal-profit__item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 16px;
-    font-weight: 600;
-    height: var(--input-height);
-    .currency-item__input {
-        width: 140px;
-    }
-    &.deal-profit__item--blue {
-        color: var(--admss-app-main-blue);
-    }
-    &.deal-profit__item--purple {
-        color: var(--vehicle-profit-accent-color);
-    }
-    &.deal-profit__item--bold {
-        font-weight: 700;
-    }
-    .currency-item__input,
-    .p-inputtext,
-    .p-inputnumber {
-        height: var(--input-height);
-        font-size: 14px;
-        &:focus {
-            box-shadow: none;
-        }
-    }
-    .deal-profit__currency-select {
-        width: 54px;
-        height: var(--input-height);
-        margin-left: auto;
-        margin-right: 10px;
-        font-size: 14px;
-        .p-dropdown-trigger {
-            height: var(--input-height);
-            width: 24px;
-        }
-        .p-dropdown-label {
-            height: var(--input-height);
-            line-height: 1;
-        }
-        .p-inputtext {
-            text-overflow: initial;
-            font-size: 14px;
-            height: var(--input-height);
-            align-items: center;
-        }
-    }
-    .currency-item__icon {
-        width: var(--input-height);
-    }
-    .deal-profit__includes {
-        display: flex;
-        margin-left: 15px;
-        align-items: center;
-        justify-content: space-between;
-        width: 45px;
-    }
-}
-
 .profit-commission {
     .deal-profit__includes::before {
         background-color: var(--commission-color);
@@ -273,8 +336,8 @@
         }
 
         .deal-profit__item {
-            padding-top: 10px;
-            margin-top: 10px;
+            padding-top: 8px;
+            margin-top: 5.5px;
 
             &:nth-child(2) .deal-profit__includes::before {
                 content: "A B";
@@ -391,7 +454,6 @@
         }
 
         .deal-profit__includes {
-            margin-left: auto;
             &::before {
                 color: var(--finance-accent-color);
             }
@@ -418,6 +480,11 @@
         background-color: var(--interest-color);
         color: var(--interest-accent-color);
     }
+
+    .splitter__line {
+        border-color: var(--interest-accent-color);
+    }
+
     .interest-profit__body {
         display: flex;
         justify-content: space-between;
@@ -427,6 +494,7 @@
                 background-color: var(--interest-color);
             }
             &:first-child .deal-profit__includes::before {
+                height: 100%;
                 color: var(--interest-accent-color);
             }
         }
@@ -435,30 +503,51 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            flex: 0 0 46%;
+            flex: 0 0 48%;
+            .deal-profit__label {
+                width: 160px;
+            }
         }
 
         .interest-results {
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
             gap: 10px;
-            flex: 0 0 46%;
+            flex: 0 0 48%;
+            .deal-profit__label {
+                width: 160px;
+            }
         }
+    }
+
+    .vertical-splitter {
+        height: 246px;
+        width: 1px;
+        background-color: var(--interest-color);
     }
 }
 
 .totals-profit {
     box-shadow: 0 0 3px 0 var(--totals-text-color);
     background-color: var(--totals-color);
+    font-weight: 600;
     .totals-profit__header {
         background-color: var(--totals-accent-color);
         text-transform: uppercase;
         color: var(--totals-text-color);
-        font-weight: 600;
+    }
+
+    .splitter__line {
+        border-color: var(--totals-text-color);
     }
 
     .totals-profit__body {
         display: flex;
+    }
+
+    &.profit-card .profit-card__body {
+        padding-bottom: 20px;
     }
 
     .totals-info {
@@ -471,44 +560,45 @@
 
         .totals-info__item {
             display: flex;
+            flex-direction: column;
             border-width: 1px;
             border-style: solid;
             border-radius: 10px;
             padding: 10px 15px;
+            height: 81px;
             justify-content: space-between;
-            align-items: center;
             .totals-info__title,
             .totals-info__value {
-                font-weight: 600;
+                font-weight: 700;
                 font-size: 14px;
             }
             .totals-info__value {
                 margin-left: auto;
-                padding-right: 15%;
+                padding-right: 5%;
             }
-            &.totals-info__item--red {
-                border-color: var(--admss-app-red);
-                color: var(--admss-app-red);
-                background-color: var(--admss-app-light-red);
+            &.totals-info__item--vehicle {
+                border-color: var(--vehicle-profit-accent-color);
+                color: var(--vehicle-profit-accent-color);
+                background-color: var(--vehicle-profit-color);
             }
-            &.totals-info__item--green {
-                border-color: var(--admss-app-warning-green);
-                color: var(--admss-app-warning-green);
-                background-color: var(--admss-app-light-green);
+            &.totals-info__item--finance {
+                border-color: var(--finance-accent-color);
+                color: var(--finance-accent-color);
+                background-color: var(--finance-color);
             }
-            &.totals-info__item--blue {
-                border-color: var(--admss-app-main-blue);
-                color: var(--admss-app-main-blue);
-                background-color: var(--admss-app-white-blue);
+            &.totals-info__item--commission {
+                border-color: var(--commission-accent-color);
+                color: var(--commission-accent-color);
+                background-color: var(--commission-color);
             }
         }
     }
 
     .totals-controls {
-        padding: 0 10px;
+        padding-left: 10px;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 7px;
         width: 100%;
         font-size: 14px;
         .currency-item__input {
@@ -523,14 +613,12 @@
             gap: 10px;
             .deal-profit__includes {
                 position: relative;
+                margin-left: auto;
+                height: 100%;
 
                 &::before {
                     background-color: var(--totals-accent-color);
-                }
-                &:first-child {
-                    &::before {
-                        color: var(--totals-accent-color);
-                    }
+                    color: var(--totals-text-color);
                 }
             }
         }
@@ -564,6 +652,11 @@
         .currency-item__icon {
             line-height: 0;
             width: 30px;
+        }
+
+        .totals-summary {
+            color: var(--totals-text-color);
+            font-weight: 700;
         }
     }
 }
