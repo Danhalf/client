@@ -44,26 +44,28 @@ export const DealTotalsProfit = observer(() => {
         <Card className='profit-card totals-profit'>
             <h3 className='profit-card__header totals-profit__header'>Totals</h3>
             <article className='profit-card__body totals-profit__body'>
-                <div className='totals-content'>
-                    <div className='totals-content__info totals-content__info--red'>
-                        <span className='totals-content__info-title'>Vehicle Profit:</span>
-                        <span className='totals-content__info-value'>
+                <section className='totals-profit__info totals-info'>
+                    <div className='totals-info__item totals-info__item--red'>
+                        <span className='totals-info__title'>Vehicle Profit:</span>
+                        <span className='totals-info__value'>
                             {getCurrencyValue(dealWashout.VehicleProfit)}
                         </span>
                     </div>
-                    <div className='totals-content__info totals-content__info--green'>
-                        <span className='totals-content__info-title'>(+) F&amp;I Profit:</span>
-                        <span className='totals-content__info-value'>
+                    <div className='totals-info__item totals-info__item--green'>
+                        <span className='totals-info__title'>(+) F&amp;I Profit:</span>
+                        <span className='totals-info__value'>
                             {getCurrencyValue(dealWashout.FIProfitTotal)}
                         </span>
                     </div>
-                    <div className='totals-content__info totals-content__info--blue'>
-                        <span className='totals-content__info-title'>(-) Commissions:</span>
-                        <span className='totals-content__info-value'>
+                    <div className='totals-info__item totals-info__item--blue'>
+                        <span className='totals-info__title'>(-) Commissions:</span>
+                        <span className='totals-info__value'>
                             {getCurrencyValue(dealWashout.CommissionTotal)}
                         </span>
                     </div>
+                </section>
 
+                <section className='totals-controls'>
                     <div className='totals-row totals-misc'>
                         <TextInput
                             name='(-) Misc. Cost'
@@ -140,7 +142,7 @@ export const DealTotalsProfit = observer(() => {
                         </div>
                     </div>
 
-                    <div className='totals-row totals-info'>
+                    <div className='totals-row'>
                         <span className='totals-info__title'>
                             (+) Reserve Refund from Finance Co.:
                         </span>
@@ -172,7 +174,7 @@ export const DealTotalsProfit = observer(() => {
                         </div>
                     </div>
 
-                    <div className='totals-row totals-info'>
+                    <div className='totals-row'>
                         <span className='totals-info__title'>(+) Vehicle Pack:</span>
                         <span className='totals-info__value'>
                             {getCurrencyValue(dealWashout.VehiclePack, true)}
@@ -196,7 +198,7 @@ export const DealTotalsProfit = observer(() => {
                             />
                         </div>
                     </div>
-                    <div className='totals-row totals-info'>
+                    <div className='totals-row'>
                         <span className='totals-info__title'>(+) Doc Fee:</span>
                         <span className='totals-info__value'>
                             {getCurrencyValue(dealWashout.DocFee, true)}
@@ -231,7 +233,7 @@ export const DealTotalsProfit = observer(() => {
                             {getCurrencyValue(dealWashout.TotalDealCost, true)}
                         </span>
                     </div>
-                </div>
+                </section>
             </article>
         </Card>
     );

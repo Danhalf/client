@@ -12,11 +12,13 @@
     --interest-color: var(--admss-app-light-green);
     --interest-accent-color: var(--admss-app-green);
 
-    --totals-color: var(--admss-app-focus-blue);
-    --totals-accent-color: var(--admss-app-dark-blue);
+    --totals-color: var(--admss-app-lightest-blue-violet);
+    --totals-text-color: var(--admss-app-blue-violet);
+    --totals-accent-color: var(--admss-app-light-blue-violet);
 
     .profit-card {
-        .deal-profit__item {
+        .deal-profit__item,
+        .totals-row {
             &:first-child {
                 margin-top: 20px;
             }
@@ -44,7 +46,8 @@
         }
     }
 
-    .deal-profit__item {
+    .deal-profit__item,
+    .totals-row {
         .deal-profit__label {
             min-width: 15%;
         }
@@ -445,118 +448,122 @@
 }
 
 .totals-profit {
-    box-shadow: 0 0 3px 0 var(--totals-accent-color);
+    box-shadow: 0 0 3px 0 var(--totals-text-color);
     background-color: var(--totals-color);
     .totals-profit__header {
         background-color: var(--totals-accent-color);
         text-transform: uppercase;
-        color: var(--admss-app-white);
+        color: var(--totals-text-color);
         font-weight: 600;
     }
 
-    .totals-content {
+    .totals-profit__body {
+        display: flex;
+    }
+
+    .totals-info {
         display: flex;
         flex-direction: column;
         gap: 7px;
         width: 100%;
-        .totals-content__info {
+
+        flex: 0 0 25%;
+
+        .totals-info__item {
             display: flex;
             border-width: 1px;
             border-style: solid;
-            border-radius: 30px;
+            border-radius: 10px;
             padding: 10px 15px;
             justify-content: space-between;
             align-items: center;
-            .totals-content__info-title,
-            .totals-content__info-value {
+            .totals-info__title,
+            .totals-info__value {
                 font-weight: 600;
                 font-size: 14px;
             }
-            .totals-content__info-value {
+            .totals-info__value {
                 margin-left: auto;
                 padding-right: 15%;
             }
-            &.totals-content__info--red {
+            &.totals-info__item--red {
                 border-color: var(--admss-app-red);
                 color: var(--admss-app-red);
                 background-color: var(--admss-app-light-red);
             }
-            &.totals-content__info--green {
+            &.totals-info__item--green {
                 border-color: var(--admss-app-warning-green);
                 color: var(--admss-app-warning-green);
                 background-color: var(--admss-app-light-green);
             }
-            &.totals-content__info--blue {
+            &.totals-info__item--blue {
                 border-color: var(--admss-app-main-blue);
                 color: var(--admss-app-main-blue);
                 background-color: var(--admss-app-white-blue);
             }
         }
-        .totals-misc,
-        .totals-info {
+    }
+
+    .totals-controls {
+        padding: 0 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        font-size: 14px;
+        .currency-item__input {
+            align-items: center;
+        }
+
+        .totals-row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            width: 100%;
+            flex-wrap: nowrap;
+            height: 32px;
             gap: 10px;
-            font-size: 14px;
-            .currency-item__input {
-                align-items: center;
-            }
-            .totals-misc__input,
-            .totals-info__title,
-            .totals-info__input {
-                font-size: 14px;
-                height: 32px;
-                max-width: 140px;
-                flex: 1 1 140px;
-            }
+            .deal-profit__includes {
+                position: relative;
 
-            .totals-info__title {
-                display: flex;
-                align-items: center;
-                flex: 0 0 140px;
-            }
-
-            .currency-item {
-                .p-inputtext {
-                    max-width: 110px;
-                    font-size: 14px;
-                    flex: 1 1 110px;
+                &::before {
+                    background-color: var(--totals-accent-color);
+                }
+                &:first-child {
+                    &::before {
+                        color: var(--totals-accent-color);
+                    }
                 }
             }
-            .p-inputtext,
-            .currency-item__icon {
-                height: 32px;
-            }
-            .currency-item__icon {
-                line-height: 0;
-                width: 30px;
-            }
         }
 
-        .totals-summary {
+        .totals-misc__input,
+        .totals-info__title,
+        .totals-info__input {
+            font-size: 14px;
+            height: 32px;
+            max-width: 140px;
+            flex: 1 1 140px;
+        }
+
+        .totals-info__title {
             display: flex;
             align-items: center;
-            flex-wrap: nowrap;
-            .totals-summary__title {
-                font-size: 16px;
-                font-weight: 600;
-                display: flex;
-                align-items: center;
-                flex: 0 0 140px;
-            }
-            .totals-summary__value {
-                font-size: 16px;
-                font-weight: 600;
-                margin-left: 15%;
+            flex: 0 0 140px;
+        }
+
+        .currency-item {
+            .p-inputtext {
+                max-width: 110px;
+                font-size: 14px;
+                flex: 1 1 110px;
             }
         }
-        .deal-profit__includes {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex-wrap: nowrap;
+        .p-inputtext,
+        .currency-item__icon {
+            height: 32px;
+        }
+        .currency-item__icon {
+            line-height: 0;
+            width: 30px;
         }
     }
 }
