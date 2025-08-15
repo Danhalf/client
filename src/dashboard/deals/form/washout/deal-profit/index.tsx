@@ -120,6 +120,7 @@ export const DealProfitItem = observer(
                             }
                             className={`deal-profit__input ${fieldChanged ? "input-change" : ""}`}
                             {...props}
+                            coloredEmptyValue
                             onChange={handleChange}
                         />
                     </>

@@ -7,7 +7,7 @@
     --commission-accent-color: var(--admss-app-dusty-blue);
 
     --finance-color: var(--admss-app-light-red);
-    --finance-accent-color: var(--admss-app-red);
+    --finance-accent-color: var(--admss-app-deep-red);
 
     --interest-color: var(--admss-app-light-green);
     --interest-accent-color: var(--admss-app-green);
@@ -51,7 +51,7 @@
             }
             &:last-child .deal-profit__includes::before {
                 top: -10px;
-                height: 90%;
+                height: 100%;
                 border-radius: 0 0 6px 6px;
             }
         }
@@ -296,7 +296,8 @@
         display: flex;
         flex-direction: column;
         gap: 5px;
-        padding-top: 6px;
+        padding-top: 4px;
+        padding-bottom: 0px;
 
         .splitter {
             padding-top: 6px;
@@ -340,7 +341,7 @@
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 7px;
 
         .p-button {
             margin-bottom: 20px;
@@ -348,25 +349,39 @@
 
         .splitter__line {
             border-color: var(--commission-accent-color);
+            margin-top: 6px;
+            margin-bottom: 6px;
         }
 
         .deal-profit__item {
             padding-top: 8px;
             margin-top: 5.5px;
 
-            &:nth-child(2) .deal-profit__includes::before {
-                content: "A B";
-                padding: 10px 0;
-                color: var(--commission-accent-color);
-                width: 100%;
-                text-align: center;
-                letter-spacing: 0.3rem;
-                height: 80%;
-                border-radius: 6px 6px 0 0;
+            &:nth-child(2) {
+                .deal-profit__label {
+                    padding-left: 20px;
+                    white-space: nowrap;
+                    flex: 0 0 34%;
+                }
+
+                .deal-profit__includes::before {
+                    content: "A B";
+                    padding: 10px 0;
+                    color: var(--commission-accent-color);
+                    width: 100%;
+                    text-align: center;
+                    letter-spacing: 0.3rem;
+                    height: 80%;
+                    border-radius: 6px 6px 0 0;
+                }
             }
-            &:last-child .deal-profit__includes::before {
-                padding-bottom: 10px;
-                border-radius: 0 0 6px 6px;
+            &:last-child {
+                padding-top: 0;
+                margin-top: 0;
+                .deal-profit__includes::before {
+                    padding-bottom: 10px;
+                    border-radius: 0 0 6px 6px;
+                }
             }
         }
     }
@@ -390,6 +405,7 @@
         padding-bottom: 24px;
 
         .deal-profit__label {
+            padding-left: 5px;
             flex: 0 0 48%;
         }
 
@@ -443,16 +459,17 @@
     .finance-worksheet {
         display: flex;
         justify-content: space-between;
+        padding-top: 0px;
         .finance-profit__info {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             flex: 0 0 40%;
         }
         .finance-profit__inputs {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             flex: 0 0 55%;
         }
     }
@@ -463,10 +480,17 @@
         gap: 10px;
         flex: 0 0 40%;
 
+        .deal-profit__item:last-child {
+            .deal-profit__label {
+                flex: 0 0 calc(40% - 65px);
+            }
+        }
+
         .deal-profit__label {
             flex: 0 0 40%;
             white-space: nowrap;
         }
+
         .deal-profit__value {
             flex: 0 0 55%;
         }
@@ -485,6 +509,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            padding-bottom: 50px;
         }
     }
 
