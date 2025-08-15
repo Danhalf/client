@@ -41,9 +41,12 @@
             }
             &:first-child .deal-profit__includes::before {
                 content: "A B";
-                padding: 0 15px;
-                height: 120%;
-                width: calc(100% - 30px);
+                padding: 10px 0;
+                font-size: 14px;
+                text-align: center;
+                letter-spacing: 0.3rem;
+                height: 80%;
+                width: 100%;
                 border-radius: 6px 6px 0 0;
             }
             &:last-child .deal-profit__includes::before {
@@ -127,7 +130,6 @@
                 content: "";
                 position: absolute;
                 font-weight: 700;
-                letter-spacing: 0.1em;
                 white-space: nowrap;
                 bottom: 0;
                 right: 0;
@@ -260,6 +262,7 @@
 
         .deal-profit__label {
             flex: 0 0 35%;
+            white-space: nowrap;
         }
         .deal-profit__value {
             flex: 0 0 42%;
@@ -282,6 +285,8 @@
             width: 100%;
             font-size: 16px;
             font-weight: 600;
+            padding-bottom: 4px;
+            margin-top: 20px;
         }
         .profit-trade__input {
             width: 49%;
@@ -290,7 +295,13 @@
     .profit-info {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 5px;
+        padding-top: 6px;
+
+        .splitter {
+            padding-top: 6px;
+            padding-bottom: 6px;
+        }
     }
     .vehicle-profit__button {
         background-color: var(--vehicle-profit-accent-color);
@@ -331,6 +342,10 @@
         flex-direction: column;
         gap: 10px;
 
+        .p-button {
+            margin-bottom: 20px;
+        }
+
         .splitter__line {
             border-color: var(--commission-accent-color);
         }
@@ -341,9 +356,12 @@
 
             &:nth-child(2) .deal-profit__includes::before {
                 content: "A B";
-                padding: 0 15px;
+                padding: 10px 0;
                 color: var(--commission-accent-color);
-                width: calc(100% - 30px);
+                width: 100%;
+                text-align: center;
+                letter-spacing: 0.3rem;
+                height: 80%;
                 border-radius: 6px 6px 0 0;
             }
             &:last-child .deal-profit__includes::before {
@@ -365,10 +383,11 @@
         white-space: nowrap;
     }
 
-    .profit-commission__body {
+    .profit-commission__body.profit-card__body {
         font-size: 16px;
         display: flex;
         gap: 10px;
+        padding-bottom: 24px;
 
         .deal-profit__label {
             flex: 0 0 48%;
@@ -386,6 +405,9 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            .commission-settings__title {
+                padding-bottom: 6px;
+            }
             .commission-settings__radio {
                 width: 100%;
                 .radio__item {
