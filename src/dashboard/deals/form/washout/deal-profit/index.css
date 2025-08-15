@@ -10,7 +10,7 @@
     --finance-accent-color: var(--admss-app-deep-red);
 
     --interest-color: var(--admss-app-light-green);
-    --interest-accent-color: var(--admss-app-green);
+    --interest-accent-color: var(--admss-app-deep-green);
 
     --totals-color: var(--admss-app-lightest-blue-violet);
     --totals-text-color: var(--admss-app-blue-violet);
@@ -532,24 +532,32 @@
         border-color: var(--interest-accent-color);
     }
 
-    .interest-profit__body {
+    .interest-profit__body.profit-card__body {
         display: flex;
         justify-content: space-between;
+        padding-bottom: 16px;
 
         .deal-profit__item {
+            .deal-profit__label {
+                white-space: nowrap;
+            }
             .deal-profit__includes::before {
                 background-color: var(--interest-color);
             }
             &:first-child .deal-profit__includes::before {
-                height: 100%;
+                height: 80%;
                 color: var(--interest-accent-color);
+            }
+            &:last-child .deal-profit__includes::before {
+                height: 90%;
             }
         }
 
         .interest-controls {
+            padding-top: 4px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 14px;
             flex: 0 0 48%;
             .deal-profit__label {
                 width: 160px;
@@ -594,7 +602,7 @@
     }
 
     &.profit-card .profit-card__body {
-        padding-bottom: 20px;
+        padding-bottom: 10px;
     }
 
     .totals-info {
@@ -618,6 +626,7 @@
             .totals-info__value {
                 font-weight: 700;
                 font-size: 14px;
+                white-space: nowrap;
             }
             .totals-info__value {
                 margin-left: auto;
@@ -661,11 +670,16 @@
             .deal-profit__includes {
                 position: relative;
                 margin-left: auto;
-                height: 100%;
+                display: flex;
+                justify-content: space-between;
 
                 &::before {
                     background-color: var(--totals-accent-color);
                     color: var(--totals-text-color);
+                }
+
+                &:last-child::before {
+                    height: 78%;
                 }
             }
         }
