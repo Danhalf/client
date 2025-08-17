@@ -84,6 +84,7 @@ export const DealWashout = observer((): ReactElement | null => {
         if (!id) return;
         const response = await setDealWashout(id, store.dealWashout);
         if (!response?.error) {
+            store.resetWashoutChanges();
             toast.current?.show({
                 severity: "success",
                 summary: "Success",
@@ -187,6 +188,7 @@ export const DealWashout = observer((): ReactElement | null => {
                                 onClick={handleSaveWashout}
                                 severity='success'
                                 className='uppercase px-6 form-nav__button deal-washout__button'
+                                disabled={!store.isWashoutChanged}
                             >
                                 Save
                             </Button>
