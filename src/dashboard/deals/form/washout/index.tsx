@@ -177,7 +177,7 @@ export const DealWashout = observer((): ReactElement | null => {
                         <div className='washout-footer__buttons'>
                             <Button
                                 className='uppercase px-6 form-nav__button deal-washout__button'
-                                onClick={() => navigate(-1)}
+                                onClick={() => navigate(DEALS_PAGE.EDIT(id))}
                                 severity='danger'
                                 outlined
                             >
@@ -186,7 +186,7 @@ export const DealWashout = observer((): ReactElement | null => {
                             <Button
                                 type='button'
                                 onClick={handleSaveWashout}
-                                severity='success'
+                                severity={store.isWashoutChanged ? "success" : "secondary"}
                                 className='uppercase px-6 form-nav__button deal-washout__button'
                                 disabled={!store.isWashoutChanged}
                             >

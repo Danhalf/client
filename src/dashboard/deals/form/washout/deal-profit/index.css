@@ -2,9 +2,11 @@
     --input-height: 32px;
     --vehicle-profit-color: var(--admss-app-light-purple);
     --vehicle-profit-accent-color: var(--admss-app-deep-purple);
+    --vehicle-profit-button-color: var(--admss-app-focus-purple);
 
     --commission-color: var(--admss-app-light-dusty-blue);
     --commission-accent-color: var(--admss-app-dusty-blue);
+    --commission-button-color: var(--admss-app-button-dusty-blue);
 
     --finance-color: var(--admss-app-light-red);
     --finance-accent-color: var(--admss-app-deep-red);
@@ -313,7 +315,7 @@
         font-weight: 700;
         text-transform: uppercase;
         &:hover {
-            background-color: var(--vehicle-profit-accent-color);
+            background-color: var(--vehicle-profit-button-color);
             color: var(--admss-app-white);
         }
     }
@@ -333,7 +335,7 @@
         font-weight: 700;
         font-size: 18px;
         &:hover {
-            background-color: var(--commission-accent-color);
+            background-color: var(--commission-button-color);
             border-color: var(--commission-accent-color);
             color: var(--admss-app-white);
         }
