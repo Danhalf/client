@@ -686,6 +686,18 @@
             }
         }
 
+        .totals-misc {
+            .p-float-label label {
+                margin-top: -0.4rem;
+                overflow: visible;
+            }
+
+            .p-inputtext:focus + label {
+                margin-top: -0.5rem;
+                font-size: 8px;
+            }
+        }
+
         .totals-misc__input,
         .totals-info__title,
         .totals-info__input {
@@ -693,6 +705,8 @@
             height: 32px;
             max-width: 140px;
             flex: 1 1 140px;
+            display: flex;
+            align-items: center;
         }
 
         .totals-info__title {

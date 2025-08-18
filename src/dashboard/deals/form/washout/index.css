@@ -70,6 +70,11 @@
     font-weight: 600;
 }
 
+.currency-select__list .p-dropdown-items .p-dropdown-item {
+    padding: 6px;
+    font-size: 14px;
+}
+
 .deal-washout__item--subtitle {
     font-size: 18px;
 }

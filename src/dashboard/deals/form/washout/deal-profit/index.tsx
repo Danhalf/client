@@ -115,7 +115,8 @@ export const DealProfitItem = observer(
                                 onChange={(e) => {
                                     handleCurrencySelect(e.value as 0 | 1);
                                 }}
-                                className={`deal-profit__currency-select`}
+                                className={`deal-profit__currency-select currency-select`}
+                                panelClassName='currency-select__list'
                             />
                         )}
                         <CurrencyInput
