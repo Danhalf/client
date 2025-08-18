@@ -30,6 +30,7 @@
         .washout-footer__controls {
             display: flex;
             gap: 25px;
+            padding-left: 12px;
             .p-button {
                 width: 70px;
                 height: 70px;
