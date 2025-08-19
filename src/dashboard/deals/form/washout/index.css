@@ -3,12 +3,16 @@
     --input-small: 30px;
     --washout-height: 72vh;
 
+    .p-tabview-panels {
+        box-shadow: 1px 0 0 0 var(--admss-app-light-grey);
+    }
+
     .info-section__title {
         color: var(--admss-app-main-blue);
     }
 
     .card {
-        padding: 40px;
+        padding: 28px 40px;
 
         .card-header {
             padding-top: 0;
@@ -21,7 +25,7 @@
     }
 
     .washout-footer {
-        padding: 0;
+        padding: 12px;
         margin: 0;
         display: flex;
         justify-content: space-between;
@@ -30,7 +34,7 @@
         .washout-footer__controls {
             display: flex;
             gap: 25px;
-            padding-left: 12px;
+
             .p-button {
                 width: 70px;
                 height: 70px;
@@ -54,6 +58,12 @@
     border-radius: 8px;
     max-height: var(--washout-height);
     overflow-y: auto;
+    position: relative;
+    transition: box-shadow 0.3s ease;
+}
+
+.deal-washout__card--with-shadow {
+    box-shadow: inset 0 -30px 30px -30px rgba(0, 0, 0, 0.15);
 }
 
 .deal-washout__title {
