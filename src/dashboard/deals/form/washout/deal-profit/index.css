@@ -250,12 +250,15 @@
         padding-bottom: 28px;
     }
     .deal-profit__item {
+        font-size: 14px;
         &:first-child .deal-profit__includes::before {
             color: var(--vehicle-profit-accent-color);
         }
-        &:last-child .deal-profit__includes::before {
-            padding-bottom: 0px;
-            border-radius: 0 0 6px 6px;
+        &:last-child {
+            .deal-profit__includes::before {
+                padding-bottom: 0px;
+                border-radius: 0 0 6px 6px;
+            }
         }
 
         .deal-profit__includes {
@@ -398,6 +401,7 @@
         background-color: var(--commission-color);
         padding: 8px 20px;
         white-space: nowrap;
+        font-weight: 600;
     }
 
     .profit-commission__body.profit-card__body {
@@ -444,6 +448,12 @@
 
 .profit-finance {
     box-shadow: 0 0 3px 0 var(--finance-accent-color);
+
+    .deal-profit__item {
+        .deal-profit__value {
+            font-weight: 400;
+        }
+    }
 
     .profit-finance__header {
         background-color: var(--finance-color);
