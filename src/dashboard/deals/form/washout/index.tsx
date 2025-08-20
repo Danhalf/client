@@ -184,7 +184,7 @@ export const DealWashout = observer((): ReactElement | null => {
                         </TabView>
                     </div>
                     <div
-                        className={`deal-washout__footer washout-footer form-nav ${showOverlay ? "show-overlay" : ""}`}
+                        className={`deal-washout__footer washout-footer form-nav ${showOverlay ? "show-overlay" : "pt-3"}`}
                     >
                         <div className='washout-footer__controls'>
                             <ControlButton

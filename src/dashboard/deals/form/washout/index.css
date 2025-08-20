@@ -4,7 +4,7 @@
     --washout-height: 72vh;
 
     .p-tabview-panels {
-        box-shadow: 1px 0 0 0 var(--admss-app-light-grey);
+        padding-bottom: 0px;
     }
 
     .info-section__title {
@@ -35,11 +35,17 @@
         &::after {
             content: "";
             position: absolute;
-            top: -50px;
+            top: -80px;
             left: 0;
             right: 0;
-            height: 50px;
-            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.9));
+            height: 80px;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.5) 70%,
+                rgb(255, 255, 255) 100%
+            );
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease;
