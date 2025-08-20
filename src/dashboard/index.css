@@ -655,8 +655,13 @@
     border: 1px solid var(--admss-app-primary-main-green);
 }
 
-.p-checkbox .p-checkbox-box {
-    border-radius: 3px;
+.p-checkbox {
+    &:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
+        box-shadow: none;
+    }
+    .p-checkbox-box {
+        border-radius: 3px;
+    }
 }
 
 .p-datepicker-calendar {
