@@ -25,11 +25,29 @@
     }
 
     .washout-footer {
-        padding: 12px;
+        padding: 0 12px;
         margin: 0;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        position: relative;
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: -50px;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.9));
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        &.show-overlay::after {
+            opacity: 1;
+        }
 
         .washout-footer__controls {
             display: flex;
