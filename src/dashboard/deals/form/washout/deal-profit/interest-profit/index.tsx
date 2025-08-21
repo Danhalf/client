@@ -16,10 +16,10 @@ export const DealInterestProfit = observer(() => {
     const [interestMarkup, setInterestMarkup] = useState<INCLUDE_OPTIONS | null>(null);
 
     return (
-        <Card className='profit-card interest-profit'>
-            <h3 className='profit-card__header interest-profit__header'>Interest Profit</h3>
-            <article className='profit-card__body interest-profit__body'>
-                <div className='interest-profit__controls interest-controls'>
+        <Card className='profit-card deal-interest-profit'>
+            <h3 className='profit-card__header deal-interest-profit__header'>Interest Profit</h3>
+            <article className='profit-card__body deal-interest-profit__body'>
+                <div className='deal-interest-profit__controls interest-controls'>
                     <DealProfitItem
                         title='Warranty Profit:'
                         value={Number(dealWashout.Warranty_Profit) || 0}
@@ -68,7 +68,7 @@ export const DealInterestProfit = observer(() => {
 
                 <div className='vertical-splitter' />
 
-                <div className='interest-profit__results interest-results'>
+                <div className='deal-interest-profit__results interest-results'>
                     <DealProfitItem
                         title='VSI Profit:'
                         value={Number(dealWashout.VSI_Profit) || 0}

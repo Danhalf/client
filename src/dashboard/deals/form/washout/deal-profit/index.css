@@ -116,6 +116,7 @@
         .deal-profit__value {
             display: flex;
             flex-wrap: nowrap;
+            font-weight: 400;
         }
 
         .deal-profit__includes {
@@ -542,10 +543,10 @@
     }
 }
 
-.interest-profit {
+.deal-interest-profit {
     box-shadow: 0 0 3px 0 var(--interest-accent-color);
     padding: 0;
-    .profit-card__header.interest-profit__header {
+    .profit-card__header.deal-interest-profit__header {
         background-color: var(--interest-color);
         color: var(--interest-accent-color);
     }
@@ -554,7 +555,7 @@
         border-color: var(--interest-accent-color);
     }
 
-    .interest-profit__body.profit-card__body {
+    .deal-interest-profit__body.profit-card__body {
         display: flex;
         justify-content: space-between;
         padding-bottom: 24px;
@@ -650,8 +651,10 @@
                 font-size: 14px;
                 white-space: nowrap;
             }
+
             .totals-info__value {
                 margin-left: auto;
+                font-weight: 400;
                 padding-right: 5%;
             }
             &.totals-info__item--vehicle {
@@ -739,6 +742,9 @@
 
         .totals-info__value {
             padding-left: 10%;
+            &:not(.totals-summary) {
+                font-weight: 400;
+            }
         }
 
         .currency-item {
@@ -760,6 +766,9 @@
         .totals-summary {
             color: var(--totals-text-color);
             font-weight: 700;
+            .totals-summary__value {
+                margin-left: auto;
+            }
         }
     }
 }
