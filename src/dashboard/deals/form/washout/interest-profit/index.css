@@ -73,6 +73,7 @@
 
     .account-wash {
         .deal-profit__label {
+            white-space: nowrap;
             width: 292px;
         }
 

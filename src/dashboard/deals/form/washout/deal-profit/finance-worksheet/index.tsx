@@ -171,6 +171,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                         withInput
                         fieldName='Reserve'
                         currency={CURRENCY_OPTIONS.DOLLAR}
+                        additionalValue='$ 0.00'
                     />
                 </article>
             </section>

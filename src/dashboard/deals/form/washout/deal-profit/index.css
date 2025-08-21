@@ -38,6 +38,12 @@
         }
         .deal-profit__item,
         .totals-row {
+            &:not(.deal-profit__item--bold) {
+                .deal-profit__value {
+                    font-weight: 400;
+                }
+            }
+
             &:first-child {
                 margin-top: 20px;
             }
@@ -116,7 +122,6 @@
         .deal-profit__value {
             display: flex;
             flex-wrap: nowrap;
-            font-weight: 400;
         }
 
         .deal-profit__includes {
@@ -456,12 +461,6 @@
 .profit-finance {
     box-shadow: 0 0 3px 0 var(--finance-accent-color);
 
-    .deal-profit__item {
-        .deal-profit__value {
-            font-weight: 400;
-        }
-    }
-
     .profit-finance__header {
         background-color: var(--finance-color);
         color: var(--finance-accent-color);
@@ -503,6 +502,14 @@
             .deal-profit__label {
                 flex: 0 0 calc(40% - 65px);
             }
+        }
+
+        .deal-profit__additional-value {
+            font-size: 14px;
+            font-weight: 400;
+            flex: 0 0 65px;
+            margin-left: auto;
+            text-align: right;
         }
 
         .deal-profit__label {
@@ -563,6 +570,11 @@
         .deal-profit__item {
             .deal-profit__label {
                 white-space: nowrap;
+            }
+            .deal-profit__value {
+                flex: 1;
+                justify-content: flex-end;
+                padding-right: 15px;
             }
             .deal-profit__includes::before {
                 background-color: var(--interest-color);
@@ -654,7 +666,6 @@
 
             .totals-info__value {
                 margin-left: auto;
-                font-weight: 400;
                 padding-right: 5%;
             }
             &.totals-info__item--vehicle {
@@ -676,6 +687,7 @@
     }
 
     .totals-controls {
+        --padding-left: 10%;
         padding-left: 20px;
         padding-top: 12px;
         display: flex;
@@ -741,7 +753,7 @@
         }
 
         .totals-info__value {
-            padding-left: 10%;
+            padding-left: var(--padding-left);
             &:not(.totals-summary) {
                 font-weight: 400;
             }
@@ -767,7 +779,7 @@
             color: var(--totals-text-color);
             font-weight: 700;
             .totals-summary__value {
-                margin-left: auto;
+                margin-left: var(--padding-left);
             }
         }
     }

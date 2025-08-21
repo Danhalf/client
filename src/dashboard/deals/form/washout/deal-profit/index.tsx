@@ -34,6 +34,7 @@ interface DealProfitItemProps extends InputNumberProps {
     includes?: boolean;
     includeCheckbox?: INCLUDE_OPTIONS | null;
     includeCheckboxOnChange?: (value: INCLUDE_OPTIONS | null) => void;
+    additionalValue?: string;
 }
 
 export const DealProfitItem = observer(
@@ -51,6 +52,7 @@ export const DealProfitItem = observer(
         includeCheckbox,
         includeCheckboxOnChange,
         onCurrencySelect,
+        additionalValue,
         ...props
     }: DealProfitItemProps): ReactElement => {
         const [fieldChanged, setFieldChanged] = useState(false);
@@ -115,9 +117,11 @@ export const DealProfitItem = observer(
                         )}
                         <CurrencyInput
                             currencyIcon={
-                                CURRENCY_SELECT_OPTIONS.find(
-                                    (option) => option.value === currencySelectValue
-                                )?.label
+                                currencySelectValue !== undefined
+                                    ? CURRENCY_SELECT_OPTIONS.find(
+                                          (option) => option.value === currencySelectValue
+                                      )?.label
+                                    : currency
                             }
                             className={`deal-profit__input ${fieldChanged ? "input-change" : ""}`}
                             {...props}
@@ -141,6 +145,9 @@ export const DealProfitItem = observer(
                               })
                             : props.value}
                     </div>
+                )}
+                {additionalValue && (
+                    <span className='deal-profit__additional-value'>{additionalValue}</span>
                 )}
                 {includes && (
                     <div className='deal-profit__includes'>
