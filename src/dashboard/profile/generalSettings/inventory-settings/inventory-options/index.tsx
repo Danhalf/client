@@ -309,6 +309,7 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
                             options={inventoryGroups}
                             value={inventoryGroupID}
                             onChange={(e) => {
+                                setEditedItem({});
                                 store.inventoryGroupID = e.value;
                             }}
                             placeholder='Group class'
