@@ -11,7 +11,7 @@ interface InventoryOptionRowProps {
     index: number;
     isFirst: boolean;
     draggedItemId?: string | null;
-    editedItem: Partial<GeneralInventoryOptions>;
+    editedItem: Partial<GeneralInventoryOptions> | null;
     setEditedItem: (item: Partial<GeneralInventoryOptions>) => void;
     handleSetOrder: (option: Partial<GeneralInventoryOptions>, newOrder: number) => Promise<void>;
     handleSaveOption: (option: Partial<GeneralInventoryOptions>) => void;
@@ -89,11 +89,11 @@ export const InventoryOptionRow = observer(
                 )}
             </div>
             <div className='col-8 p-0 flex align-items-center'>
-                {editedItem.itemuid === item.itemuid ? (
+                {editedItem?.itemuid === item.itemuid ? (
                     <div className='flex row-edit'>
                         <InputText
                             type='text'
-                            value={editedItem.name || ""}
+                            value={editedItem?.name || ""}
                             className='row-edit__input'
                             onChange={(e) =>
                                 setEditedItem({
@@ -107,7 +107,7 @@ export const InventoryOptionRow = observer(
                             icon='icon adms-arrow-right-1'
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleSaveOption(editedItem);
+                                editedItem && handleSaveOption(editedItem);
                             }}
                         />
                     </div>
@@ -125,7 +125,7 @@ export const InventoryOptionRow = observer(
                             text
                             onClick={(e) => {
                                 e.stopPropagation();
-                                editedItem.itemuid ? setEditedItem({}) : setEditedItem(item);
+                                editedItem?.itemuid ? setEditedItem({}) : setEditedItem(item);
                             }}
                         />
                         <Button
