@@ -1,10 +1,11 @@
 import { GeneralInventoryOptions } from "common/models/general-settings";
+import { TextInput } from "dashboard/common/form/inputs";
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
-import { ReactElement } from "react";
+import { ReactElement, useMemo } from "react";
 
 export const NEW_ITEM = "new";
+const MAX_LENGTH = 32;
 
 interface InventoryOptionRowProps {
     item: Partial<GeneralInventoryOptions>;
@@ -55,12 +56,20 @@ export const InventoryOptionRow = observer(
         totalOffset = 0,
     }: InventoryOptionRowProps): ReactElement => {
         const initialValue = item.name;
+        const symbolToLimit = useMemo(() => {
+            if (!editedItem?.name) return MAX_LENGTH.toString();
+            const limit = MAX_LENGTH - editedItem.name.length;
+            return limit.toString();
+        }, [editedItem?.name]);
+
         const editTemplate = (
             <div className='flex row-edit'>
-                <InputText
-                    type='text'
+                <TextInput
                     value={editedItem?.name || ""}
                     className='row-edit__input'
+                    maxLength={MAX_LENGTH}
+                    infoText={symbolToLimit}
+                    height={35}
                     onChange={(e) =>
                         setEditedItem({
                             ...editedItem,
