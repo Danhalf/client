@@ -164,6 +164,8 @@ export const SettingsInventoryOptions = observer((): ReactElement => {
             });
             return handleGetInventoryOptionsGroupList();
         }
+
+        await handleGetInventoryOptionsGroupList();
     };
 
     const handleRestoreDefaults = async () => {
