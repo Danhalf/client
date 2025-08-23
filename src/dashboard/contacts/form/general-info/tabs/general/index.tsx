@@ -51,7 +51,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
         useFormikContext<Contact>();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isScanning, setIsScanning] = useState<boolean>(true);
+    const [isScanning, setIsScanning] = useState<boolean>(false);
 
     const handleGetTypeList = async () => {
         setIsLoading(true);
@@ -71,18 +71,14 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     }, [id]);
 
     const handleScanDL = () => {
-        setIsScanning(true);
-        return setTimeout(() => {
-            setIsScanning(false);
-        }, 2000);
-        // fileInputRef.current?.click();
+        fileInputRef.current?.click();
     };
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        store.isLoading = true;
+        setIsScanning(true);
 
         try {
             const response = await scanContactDL(file);
@@ -190,7 +186,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 life: TOAST_LIFETIME,
             });
         } finally {
-            store.isLoading = false;
+            setIsScanning(false);
             event.target.value = "";
         }
     };
