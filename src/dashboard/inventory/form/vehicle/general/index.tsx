@@ -70,22 +70,31 @@ export const VehicleGeneral = observer((): ReactElement => {
         }
     };
 
-    const handleGetInventoryList = async () => {
-        if (!authUser) return;
-        const [
-            locationsResponse,
-            userGroupsResponse,
-            exteriorColorsResponse,
-            interiorColorsResponse,
-        ] = await Promise.all([
-            getInventoryLocations(authUser.useruid),
-            getUserGroupList(authUser.useruid),
+    const handleGetColorsList = async () => {
+        const [exteriorColorsResponse, interiorColorsResponse] = await Promise.all([
             getInventoryExteriorColorsList(),
             getInventoryInteriorColorsList(),
         ]);
-        if (locationsResponse && Array.isArray(locationsResponse)) {
-            setLocationList(locationsResponse);
+        if (exteriorColorsResponse && Array.isArray(exteriorColorsResponse)) {
+            setColorList(exteriorColorsResponse);
         }
+        if (interiorColorsResponse && Array.isArray(interiorColorsResponse)) {
+            setInteriorList(interiorColorsResponse);
+        }
+    };
+
+    const handleGetLocationsList = async () => {
+        if (!authUser) return;
+        const response = await getInventoryLocations(authUser.useruid);
+        if (response && Array.isArray(response)) {
+            setLocationList(response);
+        }
+    };
+
+    const handleGetUserGroupsList = async () => {
+        if (!authUser) return;
+
+        const userGroupsResponse = await getUserGroupList(authUser.useruid);
         if (userGroupsResponse && Array.isArray(userGroupsResponse)) {
             if (!initialGroupClassName && inventory.GroupClassName) {
                 setInitialGroupClassName(inventory.GroupClassName);
@@ -107,17 +116,16 @@ export const VehicleGeneral = observer((): ReactElement => {
                 handleGetInventoryGroupFullInfo(inventory.GroupClassName);
             }
         }
-        if (exteriorColorsResponse && Array.isArray(exteriorColorsResponse)) {
-            setColorList(exteriorColorsResponse);
-        }
-        if (interiorColorsResponse && Array.isArray(interiorColorsResponse)) {
-            setInteriorList(interiorColorsResponse);
-        }
     };
 
     useEffect(() => {
         handleGetAutoMakeModelList();
-        handleGetInventoryList();
+        handleGetColorsList();
+        handleGetLocationsList();
+    }, []);
+
+    useEffect(() => {
+        handleGetUserGroupsList();
     }, [inventory.GroupClassName]);
 
     const handleGetInventoryGroupFullInfo = (groupName: string) => {
