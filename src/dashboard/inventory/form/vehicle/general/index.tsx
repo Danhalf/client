@@ -52,6 +52,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [colorList, setColorList] = useState<ListData[]>([]);
     const [interiorList, setInteriorList] = useState<ListData[]>([]);
     const [groupClassList, setGroupClassList] = useState<UserGroup[]>([]);
+    const [initialGroupClassName, setInitialGroupClassName] = useState<string>("");
     const [locationList, setLocationList] = useState<InventoryLocations[]>([]);
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
@@ -86,17 +87,25 @@ export const VehicleGeneral = observer((): ReactElement => {
             setLocationList(locationsResponse);
         }
         if (userGroupsResponse && Array.isArray(userGroupsResponse)) {
+            if (!initialGroupClassName && inventory.GroupClassName) {
+                setInitialGroupClassName(inventory.GroupClassName);
+            }
+
             const activeUserGroups = userGroupsResponse.filter(
                 (group) =>
-                    (Boolean(group.enabled) && Boolean(group.itemuid)) ||
-                    group.description === inventory.GroupClassName
+                    (group.enabled === 1 && Boolean(group.itemuid)) ||
+                    (inventory.GroupClassName && group.description === inventory.GroupClassName) ||
+                    (initialGroupClassName && group.description === initialGroupClassName)
             );
+
+            setGroupClassList(activeUserGroups);
+
             if (
+                inventory.GroupClassName &&
                 userGroupsResponse.some((group) => group.description === inventory.GroupClassName)
             ) {
                 handleGetInventoryGroupFullInfo(inventory.GroupClassName);
             }
-            setGroupClassList(activeUserGroups);
         }
         if (exteriorColorsResponse && Array.isArray(exteriorColorsResponse)) {
             setColorList(exteriorColorsResponse);
@@ -109,13 +118,12 @@ export const VehicleGeneral = observer((): ReactElement => {
     useEffect(() => {
         handleGetAutoMakeModelList();
         handleGetInventoryList();
-    }, []);
+    }, [inventory.GroupClassName]);
 
     const handleGetInventoryGroupFullInfo = (groupName: string) => {
         if (groupName) {
-            const activeGroup = groupClassList.find(
-                (group) => group.description === inventory.GroupClassName
-            );
+            const activeGroup = groupClassList.find((group) => group.description === groupName);
+
             if (activeGroup) {
                 store.inventoryGroupID = activeGroup.itemuid;
             }
