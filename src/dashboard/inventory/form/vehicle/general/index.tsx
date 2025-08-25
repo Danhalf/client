@@ -20,7 +20,7 @@ import { Audit, Inventory, InventoryLocations, MakesListData } from "common/mode
 import { InputNumber } from "primereact/inputnumber";
 
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
-import { getUserGroupActiveList } from "http/services/auth-user.service";
+import { getUserGroupList } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
 import { VINDecoder } from "dashboard/common/form/vin-decoder";
 import { Button } from "primereact/button";
@@ -57,7 +57,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
     const [isGroupClassFocused, setIsGroupClassFocused] = useState<boolean>(false);
 
-    const hangeGetAutoMakeModelList = async () => {
+    const handleGetAutoMakeModelList = async () => {
         const response = await getInventoryAutomakesList();
         if (response && Array.isArray(response)) {
             const upperCasedList = response.map((item) => ({
@@ -69,14 +69,46 @@ export const VehicleGeneral = observer((): ReactElement => {
         }
     };
 
+    const handleGetInventoryList = async () => {
+        if (!authUser) return;
+        const [
+            locationsResponse,
+            userGroupsResponse,
+            exteriorColorsResponse,
+            interiorColorsResponse,
+        ] = await Promise.all([
+            getInventoryLocations(authUser.useruid),
+            getUserGroupList(authUser.useruid),
+            getInventoryExteriorColorsList(),
+            getInventoryInteriorColorsList(),
+        ]);
+        if (locationsResponse && Array.isArray(locationsResponse)) {
+            setLocationList(locationsResponse);
+        }
+        if (userGroupsResponse && Array.isArray(userGroupsResponse)) {
+            const activeUserGroups = userGroupsResponse.filter(
+                (group) =>
+                    (Boolean(group.enabled) && Boolean(group.itemuid)) ||
+                    group.description === inventory.GroupClassName
+            );
+            if (
+                userGroupsResponse.some((group) => group.description === inventory.GroupClassName)
+            ) {
+                handleGetInventoryGroupFullInfo(inventory.GroupClassName);
+            }
+            setGroupClassList(activeUserGroups);
+        }
+        if (exteriorColorsResponse && Array.isArray(exteriorColorsResponse)) {
+            setColorList(exteriorColorsResponse);
+        }
+        if (interiorColorsResponse && Array.isArray(interiorColorsResponse)) {
+            setInteriorList(interiorColorsResponse);
+        }
+    };
+
     useEffect(() => {
-        hangeGetAutoMakeModelList();
-        getInventoryExteriorColorsList().then((list) => {
-            list && setColorList(list);
-        });
-        getInventoryInteriorColorsList().then((list) => {
-            list && setInteriorList(list);
-        });
+        handleGetAutoMakeModelList();
+        handleGetInventoryList();
     }, []);
 
     const handleGetInventoryGroupFullInfo = (groupName: string) => {
@@ -89,24 +121,6 @@ export const VehicleGeneral = observer((): ReactElement => {
             }
         }
     };
-
-    useEffect(() => {
-        if (authUser) {
-            getInventoryLocations(authUser.useruid).then((list) => {
-                if (list && Array.isArray(list)) {
-                    setLocationList(list);
-                }
-            });
-            getUserGroupActiveList(authUser.useruid).then((list) => {
-                if (list && Array.isArray(list)) {
-                    setGroupClassList(list);
-                    if (list.some((group) => group.description === inventory.GroupClassName)) {
-                        handleGetInventoryGroupFullInfo(inventory.GroupClassName);
-                    }
-                }
-            });
-        }
-    }, [authUser]);
 
     useEffect(() => {
         if (!values?.locationuid?.trim() && !!locationList.length) {
@@ -180,7 +194,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                     summary: "Success",
                     detail: `${isModel ? "Model" : "Make"} ${record.name} deleted successfully`,
                 });
-                hangeGetAutoMakeModelList();
+                handleGetAutoMakeModelList();
             }
         };
 
