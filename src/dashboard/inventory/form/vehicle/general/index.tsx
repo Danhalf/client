@@ -92,9 +92,9 @@ export const VehicleGeneral = observer((): ReactElement => {
     };
 
     const handleGetUserGroupsList = async () => {
-        if (!authUser) return;
+        if (groupClassList.length > 0 && !inventory.GroupClassName) return;
 
-        const userGroupsResponse = await getUserGroupList(authUser.useruid);
+        const userGroupsResponse = await getUserGroupList(authUser!.useruid);
         if (userGroupsResponse && Array.isArray(userGroupsResponse)) {
             if (!initialGroupClassName && inventory.GroupClassName) {
                 setInitialGroupClassName(inventory.GroupClassName);
@@ -125,8 +125,10 @@ export const VehicleGeneral = observer((): ReactElement => {
     }, []);
 
     useEffect(() => {
-        handleGetUserGroupsList();
-    }, [inventory.GroupClassName]);
+        if (authUser) {
+            handleGetUserGroupsList();
+        }
+    }, [inventory.GroupClassName, authUser]);
 
     const handleGetInventoryGroupFullInfo = (groupName: string) => {
         if (groupName) {
