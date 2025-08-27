@@ -5,11 +5,16 @@ import { Button } from "primereact/button";
 interface InfoOverlayPanelProps {
     panelTitle?: string;
     children: ReactNode;
+    className?: string;
 }
-export const InfoOverlayPanel = ({ panelTitle, children }: InfoOverlayPanelProps): ReactElement => {
-    const [panelShow, setPanelShow] = useState<boolean>(false);
+export const InfoOverlayPanel = ({
+    panelTitle,
+    children,
+    className,
+}: InfoOverlayPanelProps): ReactElement => {
+    const [panelShow, setPanelShow] = useState<boolean>(true);
     return (
-        <div className='info-panel'>
+        <div className={`info-panel ${className ?? ""}`}>
             <Button
                 type='button'
                 className='info-panel__button'

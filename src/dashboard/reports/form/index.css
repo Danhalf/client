@@ -188,7 +188,7 @@
     }
 }
 
-.report-controls__dropdown {
+.data-set__dropdown {
     width: var(--column-width);
     text-transform: capitalize;
 }
