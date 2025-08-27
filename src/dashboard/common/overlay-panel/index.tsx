@@ -12,7 +12,7 @@ export const InfoOverlayPanel = ({
     children,
     className,
 }: InfoOverlayPanelProps): ReactElement => {
-    const [panelShow, setPanelShow] = useState<boolean>(true);
+    const [panelShow, setPanelShow] = useState<boolean>(false);
     return (
         <div className={`info-panel ${className ?? ""}`}>
             <Button
