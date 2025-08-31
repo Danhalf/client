@@ -125,7 +125,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     }, []);
 
     useEffect(() => {
-        inventory.GroupClassName && handleGetUserGroupsList();
+        handleGetUserGroupsList();
     }, [inventory.GroupClassName]);
 
     const handleGetInventoryGroupFullInfo = (groupName: string) => {
