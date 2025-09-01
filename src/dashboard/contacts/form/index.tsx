@@ -207,6 +207,7 @@ export const ContactForm = observer((): ReactElement => {
         deleteReason,
         activeTab,
         tabLength,
+        separateContact,
     } = store;
     const navigate = useNavigate();
     const formikRef = useRef<FormikProps<PartialContact>>(null);

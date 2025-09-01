@@ -21,7 +21,7 @@ import "./index.css";
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
     const store = useStore().contactStore;
-    const { contactExtData, changeContactExtData } = store;
+    const { contactExtData, changeContactExtData, coBuyerContact, separateContact } = store;
 
     const { setFieldValue, validateField, setFieldTouched, errors } =
         useFormikContext<ContactExtData>();
@@ -29,7 +29,6 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isScanning, setIsScanning] = useState<boolean>(false);
-    const [separateContact, setSeparateContact] = useState<boolean>(false);
 
     const shouldDisableNameFields = useMemo(() => {
         return (
@@ -188,18 +187,20 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
     return (
         <div className='grid general-info row-gap-2 cobuyer-info'>
-            <div className='cobuyer-info__checkbox'>
-                <Checkbox
-                    checked={separateContact}
-                    onChange={() => setSeparateContact(!separateContact)}
-                    inputId='separate-contact'
-                    name='separate-contact'
-                    title='Save As a Separate Contact'
-                />
-                <label htmlFor='separate-contact' className='cobuyer-info__label'>
-                    Save As a Separate Contact
-                </label>
-            </div>
+            {!coBuyerContact.useruid && (
+                <div className='cobuyer-info__checkbox'>
+                    <Checkbox
+                        checked={separateContact}
+                        onChange={(e) => (store.separateContact = !!e.checked)}
+                        inputId='separate-contact'
+                        name='separate-contact'
+                        title='Save As a Separate Contact'
+                    />
+                    <label htmlFor='separate-contact' className='cobuyer-info__label'>
+                        Save As a Separate Contact
+                    </label>
+                </div>
+            )}
             <div className='col-12 flex gap-4'>
                 <Button
                     type='button'
