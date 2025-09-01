@@ -16,6 +16,7 @@ import { SexList } from "common/constants/contract-options";
 import { TOOLTIP_MESSAGE } from "dashboard/contacts/form/general-info/tabs/general";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { Loader } from "dashboard/common/loader";
+import "./index.css";
 
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -28,6 +29,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isScanning, setIsScanning] = useState<boolean>(false);
+    const [separateContact, setSeparateContact] = useState<boolean>(false);
 
     const shouldDisableNameFields = useMemo(() => {
         return (
@@ -185,7 +187,19 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     };
 
     return (
-        <div className='grid general-info row-gap-2'>
+        <div className='grid general-info row-gap-2 cobuyer-info'>
+            <div className='cobuyer-info__checkbox'>
+                <Checkbox
+                    checked={separateContact}
+                    onChange={() => setSeparateContact(!separateContact)}
+                    inputId='separate-contact'
+                    name='separate-contact'
+                    title='Save As a Separate Contact'
+                />
+                <label htmlFor='separate-contact' className='cobuyer-info__label'>
+                    Save As a Separate Contact
+                </label>
+            </div>
             <div className='col-12 flex gap-4'>
                 <Button
                     type='button'
