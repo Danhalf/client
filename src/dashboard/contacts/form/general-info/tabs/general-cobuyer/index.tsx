@@ -199,7 +199,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
     return (
         <div className='grid general-info row-gap-2 cobuyer-info'>
-            {!coBuyerContact.useruid && (
+            {(!coBuyerContact.useruid || store.coBuyerGeneralFieldsChanged) && (
                 <div className='cobuyer-info__checkbox'>
                     <Checkbox
                         checked={separateContact}
