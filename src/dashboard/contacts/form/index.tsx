@@ -366,7 +366,14 @@ export const ContactForm = observer((): ReactElement => {
             const allErrors = { ...errors, ...coBuyerValidationErrors };
 
             if (!Object.keys(allErrors).length) {
-                const response = await saveContact();
+                let response;
+
+                if (store.separateContact) {
+                    response = await store.createSeparateCoBuyerContact();
+                } else {
+                    response = await saveContact();
+                }
+
                 if (response && response.status === Status.OK) {
                     if (memoRoute) {
                         navigate(memoRoute);
