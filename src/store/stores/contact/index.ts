@@ -75,6 +75,7 @@ export class ContactStore {
     private _deleteReason: string = "";
     private _activeTab: number | null = null;
     private _tabLength: number = 0;
+    private _separateContact: boolean = false;
 
     private _contactDocumentsID: Partial<InventoryMedia>[] = [];
     private _uploadFileDocuments: UploadMediaItem = initialMediaItem;
@@ -136,6 +137,10 @@ export class ContactStore {
 
     public get coBuyerBackSideDLurl() {
         return this._coBuyerBackSideDLurl;
+    }
+
+    public get separateContact() {
+        return this._separateContact;
     }
 
     public get isContactChanged() {
@@ -788,6 +793,10 @@ export class ContactStore {
 
     public set isContactChanged(state: boolean) {
         this._isContactChanged = state;
+    }
+
+    public set separateContact(state: boolean) {
+        this._separateContact = state;
     }
 
     public set uploadFileDocuments(files: UploadMediaItem) {
