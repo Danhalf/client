@@ -1,12 +1,20 @@
 .deal-washout {
     --input-regular: 40px;
     --input-small: 30px;
+    --washout-content-height: 64vh;
     --washout-min-height: 800px;
-    --washout-height: 86vh;
+    --washout-content-max-height: 1000px;
+    --washout-max-height: 84vh;
+    --washout-height: 1210px;
+
+    .deal-washout__tabs {
+        width: 100%;
+    }
 
     .p-tabview-panels {
         padding-bottom: 0px;
-        height: 66vh;
+        height: var(--washout-content-height);
+        max-height: var(--washout-content-max-height);
         overflow: scroll;
     }
 
@@ -38,12 +46,12 @@
         align-items: flex-end;
         position: relative;
 
-        &::after {
+        &::before {
             content: "";
             position: absolute;
             top: -80px;
-            left: 0;
-            right: 0;
+            left: -40px;
+            right: -40px;
             height: 80px;
             background: linear-gradient(
                 to bottom,
@@ -55,9 +63,10 @@
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease;
+            z-index: 1;
         }
 
-        &.show-overlay::after {
+        &.show-overlay::before {
             opacity: 1;
         }
 
@@ -89,6 +98,7 @@
     overflow: hidden;
     border-radius: 8px;
     height: var(--washout-height);
+    max-height: var(--washout-max-height);
     position: relative;
     transition: box-shadow 0.3s ease;
 }

@@ -84,20 +84,23 @@ export const DealWashout = observer((): ReactElement | null => {
 
     useEffect(() => {
         const handleScroll = () => {
-            if (cardRef.current) {
-                const { scrollTop, scrollHeight, clientHeight } = cardRef.current;
+            const tabPanels = document.querySelector(
+                ".deal-washout .p-tabview-panels"
+            ) as HTMLElement;
+            if (tabPanels) {
+                const { scrollTop, scrollHeight, clientHeight } = tabPanels;
                 const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
                 setShowOverlay(!isAtBottom);
             }
         };
 
-        const cardElement = cardRef.current;
-        if (cardElement) {
-            cardElement.addEventListener("scroll", handleScroll);
+        const tabPanels = document.querySelector(".deal-washout .p-tabview-panels") as HTMLElement;
+        if (tabPanels) {
+            tabPanels.addEventListener("scroll", handleScroll);
             handleScroll();
 
             return () => {
-                cardElement.removeEventListener("scroll", handleScroll);
+                tabPanels.removeEventListener("scroll", handleScroll);
             };
         }
     }, []);
