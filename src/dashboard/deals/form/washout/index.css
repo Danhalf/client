@@ -1,7 +1,14 @@
 .deal-washout {
     --input-regular: 40px;
     --input-small: 30px;
-    --washout-content-height: 64vh;
+    --washout-content-height: 66vh;
+    @media (max-height: 1100px) {
+        --washout-content-height: 60vh;
+    }
+
+    @media (max-height: 900px) {
+        --washout-content-height: 52vh;
+    }
     --washout-min-height: 800px;
     --washout-content-max-height: 1000px;
     --washout-max-height: 84vh;
@@ -72,6 +79,7 @@
 
         .washout-footer__controls {
             display: flex;
+            align-items: flex-end;
             gap: 25px;
 
             .p-button {
