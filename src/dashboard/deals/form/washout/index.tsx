@@ -137,7 +137,7 @@ export const DealWashout = observer((): ReactElement | null => {
                 onClick={() => navigate(DEALS_PAGE.EDIT(id))}
             />
             <div className='col-12'>
-                <div className='card'>
+                <div className='card deal-washout__card'>
                     <div className='card-header flex'>
                         <h2 className='card-header__title uppercase m-0'>Deal Washout</h2>
                         {id && (
@@ -163,7 +163,7 @@ export const DealWashout = observer((): ReactElement | null => {
                             </div>
                         )}
                     </div>
-                    <div className='card-content deal-washout__card grid' ref={cardRef}>
+                    <div className='card-content grid' ref={cardRef}>
                         <TabView
                             className='deal-washout__tabs'
                             activeIndex={activeIndex}

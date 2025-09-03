@@ -2,10 +2,12 @@
     --input-regular: 40px;
     --input-small: 30px;
     --washout-min-height: 800px;
-    --washout-height: 72vh;
+    --washout-height: 86vh;
 
     .p-tabview-panels {
         padding-bottom: 0px;
+        height: 66vh;
+        overflow: scroll;
     }
 
     .info-section__title {
@@ -33,7 +35,7 @@
         margin: 0;
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-end;
         position: relative;
 
         &::after {
@@ -83,9 +85,10 @@
 .deal-washout__card {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
     border-radius: 8px;
-    max-height: var(--washout-height);
-    overflow-y: auto;
+    height: var(--washout-height);
     position: relative;
     transition: box-shadow 0.3s ease;
 }
@@ -280,7 +283,7 @@
 
 .deal-washout__footer {
     display: flex;
-    justify-content: flex-end;
+    flex-grow: 1;
     gap: 25px;
-    margin-top: 10px;
+    margin-top: auto;
 }
