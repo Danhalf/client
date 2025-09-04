@@ -282,7 +282,7 @@ export const ContactsDataTable = ({
     const handleAdvancedSearch = () => {
         const searchQuery = Object.entries(advancedSearch)
             .filter(([_, value]) => value)
-            .map(([key, value]) => `${value}.${key.replace(/\d+/g, "")}`)
+            .map(([key, value]) => `${value}.${key}`)
             .join("+");
 
         handleGetContactsList({ qry: searchQuery }, true);
