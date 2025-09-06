@@ -19,7 +19,6 @@
     .profit-card {
         font-size: 16px;
         font-weight: 600;
-        /* box-shadow: 0 0 3px 0 var(--admss-app-warning-blue); */
     }
 
     .profit-card__header {
@@ -31,7 +30,6 @@
         overflow: hidden;
         justify-content: space-between;
         align-items: center;
-        /* color: var(--admss-app-warning-blue); */
     }
 
     .account-wash__body,
