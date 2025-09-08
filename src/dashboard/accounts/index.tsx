@@ -250,39 +250,35 @@ export const AccountsDataTable = observer(
         return (
             <div className='card-content'>
                 <div className='grid datatable-controls'>
-                    <div className='col-6'>
-                        <div className='contact-top-controls'>
-                            <Button
-                                severity='success'
-                                type='button'
-                                icon='icon adms-print'
-                                tooltip='Print accounts form'
-                                onClick={() => printTableData(true)}
-                            />
-                            <Button
-                                severity='success'
-                                type='button'
-                                icon='icon adms-download'
-                                tooltip='Download accounts form'
-                                onClick={() => printTableData()}
-                            />
-                        </div>
-                    </div>
-                    <div className='col-6 text-right'>
+                    <span className='p-input-icon-right'>
+                        <i className='icon adms-search' />
+                        <InputText
+                            value={globalSearch}
+                            onChange={(e) => setGlobalSearch(e.target.value)}
+                        />
+                    </span>
+                    <Button
+                        className='contact-top-controls__button'
+                        label='Advanced search'
+                        severity='success'
+                        type='button'
+                        onClick={() => setDialogVisible(true)}
+                    />
+                    <div className='contact-top-controls'>
                         <Button
-                            className='contact-top-controls__button m-r-20px'
-                            label='Advanced search'
                             severity='success'
                             type='button'
-                            onClick={() => setDialogVisible(true)}
+                            icon='icon adms-print'
+                            tooltip='Print accounts form'
+                            onClick={() => printTableData(true)}
                         />
-                        <span className='p-input-icon-right'>
-                            <i className='icon adms-search' />
-                            <InputText
-                                value={globalSearch}
-                                onChange={(e) => setGlobalSearch(e.target.value)}
-                            />
-                        </span>
+                        <Button
+                            severity='success'
+                            type='button'
+                            icon='icon adms-download'
+                            tooltip='Download accounts form'
+                            onClick={() => printTableData()}
+                        />
                     </div>
                 </div>
                 <div className='grid'>
@@ -343,15 +339,11 @@ export const AccountsDataTable = observer(
 
 export const Accounts = () => {
     return (
-        <div className='grid'>
-            <div className='col-12'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Accounts</h2>
-                    </div>
-                    <AccountsDataTable />
-                </div>
+        <div className='card accounts'>
+            <div className='card-header'>
+                <h2 className='card-header__title uppercase m-0'>Accounts</h2>
             </div>
+            <AccountsDataTable />
         </div>
     );
 };
