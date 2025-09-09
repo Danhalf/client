@@ -9,7 +9,6 @@ import {
 } from "primereact/datatable";
 import { getAccountsList, TotalAccountList } from "http/services/accounts.service";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
 import { Column, ColumnProps } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { ROWS_PER_PAGE } from "common/settings";
@@ -27,6 +26,7 @@ import {
 } from "dashboard/common/dialog/search";
 import { useStore } from "store/hooks";
 import { AccountInfo } from "common/models/accounts";
+import { GlobalSearchInput } from "dashboard/common/form/inputs";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountnumber", header: "Account" },
@@ -250,13 +250,10 @@ export const AccountsDataTable = observer(
         return (
             <div className='card-content'>
                 <div className='grid datatable-controls'>
-                    <span className='p-input-icon-right'>
-                        <i className='icon adms-search' />
-                        <InputText
-                            value={globalSearch}
-                            onChange={(e) => setGlobalSearch(e.target.value)}
-                        />
-                    </span>
+                    <GlobalSearchInput
+                        value={globalSearch}
+                        onChange={(e) => setGlobalSearch(e.target.value)}
+                    />
                     <Button
                         className='contact-top-controls__button'
                         label='Advanced search'
@@ -264,22 +261,20 @@ export const AccountsDataTable = observer(
                         type='button'
                         onClick={() => setDialogVisible(true)}
                     />
-                    <div className='contact-top-controls'>
-                        <Button
-                            severity='success'
-                            type='button'
-                            icon='icon adms-print'
-                            tooltip='Print accounts form'
-                            onClick={() => printTableData(true)}
-                        />
-                        <Button
-                            severity='success'
-                            type='button'
-                            icon='icon adms-download'
-                            tooltip='Download accounts form'
-                            onClick={() => printTableData()}
-                        />
-                    </div>
+                    <Button
+                        severity='success'
+                        type='button'
+                        icon='icon adms-print'
+                        tooltip='Print accounts form'
+                        onClick={() => printTableData(true)}
+                    />
+                    <Button
+                        severity='success'
+                        type='button'
+                        icon='icon adms-download'
+                        tooltip='Download accounts form'
+                        onClick={() => printTableData()}
+                    />
                 </div>
                 <div className='grid'>
                     <div className='col-12'>
