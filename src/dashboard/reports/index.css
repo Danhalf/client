@@ -318,6 +318,9 @@
     }
 }
 
-.reports-actions__menu.p-menu .p-menuitem-link {
-    height: auto;
+.reports-actions__menu {
+    padding: 0;
+    &.p-menu .p-menuitem-link {
+        height: auto;
+    }
 }
