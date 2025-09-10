@@ -115,8 +115,7 @@ export const AccountsForm = observer((): ReactElement => {
                 severity: "warn",
                 summary: "Warning",
                 detail: `The insurance data in ${TabName.INSURANCE.toUpperCase()} section has not been saved.`,
-                // life: TOAST_LIFETIME,
-                life: 99999999999,
+                life: TOAST_LIFETIME,
             });
         }
 
