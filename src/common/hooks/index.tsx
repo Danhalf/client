@@ -62,8 +62,8 @@ interface UseFormExitConfirmationProps {
 enum ModalMessage {
     TITLE = "Quit Editing?",
     MESSAGE = "Are you sure you want to leave this page? All unsaved data will be lost.",
-    ICON = "pi-exclamation-triangle",
-    CLASS_NAME = "form-exit-confirm-dialog",
+    ICON = "adms-warning",
+    CLASS_NAME = "quit-editing",
     ACCEPT_LABEL = "Confirm",
     REJECT_LABEL = "Cancel",
 }
