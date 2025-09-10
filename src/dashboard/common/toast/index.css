@@ -1,3 +1,5 @@
-.p-toast-summary {
-    text-transform: uppercase;
+.p-toast {
+    .p-toast-summary {
+        text-transform: uppercase;
+    }
 }
