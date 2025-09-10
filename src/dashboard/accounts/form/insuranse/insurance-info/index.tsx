@@ -12,13 +12,14 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Loader } from "dashboard/common/loader";
+import { CONTACTS_PAGE } from "common/constants/links";
 
 export interface InsuranceInfoRef {
     hasUnsavedChanges: () => boolean;
 }
 
 export const AccountInsuranceInfo = observer(
-    forwardRef<InsuranceInfoRef>((props, ref): ReactElement => {
+    forwardRef<InsuranceInfoRef>((_, ref): ReactElement => {
         const { id } = useParams();
         const navigate = useNavigate();
         const toast = useToast();
@@ -100,7 +101,7 @@ export const AccountInsuranceInfo = observer(
                     life: TOAST_LIFETIME,
                 });
             } else {
-                navigate(`/dashboard/contacts/${insuranceInfo?.Insurance_userUID}`);
+                navigate(CONTACTS_PAGE.EDIT(insuranceInfo?.Insurance_userUID));
             }
         };
 
