@@ -6,6 +6,12 @@
     border: none;
 }
 
+.export-web {
+    .column-picker {
+        height: 50px;
+    }
+}
+
 .export-web__body .p-datatable-wrapper {
     height: 62vh;
 }
