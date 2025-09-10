@@ -19,6 +19,7 @@ import { TOAST_LIFETIME } from "common/settings";
 import { Loader } from "dashboard/common/loader";
 import { NoticeAlert } from "dashboard/accounts/form/common";
 import { useFormExitConfirmation } from "common/hooks";
+import { ACCOUNTS_PAGE } from "common/constants/links";
 
 interface TabItem {
     tabName: string;
@@ -80,7 +81,7 @@ export const AccountsForm = observer((): ReactElement => {
                         detail: (response?.error as string) || "",
                         life: TOAST_LIFETIME,
                     });
-                    navigate(`/dashboard/accounts`);
+                    navigate(ACCOUNTS_PAGE.MAIN);
                 } else {
                     getNotes(id);
                 }
@@ -102,7 +103,7 @@ export const AccountsForm = observer((): ReactElement => {
 
     const { handleExitClick, ConfirmModalComponent } = useFormExitConfirmation({
         isFormChanged: isAccountChanged,
-        onConfirmExit: () => navigate("/dashboard/accounts"),
+        onConfirmExit: () => navigate(ACCOUNTS_PAGE.MAIN),
         className: "account-confirm-dialog",
     });
 
@@ -123,7 +124,7 @@ export const AccountsForm = observer((): ReactElement => {
         const tabName = transformTabName(tabItems[index].tabName);
         const queryParams = new URLSearchParams(location.search);
         queryParams.set("tab", tabName);
-        navigate(`/dashboard/accounts/${id}?${queryParams.toString()}`, { replace: true });
+        navigate(`${ACCOUNTS_PAGE.EDIT(id ?? "")}?${queryParams.toString()}`, { replace: true });
     };
 
     return isLoading ? (

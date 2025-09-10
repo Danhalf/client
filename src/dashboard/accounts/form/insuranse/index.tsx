@@ -8,7 +8,7 @@ export interface AccountInsuranceRef {
     hasUnsavedChanges: () => boolean;
 }
 
-export const AccountInsurance = forwardRef<AccountInsuranceRef>((props, ref): ReactElement => {
+export const AccountInsurance = forwardRef<AccountInsuranceRef>((_, ref): ReactElement => {
     const insuranceInfoRef = useRef<InsuranceInfoRef>(null);
 
     useImperativeHandle(ref, () => ({
