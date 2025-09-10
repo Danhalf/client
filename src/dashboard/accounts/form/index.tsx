@@ -18,7 +18,7 @@ import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Loader } from "dashboard/common/loader";
 import { NoticeAlert } from "dashboard/accounts/form/common";
-import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { useFormExitConfirmation } from "common/hooks";
 
 interface TabItem {
     tabName: string;
@@ -53,10 +53,6 @@ export const AccountsForm = observer((): ReactElement => {
         isLoading,
     } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
-    const [confirmMessage, setConfirmMessage] = useState<string>("");
-    const [confirmTitle, setConfirmTitle] = useState<string>("");
-    const [confirmAction, setConfirmAction] = useState<() => void>(() => () => {});
-    const [isConfirmVisible, setIsConfirmVisible] = useState<boolean>(false);
 
     useEffect(() => {
         store.prevPath = `${location.pathname}${location.search}`;
@@ -92,17 +88,11 @@ export const AccountsForm = observer((): ReactElement => {
         setActiveTab(tabIndex >= 0 ? tabIndex : 0);
     }, [location.search]);
 
-    useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-            if (isAccountChanged) {
-                event.preventDefault();
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    }, [isAccountChanged]);
+    const { handleExitClick, ConfirmModalComponent } = useFormExitConfirmation({
+        isFormChanged: isAccountChanged,
+        onConfirmExit: () => navigate("/dashboard/accounts"),
+        className: "account-confirm-dialog",
+    });
 
     const handleTabChange = (index: number) => {
         setActiveTab(index);
@@ -112,23 +102,6 @@ export const AccountsForm = observer((): ReactElement => {
         navigate(`/dashboard/accounts/${id}?${queryParams.toString()}`, { replace: true });
     };
 
-    const handleCloseClick = () => {
-        const performNavigation = () => {
-            navigate("/dashboard/accounts");
-        };
-
-        if (isAccountChanged) {
-            setConfirmTitle("Quit Editing?");
-            setConfirmMessage(
-                "Are you sure you want to leave this page? All unsaved data will be lost."
-            );
-            setConfirmAction(() => performNavigation);
-            setIsConfirmVisible(true);
-        } else {
-            performNavigation();
-        }
-    };
-
     return isLoading ? (
         <Loader overlay />
     ) : (
@@ -136,7 +109,7 @@ export const AccountsForm = observer((): ReactElement => {
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
-                onClick={handleCloseClick}
+                onClick={handleExitClick}
             />
             <div className='col-12'>
                 <div className='card account'>
@@ -206,21 +179,7 @@ export const AccountsForm = observer((): ReactElement => {
                     </div>
                 </div>
             </div>
-            {isConfirmVisible && (
-                <ConfirmModal
-                    visible={isConfirmVisible}
-                    title={confirmTitle}
-                    icon='pi-exclamation-triangle'
-                    bodyMessage={confirmMessage}
-                    confirmAction={confirmAction}
-                    draggable={false}
-                    rejectLabel='Cancel'
-                    acceptLabel='Confirm'
-                    resizable={false}
-                    className='account-confirm-dialog'
-                    onHide={() => setIsConfirmVisible(false)}
-                />
-            )}
+            <ConfirmModalComponent />
         </div>
     );
 });
