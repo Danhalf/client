@@ -1,10 +1,10 @@
 import { Button } from "primereact/button";
-import { ReactElement, useEffect, useState, useRef } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { TabPanel, TabView } from "primereact/tabview";
 import { AccountInformation } from "dashboard/accounts/form/information";
 import { AccountDownPayment } from "dashboard/accounts/form/down-payment";
-import { AccountInsurance, AccountInsuranceRef } from "dashboard/accounts/form/insuranse";
+import { AccountInsurance } from "dashboard/accounts/form/insurance";
 import { AccountManagement } from "dashboard/accounts/form/management";
 import { AccountNotes } from "dashboard/accounts/form/notes";
 import { AccountPaymentHistory } from "dashboard/accounts/form/payment-history";
@@ -54,7 +54,7 @@ export const AccountsForm = observer((): ReactElement => {
         isLoading,
     } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
-    const insuranceRef = useRef<AccountInsuranceRef>(null);
+    const [hasInsuranceUnsavedChanges, setHasInsuranceUnsavedChanges] = useState<boolean>(false);
 
     const tabItems: TabItem[] = [
         { tabName: TabName.ACCOUNT_INFORMATION, component: <AccountInformation /> },
@@ -64,7 +64,10 @@ export const AccountsForm = observer((): ReactElement => {
         { tabName: TabName.ACCOUNT_SETTINGS, component: <AccountSettings /> },
         { tabName: TabName.NOTES, component: <AccountNotes /> },
         { tabName: TabName.PROMISE_TO_PAY, component: <AccountPromiseToPay /> },
-        { tabName: TabName.INSURANCE },
+        {
+            tabName: TabName.INSURANCE,
+            component: <AccountInsurance onUnsavedChangesChange={setHasInsuranceUnsavedChanges} />,
+        },
     ];
 
     useEffect(() => {
@@ -111,7 +114,7 @@ export const AccountsForm = observer((): ReactElement => {
         const currentTabIndex = activeTab;
         const currentTabName = tabItems[currentTabIndex]?.tabName;
 
-        if (currentTabName === TabName.INSURANCE && insuranceRef.current?.hasUnsavedChanges()) {
+        if (currentTabName === TabName.INSURANCE && hasInsuranceUnsavedChanges) {
             toast.current?.show({
                 severity: "warn",
                 summary: "Warning",
@@ -169,11 +172,7 @@ export const AccountsForm = observer((): ReactElement => {
                                             key={tabName}
                                             className='account__panel h-full'
                                         >
-                                            {tabName === TabName.INSURANCE ? (
-                                                <AccountInsurance ref={insuranceRef} />
-                                            ) : (
-                                                component
-                                            )}
+                                            {component}
                                         </TabPanel>
                                     );
                                 })}
