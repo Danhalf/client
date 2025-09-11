@@ -1,17 +1,11 @@
 import { Card } from "primereact/card";
-import { useState } from "react";
 import { DealProfitItem } from "dashboard/deals/form/washout/deal-profit";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { CURRENCY_OPTIONS } from "dashboard/common/form/inputs";
-import { INCLUDE_OPTIONS } from "store/stores/deal";
 
 export const DealProfitFinanceWorksheet = observer(() => {
     const { dealWashout, changeDealWashout } = useStore().dealStore;
-
-    const [discount, setDiscount] = useState<INCLUDE_OPTIONS | null>(null);
-    const [acquisitionFee, setAcquisitionFee] = useState<INCLUDE_OPTIONS | null>(null);
-    const [reserve, setReserve] = useState<INCLUDE_OPTIONS | null>(null);
 
     return (
         <Card className='profit-card profit-finance'>
@@ -143,8 +137,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                         fieldName='Discount'
                         justify='start'
                         includes
-                        includeCheckbox={discount}
-                        includeCheckboxOnChange={setDiscount}
+                        includeCheckboxFieldName='Discount'
                         currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
@@ -153,8 +146,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                         withInput
                         justify='start'
                         includes
-                        includeCheckbox={acquisitionFee}
-                        includeCheckboxOnChange={setAcquisitionFee}
+                        includeCheckboxFieldName='AcquisitionFee'
                         fieldName='AcquisitionFee'
                         currency={CURRENCY_OPTIONS.DOLLAR}
                     />
@@ -167,8 +159,7 @@ export const DealProfitFinanceWorksheet = observer(() => {
                             changeDealWashout("Reserve_Type", value);
                         }}
                         includes
-                        includeCheckbox={reserve}
-                        includeCheckboxOnChange={setReserve}
+                        includeCheckboxFieldName='Reserve'
                         withInput
                         fieldName='Reserve'
                         currency={CURRENCY_OPTIONS.DOLLAR}

@@ -1,21 +1,11 @@
 import { Card } from "primereact/card";
 import { DealProfitItem } from "dashboard/deals/form/washout/deal-profit";
-import { useState } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { CURRENCY_OPTIONS } from "dashboard/common/form/inputs";
-import { INCLUDE_OPTIONS } from "store/stores/deal";
 
 export const DealInterestProfit = observer(() => {
     const { dealWashout } = useStore().dealStore;
-
-    const [warrantyProfit, setWarrantyProfit] = useState<INCLUDE_OPTIONS | null>(null);
-    const [gapProfit, setGapProfit] = useState<INCLUDE_OPTIONS | null>(null);
-    const [accessoriesProfit, setAccessoriesProfit] = useState<INCLUDE_OPTIONS | null>(null);
-    const [clProfit, setClProfit] = useState<INCLUDE_OPTIONS | null>(null);
-    const [ahProfit, setAhProfit] = useState<INCLUDE_OPTIONS | null>(null);
-    const [vsiProfit, setVsiProfit] = useState<INCLUDE_OPTIONS | null>(null);
-    const [interestMarkup, setInterestMarkup] = useState<INCLUDE_OPTIONS | null>(null);
 
     return (
         <Card className='profit-card deal-interest-profit'>
@@ -27,8 +17,7 @@ export const DealInterestProfit = observer(() => {
                         value={Number(dealWashout.Warranty_Profit) || 0}
                         currency={CURRENCY_OPTIONS.DOLLAR}
                         includes
-                        includeCheckbox={warrantyProfit}
-                        includeCheckboxOnChange={setWarrantyProfit}
+                        includeCheckboxFieldName='Warranty_Profit'
                     />
                     <DealProfitItem
                         title='Gap Profit:'
@@ -36,8 +25,7 @@ export const DealInterestProfit = observer(() => {
                         currency={CURRENCY_OPTIONS.DOLLAR}
                         numberSign='+'
                         includes
-                        includeCheckbox={gapProfit}
-                        includeCheckboxOnChange={setGapProfit}
+                        includeCheckboxFieldName='Gap_Profit'
                     />
                     <DealProfitItem
                         title='Accessories Profit:'
@@ -45,8 +33,7 @@ export const DealInterestProfit = observer(() => {
                         currency={CURRENCY_OPTIONS.DOLLAR}
                         numberSign='+'
                         includes
-                        includeCheckbox={accessoriesProfit}
-                        includeCheckboxOnChange={setAccessoriesProfit}
+                        includeCheckboxFieldName='Accessory_Profit'
                     />
                     <DealProfitItem
                         title='C/L Profit:'
@@ -54,8 +41,7 @@ export const DealInterestProfit = observer(() => {
                         currency={CURRENCY_OPTIONS.DOLLAR}
                         numberSign='+'
                         includes
-                        includeCheckbox={clProfit}
-                        includeCheckboxOnChange={setClProfit}
+                        includeCheckboxFieldName='CL_Profit'
                     />
                     <DealProfitItem
                         title='A/H Profit:'
@@ -63,8 +49,7 @@ export const DealInterestProfit = observer(() => {
                         currency={CURRENCY_OPTIONS.DOLLAR}
                         numberSign='+'
                         includes
-                        includeCheckbox={ahProfit}
-                        includeCheckboxOnChange={setAhProfit}
+                        includeCheckboxFieldName='AH_Profit'
                     />
                 </div>
 
@@ -77,8 +62,7 @@ export const DealInterestProfit = observer(() => {
                         currency={CURRENCY_OPTIONS.DOLLAR}
                         numberSign='+'
                         includes
-                        includeCheckbox={vsiProfit}
-                        includeCheckboxOnChange={setVsiProfit}
+                        includeCheckboxFieldName='VSI_Profit'
                     />
 
                     <div className='splitter my-0'>
@@ -91,8 +75,7 @@ export const DealInterestProfit = observer(() => {
                         fieldName='InterestMarkup'
                         numberSign='+'
                         includes
-                        includeCheckbox={interestMarkup}
-                        includeCheckboxOnChange={setInterestMarkup}
+                        includeCheckboxFieldName='Interest_Markup'
                         currency={CURRENCY_OPTIONS.DOLLAR}
                     />
                     <DealProfitItem
