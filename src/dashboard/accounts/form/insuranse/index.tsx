@@ -1,5 +1,5 @@
 import { TabView, TabPanel } from "primereact/tabview";
-import { ReactElement, useImperativeHandle, useRef, forwardRef } from "react";
+import { ReactElement, useImperativeHandle, useRef } from "react";
 import { AccountInsuranceHistory } from "./insurance-history";
 import { AccountInsuranceInfo, InsuranceInfoRef } from "./insurance-info";
 import "./index.css";
@@ -8,7 +8,11 @@ export interface AccountInsuranceRef {
     hasUnsavedChanges: () => boolean;
 }
 
-export const AccountInsurance = forwardRef<AccountInsuranceRef>((_, ref): ReactElement => {
+export const AccountInsurance = ({
+    ref,
+}: {
+    ref: React.Ref<AccountInsuranceRef>;
+}): ReactElement => {
     const insuranceInfoRef = useRef<InsuranceInfoRef>(null);
 
     useImperativeHandle(
@@ -37,4 +41,4 @@ export const AccountInsurance = forwardRef<AccountInsuranceRef>((_, ref): ReactE
             </div>
         </div>
     );
-});
+};

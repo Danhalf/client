@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState, useImperativeHandle, forwardRef } from "react";
+import { ReactElement, useEffect, useState, useImperativeHandle } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getAccountInsurance, updateAccountInsurance } from "http/services/accounts.service";
 import { Checkbox } from "primereact/checkbox";
@@ -19,7 +19,7 @@ export interface InsuranceInfoRef {
 }
 
 export const AccountInsuranceInfo = observer(
-    forwardRef<InsuranceInfoRef>((_, ref): ReactElement => {
+    ({ ref }: { ref: React.Ref<InsuranceInfoRef> }): ReactElement => {
         const { id } = useParams();
         const navigate = useNavigate();
         const toast = useToast();
@@ -236,5 +236,5 @@ export const AccountInsuranceInfo = observer(
                 </div>
             </div>
         );
-    })
+    }
 );
