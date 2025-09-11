@@ -5,9 +5,10 @@ import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { SalesmanSelectDialog } from "dashboard/deals/form/washout/deal-profit/commission/salesman-select-dialog";
-import { DealProfitItem, INCLUDE_OPTIONS } from "dashboard/deals/form/washout/deal-profit/index";
+import { DealProfitItem } from "dashboard/deals/form/washout/deal-profit/index";
 import { CURRENCY_OPTIONS, DashboardRadio } from "dashboard/common/form/inputs";
 import { RadioButtonProps } from "primereact/radiobutton";
+import { INCLUDE_OPTIONS } from "store/stores/deal";
 
 const COMMISSION_2_OPTIONS: RadioButtonProps[] = [
     { name: "figureAfterCommission", title: "Figure After Commission", value: 0 },
