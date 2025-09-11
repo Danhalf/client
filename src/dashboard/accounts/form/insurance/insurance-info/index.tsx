@@ -9,8 +9,7 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { InsuranceInfoField } from "./insurance-info-item";
 import { Status } from "common/models/base-response";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
+import { useToastMessage } from "common/hooks";
 import { Loader } from "dashboard/common/loader";
 import { CONTACTS_PAGE } from "common/constants/links";
 
@@ -18,11 +17,16 @@ export interface InsuranceInfoProps {
     onUnsavedChangesChange?: (hasChanges: boolean) => void;
 }
 
+enum ToastMessage {
+    SUCCESS = "Insurance info updated successfully!",
+    REQUIRED = "Insurance userUID is required",
+}
+
 export const AccountInsuranceInfo = observer(
     ({ onUnsavedChangesChange }: InsuranceInfoProps): ReactElement => {
         const { id } = useParams();
         const navigate = useNavigate();
-        const toast = useToast();
+        const { showError, showSuccess } = useToastMessage();
         const [insuranceInfo, setInsuranceInfo] = useState<AccountInsurance>();
         const store = useStore().accountStore;
         const [insuranceEdit, setInsuranceEdit] = useState<boolean>(true);
@@ -44,12 +48,7 @@ export const AccountInsuranceInfo = observer(
             setIsLoading(true);
             getAccountInsurance(id).then((res) => {
                 if (res?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: res.error,
-                        life: TOAST_LIFETIME,
-                    });
+                    showError(res.error);
                 }
                 if (res) {
                     setInsuranceInfo(res as AccountInsurance);
@@ -67,35 +66,20 @@ export const AccountInsuranceInfo = observer(
 
             const res = await updateAccountInsurance(id, insuranceInfo);
             if (res?.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: res.error,
-                    life: TOAST_LIFETIME,
-                });
+                showError(res.error);
             } else {
                 await handleGetInsuranceHistory();
                 setInsuranceEdit(true);
                 setIsButtonDisabled(true);
                 setHasUnsavedChanges(false);
 
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: "Insurance info updated successfully!",
-                    life: TOAST_LIFETIME,
-                });
+                showSuccess(ToastMessage.SUCCESS);
             }
         };
 
         const handleChangeInsuranceEdit = () => {
             if (!insuranceInfo?.Insurance_userUID) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: "Insurance userUID is required",
-                    life: TOAST_LIFETIME,
-                });
+                showError(ToastMessage.REQUIRED);
             } else {
                 navigate(CONTACTS_PAGE.EDIT(insuranceInfo?.Insurance_userUID));
             }

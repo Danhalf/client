@@ -13,12 +13,9 @@ import { AccountSettings } from "dashboard/accounts/form/settings";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
-import { Status } from "common/models/base-response";
-import { useToast } from "dashboard/common/toast";
-import { TOAST_LIFETIME } from "common/settings";
 import { Loader } from "dashboard/common/loader";
 import { NoticeAlert } from "dashboard/accounts/form/common";
-import { useFormExitConfirmation } from "common/hooks";
+import { useFormExitConfirmation, useToastMessage } from "common/hooks";
 import { ACCOUNTS_PAGE } from "common/constants/links";
 
 interface TabItem {
@@ -42,7 +39,7 @@ const transformTabName = (name: string) => name.toLowerCase().replace(/\s+/g, "-
 export const AccountsForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const toast = useToast();
+    const { showError, showWarning } = useToastMessage();
     const location = useLocation();
     const store = useStore().accountStore;
     const {
@@ -74,21 +71,19 @@ export const AccountsForm = observer((): ReactElement => {
         store.prevPath = `${location.pathname}${location.search}`;
     }, [location.pathname, location.search, store]);
 
+    const handleGetAccount = async () => {
+        if (!id) return;
+        const response = await getAccount(id);
+        if (response?.error) {
+            showError(response.error as string);
+            navigate(ACCOUNTS_PAGE.MAIN);
+        } else {
+            getNotes(id);
+        }
+    };
+
     useEffect(() => {
-        id &&
-            getAccount(id).then((response) => {
-                if (response?.status === Status.ERROR) {
-                    toast.current?.show({
-                        severity: "error",
-                        summary: Status.ERROR,
-                        detail: (response?.error as string) || "",
-                        life: TOAST_LIFETIME,
-                    });
-                    navigate(ACCOUNTS_PAGE.MAIN);
-                } else {
-                    getNotes(id);
-                }
-            });
+        handleGetAccount();
         return () => {
             accountNote.note = "";
             accountNote.alert = "";
@@ -115,12 +110,9 @@ export const AccountsForm = observer((): ReactElement => {
         const currentTabName = tabItems[currentTabIndex]?.tabName;
 
         if (currentTabName === TabName.INSURANCE && hasInsuranceUnsavedChanges) {
-            toast.current?.show({
-                severity: "warn",
-                summary: "Warning",
-                detail: `The insurance data in ${TabName.INSURANCE.toUpperCase()} section has not been saved.`,
-                life: TOAST_LIFETIME,
-            });
+            showWarning(
+                `The insurance data in ${TabName.INSURANCE.toUpperCase()} section has not been saved.`
+            );
         }
 
         setActiveTab(index);
