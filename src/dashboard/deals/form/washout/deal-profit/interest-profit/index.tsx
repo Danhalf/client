@@ -1,9 +1,10 @@
 import { Card } from "primereact/card";
-import { DealProfitItem, INCLUDE_OPTIONS } from "dashboard/deals/form/washout/deal-profit";
+import { DealProfitItem } from "dashboard/deals/form/washout/deal-profit";
 import { useState } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { CURRENCY_OPTIONS } from "dashboard/common/form/inputs";
+import { INCLUDE_OPTIONS } from "store/stores/deal";
 
 export const DealInterestProfit = observer(() => {
     const { dealWashout } = useStore().dealStore;
