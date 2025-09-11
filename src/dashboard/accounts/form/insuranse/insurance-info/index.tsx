@@ -35,9 +35,13 @@ export const AccountInsuranceInfo = observer(
             changeAccountExtData,
         } = store;
 
-        useImperativeHandle(ref, () => ({
-            hasUnsavedChanges: () => hasUnsavedChanges,
-        }));
+        useImperativeHandle(
+            ref,
+            () => ({
+                hasUnsavedChanges: () => hasUnsavedChanges,
+            }),
+            [hasUnsavedChanges]
+        );
 
         const handleGetInsuranceHistory = async () => {
             if (id) {

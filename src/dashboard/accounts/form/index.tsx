@@ -37,17 +37,6 @@ enum TabName {
     INSURANCE = "Insurance",
 }
 
-const tabItems: TabItem[] = [
-    { tabName: TabName.ACCOUNT_INFORMATION, component: <AccountInformation /> },
-    { tabName: TabName.ACCOUNT_MANAGEMENT, component: <AccountManagement /> },
-    { tabName: TabName.PAYMENT_HISTORY, component: <AccountPaymentHistory /> },
-    { tabName: TabName.DOWN_PAYMENT, component: <AccountDownPayment /> },
-    { tabName: TabName.ACCOUNT_SETTINGS, component: <AccountSettings /> },
-    { tabName: TabName.NOTES, component: <AccountNotes /> },
-    { tabName: TabName.PROMISE_TO_PAY, component: <AccountPromiseToPay /> },
-    { tabName: TabName.INSURANCE, component: <AccountInsurance /> },
-];
-
 const transformTabName = (name: string) => name.toLowerCase().replace(/\s+/g, "-");
 
 export const AccountsForm = observer((): ReactElement => {
@@ -66,6 +55,17 @@ export const AccountsForm = observer((): ReactElement => {
     } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
     const insuranceRef = useRef<AccountInsuranceRef>(null);
+
+    const tabItems: TabItem[] = [
+        { tabName: TabName.ACCOUNT_INFORMATION, component: <AccountInformation /> },
+        { tabName: TabName.ACCOUNT_MANAGEMENT, component: <AccountManagement /> },
+        { tabName: TabName.PAYMENT_HISTORY, component: <AccountPaymentHistory /> },
+        { tabName: TabName.DOWN_PAYMENT, component: <AccountDownPayment /> },
+        { tabName: TabName.ACCOUNT_SETTINGS, component: <AccountSettings /> },
+        { tabName: TabName.NOTES, component: <AccountNotes /> },
+        { tabName: TabName.PROMISE_TO_PAY, component: <AccountPromiseToPay /> },
+        { tabName: TabName.INSURANCE },
+    ];
 
     useEffect(() => {
         store.prevPath = `${location.pathname}${location.search}`;
