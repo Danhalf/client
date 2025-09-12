@@ -35,13 +35,6 @@ const parseMileage = (mileage: string): number => {
     return parseFloat(mileage.replace(/,/g, ""));
 };
 
-const renderedAuditKeys: (keyof Audit)[] = [
-    "JustArrived",
-    "NeedsCleaning",
-    "DataNeedsUpdate",
-    "ReadyForSale",
-];
-
 export const VehicleGeneral = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const userStore = useStore().userStore;
@@ -153,17 +146,16 @@ export const VehicleGeneral = observer((): ReactElement => {
         }
     }, [currentLocation, locationList, values.locationuid, store]);
 
-    const handleSelectMake = useCallback(async () => {
-        const makeSting = inventory.Make.toLowerCase();
+    const handleSelectMake = useCallback(() => {
+        const makeSting = inventory.Make.toLowerCase().replaceAll(" ", "");
         if (automakesList.some((item) => item.name.toLocaleLowerCase() === makeSting)) {
-            const list = await getAutoMakeModelList(makeSting.replaceAll(" ", "-"));
-            if (list && Array.isArray(list) && list.length) {
-                setAutomakesModelList(list);
-            } else {
-                setAutomakesModelList([]);
-            }
-        } else {
-            setAutomakesModelList([]);
+            getAutoMakeModelList(makeSting).then((list) => {
+                if (list && Array.isArray(list) && list.length) {
+                    setAutomakesModelList(list);
+                } else {
+                    setAutomakesModelList([]);
+                }
+            });
         }
     }, [automakesList, inventory.Make]);
 
@@ -331,6 +323,13 @@ export const VehicleGeneral = observer((): ReactElement => {
             handleGetInventoryGroupFullInfo(vinInfo.GroupClassName || values.GroupClassName);
         }
     };
+
+    const renderedAuditKeys: (keyof Audit)[] = [
+        "JustArrived",
+        "NeedsCleaning",
+        "DataNeedsUpdate",
+        "ReadyForSale",
+    ];
 
     useEffect(() => {
         const activeKey = renderedAuditKeys.find((key) => inventoryAudit[key] === 1) || null;
@@ -542,6 +541,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         setFieldValue("Model", value);
                         changeInventory({ key: "Model", value });
                     }}
+                    placeholder='Model (required)'
                     className={`vehicle-general__dropdown w-full ${
                         errors.Model ? "p-invalid" : ""
                     }`}
