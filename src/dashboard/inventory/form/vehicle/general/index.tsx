@@ -156,7 +156,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const handleSelectMake = useCallback(async () => {
         const makeSting = inventory.Make.toLowerCase();
         if (automakesList.some((item) => item.name.toLocaleLowerCase() === makeSting)) {
-            const list = await getAutoMakeModelList(makeSting.replaceAll(" ", "-"));
+            const list = await getAutoMakeModelList(makeSting);
             if (list && Array.isArray(list) && list.length) {
                 setAutomakesModelList(list);
             } else {
