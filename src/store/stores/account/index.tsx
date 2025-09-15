@@ -208,7 +208,7 @@ export class AccountStore {
         }
     });
 
-    public saveAccount = action(async (): Promise<string | undefined> => {
+    public saveAccount = action(async (): Promise<BaseResponseError | undefined> => {
         try {
             this._isLoading = true;
 
@@ -216,16 +216,21 @@ export class AccountStore {
                 ...this._account,
                 extdata: this._accountExtData,
             });
-            await Promise.all([response]).then((response) =>
-                response.forEach((res) => {
-                    if (res?.status === Status.ERROR) {
-                        const { error } = res as BaseResponseError;
-                        throw new Error(error);
-                    }
-                })
-            );
+            const result = await Promise.all([response]);
+            result.forEach((res) => {
+                if (res?.status === Status.ERROR) {
+                    const { error } = res as BaseResponseError;
+                    throw new Error(error);
+                }
+            });
+            return {
+                status: Status.OK,
+            };
         } catch (error) {
-            return error as string;
+            return {
+                status: Status.ERROR,
+                error: error as string,
+            };
         } finally {
             this._isLoading = false;
         }

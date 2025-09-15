@@ -49,6 +49,7 @@ export const AccountsForm = observer((): ReactElement => {
         getNotes,
         account: { accountnumber, accountstatus },
         saveAccount,
+        clearAccount,
         isLoading,
     } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
@@ -123,6 +124,16 @@ export const AccountsForm = observer((): ReactElement => {
         navigate(`${ACCOUNTS_PAGE.EDIT(id ?? "")}?${queryParams.toString()}`, { replace: true });
     };
 
+    const handleSaveAccount = async () => {
+        const response = await saveAccount();
+        if (response?.error) {
+            showError(response.error);
+        } else {
+            clearAccount();
+            navigate(ACCOUNTS_PAGE.MAIN);
+        }
+    };
+
     return isLoading ? (
         <Loader overlay />
     ) : (
@@ -195,7 +206,7 @@ export const AccountsForm = observer((): ReactElement => {
                             disabled={!isAccountChanged}
                             severity={isAccountChanged ? "success" : "secondary"}
                             className='uppercase px-6 account__button'
-                            onClick={saveAccount}
+                            onClick={handleSaveAccount}
                         >
                             Update
                         </Button>
