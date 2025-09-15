@@ -48,6 +48,7 @@ export const AccountsForm = observer((): ReactElement => {
         accountNote,
         getNotes,
         account: { accountnumber, accountstatus },
+        saveAccount,
         isLoading,
     } = store;
     const [activeTab, setActiveTab] = useState<number>(0);
@@ -185,6 +186,7 @@ export const AccountsForm = observer((): ReactElement => {
                             className='uppercase px-6 account__button'
                             onClick={() => handleTabChange(activeTab + 1)}
                             disabled={activeTab === tabItems.length - 1}
+                            severity={activeTab === tabItems.length - 1 ? "secondary" : "success"}
                             outlined
                         >
                             Next
@@ -193,6 +195,7 @@ export const AccountsForm = observer((): ReactElement => {
                             disabled={!isAccountChanged}
                             severity={isAccountChanged ? "success" : "secondary"}
                             className='uppercase px-6 account__button'
+                            onClick={saveAccount}
                         >
                             Update
                         </Button>
