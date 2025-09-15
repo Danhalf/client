@@ -89,6 +89,7 @@ export const AccountsForm = observer((): ReactElement => {
         return () => {
             accountNote.note = "";
             accountNote.alert = "";
+            clearAccount();
         };
     }, [id]);
 
@@ -129,7 +130,6 @@ export const AccountsForm = observer((): ReactElement => {
         if (response?.error) {
             showError(response.error);
         } else {
-            clearAccount();
             navigate(ACCOUNTS_PAGE.MAIN);
         }
     };
