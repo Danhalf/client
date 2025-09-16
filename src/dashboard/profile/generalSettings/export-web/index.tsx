@@ -1,4 +1,6 @@
 import { ReactElement, useEffect, useState } from "react";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
 import { Loader } from "dashboard/common/loader";
 import { useStore } from "store/hooks";
 import { getUserExportWebList } from "http/services/settings.service";
@@ -61,22 +63,30 @@ export const SettingsExportWeb = (): ReactElement => {
             <div className='settings-form__title'>Export to Web</div>
             <div className='grid settings-export-web p-2'>
                 <div className='col-12'>
-                    <div className='settings-export-web__header grid'>
-                        <div className='col-10 flex settings-export-web__header-row align-items-center'>
-                            Service
-                        </div>
-                        <div className='col-2 flex align-items-center p-0'>Key</div>
-                    </div>
-                    <div className='settings-export-web__body grid'>
-                        {exportWebList.map((item) => (
-                            <div className='col-12' key={item.itemuid}>
-                                <div className='settings-export-web__body-row grid'>
-                                    <div className='col-10'>{item.name}</div>
-                                    <div className='col-2'>{item.itemuid}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <DataTable
+                        showGridlines
+                        className='settings-export-web__table'
+                        value={exportWebList}
+                        emptyMessage='No export web services configured.'
+                        reorderableColumns
+                        resizableColumns
+                        scrollable
+                    >
+                        <Column
+                            field='name'
+                            header='Service'
+                            alignHeader='left'
+                            headerClassName='cursor-move'
+                            className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                        />
+                        <Column
+                            field='itemuid'
+                            header='Key'
+                            alignHeader='left'
+                            headerClassName='cursor-move'
+                            className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                        />
+                    </DataTable>
                 </div>
             </div>
         </div>
