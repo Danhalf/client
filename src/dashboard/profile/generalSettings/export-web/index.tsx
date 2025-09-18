@@ -9,6 +9,7 @@ import { BaseResponseError } from "common/models/base-response";
 import { GeneralSettingsWebExport } from "common/models/general-settings";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
+import { Tooltip } from "primereact/tooltip";
 import "./index.css";
 
 const mockExportWebList: GeneralSettingsWebExport[] = [
@@ -72,11 +73,10 @@ const renderColumnsData: TableColumnProps[] = [
 export const SettingsExportWeb = (): ReactElement => {
     const store = useStore().userStore;
     const { authUser } = store;
-    const { showError } = useToastMessage();
+    const { showError, showSuccess } = useToastMessage();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
     const [exportWebList, setExportWebList] = useState<GeneralSettingsWebExport[]>([]);
-    const { showSuccess } = useToastMessage();
 
     const isErrorResponse = (
         response: GeneralSettingsWebExport[] | BaseResponseError | undefined
@@ -159,10 +159,27 @@ export const SettingsExportWeb = (): ReactElement => {
         selectedRows: boolean[]
     ): ReactElement => {
         const isSelected = selectedRows[rowIndex];
+
+        if (field === "service_name") {
+            const tooltipClass = `settings-export-web__key--tooltip-${rowIndex}`;
+            return (
+                <>
+                    <div
+                        className={`settings-export-web__key ${tooltipClass} ${isSelected && "row--selected"}`}
+                    >
+                        {value}
+                    </div>
+                    <Tooltip
+                        target={`.${tooltipClass}`}
+                        content={value as string}
+                        position='mouse'
+                    />
+                </>
+            );
+        }
+
         return (
-            <div
-                className={`${field === "service_name" ? "settings-export-web__key" : "settings-export-web__service"} ${isSelected && "row--selected"}`}
-            >
+            <div className={`settings-export-web__service ${isSelected && "row--selected"}`}>
                 {value}
             </div>
         );
@@ -176,7 +193,13 @@ export const SettingsExportWeb = (): ReactElement => {
 
         return (
             <div className='flex gap-3 align-items-center'>
-                <Button outlined label='Copy' onClick={() => handleCopyData(copiedKey)} />
+                <Button
+                    outlined
+                    icon='adms-copy'
+                    className='settings-export-web__copy-button'
+                    label='Copy'
+                    onClick={() => handleCopyData(copiedKey)}
+                />
             </div>
         );
     };
