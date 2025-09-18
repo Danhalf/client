@@ -8,52 +8,60 @@ import { useToastMessage } from "common/hooks";
 import { BaseResponseError } from "common/models/base-response";
 import { GeneralSettingsWebExport } from "common/models/general-settings";
 import { Checkbox } from "primereact/checkbox";
+import { Button } from "primereact/button";
+import "./index.css";
 
 const mockExportWebList: GeneralSettingsWebExport[] = [
     {
         id: 1,
         name: "AutoTrader",
-        service_name: "autotrader",
+        service_name:
+            "dd2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d",
     },
     {
         id: 2,
         name: "Cars.com",
-        service_name: "cars_com",
+        service_name:
+            "2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d",
     },
     {
         id: 3,
         name: "CarGurus",
-        service_name: "cargurus",
+        service_name: "wi2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422",
     },
     {
         id: 4,
         name: "AutoList",
-        service_name: "autolist",
+        service_name:
+            "r2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d",
     },
     {
         id: 5,
         name: "CarMax",
-        service_name: "carmax",
+        service_name: "ran2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63",
     },
     {
         id: 6,
         name: "Vroom",
-        service_name: "vroom",
+        service_name:
+            "l7fa7ec63bd6422dd2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f754dd31e7d1f75d31e7d1ata16fa4dd31e7d1f754dd31e7d1f75d31e7d1ata16fa4dd31e7d1f754dd31e7d1f75d31e7d1ata",
     },
     {
         id: 7,
         name: "Carvana",
-        service_name: "carvana",
+        service_name:
+            "carvana2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d",
     },
     {
         id: 8,
         name: "TrueCar",
-        service_name: "truecar",
+        service_name:
+            "truecar2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d",
     },
 ];
 
 interface TableColumnProps extends ColumnProps {
-    field: keyof GeneralSettingsWebExport | "";
+    field: keyof GeneralSettingsWebExport;
 }
 
 const renderColumnsData: TableColumnProps[] = [
@@ -68,6 +76,7 @@ export const SettingsExportWeb = (): ReactElement => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
     const [exportWebList, setExportWebList] = useState<GeneralSettingsWebExport[]>([]);
+    const { showSuccess } = useToastMessage();
 
     const isErrorResponse = (
         response: GeneralSettingsWebExport[] | BaseResponseError | undefined
@@ -143,9 +152,33 @@ export const SettingsExportWeb = (): ReactElement => {
         );
     };
 
-    const dataColumnBody = (value: string | number, rowIndex: number, selectedRows: boolean[]) => {
+    const dataColumnBody = (
+        field: keyof GeneralSettingsWebExport,
+        value: string | number,
+        rowIndex: number,
+        selectedRows: boolean[]
+    ): ReactElement => {
         const isSelected = selectedRows[rowIndex];
-        return <div className={`${isSelected && "row--selected"}`}>{value}</div>;
+        return (
+            <div
+                className={`${field === "service_name" ? "settings-export-web__key" : "settings-export-web__service"} ${isSelected && "row--selected"}`}
+            >
+                {value}
+            </div>
+        );
+    };
+
+    const actionColumnBody = (serviceName: string, copiedKey: string): ReactElement => {
+        const handleCopyData = (key: string) => {
+            navigator.clipboard.writeText(key);
+            showSuccess(`Service ${serviceName} key copied to clipboard`);
+        };
+
+        return (
+            <div className='flex gap-3 align-items-center'>
+                <Button outlined label='Copy' onClick={() => handleCopyData(copiedKey)} />
+            </div>
+        );
     };
 
     return (
@@ -159,8 +192,6 @@ export const SettingsExportWeb = (): ReactElement => {
                         className='settings-export-web__table'
                         value={exportWebList}
                         emptyMessage='No export web services configured.'
-                        reorderableColumns
-                        resizableColumns
                         scrollable
                     >
                         <Column
@@ -182,10 +213,23 @@ export const SettingsExportWeb = (): ReactElement => {
                                 header={header}
                                 key={field}
                                 body={({ [field]: value }, { rowIndex }) =>
-                                    dataColumnBody(value, rowIndex, selectedRows)
+                                    dataColumnBody(field, value, rowIndex, selectedRows)
                                 }
                             />
                         ))}
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            className='account__table-checkbox'
+                            body={({ name, service_name }) => actionColumnBody(name, service_name)}
+                            pt={{
+                                root: {
+                                    style: {
+                                        width: "100px",
+                                        borderLeft: "none",
+                                    },
+                                },
+                            }}
+                        />
                     </DataTable>
                 </div>
             </div>
