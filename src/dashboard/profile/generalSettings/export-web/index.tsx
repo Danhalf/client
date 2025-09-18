@@ -81,6 +81,7 @@ export const SettingsExportWeb = (): ReactElement => {
         const response = await getUserExportWebList(authUser?.useruid);
         if (response && Array.isArray(response) && response.length) {
             setExportWebList(response);
+            setSelectedRows(Array(response.length).fill(false));
             setIsLoading(false);
             return;
         }
@@ -98,10 +99,12 @@ export const SettingsExportWeb = (): ReactElement => {
             defaultExportWebList.length
         ) {
             setExportWebList(defaultExportWebList);
+            setSelectedRows(Array(defaultExportWebList.length).fill(false));
         } else if (isErrorResponse(defaultExportWebList)) {
             showError(defaultExportWebList.error || "Unknown error occurred");
         } else {
             setExportWebList(mockExportWebList);
+            setSelectedRows(Array(mockExportWebList.length).fill(false));
         }
 
         setIsLoading(false);
@@ -113,7 +116,7 @@ export const SettingsExportWeb = (): ReactElement => {
 
     const controlColumnHeader = (): ReactElement => (
         <Checkbox
-            checked={selectedRows.every((checkbox) => !!checkbox)}
+            checked={selectedRows.length > 0 && selectedRows.every((checkbox) => !!checkbox)}
             onClick={({ checked }) => {
                 setSelectedRows(selectedRows.map(() => !!checked));
             }}
@@ -138,6 +141,11 @@ export const SettingsExportWeb = (): ReactElement => {
                 />
             </div>
         );
+    };
+
+    const dataColumnBody = (value: string | number, rowIndex: number, selectedRows: boolean[]) => {
+        const isSelected = selectedRows[rowIndex];
+        return <div className={`${isSelected && "row--selected"}`}>{value}</div>;
     };
 
     return (
@@ -169,7 +177,14 @@ export const SettingsExportWeb = (): ReactElement => {
                             }}
                         />
                         {renderColumnsData.map(({ field, header }) => (
-                            <Column field={field} header={header} key={field} />
+                            <Column
+                                field={field}
+                                header={header}
+                                key={field}
+                                body={({ [field]: value }, { rowIndex }) =>
+                                    dataColumnBody(value, rowIndex, selectedRows)
+                                }
+                            />
                         ))}
                     </DataTable>
                 </div>
