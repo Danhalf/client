@@ -12,55 +12,6 @@ import { Button } from "primereact/button";
 import { Tooltip } from "primereact/tooltip";
 import "./index.css";
 
-const mockExportWebList: GeneralSettingsWebExport[] = [
-    {
-        id: 1,
-        name: "AutoTrader",
-        service_name:
-            "dd2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d",
-    },
-    {
-        id: 2,
-        name: "Cars.com",
-        service_name:
-            "2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d",
-    },
-    {
-        id: 3,
-        name: "CarGurus",
-        service_name: "wi2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422",
-    },
-    {
-        id: 4,
-        name: "AutoList",
-        service_name:
-            "r2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d",
-    },
-    {
-        id: 5,
-        name: "CarMax",
-        service_name: "ran2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63",
-    },
-    {
-        id: 6,
-        name: "Vroom",
-        service_name:
-            "l7fa7ec63bd6422dd2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f754dd31e7d1f75d31e7d1ata16fa4dd31e7d1f754dd31e7d1f75d31e7d1ata16fa4dd31e7d1f754dd31e7d1f75d31e7d1ata",
-    },
-    {
-        id: 7,
-        name: "Carvana",
-        service_name:
-            "carvana2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d",
-    },
-    {
-        id: 8,
-        name: "TrueCar",
-        service_name:
-            "truecar2d9fcfc16fae4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d1f75e4fa7ec63bd6422dd2d9fcfc16fa4dd31e7d",
-    },
-];
-
 interface TableColumnProps extends ColumnProps {
     field: keyof GeneralSettingsWebExport;
 }
@@ -112,8 +63,7 @@ export const SettingsExportWeb = (): ReactElement => {
         } else if (isErrorResponse(defaultExportWebList)) {
             showError(defaultExportWebList.error || "Unknown error occurred");
         } else {
-            setExportWebList(mockExportWebList);
-            setSelectedRows(Array(mockExportWebList.length).fill(false));
+            setExportWebList([]);
         }
 
         setIsLoading(false);

@@ -10,6 +10,10 @@
         -webkit-box-orient: vertical;
     }
 
+    table th:first-child + th {
+        border-left: none;
+    }
+
     table td {
         &:has(.settings-export-web__key) {
             width: 400px;
@@ -20,6 +24,7 @@
             width: 180px;
             max-width: 180px;
             min-width: 180px;
+            border-left: none;
         }
         .settings-export-web__copy-button {
             width: 98px;
