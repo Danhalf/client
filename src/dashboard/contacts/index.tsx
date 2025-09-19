@@ -11,7 +11,7 @@ import {
     DataTableSortEvent,
 } from "primereact/datatable";
 import { Button } from "primereact/button";
-import { Column, ColumnProps } from "primereact/column";
+import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { useNavigate } from "react-router-dom";
@@ -33,8 +33,9 @@ import {
 import { createStringifySearchQuery, formatPhoneNumber, isObjectValuesEmpty } from "common/helpers";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
+import { ColumnSelector, TableColumn } from "dashboard/common/filter";
 
-interface TableColumnProps extends ColumnProps {
+interface TableColumnsList extends TableColumn {
     field: keyof ContactUser | "fullName";
 }
 
@@ -54,13 +55,16 @@ interface ContactsDataTableProps {
     getFullInfo?: (contact: ContactUser) => void;
 }
 
-const renderColumnsData: TableColumnProps[] = [
-    { field: "fullName", header: "Name" },
-    { field: "phone1", header: "Work Phone" },
-    { field: "phone2", header: "Home Phone" },
-    { field: "fullAddress", header: "Address" },
-    { field: "email1", header: "Email" },
-    { field: "created", header: "Created" },
+const alwaysActiveColumns: TableColumnsList[] = [
+    { field: "fullName", header: "Name", checked: true },
+    { field: "phone1", header: "Work Phone", checked: true },
+    { field: "created", header: "Created", checked: true },
+];
+
+const selectableColumns: TableColumnsList[] = [
+    { field: "phone2", header: "Home Phone", checked: false, isSelectable: true },
+    { field: "fullAddress", header: "Address", checked: false, isSelectable: true },
+    { field: "email1", header: "Email", checked: false, isSelectable: true },
 ];
 
 export const ContactsDataTable = ({
@@ -77,7 +81,7 @@ export const ContactsDataTable = ({
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
-    const [activeColumns, setActiveColumns] = useState<TableColumnProps[]>(renderColumnsData);
+    const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(selectableColumns);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const navigate = useNavigate();
     const store = useStore().contactStore;
@@ -90,7 +94,8 @@ export const ContactsDataTable = ({
     const printTableData = async (print: boolean = false) => {
         if (!authUser) return;
         setIsLoading(true);
-        const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
+        const allColumns = [...alwaysActiveColumns, ...activeColumns];
+        const columns: ReportsColumn[] = allColumns.map((column) => ({
             name: column.header as string,
             data: column.field as string,
         }));
@@ -216,7 +221,7 @@ export const ContactsDataTable = ({
                 setServerSettings(allSettings);
                 const { contacts: settings } = allSettings;
                 settings?.activeColumns &&
-                    setActiveColumns(settings.activeColumns as TableColumnProps[]);
+                    setActiveColumns(settings.activeColumns as TableColumnsList[]);
                 settings?.table &&
                     setLazyState({
                         first: settings.table.first || initialDataTableQueries.first,
@@ -412,7 +417,7 @@ export const ContactsDataTable = ({
                     editable
                     disabled={!!contactCategory}
                     placeholder='Category'
-                    className='ml-auto'
+                    className='category-selector ml-auto'
                     pt={{
                         wrapper: {
                             style: {
@@ -420,6 +425,17 @@ export const ContactsDataTable = ({
                             },
                         },
                     }}
+                />
+                <ColumnSelector<TableColumnsList>
+                    selectableColumns={selectableColumns}
+                    activeColumns={activeColumns}
+                    onColumnsChange={(columns) => {
+                        setActiveColumns(columns);
+                        changeSettings({
+                            activeColumns: columns,
+                        });
+                    }}
+                    className='contacts-filter'
                 />
             </div>
             <div className='grid'>
@@ -463,8 +479,8 @@ export const ContactsDataTable = ({
                                             );
                                         })
                                         .filter(
-                                            (column): column is TableColumnProps => column !== null
-                                        ) as TableColumnProps[];
+                                            (column): column is TableColumnsList => column !== null
+                                        ) as TableColumnsList[];
 
                                     setActiveColumns(newActiveColumns);
 
@@ -488,6 +504,31 @@ export const ContactsDataTable = ({
                                 }
                             }}
                         >
+                            {alwaysActiveColumns.map(({ field, header }, index) => (
+                                <Column
+                                    field={field}
+                                    header={header}
+                                    key={field}
+                                    sortable
+                                    body={bodyDataRender(field)}
+                                    headerClassName='cursor-move'
+                                    pt={{
+                                        root: {
+                                            style: {
+                                                width: serverSettings?.contacts?.columnWidth?.[
+                                                    field
+                                                ],
+                                                maxWidth:
+                                                    serverSettings?.contacts?.columnWidth?.[field],
+                                                overflow: "hidden",
+                                                textOverflow: "ellipsis",
+                                                borderLeft: !index ? "none" : "",
+                                            },
+                                        },
+                                    }}
+                                />
+                            ))}
+
                             {activeColumns.map(({ field, header }) => (
                                 <Column
                                     field={field}
@@ -532,17 +573,13 @@ export const ContactsDataTable = ({
     );
 };
 
-export default function Contacts() {
+export const Contacts = () => {
     return (
-        <div className='grid'>
-            <div className='col-12'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Contacts</h2>
-                    </div>
-                    <ContactsDataTable />
-                </div>
+        <div className='card contacts'>
+            <div className='card-header'>
+                <h2 className='card-header__title uppercase m-0'>Contacts</h2>
             </div>
+            <ContactsDataTable />
         </div>
     );
-}
+};
