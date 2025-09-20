@@ -187,6 +187,13 @@ export const ContactsDataTable = ({
         });
     }, [contactCategory]);
 
+    const getSortColumn = (field: string | undefined) => {
+        if (field === "fullName") {
+            return "userName";
+        }
+        return field;
+    };
+
     useEffect(() => {
         if (!authUser) return;
         const params: QueryParams = {
@@ -194,7 +201,7 @@ export const ContactsDataTable = ({
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
             ...(globalSearch && { qry: globalSearch }),
-            ...(lazyState.sortField && { column: lazyState.sortField }),
+            ...(lazyState.sortField && { column: getSortColumn(lazyState.sortField) }),
             skip: lazyState.first,
             top: lazyState.rows,
         };
