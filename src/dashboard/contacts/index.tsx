@@ -84,6 +84,7 @@ export const ContactsDataTable = ({
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>(selectableColumns);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
     const navigate = useNavigate();
     const store = useStore().contactStore;
     const userStore = useStore().userStore;
@@ -212,14 +213,18 @@ export const ContactsDataTable = ({
         if (!selectedCategory && contactCategory) {
             return;
         }
+        if (!settingsLoaded) {
+            return;
+        }
         setIsLoading(true);
 
         handleGetContactsList(params, true);
-    }, [selectedCategory, lazyState, authUser, globalSearch, contactCategory]);
+    }, [selectedCategory, lazyState, authUser, globalSearch, contactCategory, settingsLoaded]);
 
-    useEffect(() => {
+    const handleGetUserSettings = useCallback(async () => {
         if (!authUser) return;
-        getUserSettings(authUser.useruid).then((response) => {
+        const response = await getUserSettings(authUser.useruid);
+        if (response?.profile.length) {
             if (response?.profile.length) {
                 let allSettings: ServerUserSettings = {} as ServerUserSettings;
                 if (response.profile) {
@@ -243,8 +248,12 @@ export const ContactsDataTable = ({
                         sortOrder: settings.table.sortOrder || initialDataTableQueries.sortOrder,
                     });
             }
-        });
+        }
     }, [authUser]);
+
+    useEffect(() => {
+        handleGetUserSettings().finally(() => setSettingsLoaded(true));
+    }, []);
 
     const changeSettings = (settings: Partial<ContactsUserSettings>) => {
         if (!authUser) return;
