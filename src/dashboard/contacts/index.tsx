@@ -238,6 +238,14 @@ export const ContactsDataTable = ({
                 const { contacts: settings } = allSettings;
                 settings?.activeColumns &&
                     setActiveColumns(settings.activeColumns as TableColumnsList[]);
+                if (!contactCategory && settings?.selectedCategoriesOptions) {
+                    const savedCategory: ContactType[] = settings.selectedCategoriesOptions;
+                    if (Array.isArray(savedCategory) && savedCategory.length) {
+                        setSelectedCategory(savedCategory[0]);
+                    } else {
+                        setSelectedCategory(savedCategory as unknown as ContactType);
+                    }
+                }
                 settings?.table &&
                     setLazyState({
                         first: settings.table.first || initialDataTableQueries.first,
