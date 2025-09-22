@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
     getContacts,
     getContactsAmount,
@@ -34,6 +34,7 @@ import { createStringifySearchQuery, formatPhoneNumber, isObjectValuesEmpty } fr
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { ColumnSelector, TableColumn } from "dashboard/common/filter";
+import { DropdownChangeEvent } from "primereact/dropdown";
 
 interface TableColumnsList extends TableColumn {
     field: keyof ContactUser | "fullName";
@@ -172,19 +173,18 @@ export const ContactsDataTable = ({
         }
     };
 
-    useEffect(() => {
-        getContactsTypeList("0").then((response) => {
-            if (response) {
-                const types = response as ContactType[];
-                if (types?.length) {
-                    if (contactCategory) {
-                        const category = types?.find((item) => item.name === contactCategory);
-                        setSelectedCategory(category ?? null);
-                    }
-                    setCategories(types);
+    const handleGetContactsTypeList = useCallback(async () => {
+        const response = await getContactsTypeList();
+        if (response) {
+            const types = response as ContactType[];
+            if (types?.length) {
+                if (contactCategory) {
+                    const category = types?.find((item) => item.name === contactCategory);
+                    setSelectedCategory(category ?? null);
                 }
             }
-        });
+            setCategories(types);
+        }
     }, [contactCategory]);
 
     const getSortColumn = (field: string | undefined) => {
@@ -193,6 +193,10 @@ export const ContactsDataTable = ({
         }
         return field;
     };
+
+    useEffect(() => {
+        !categories.length && handleGetContactsTypeList();
+    }, [categories.length, handleGetContactsTypeList]);
 
     useEffect(() => {
         if (!authUser) return;
@@ -372,6 +376,14 @@ export const ContactsDataTable = ({
         }
     };
 
+    const handleChangeCategory = (e: DropdownChangeEvent) => {
+        if (contactCategory) return;
+        changeSettings({
+            selectedCategoriesOptions: e.value,
+        });
+        setSelectedCategory(e.value);
+    };
+
     return (
         <div className='card-content'>
             <div className='table-controls contact-controls'>
@@ -412,13 +424,7 @@ export const ContactsDataTable = ({
 
                 <ComboBox
                     value={selectedCategory}
-                    onChange={(e) => {
-                        if (contactCategory) return;
-                        changeSettings({
-                            selectedCategoriesOptions: e.value,
-                        });
-                        setSelectedCategory(e.value);
-                    }}
+                    onChange={handleChangeCategory}
                     options={categories}
                     optionLabel='name'
                     editable
