@@ -26,7 +26,11 @@ import { ContactMediaData } from "dashboard/contacts/form/media-data";
 import { DeleteForm } from "dashboard/contacts/form/delete-form";
 import { truncateText } from "common/helpers";
 import { Tooltip } from "primereact/tooltip";
-import { LETTERS_NUMBERS_SIGNS_REGEX, PHONE_NUMBER_REGEX } from "common/constants/regex";
+import {
+    EMAIL_REGEX,
+    LETTERS_NUMBERS_SIGNS_REGEX,
+    PHONE_NUMBER_REGEX,
+} from "common/constants/regex";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 const STEP = "step";
 
@@ -112,8 +116,12 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             return value !== 0 && value !== null && value !== undefined;
         })
         .required(ERROR_MESSAGES.REQUIRED),
-    email1: Yup.string().email(ERROR_MESSAGES.EMAIL),
-    email2: Yup.string().email(ERROR_MESSAGES.EMAIL),
+    email1: Yup.string().email(ERROR_MESSAGES.EMAIL).matches(EMAIL_REGEX, {
+        message: ERROR_MESSAGES.EMAIL,
+    }),
+    email2: Yup.string().email(ERROR_MESSAGES.EMAIL).matches(EMAIL_REGEX, {
+        message: ERROR_MESSAGES.EMAIL,
+    }),
     phone1: Yup.string()
         .transform((value) => value.replace(/-/g, ""))
         .matches(PHONE_NUMBER_REGEX, {
@@ -126,7 +134,9 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             message: ERROR_MESSAGES.PHONE,
             excludeEmptyString: false,
         }),
-    Buyer_Emp_Ext: Yup.string().email(ERROR_MESSAGES.EMAIL),
+    Buyer_Emp_Ext: Yup.string().email(ERROR_MESSAGES.EMAIL).matches(EMAIL_REGEX, {
+        message: ERROR_MESSAGES.EMAIL,
+    }),
     Buyer_Emp_Phone: Yup.string()
         .transform((value) => value.replace(/-/g, ""))
         .matches(PHONE_NUMBER_REGEX, {

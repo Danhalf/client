@@ -45,6 +45,8 @@ export const ContactsWorkplace = observer((): ReactElement => {
                         className={`contacts-workplace__text-input w-full ${
                             errors.Buyer_Emp_Ext ? "p-invalid" : ""
                         }`}
+                        type='email'
+                        id='Buyer_Emp_Ext'
                         onBlur={handleBlur}
                         value={values.Buyer_Emp_Ext || ""}
                         onChange={async ({ target: { value } }) => {
