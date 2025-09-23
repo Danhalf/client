@@ -4,7 +4,6 @@ import { Tooltip, TooltipProps } from "primereact/tooltip";
 interface TruncatedTextProps {
     text: string;
     className?: string;
-    width?: string;
     withTooltip?: boolean;
     tooltipOptions?: TooltipProps;
 }
@@ -12,7 +11,6 @@ interface TruncatedTextProps {
 export const TruncatedText = ({
     text,
     className,
-    width,
     withTooltip,
     tooltipOptions,
 }: TruncatedTextProps) => {
@@ -33,7 +31,6 @@ export const TruncatedText = ({
             ref={textRef}
             className={`truncated-text ${className ?? ""}`}
             data-tooltip-id={uniqueId}
-            style={{ width: width ?? "100%" }}
         >
             {text}
             {isTextTruncated && withTooltip && (

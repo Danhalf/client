@@ -21,24 +21,6 @@ const renderColumnsData: TableColumnProps[] = [
     { field: "service_key", header: "Key" },
 ];
 
-const generateRandomKey = (): string => {
-    return (
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15) +
-        Math.random().toString(36).substring(2, 15)
-    );
-};
-
 export const SettingsExportWeb = (): ReactElement => {
     const store = useStore().userStore;
     const { authUser } = store;
@@ -122,34 +104,19 @@ export const SettingsExportWeb = (): ReactElement => {
 
     const dataColumnBody = (
         field: keyof GeneralSettingsWebExport,
-        value: string | number,
+        value: string,
         rowIndex: number,
         selectedRows: boolean[]
     ): ReactElement => {
         const isSelected = selectedRows[rowIndex];
 
-        if (field === "service_key") {
-            const tooltipClass = `settings-export-web__key--tooltip-${rowIndex}`;
-            return (
-                <TruncatedText
-                    text={(value as string) || generateRandomKey()}
-                    className={`settings-export-web__key ${tooltipClass} ${isSelected && "row--selected"}`}
-                    withTooltip
-                    tooltipOptions={{ position: "mouse" }}
-                />
-            );
-        }
-
         return (
-            <div className={`settings-export-web__service ${isSelected && "row--selected"}`}>
-                <TruncatedText
-                    text={value as string}
-                    width='128px'
-                    withTooltip
-                    tooltipOptions={{ position: "mouse" }}
-                    className={`settings-export-web__service ${isSelected && "row--selected"}`}
-                />
-            </div>
+            <TruncatedText
+                text={value}
+                withTooltip
+                tooltipOptions={{ position: "mouse" }}
+                className={`settings-export-web__${field === "service_key" ? "key" : "service"} ${isSelected ? "row--selected" : ""}`}
+            />
         );
     };
 
@@ -210,7 +177,7 @@ export const SettingsExportWeb = (): ReactElement => {
                         ))}
                         <Column
                             bodyStyle={{ textAlign: "center" }}
-                            className='account__table-checkbox'
+                            className='account__table-action'
                             body={({ name, service_key }) => actionColumnBody(name, service_key)}
                             pt={{
                                 root: {
