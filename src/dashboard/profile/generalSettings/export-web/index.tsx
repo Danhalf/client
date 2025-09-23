@@ -178,7 +178,9 @@ export const SettingsExportWeb = (): ReactElement => {
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             className='account__table-action'
-                            body={({ name, service_key }) => actionColumnBody(name, service_key)}
+                            body={({ service_name, service_key }) =>
+                                actionColumnBody(service_name, service_key)
+                            }
                             pt={{
                                 root: {
                                     style: {
