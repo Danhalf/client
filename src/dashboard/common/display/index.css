@@ -1,6 +1,15 @@
 .truncated-text {
+    --truncated-text-width: 100%;
+
     width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    &.truncated-text--controlled {
+        width: var(--truncated-text-width);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }

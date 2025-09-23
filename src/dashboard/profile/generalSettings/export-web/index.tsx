@@ -9,17 +9,35 @@ import { BaseResponseError } from "common/models/base-response";
 import { GeneralSettingsWebExport } from "common/models/general-settings";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
-import { Tooltip } from "primereact/tooltip";
 import "./index.css";
+import { TruncatedText } from "dashboard/common/display";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof GeneralSettingsWebExport;
 }
 
 const renderColumnsData: TableColumnProps[] = [
-    { field: "name", header: "Service" },
-    { field: "service_name", header: "Key" },
+    { field: "service_name", header: "Service" },
+    { field: "service_key", header: "Key" },
 ];
+
+const generateRandomKey = (): string => {
+    return (
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15)
+    );
+};
 
 export const SettingsExportWeb = (): ReactElement => {
     const store = useStore().userStore;
@@ -110,27 +128,27 @@ export const SettingsExportWeb = (): ReactElement => {
     ): ReactElement => {
         const isSelected = selectedRows[rowIndex];
 
-        if (field === "service_name") {
+        if (field === "service_key") {
             const tooltipClass = `settings-export-web__key--tooltip-${rowIndex}`;
             return (
-                <>
-                    <div
-                        className={`settings-export-web__key ${tooltipClass} ${isSelected && "row--selected"}`}
-                    >
-                        {value}
-                    </div>
-                    <Tooltip
-                        target={`.${tooltipClass}`}
-                        content={value as string}
-                        position='mouse'
-                    />
-                </>
+                <TruncatedText
+                    text={(value as string) || generateRandomKey()}
+                    className={`settings-export-web__key ${tooltipClass} ${isSelected && "row--selected"}`}
+                    withTooltip
+                    tooltipOptions={{ position: "mouse" }}
+                />
             );
         }
 
         return (
             <div className={`settings-export-web__service ${isSelected && "row--selected"}`}>
-                {value}
+                <TruncatedText
+                    text={value as string}
+                    width='128px'
+                    withTooltip
+                    tooltipOptions={{ position: "mouse" }}
+                    className={`settings-export-web__service ${isSelected && "row--selected"}`}
+                />
             </div>
         );
     };
@@ -193,7 +211,7 @@ export const SettingsExportWeb = (): ReactElement => {
                         <Column
                             bodyStyle={{ textAlign: "center" }}
                             className='account__table-checkbox'
-                            body={({ name, service_name }) => actionColumnBody(name, service_name)}
+                            body={({ name, service_key }) => actionColumnBody(name, service_key)}
                             pt={{
                                 root: {
                                     style: {
