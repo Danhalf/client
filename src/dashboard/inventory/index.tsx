@@ -34,9 +34,8 @@ import {
     filterOptions,
 } from "dashboard/inventory/common/data-table";
 import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
-import { makeShortReports } from "http/services/reports.service";
 import { Checkbox } from "primereact/checkbox";
-import { ReportsColumn } from "common/models/reports";
+import { useCreateReport } from "common/hooks";
 import {
     createStringifyFilterQuery,
     createStringifySearchQuery,
@@ -92,6 +91,7 @@ export default function Inventories({
     const store = useStore().inventoryStore;
     const { clearInventory, inventoryGroupClassList, getInventoryGroupClassList } = store;
     const toast = useToast();
+    const { createReport } = useCreateReport<Inventory>();
 
     const navigate = useNavigate();
 
@@ -202,51 +202,18 @@ export default function Inventories({
     }, [authUser, locations, store, initialDataTableQueries]);
 
     const printTableData = async (print: boolean = false) => {
-        const columns: ReportsColumn[] = activeColumns.map((column) => ({
-            name: column.header as string,
-            data: column.field as string,
-            width: columnWidths?.find((item) => item.field === column.field)?.width || 0,
-        }));
-        const date = new Date();
-        const name = `inventory_${
-            date.getMonth() + 1
-        }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
-
-        if (authUser) {
-            const data = inventories.map((item) => {
-                const filteredItem: Record<string, any> = {};
-                columns.forEach((column) => {
-                    if (item.hasOwnProperty(column.data)) {
-                        filteredItem[column.data] = item[column.data as keyof typeof item];
-                    }
-                });
-                return filteredItem;
-            });
-            const JSONreport = {
-                name,
-                itemUID: "0",
-                data,
-                columns,
-                format: "",
-            };
-            await makeShortReports(authUser.useruid, JSONreport).then((response) => {
-                const url = new Blob([response], { type: "application/pdf" });
-                let link = document.createElement("a");
-                link.href = window.URL.createObjectURL(url);
-                if (!print) {
-                    link.download = `Report-${name}.pdf`;
-                    link.click();
-                }
-
-                if (print) {
-                    window.open(
-                        link.href,
-                        "_blank",
-                        "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                    );
-                }
-            });
-        }
+        if (!authUser) return;
+        await createReport({
+            userId: authUser.useruid,
+            items: inventories,
+            columns: activeColumns.map((c) => ({
+                field: c.field as keyof Inventory,
+                header: String(c.header),
+            })),
+            widths: columnWidths,
+            print,
+            name: "inventory",
+        });
     };
 
     const changeSettings = (settings: Partial<InventoryUserSettings>) => {
