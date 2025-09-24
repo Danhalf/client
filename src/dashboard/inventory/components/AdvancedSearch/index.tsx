@@ -70,6 +70,11 @@ export function InventoryAdvancedSearch({
         setIsLoading(true);
         setAdvancedSearch((prevSearch) => {
             const nextSearch = { ...prevSearch, [key]: value };
+
+            if (key === "Make") {
+                nextSearch.Model = "";
+            }
+
             const hasEmpty = isObjectValuesEmpty(nextSearch);
             setButtonDisabled(hasEmpty);
             return nextSearch;
