@@ -74,41 +74,51 @@ export const AdvancedSearchDialog = <T,>({
 
     const autoMake = fields.find((field) => field.key === "Make")?.value;
 
-    useEffect(() => {
+    const handleGetAutoMakeList = useCallback(async () => {
         if (searchForm === SEARCH_FORM_TYPE.INVENTORY) {
-            getInventoryAutomakesList().then((list) => {
-                if (list) {
-                    const upperCasedList = list.map((item) => ({
-                        ...item,
-                        name: item.name.toUpperCase(),
-                    }));
-                    setAutomakesList(upperCasedList);
-                }
-            });
+            const list = await getInventoryAutomakesList();
+            if (list && Array.isArray(list)) {
+                const upperCasedList = list.map((item) => ({
+                    ...item,
+                    name: item.name.toUpperCase(),
+                }));
+                setAutomakesList(upperCasedList);
+            }
         }
-        if (searchForm === SEARCH_FORM_TYPE.CONTACTS && visible) {
-            getContactsTypeList().then((response) => {
-                if (response) {
-                    const types = response as ContactType[];
-                    setTypeList(types);
-                }
-            });
+    }, [searchForm]);
+
+    const handleGetContactsTypeList = useCallback(async () => {
+        if (searchForm === SEARCH_FORM_TYPE.CONTACTS) {
+            const response = await getContactsTypeList();
+            if (response) {
+                const types = response as ContactType[];
+                setTypeList(types);
+            }
+        }
+    }, [searchForm]);
+
+    useEffect(() => {
+        if (!visible) return;
+        if (searchForm === SEARCH_FORM_TYPE.INVENTORY) {
+            handleGetAutoMakeList();
+        }
+        if (searchForm === SEARCH_FORM_TYPE.CONTACTS) {
+            handleGetContactsTypeList();
         }
     }, [searchForm, visible]);
 
-    const handleSelectMake = useCallback(() => {
+    const handleSelectMake = useCallback(async () => {
         if (!autoMake) {
             setAutomakesModelList([]);
             return;
         }
         const formatedMake = autoMake.toLowerCase().replaceAll(" ", "_");
-        getAutoMakeModelList(formatedMake).then((list) => {
-            if (list && Object.keys(list).length) {
-                setAutomakesModelList(list);
-            } else {
-                setAutomakesModelList([]);
-            }
-        });
+        const list = await getAutoMakeModelList(formatedMake);
+        if (list && Array.isArray(list)) {
+            setAutomakesModelList(list);
+        } else {
+            setAutomakesModelList([]);
+        }
     }, [autoMake]);
 
     useEffect(() => {
@@ -317,7 +327,7 @@ export const AdvancedSearchDialog = <T,>({
                                                 onChange={({ target }) =>
                                                     onInputChange(key, target.value)
                                                 }
-                                                showClear={false}
+                                                required
                                                 placeholder={label || key}
                                             />
                                         )}
