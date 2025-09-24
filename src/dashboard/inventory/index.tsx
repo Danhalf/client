@@ -1,6 +1,7 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 import {
     DataTable,
+    DataTableColReorderEvent,
     DataTablePageEvent,
     DataTableRowClickEvent,
     DataTableSortEvent,
@@ -14,12 +15,7 @@ import { useNavigate } from "react-router-dom";
 import "./index.css";
 import InventoryHeader from "dashboard/inventory/components/InventoryHeader";
 import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
-import {
-    AdvancedSearchDialog,
-    SEARCH_FIELD_TYPE,
-    SEARCH_FORM_TYPE,
-    SearchField,
-} from "dashboard/common/dialog/search";
+import { InventoryAdvancedSearch } from "dashboard/inventory/components/AdvancedSearch";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import {
     FilterOptions,
@@ -29,12 +25,7 @@ import {
 } from "dashboard/inventory/common/data-table";
 import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { useCreateReport } from "common/hooks";
-import {
-    createStringifyFilterQuery,
-    createStringifySearchQuery,
-    filterParams,
-    isObjectValuesEmpty,
-} from "common/helpers";
+import { createStringifyFilterQuery } from "common/helpers";
 import { Loader } from "dashboard/common/loader";
 import { SplitButton } from "primereact/splitbutton";
 import { useStore } from "store/hooks";
@@ -50,8 +41,6 @@ interface InventoriesProps {
     originalPath?: string;
 }
 
-interface AdvancedSearch extends Pick<Partial<Inventory>, "StockNo" | "Make" | "Model" | "VIN"> {}
-
 export default function Inventories({
     onRowClick,
     returnedField,
@@ -63,10 +52,10 @@ export default function Inventories({
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
-    const [advancedSearch, setAdvancedSearch] = useState<AdvancedSearch>({});
-    const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
-    const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
+
+    const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
+
     const [selectedFilter, setSelectedFilter] = useState<Pick<FilterOptions, "value">[]>([]);
     const [selectedFilterOptions, setSelectedFilterOptions] = useState<FilterOptions[] | null>(
         null
@@ -285,85 +274,29 @@ export default function Inventories({
         }
     };
 
-    const handleSetAdvancedSearch = (key: keyof Inventory, value: string) => {
-        setIsLoading(true);
-        setAdvancedSearch((prevSearch) => {
-            const newSearch = { ...prevSearch, [key]: value };
-
-            const isAnyValueEmpty = isObjectValuesEmpty(newSearch);
-
-            setButtonDisabled(isAnyValueEmpty);
-
-            return newSearch;
-        });
-        setIsLoading(false);
-    };
-
-    const handleAdvancedSearch = () => {
-        setIsLoading(true);
-        const searchParams = createStringifySearchQuery(advancedSearch);
-        handleGetInventoryList(
-            { ...filterParams({ top: lazyState.first }), qry: searchParams },
-            true
-        );
-        setDialogVisible(false);
-        setIsLoading(false);
-    };
-
-    const handleClearAdvancedSearchField = async (key: keyof AdvancedSearch) => {
-        setIsLoading(true);
-        setButtonDisabled(true);
-        setAdvancedSearch((prev) => {
-            const updatedSearch = { ...prev };
-            delete updatedSearch[key];
-            return updatedSearch;
-        });
-
-        try {
-            setIsLoading(true);
-            const updatedSearch = { ...advancedSearch };
-            delete updatedSearch[key];
-
-            const isAdvancedSearchEmpty = isObjectValuesEmpty(advancedSearch);
-            const params: QueryParams = {
-                ...(lazyState.sortOrder === 1 && { type: "asc" }),
-                ...(lazyState.sortOrder === -1 && { type: "desc" }),
-                ...(!isAdvancedSearchEmpty && { qry: createStringifySearchQuery(updatedSearch) }),
-                skip: lazyState.first,
-                top: lazyState.rows,
-            };
-            await handleGetInventoryList(params);
-        } finally {
-            setButtonDisabled(false);
-        }
-    };
-
     useEffect(() => {
         if (!authUser || !settingsInitialized || !locations.length) return;
 
         if (selectedFilterOptions) {
-            setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
+            setSelectedFilter(
+                selectedFilterOptions.map(
+                    ({ value }) => value as unknown as Pick<FilterOptions, "value">
+                )
+            );
         }
         let qry: string = "";
 
         if (globalSearch) {
             qry += globalSearch;
-        } else {
-            qry += createStringifySearchQuery(advancedSearch);
         }
 
         if (selectedFilterOptions) {
-            if (globalSearch.length || Object.values(advancedSearch).length) qry += "+";
+            if (globalSearch.length) qry += "+";
             qry += createStringifyFilterQuery(selectedFilterOptions);
         }
 
         if (selectedInventoryType.length) {
-            if (
-                globalSearch.length ||
-                Object.values(advancedSearch).length ||
-                selectedFilterOptions
-            )
-                qry += "+";
+            if (globalSearch.length || selectedFilterOptions) qry += "+";
             selectedInventoryType.forEach(
                 (type, index) =>
                     (qry += `${type}.GroupClass${
@@ -399,29 +332,6 @@ export default function Inventories({
         authUser,
         locations.length,
     ]);
-
-    const searchFields: SearchField<AdvancedSearch>[] = [
-        {
-            key: "StockNo",
-            value: advancedSearch?.StockNo,
-            type: SEARCH_FIELD_TYPE.TEXT,
-        },
-        {
-            key: "Make",
-            value: advancedSearch?.Make,
-            type: SEARCH_FIELD_TYPE.DROPDOWN,
-        },
-        {
-            key: "Model",
-            value: advancedSearch?.Model,
-            type: SEARCH_FIELD_TYPE.DROPDOWN,
-        },
-        {
-            key: "VIN",
-            value: advancedSearch?.VIN,
-            type: SEARCH_FIELD_TYPE.TEXT,
-        },
-    ];
 
     const handleAddNewInventory = () => {
         navigate(INVENTORY_PAGE.CREATE());
@@ -551,14 +461,14 @@ export default function Inventories({
                                         header={header}
                                         rowClassName={() => "hover:text-primary cursor-pointer"}
                                         onRowClick={handleOnRowClick}
-                                        onColReorder={(event: any) => {
+                                        onColReorder={(event: DataTableColReorderEvent) => {
                                             if (authUser && Array.isArray(event.columns)) {
                                                 const orderArray = event.columns?.map(
-                                                    (column: any) => column.props.field
+                                                    (column: Column) => column.props.field
                                                 );
 
                                                 const newActiveColumns = orderArray
-                                                    .map((field: string) => {
+                                                    .map((field: string | undefined) => {
                                                         return (
                                                             activeColumns.find(
                                                                 (column) => column.field === field
@@ -566,14 +476,18 @@ export default function Inventories({
                                                         );
                                                     })
                                                     .filter(
-                                                        (column: any): column is TableColumnsList =>
+                                                        (
+                                                            column: TableColumnsList | null
+                                                        ): column is TableColumnsList =>
                                                             column !== null
                                                     );
 
                                                 setActiveColumns(newActiveColumns);
 
                                                 changeSettings({
-                                                    activeColumns: newActiveColumns,
+                                                    activeColumns: newActiveColumns.map(
+                                                        ({ field }) => field
+                                                    ),
                                                 });
                                             }
                                         }}
@@ -631,22 +545,16 @@ export default function Inventories({
                                     </DataTable>
                                 )}
                             </div>
+                            <InventoryAdvancedSearch
+                                visible={dialogVisible}
+                                onClose={() => setDialogVisible(false)}
+                                lazyState={lazyState}
+                                setIsLoading={setIsLoading}
+                                handleGetInventoryList={handleGetInventoryList}
+                            />
                         </div>
                     </div>
                 </div>
-                <AdvancedSearchDialog<AdvancedSearch>
-                    visible={dialogVisible}
-                    buttonDisabled={buttonDisabled}
-                    onHide={() => {
-                        setButtonDisabled(true);
-                        setDialogVisible(false);
-                    }}
-                    action={handleAdvancedSearch}
-                    onSearchClear={handleClearAdvancedSearchField}
-                    onInputChange={handleSetAdvancedSearch}
-                    fields={searchFields}
-                    searchForm={SEARCH_FORM_TYPE.INVENTORY}
-                />
             </div>
         </div>
     );
