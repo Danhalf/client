@@ -5,8 +5,6 @@ import {
     DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
-import { Button } from "primereact/button";
-import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { getInventoryList, getInventoryLocations } from "http/services/inventory-service";
 import { Inventory, InventoryLocations } from "common/models/inventory";
 import { QueryParams } from "common/models/query-params";
@@ -14,11 +12,7 @@ import { Column } from "primereact/column";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { useNavigate } from "react-router-dom";
 import "./index.css";
-import {
-    MultiSelect,
-    MultiSelectChangeEvent,
-    MultiSelectPanelHeaderTemplateEvent,
-} from "primereact/multiselect";
+import InventoryHeader from "dashboard/inventory/components/InventoryHeader";
 import { ROWS_PER_PAGE, TOAST_LIFETIME } from "common/settings";
 import {
     AdvancedSearchDialog,
@@ -34,7 +28,6 @@ import {
     filterOptions,
 } from "dashboard/inventory/common/data-table";
 import { InventoryUserSettings, ServerUserSettings, TableState } from "common/models/user";
-import { Checkbox } from "primereact/checkbox";
 import { useCreateReport } from "common/hooks";
 import {
     createStringifyFilterQuery,
@@ -79,6 +72,7 @@ export default function Inventories({
         null
     );
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
+    const [settingsInitialized, setSettingsInitialized] = useState<boolean>(false);
     const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [locations, setLocations] = useState<InventoryLocations[]>([]);
@@ -195,6 +189,7 @@ export default function Inventories({
                             setCurrentLocation(location || ({} as InventoryLocations));
                             store.currentLocation = location?.locationuid || "";
                         }
+                        setSettingsInitialized(true);
                     }
                 })
                 .finally(() => setIsLoading(false));
@@ -343,128 +338,8 @@ export default function Inventories({
         }
     };
 
-    const dropdownHeaderPanel = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
-        return (
-            <div className='dropdown-header flex pb-1'>
-                <label className='cursor-pointer dropdown-header__label'>
-                    <Checkbox
-                        onChange={() => {
-                            if (columns.length === activeColumns.length) {
-                                setActiveColumns(columns.filter(({ checked }) => checked));
-                                changeSettings({ activeColumns: [] });
-                            } else {
-                                setActiveColumns(columns);
-                                changeSettings({
-                                    activeColumns: columns.map(({ field }) => field),
-                                });
-                            }
-                        }}
-                        checked={columns.length === activeColumns.length}
-                        className='dropdown-header__checkbox mr-2'
-                    />
-                    Select All
-                </label>
-                <button
-                    className='p-multiselect-close p-link'
-                    onClick={(e) => {
-                        setActiveColumns(columns.filter(({ checked }) => checked));
-                        changeSettings({ activeColumns: [] });
-                        onCloseClick(e);
-                    }}
-                >
-                    <i className='pi pi-times' />
-                </button>
-            </div>
-        );
-    };
-
-    const dropdownFilterHeaderPanel = (evt: MultiSelectPanelHeaderTemplateEvent) => {
-        return (
-            <div className='dropdown-header flex pb-1'>
-                <label className='cursor-pointer dropdown-header__label'>
-                    <Checkbox
-                        checked={
-                            filterOptions.filter((option) => !option.disabled).length ===
-                            selectedFilter.length
-                        }
-                        onChange={(e) => {
-                            const isChecked = e.target.checked;
-                            setSelectedFilter(
-                                isChecked
-                                    ? filterOptions.map((option) => ({ value: option.value }))
-                                    : []
-                            );
-                            const selectedOptions = isChecked ? filterOptions : [];
-                            setSelectedFilterOptions(
-                                selectedOptions.filter((option) => !option.disabled)
-                            );
-                        }}
-                        className='dropdown-header__checkbox mr-2'
-                    />
-                    Select All
-                </label>
-                <button
-                    className='p-multiselect-close p-link'
-                    onClick={(e) => {
-                        setSelectedFilter([]);
-                        setSelectedFilterOptions([]);
-                        changeSettings({
-                            selectedFilterOptions: [],
-                        });
-                        evt.onCloseClick(e);
-                    }}
-                >
-                    <i className='pi pi-times' />
-                </button>
-            </div>
-        );
-    };
-
-    const dropdownTypeHeaderPanel = ({ onCloseClick }: MultiSelectPanelHeaderTemplateEvent) => {
-        return (
-            <div className='dropdown-header flex pb-1'>
-                <label className='cursor-pointer dropdown-header__label'>
-                    <Checkbox
-                        checked={selectedInventoryType.length === inventoryGroupClassList.length}
-                        onChange={() => {
-                            if (inventoryGroupClassList.length !== selectedInventoryType.length) {
-                                setSelectedInventoryType(
-                                    inventoryGroupClassList.map(({ description }) => description)
-                                );
-                                changeSettings({
-                                    selectedInventoryType: inventoryGroupClassList.map(
-                                        ({ description }) => description
-                                    ),
-                                });
-                            } else {
-                                setSelectedInventoryType([]);
-                                changeSettings({
-                                    selectedInventoryType: [],
-                                });
-                            }
-                        }}
-                        className='dropdown-header__checkbox mr-2'
-                    />
-                    Select All
-                </label>
-                <button
-                    className='p-multiselect-close p-link'
-                    onClick={(e) => {
-                        setSelectedInventoryType([]);
-                        changeSettings({
-                            selectedInventoryType: [],
-                        });
-                        onCloseClick(e);
-                    }}
-                >
-                    <i className='pi pi-times' />
-                </button>
-            </div>
-        );
-    };
-
     useEffect(() => {
-        if (!authUser || !serverSettings || !locations.length) return;
+        if (!authUser || !settingsInitialized || !locations.length) return;
 
         if (selectedFilterOptions) {
             setSelectedFilter(selectedFilterOptions.map(({ value }) => value as any));
@@ -516,7 +391,7 @@ export default function Inventories({
 
         handleGetInventoryList(params, true);
     }, [
-        serverSettings,
+        settingsInitialized,
         globalSearch,
         selectedFilterOptions,
         currentLocation,
@@ -553,136 +428,32 @@ export default function Inventories({
     };
 
     const header = (
-        <div className='datatable-controls'>
-            <GlobalSearchInput
-                value={globalSearch}
-                onInputChange={(value) => setGlobalSearch(value)}
-                enableDebounce
-            />
-            <Button
-                className='inventory-top-controls__button new-inventory-button'
-                icon='icon adms-add-item'
-                severity='success'
-                type='button'
-                tooltip='Add new inventory'
-                onClick={handleAddNewInventory}
-            >
-                New
-            </Button>
-            <Button
-                className='inventory-top-controls__button'
-                severity='success'
-                type='button'
-                icon='icon adms-print'
-                tooltip='Print inventory form'
-                onClick={() => printTableData(true)}
-            />
-            <Button
-                className='inventory-top-controls__button'
-                severity='success'
-                type='button'
-                icon='icon adms-download'
-                tooltip='Download inventory form'
-                onClick={() => printTableData()}
-            />
-            <MultiSelect
-                optionValue='value'
-                optionLabel='label'
-                options={filterOptions}
-                value={selectedFilter}
-                onChange={({ value }: MultiSelectChangeEvent) => {
-                    const selectedOptions = filterOptions.filter((option) =>
-                        value.includes(option.value)
-                    );
-                    setSelectedFilterOptions(selectedOptions);
-
-                    changeSettings({
-                        selectedFilterOptions: selectedOptions,
-                    });
-                }}
-                placeholder='Filter'
-                className='inventory-dropdown inventory-filter ml-auto'
-                display='chip'
-                selectedItemsLabel='Clear Filter'
-                panelHeaderTemplate={dropdownFilterHeaderPanel}
-                pt={{
-                    header: {
-                        className: "inventory-filter__header",
-                    },
-                    wrapper: {
-                        className: "inventory-filter__wrapper",
-                        style: {
-                            maxHeight: "500px",
-                            maxWidth: "230px",
-                        },
-                    },
-                }}
-            />
-            <MultiSelect
-                options={columns}
-                value={activeColumns}
-                optionLabel='header'
-                onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
-                    stopPropagation();
-                    const sortedValue = value.sort((a: TableColumnsList, b: TableColumnsList) => {
-                        const firstIndex = columns.findIndex((col) => col.field === a.field);
-                        const secondIndex = columns.findIndex((col) => col.field === b.field);
-                        return firstIndex - secondIndex;
-                    });
-
-                    setActiveColumns(sortedValue);
-
-                    changeSettings({
-                        activeColumns: value.map(({ field }: { field: string }) => field),
-                    });
-                }}
-                panelHeaderTemplate={dropdownHeaderPanel}
-                className='inventory-dropdown column-picker'
-                display='chip'
-                pt={{
-                    header: {
-                        className: "column-picker__header",
-                    },
-                    wrapper: {
-                        className: "column-picker__wrapper",
-                        style: {
-                            maxHeight: "500px",
-                            maxWidth: "230px",
-                        },
-                    },
-                }}
-            />
-            <MultiSelect
-                optionValue='description'
-                optionLabel='description'
-                options={inventoryGroupClassList}
-                value={selectedInventoryType}
-                onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
-                    stopPropagation();
-                    setSelectedInventoryType(value);
-                    changeSettings({
-                        selectedInventoryType: value,
-                    });
-                }}
-                placeholder='Inventory Type'
-                className='inventory-dropdown inventory-filter'
-                display='chip'
-                selectedItemsLabel='Clear Filter'
-                panelHeaderTemplate={dropdownTypeHeaderPanel}
-                pt={{
-                    header: {
-                        className: "inventory-filter__header",
-                    },
-                    wrapper: {
-                        className: "inventory-filter__wrapper",
-                        style: {
-                            maxHeight: "500px",
-                            maxWidth: "230px",
-                        },
-                    },
-                }}
-            />
-        </div>
+        <InventoryHeader
+            searchValue={globalSearch}
+            onSearchChange={(nextValue: string) => setGlobalSearch(nextValue)}
+            onAdvancedSearch={() => setDialogVisible(true)}
+            onAddNew={handleAddNewInventory}
+            onPrint={() => printTableData(true)}
+            onDownload={() => printTableData(false)}
+            filterOptions={filterOptions}
+            selectedFilterValues={selectedFilter}
+            onFilterOptionsChange={(nextSelected: FilterOptions[]) => {
+                setSelectedFilterOptions(nextSelected);
+                changeSettings({ selectedFilterOptions: nextSelected });
+            }}
+            availableColumns={columns}
+            activeColumns={activeColumns}
+            onActiveColumnsChange={(nextColumns: TableColumnsList[]) => {
+                setActiveColumns(nextColumns);
+                changeSettings({ activeColumns: nextColumns.map(({ field }) => field) });
+            }}
+            inventoryTypes={inventoryGroupClassList}
+            selectedInventoryTypes={selectedInventoryType}
+            onInventoryTypesChange={(nextTypes: string[]) => {
+                setSelectedInventoryType(nextTypes);
+                changeSettings({ selectedInventoryType: nextTypes });
+            }}
+        />
     );
 
     const handleOnRowClick = ({ data }: DataTableRowClickEvent): void => {
