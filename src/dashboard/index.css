@@ -532,11 +532,11 @@
     color: var(--admss-app-light-grey);
     &:hover {
         background: transparent;
-        color: var(--admss-app-medium-grey);
+        color: var(--admss-app-lightest-grey);
     }
     &:focus {
         background: transparent;
-        color: var(--admss-app-medium-grey);
+        color: var(--admss-app-lightest-grey);
     }
 }
 

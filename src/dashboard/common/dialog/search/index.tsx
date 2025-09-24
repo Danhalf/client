@@ -17,6 +17,7 @@ import { ComboBox } from "dashboard/common/form/dropdown";
 import { useDateRange } from "common/hooks";
 import { validateDates } from "common/helpers";
 import { AutoComplete } from "primereact/autocomplete";
+import { Button } from "primereact/button";
 const INPUT_NUMBER_MAX_LENGTH = 11;
 
 export enum SEARCH_FORM_TYPE {
@@ -65,6 +66,7 @@ export const AdvancedSearchDialog = <T,>({
     action,
     searchForm,
 }: AdvancedSearchDialogProps<T>): ReactElement => {
+    const [initialAutomakesList, setInitialAutomakesList] = useState<MakesListData[]>([]);
     const [automakesList, setAutomakesList] = useState<MakesListData[]>([]);
     const [automakesModelList, setAutomakesModelList] = useState<ListData[]>([]);
     const [typeList, setTypeList] = useState<ContactType[]>([]);
@@ -82,6 +84,7 @@ export const AdvancedSearchDialog = <T,>({
                     ...item,
                     name: item.name.toUpperCase(),
                 }));
+                setInitialAutomakesList(upperCasedList);
                 setAutomakesList(upperCasedList);
             }
         }
@@ -235,7 +238,7 @@ export const AdvancedSearchDialog = <T,>({
                     }
 
                     return (
-                        <span className='p-float-label p-input-icon-right' key={key}>
+                        <span className='p-float-label p-input-icon-right relative' key={key}>
                             {type === SEARCH_FIELD_TYPE.TEXT && (
                                 <InputText
                                     type='tel'
@@ -286,7 +289,7 @@ export const AdvancedSearchDialog = <T,>({
                                                 suggestions={automakesList}
                                                 completeMethod={({ query }) => {
                                                     setAutomakesList(
-                                                        automakesList.filter((item) =>
+                                                        initialAutomakesList.filter((item) =>
                                                             item.name.includes(query.toUpperCase())
                                                         )
                                                     );
@@ -370,10 +373,11 @@ export const AdvancedSearchDialog = <T,>({
                             )}
 
                             {value && onSearchClear && (
-                                <i
-                                    className={`pi pi-times cursor-pointer search-dialog__clear ${
-                                        type === SEARCH_FIELD_TYPE.DROPDOWN && "pr-4"
-                                    }`}
+                                <Button
+                                    type='button'
+                                    icon='pi pi-times'
+                                    text
+                                    className={`cursor-pointer search-dialog__clear`}
                                     onClick={() => {
                                         if (key === DROPDOWN_TYPE.TYPE) {
                                             setSelectedType("");
@@ -385,6 +389,8 @@ export const AdvancedSearchDialog = <T,>({
                                             if (modelField) {
                                                 onInputChange("Model" as keyof T, "");
                                             }
+                                            setAutomakesList(initialAutomakesList);
+                                            setAutomakesModelList([]);
                                         }
                                         onSearchClear(key);
                                     }}
