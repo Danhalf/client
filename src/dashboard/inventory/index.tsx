@@ -146,10 +146,12 @@ export default function Inventories({
                         setServerSettings(allSettings);
                         const { inventory: settings } = allSettings;
                         if (settings?.activeColumns?.length) {
-                            const uniqueColumns = Array.from(new Set(settings?.activeColumns));
-                            const serverColumns = columns.filter((column) =>
-                                uniqueColumns.find((col) => col === column.field)
-                            );
+                            const uniqueColumns = Array.from(new Set(settings.activeColumns));
+                            const serverColumns = uniqueColumns
+                                .map((field) => columns.find((column) => column.field === field))
+                                .filter((foundColumn): foundColumn is TableColumnsList =>
+                                    Boolean(foundColumn)
+                                );
                             setActiveColumns(serverColumns);
                         } else {
                             setActiveColumns(columns.filter(({ checked }) => checked));
@@ -190,9 +192,9 @@ export default function Inventories({
         await createReport({
             userId: authUser.useruid,
             items: inventories,
-            columns: activeColumns.map((c) => ({
-                field: c.field as keyof Inventory,
-                header: String(c.header),
+            columns: activeColumns.map((activeColumn) => ({
+                field: activeColumn.field as keyof Inventory,
+                header: String(activeColumn.header),
             })),
             widths: columnWidths,
             print,

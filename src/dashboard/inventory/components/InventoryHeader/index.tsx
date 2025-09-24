@@ -65,9 +65,9 @@ export default function InventoryHeader({
                 </label>
                 <button
                     className='p-multiselect-close p-link'
-                    onClick={(e) => {
+                    onClick={(event) => {
                         onActiveColumnsChange(availableColumns.filter(({ checked }) => checked));
-                        onCloseClick(e);
+                        onCloseClick(event);
                     }}
                 >
                     <i className='pi pi-times' />
@@ -95,9 +95,9 @@ export default function InventoryHeader({
                 </label>
                 <button
                     className='p-multiselect-close p-link'
-                    onClick={(e) => {
+                    onClick={(event) => {
                         onFilterOptionsChange([]);
-                        evt.onCloseClick(e);
+                        evt.onCloseClick(event);
                     }}
                 >
                     <i className='pi pi-times' />
@@ -128,9 +128,9 @@ export default function InventoryHeader({
                 </label>
                 <button
                     className='p-multiselect-close p-link'
-                    onClick={(e) => {
+                    onClick={(event) => {
                         onInventoryTypesChange([]);
-                        onCloseClick(e);
+                        onCloseClick(event);
                     }}
                 >
                     <i className='pi pi-times' />
