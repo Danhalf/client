@@ -188,6 +188,15 @@ export const AdvancedSearchDialog = <T,>({
         const modelField = fields.find((field) => field.key === "Model");
         if (modelField) {
             onInputChange("Model" as keyof T, "");
+            setTimeout(() => {
+                const modelElements = document.querySelectorAll('[data-pc-name="dropdown"]');
+                modelElements.forEach((element) => {
+                    const input = element.querySelector("input");
+                    if (input && input === document.activeElement) {
+                        input.blur();
+                    }
+                });
+            }, 0);
         }
     };
 
@@ -197,6 +206,15 @@ export const AdvancedSearchDialog = <T,>({
         const modelField = fields.find((field) => field.key === "Model");
         if (modelField) {
             onInputChange("Model" as keyof T, "");
+            setTimeout(() => {
+                const modelElements = document.querySelectorAll('[data-pc-name="dropdown"]');
+                modelElements.forEach((element) => {
+                    const input = element.querySelector("input");
+                    if (input && input === document.activeElement) {
+                        input.blur();
+                    }
+                });
+            }, 0);
         }
 
         const isValidMake = initialAutomakesList.some(
@@ -379,7 +397,6 @@ export const AdvancedSearchDialog = <T,>({
                                                 onChange={({ target }) =>
                                                     onInputChange(key, target.value)
                                                 }
-                                                required
                                                 placeholder={label || key}
                                             />
                                         )}
