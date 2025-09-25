@@ -1,4 +1,4 @@
-import { ReactElement, useCallback, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useRef, useState } from "react";
 import { DashboardDialog, DashboardDialogProps } from "..";
 import { InputText } from "primereact/inputtext";
 import "./index.css";
@@ -73,7 +73,8 @@ export const AdvancedSearchDialog = <T,>({
     const [selectedType, setSelectedType] = useState<string>("");
     const { startDate, endDate, handleDateChange } = useDateRange();
     const [dateError, setDateError] = useState<string>("");
-
+    const autoCompleteRef = useRef<AutoComplete>(null);
+    const [isDropdownVisible, setIsDropdownVisible] = useState<boolean>(false);
     const autoMake = fields.find((field) => field.key === "Make")?.value;
 
     const handleGetAutoMakeList = useCallback(async () => {
@@ -111,10 +112,16 @@ export const AdvancedSearchDialog = <T,>({
     }, [searchForm, visible]);
 
     const handleSelectMake = useCallback(async () => {
-        if (!autoMake) {
+        if (!autoMake) return;
+
+        const isMakeCorrect = automakesList.some(
+            (make) => make.name.toUpperCase() === autoMake.toUpperCase()
+        );
+        if (!isMakeCorrect) {
             setAutomakesModelList([]);
             return;
         }
+
         const formatedMake = autoMake.toLowerCase().replaceAll(" ", "_");
         const list = await getAutoMakeModelList(formatedMake);
         if (list && Array.isArray(list)) {
@@ -166,6 +173,41 @@ export const AdvancedSearchDialog = <T,>({
                 <div>{option.name}</div>
             </div>
         );
+    };
+
+    const handleAutoCompleteDropdownClick = ({
+        value,
+        key,
+    }: {
+        value: MakesListData;
+        key: keyof T;
+    }) => {
+        const make = typeof value === "string" ? value : value.name;
+        onInputChange(key, make);
+
+        const modelField = fields.find((field) => field.key === "Model");
+        if (modelField) {
+            onInputChange("Model" as keyof T, "");
+        }
+    };
+
+    const handleAutoCompleteChange = ({ value, key }: { value: string; key: keyof T }) => {
+        onInputChange(key, value);
+
+        const modelField = fields.find((field) => field.key === "Model");
+        if (modelField) {
+            onInputChange("Model" as keyof T, "");
+        }
+
+        const isValidMake = initialAutomakesList.some(
+            (make) => make.name.toUpperCase() === value.toUpperCase()
+        );
+
+        if (isValidMake) {
+            handleSelectMake();
+        } else {
+            setAutomakesModelList([]);
+        }
     };
 
     return (
@@ -286,6 +328,7 @@ export const AdvancedSearchDialog = <T,>({
                                         {key === DROPDOWN_TYPE.MAKE ? (
                                             <AutoComplete
                                                 value={value ?? ""}
+                                                ref={autoCompleteRef}
                                                 suggestions={automakesList}
                                                 completeMethod={({ query }) => {
                                                     setAutomakesList(
@@ -296,19 +339,25 @@ export const AdvancedSearchDialog = <T,>({
                                                 }}
                                                 dropdown
                                                 onChange={({ value }) => {
-                                                    const make =
-                                                        typeof value === "string"
-                                                            ? value
-                                                            : value.name;
-                                                    onInputChange(key, make);
-
-                                                    const modelField = fields.find(
-                                                        (field) => field.key === "Model"
-                                                    );
-                                                    if (modelField) {
-                                                        onInputChange("Model" as keyof T, "");
+                                                    if (typeof value === "string") {
+                                                        handleAutoCompleteChange({ value, key });
+                                                    } else {
+                                                        handleAutoCompleteDropdownClick({
+                                                            value,
+                                                            key,
+                                                        });
                                                     }
                                                 }}
+                                                onDropdownClick={() => {
+                                                    if (
+                                                        autoCompleteRef.current &&
+                                                        isDropdownVisible
+                                                    ) {
+                                                        autoCompleteRef.current.hide();
+                                                    }
+                                                }}
+                                                onShow={() => setIsDropdownVisible(true)}
+                                                onHide={() => setIsDropdownVisible(false)}
                                                 itemTemplate={(option) =>
                                                     autoMakesOptionTemplate(option)
                                                 }
