@@ -31,6 +31,7 @@ import { SplitButton } from "primereact/splitbutton";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
 import { INVENTORY_PAGE } from "common/constants/links";
+import { EditActionColumn } from "dashboard/common/data-table";
 
 const DATA_FIELD = "data-field";
 
@@ -508,6 +509,11 @@ export default function Inventories({
                                             }
                                         }}
                                     >
+                                        <EditActionColumn
+                                            onEdit={({ itemuid }) =>
+                                                navigate(INVENTORY_PAGE.EDIT(itemuid))
+                                            }
+                                        />
                                         {activeColumns.map(({ field, header }) => {
                                             return (
                                                 <Column
