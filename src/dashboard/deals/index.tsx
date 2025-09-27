@@ -33,6 +33,7 @@ import { DropdownHeaderPanel } from "dashboard/deals/common";
 import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 import { DEALS_PAGE } from "common/constants/links";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
+import { EditActionColumn } from "dashboard/common/data-table";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
@@ -540,6 +541,9 @@ export const DealsDataTable = observer(
                                 rowClassName={() => "hover:text-primary cursor-pointer"}
                                 onRowClick={handleOnRowClick}
                             >
+                                <EditActionColumn
+                                    onEdit={({ dealuid }) => navigate(DEALS_PAGE.EDIT(dealuid))}
+                                />
                                 {activeColumns.map(({ field, header }) => (
                                     <Column
                                         field={field}
