@@ -21,11 +21,7 @@ export default function AccountsHeader({
 }: AccountsHeaderProps): ReactElement {
     return (
         <div className='grid datatable-controls'>
-            <GlobalSearchInput
-                value={searchValue}
-                onChange={(event) => onSearchChange(event.target.value)}
-                enableDebounce
-            />
+            <GlobalSearchInput value={searchValue} onInputChange={onSearchChange} enableDebounce />
             <Button
                 className='contact-top-controls__button'
                 label='Advanced search'

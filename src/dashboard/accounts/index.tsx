@@ -11,16 +11,15 @@ import { getAccountsList, TotalAccountList } from "http/services/accounts.servic
 import { Column, ColumnProps } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { ROWS_PER_PAGE } from "common/settings";
-import { makeShortReports } from "http/services/reports.service";
 import "./index.css";
 import { useNavigate } from "react-router-dom";
-import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { AccountInfo } from "common/models/accounts";
 import AccountsHeader from "dashboard/accounts/components/AccountsHeader";
 import AccountsAdvancedSearch from "dashboard/accounts/components/AccountsAdvancedSearch";
+import { useCreateReport } from "common/hooks";
 
 const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
     { field: "accountnumber", header: "Account" },
@@ -46,54 +45,27 @@ export const AccountsDataTable = observer(
         const [dialogVisible, setDialogVisible] = useState<boolean>(false);
         const [isLoading, setIsLoading] = useState<boolean>(false);
         const navigate = useNavigate();
+        const { createReport } = useCreateReport<AccountInfo>();
 
         const printTableData = async (print: boolean = false) => {
+            if (!authUser) return;
+
             setIsLoading(true);
-            const columns: ReportsColumn[] = renderColumnsData.map((column) => ({
-                name: column.header as string,
-                data: column.field as string,
-            }));
-            const date = new Date();
-            const name = `accounts_${
-                date.getMonth() + 1
-            }-${date.getDate()}-${date.getFullYear()}_${date.getHours()}-${date.getMinutes()}`;
-
-            if (authUser) {
-                const data = accounts.map((item) => {
-                    const filteredItem: Record<string, any> = {};
-                    columns.forEach((column) => {
-                        if (item.hasOwnProperty(column.data)) {
-                            filteredItem[column.data] = item[column.data as keyof typeof item];
-                        }
-                    });
-                    return filteredItem;
+            try {
+                await createReport({
+                    userId: authUser.useruid,
+                    items: accounts,
+                    columns: renderColumnsData.map((column) => ({
+                        field: column.field as keyof AccountInfo,
+                        header: String(column.header),
+                    })),
+                    widths: [],
+                    print,
+                    name: "accounts",
                 });
-                const JSONreport = {
-                    name,
-                    itemUID: "0",
-                    data,
-                    columns,
-                    format: "",
-                };
-                await makeShortReports(authUser.useruid, JSONreport).then((response) => {
-                    const url = new Blob([response], { type: "application/pdf" });
-                    let link = document.createElement("a");
-                    link.href = window.URL.createObjectURL(url);
-                    if (!print) {
-                        link.download = `Report-${name}.pdf`;
-                        link.click();
-                    }
-
-                    if (print) {
-                        window.open(
-                            link.href,
-                            "_blank",
-                            "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
-                        );
-                    }
-                });
+            } finally {
+                setIsLoading(false);
             }
-            setIsLoading(false);
         };
 
         const pageChanged = (event: DataTablePageEvent) => {
