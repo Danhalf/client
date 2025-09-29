@@ -413,9 +413,11 @@
     }
 }
 
-.p-dialog .card {
-    box-shadow: none;
-    min-height: 70vh;
+.p-dialog {
+    .card {
+        box-shadow: none;
+        min-height: 70vh;
+    }
 }
 
 .dashboard-loader__wrapper {

@@ -8,7 +8,7 @@ import {
     DataTableSortEvent,
 } from "primereact/datatable";
 import { getAccountsList, TotalAccountList } from "http/services/accounts.service";
-import { Column, ColumnProps } from "primereact/column";
+import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
 import { ROWS_PER_PAGE } from "common/settings";
 import "./index.css";
@@ -20,13 +20,7 @@ import { AccountInfo } from "common/models/accounts";
 import AccountsHeader from "dashboard/accounts/components/AccountsHeader";
 import AccountsAdvancedSearch from "dashboard/accounts/components/AccountsAdvancedSearch";
 import { useCreateReport } from "common/hooks";
-
-const renderColumnsData: Pick<ColumnProps, "header" | "field">[] = [
-    { field: "accountnumber", header: "Account" },
-    { field: "accounttype", header: "Type" },
-    { field: "name", header: "Name" },
-    { field: "created", header: "Date" },
-];
+import { columns, TableColumnsList } from "dashboard/accounts/common/data-table";
 
 interface AccountsDataTableProps {
     onRowClick?: (accountName: string) => void;
@@ -44,6 +38,7 @@ export const AccountsDataTable = observer(
         const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
         const [dialogVisible, setDialogVisible] = useState<boolean>(false);
         const [isLoading, setIsLoading] = useState<boolean>(false);
+        const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
         const navigate = useNavigate();
         const { createReport } = useCreateReport<AccountInfo>();
 
@@ -55,7 +50,7 @@ export const AccountsDataTable = observer(
                 await createReport({
                     userId: authUser.useruid,
                     items: accounts,
-                    columns: renderColumnsData.map((column) => ({
+                    columns: activeColumns.map((column) => ({
                         field: column.field as keyof AccountInfo,
                         header: String(column.header),
                     })),
@@ -83,6 +78,10 @@ export const AccountsDataTable = observer(
                     setTotalRecords(total ?? 0);
                 }
             });
+        }, []);
+
+        useEffect(() => {
+            setActiveColumns(columns.filter((column) => column.checked));
         }, []);
 
         useEffect(() => {
@@ -129,6 +128,9 @@ export const AccountsDataTable = observer(
                     onPrint={() => printTableData(true)}
                     onDownload={() => printTableData()}
                     isLoading={isLoading}
+                    availableColumns={columns}
+                    activeColumns={activeColumns}
+                    onActiveColumnsChange={setActiveColumns}
                 />
                 <div className='grid'>
                     <div className='col-12'>
@@ -155,7 +157,7 @@ export const AccountsDataTable = observer(
                                 rowClassName={() => "hover:text-primary cursor-pointer"}
                                 onRowClick={handleOnRowClick}
                             >
-                                {renderColumnsData.map(({ field, header }) => (
+                                {activeColumns.map(({ field, header }) => (
                                     <Column
                                         field={field}
                                         header={header}

@@ -10,6 +10,7 @@ import { getAccountsList } from "http/services/accounts.service";
 import { QueryParams } from "common/models/query-params";
 import { useStore } from "store/hooks";
 import { DatatableQueries } from "common/models/datatable-queries";
+import "./index.css";
 
 interface AdvancedSearch {
     [key: string]: string | number;
@@ -134,6 +135,7 @@ export default function AccountsAdvancedSearch({
             action={handleAdvancedSearch}
             onSearchClear={handleClearAdvancedSearchField}
             onInputChange={handleSetAdvancedSearch}
+            className='accounts-advanced-search'
             fields={searchFields as SearchField<AdvancedSearch>[]}
             searchForm={SEARCH_FORM_TYPE.ACCOUNTS}
         />
