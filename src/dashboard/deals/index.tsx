@@ -33,7 +33,6 @@ import { DropdownHeaderPanel } from "dashboard/deals/common";
 import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 import { DEALS_PAGE } from "common/constants/links";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
-import { EditActionColumn } from "dashboard/common/data-table";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal | "";
@@ -541,8 +540,29 @@ export const DealsDataTable = observer(
                                 rowClassName={() => "hover:text-primary cursor-pointer"}
                                 onRowClick={handleOnRowClick}
                             >
-                                <EditActionColumn
-                                    onEdit={({ dealuid }) => navigate(DEALS_PAGE.EDIT(dealuid))}
+                                <Column
+                                    bodyStyle={{ textAlign: "center" }}
+                                    reorderable={false}
+                                    resizeable={false}
+                                    body={({ item }) => {
+                                        return (
+                                            <Button
+                                                text
+                                                className='table-edit-button'
+                                                icon='adms-edit-item'
+                                                onClick={() =>
+                                                    navigate(DEALS_PAGE.EDIT(item.dealuid))
+                                                }
+                                            />
+                                        );
+                                    }}
+                                    pt={{
+                                        root: {
+                                            style: {
+                                                width: "80px",
+                                            },
+                                        },
+                                    }}
                                 />
                                 {activeColumns.map(({ field, header }) => (
                                     <Column

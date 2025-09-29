@@ -31,7 +31,7 @@ import { SplitButton } from "primereact/splitbutton";
 import { useStore } from "store/hooks";
 import { useToast } from "dashboard/common/toast";
 import { INVENTORY_PAGE } from "common/constants/links";
-import { EditActionColumn } from "dashboard/common/data-table";
+import { Button } from "primereact/button";
 
 const DATA_FIELD = "data-field";
 
@@ -509,10 +509,31 @@ export default function Inventories({
                                             }
                                         }}
                                     >
-                                        <EditActionColumn
-                                            onEdit={({ itemuid }) =>
-                                                navigate(INVENTORY_PAGE.EDIT(itemuid))
-                                            }
+                                        <Column
+                                            bodyStyle={{ textAlign: "center" }}
+                                            reorderable={false}
+                                            resizeable={false}
+                                            body={({ item }) => {
+                                                return (
+                                                    <Button
+                                                        text
+                                                        className='table-edit-button'
+                                                        icon='adms-edit-item'
+                                                        onClick={() =>
+                                                            navigate(
+                                                                INVENTORY_PAGE.EDIT(item.itemuid)
+                                                            )
+                                                        }
+                                                    />
+                                                );
+                                            }}
+                                            pt={{
+                                                root: {
+                                                    style: {
+                                                        width: "80px",
+                                                    },
+                                                },
+                                            }}
                                         />
                                         {activeColumns.map(({ field, header }) => {
                                             return (

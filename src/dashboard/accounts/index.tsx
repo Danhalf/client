@@ -21,6 +21,8 @@ import AccountsHeader from "dashboard/accounts/components/AccountsHeader";
 import AccountsAdvancedSearch from "dashboard/accounts/components/AccountsAdvancedSearch";
 import { useCreateReport } from "common/hooks";
 import { columns, TableColumnsList } from "dashboard/accounts/common/data-table";
+import { ACCOUNTS_PAGE } from "common/constants/links";
+import { Button } from "primereact/button";
 
 interface AccountsDataTableProps {
     onRowClick?: (accountName: string) => void;
@@ -157,6 +159,31 @@ export const AccountsDataTable = observer(
                                 rowClassName={() => "hover:text-primary cursor-pointer"}
                                 onRowClick={handleOnRowClick}
                             >
+                                <Column
+                                    bodyStyle={{ textAlign: "center" }}
+                                    reorderable={false}
+                                    resizeable={false}
+                                    body={({ item }) => {
+                                        return (
+                                            <Button
+                                                text
+                                                className='table-edit-button'
+                                                icon='adms-edit-item'
+                                                onClick={() =>
+                                                    navigate(ACCOUNTS_PAGE.EDIT(item.accountuid))
+                                                }
+                                            />
+                                        );
+                                    }}
+                                    pt={{
+                                        root: {
+                                            style: {
+                                                width: "80px",
+                                            },
+                                        },
+                                    }}
+                                />
+
                                 {activeColumns.map(({ field, header }) => (
                                     <Column
                                         field={field}

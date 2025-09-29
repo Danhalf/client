@@ -167,6 +167,20 @@
         color: var(--admss-app-primary);
     }
 
+    .table-edit-button {
+        border: none;
+        background: transparent;
+        width: 24px;
+        height: 24px;
+        color: var(--admss-app-primary-main-green);
+        &:enabled:hover,
+        &:enabled:focus,
+        &:enabled:active {
+            background: transparent;
+            color: var(--admss-app-primary-main-green);
+        }
+    }
+
     .table-button {
         border: none;
         background: transparent;
