@@ -181,6 +181,10 @@
         }
     }
 
+    tr td:has(.table-edit-button) + td {
+        border-left: none;
+    }
+
     .table-button {
         border: none;
         background: transparent;
