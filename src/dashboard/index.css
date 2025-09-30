@@ -170,6 +170,7 @@
     .table-edit-button {
         border: none;
         background: transparent;
+        font-size: 20px;
         width: 24px;
         height: 24px;
         color: var(--admss-app-primary-main-green);
@@ -234,6 +235,14 @@
 
 .p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th:last-child {
     border-right: none;
+}
+
+.p-datatable .p-datatable-thead > tr > th:first-child:has(.p-column-title:empty) {
+    border: none;
+}
+
+.p-datatable .p-datatable-thead > tr > th:first-child:has(.p-column-title:empty) + th {
+    border-left: none;
 }
 
 .p-datatable.p-datatable-gridlines .p-datatable-tbody > tr:first-child > td {
