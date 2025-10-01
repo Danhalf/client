@@ -23,6 +23,8 @@ import { useCreateReport } from "common/hooks";
 import { columns, TableColumnsList } from "dashboard/accounts/common/data-table";
 import { ACCOUNTS_PAGE } from "common/constants/links";
 import { Button } from "primereact/button";
+import { AccountsUserSettings } from "common/models/user";
+import { useUserModuleSettings } from "common/hooks/useUserProfileSettings";
 
 interface AccountsDataTableProps {
     onRowClick?: (accountName: string) => void;
@@ -40,7 +42,10 @@ export const AccountsDataTable = observer(
         const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
         const [dialogVisible, setDialogVisible] = useState<boolean>(false);
         const [isLoading, setIsLoading] = useState<boolean>(false);
-        const [activeColumns, setActiveColumns] = useState<TableColumnsList[]>([]);
+        const { activeColumns, setActiveColumnsAndSave } = useUserModuleSettings<
+            AccountsUserSettings,
+            TableColumnsList
+        >("accounts", columns);
         const navigate = useNavigate();
         const { createReport } = useCreateReport<AccountInfo>();
 
@@ -80,10 +85,6 @@ export const AccountsDataTable = observer(
                     setTotalRecords(total ?? 0);
                 }
             });
-        }, []);
-
-        useEffect(() => {
-            setActiveColumns(columns.filter((column) => column.checked));
         }, []);
 
         useEffect(() => {
@@ -132,7 +133,9 @@ export const AccountsDataTable = observer(
                     isLoading={isLoading}
                     availableColumns={columns}
                     activeColumns={activeColumns}
-                    onActiveColumnsChange={setActiveColumns}
+                    onActiveColumnsChange={(nextColumns: TableColumnsList[]) => {
+                        setActiveColumnsAndSave(nextColumns);
+                    }}
                 />
                 <div className='grid'>
                     <div className='col-12'>
