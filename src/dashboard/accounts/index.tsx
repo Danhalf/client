@@ -89,17 +89,16 @@ export const AccountsDataTable = observer(
         }, []);
 
         useEffect(() => {
-            const params: QueryParams = {
+            const params: QueryParams & { accounttype?: string } = {
                 ...(lazyState.sortField && { column: lazyState.sortField }),
                 skip: lazyState.first,
                 top: lazyState.rows,
             };
             let qry: string = "";
             if (selectedAccountType) {
-                qry += selectedAccountType;
+                params.accounttype = selectedAccountType;
             }
             if (globalSearch) {
-                if (qry.length) qry += "+";
                 qry += globalSearch;
             }
             if (qry.length) {
