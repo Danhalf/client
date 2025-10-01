@@ -20,7 +20,7 @@ import { ROWS_PER_PAGE } from "common/settings";
 import { ContactType, ContactTypeNameList, ContactUser } from "common/models/contact";
 import { ContactsUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
-import { useUserModuleSettings } from "common/hooks/useUserProfileSettings";
+import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { makeShortReports } from "http/services/reports.service";
 import { ReportsColumn } from "common/models/reports";
 import { Loader } from "dashboard/common/loader";
@@ -84,7 +84,7 @@ export const ContactsDataTable = ({
     const [contacts, setUserContacts] = useState<ContactUser[]>([]);
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
-    const { activeColumns, setActiveColumnsAndSave } = useUserModuleSettings<
+    const { activeColumns, setActiveColumnsAndSave } = useUserProfileSettings<
         ContactsUserSettings,
         TableColumnsList
     >("contacts", selectableColumns);
@@ -581,7 +581,7 @@ export const ContactsDataTable = ({
                                 />
                             ))}
 
-                            {activeColumns.map(({ field, header }) => (
+                            {activeColumns.map(({ field, header }: TableColumnsList) => (
                                 <Column
                                     field={field}
                                     header={header}

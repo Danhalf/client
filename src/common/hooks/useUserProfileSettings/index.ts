@@ -11,7 +11,7 @@ export interface TableColumnsListSettings {
 
 type ModuleKey = keyof ServerUserSettings;
 
-interface UseUserModuleSettingsResult<
+interface UserProfileSettingsResult<
     TModuleSettings extends BaseUserSettings,
     TColumn extends TableColumnsListSettings,
 > {
@@ -23,13 +23,13 @@ interface UseUserModuleSettingsResult<
     settingsLoaded: boolean;
 }
 
-export function useUserModuleSettings<
+export const useUserProfileSettings = <
     TModuleSettings extends BaseUserSettings,
     TColumn extends TableColumnsListSettings,
 >(
     moduleKey: ModuleKey,
     availableColumns: TColumn[]
-): UseUserModuleSettingsResult<TModuleSettings, TColumn> {
+): UserProfileSettingsResult<TModuleSettings, TColumn> => {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
@@ -118,4 +118,4 @@ export function useUserModuleSettings<
         setModuleSettings,
         settingsLoaded,
     };
-}
+};
