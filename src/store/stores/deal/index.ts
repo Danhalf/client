@@ -115,10 +115,6 @@ export class DealStore {
         return current !== original;
     }
 
-    public get temporaryWashoutState() {
-        return this._temporaryWashoutState;
-    }
-
     public get isWashoutStatePreserved() {
         return this._isWashoutStatePreserved;
     }
@@ -379,10 +375,6 @@ export class DealStore {
             this._dealWashout = JSON.parse(JSON.stringify(this._temporaryWashoutState));
             this._temporaryWashoutState = null;
         }
-    });
-
-    public clearWashoutPreservationFlag = action(() => {
-        this._isWashoutStatePreserved = false;
     });
 
     public clearWashoutState = action(() => {

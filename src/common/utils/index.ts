@@ -37,9 +37,6 @@ export const typeGuards = {
     isFunction: <F extends Function = Function>(value: unknown): value is F => {
         return typeof value === "function";
     },
-    isObject: (value: unknown): value is Record<string, unknown> => {
-        return typeof value === "object" && value !== null;
-    },
     isArray: (value: unknown): value is Array<unknown> => {
         return Array.isArray(value);
     },
