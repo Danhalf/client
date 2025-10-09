@@ -178,8 +178,6 @@ export const useToastMessage = () => {
     };
 };
 
-export { useCreateReport } from "common/hooks/useCreateReport";
-
 export const useSelectAllOnFocus = <E extends HTMLInputElement = HTMLInputElement>(
     externalOnFocus?: (e: React.FocusEvent<E>) => void
 ) => {
@@ -204,3 +202,5 @@ export const useSelectAllOnFocus = <E extends HTMLInputElement = HTMLInputElemen
         [externalOnFocus]
     );
 };
+
+export { useCreateReport } from "common/hooks/useCreateReport";
