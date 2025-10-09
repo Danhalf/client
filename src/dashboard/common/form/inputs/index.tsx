@@ -12,7 +12,6 @@ import { Button } from "primereact/button";
 import { InputMask, InputMaskChangeEvent, InputMaskProps } from "primereact/inputmask";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
-import { useSelectAllOnFocus } from "common/hooks";
 
 type LabelPosition = "left" | "right" | "top";
 
@@ -165,9 +164,57 @@ export const CurrencyInput = ({
     ...props
 }: CurrencyInputProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<any>(null);
     const uniqueId = useId();
+    const shouldClearOnInput = useRef(false);
 
-    const handleFocus = useSelectAllOnFocus<HTMLInputElement>(props.onFocus);
+    const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+        const input = inputRef.current?.getInput();
+        if (input) {
+            requestAnimationFrame(() => {
+                input.setSelectionRange(0, 0);
+            });
+        }
+        if (!value || value === 0) {
+            shouldClearOnInput.current = true;
+        }
+        if (props.onFocus) {
+            props.onFocus(e);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (shouldClearOnInput?.current && !!e?.key?.length) {
+            shouldClearOnInput.current = false;
+            const input = inputRef.current?.getInput();
+            if (input) {
+                input.select();
+            }
+        }
+        if (props.onKeyDown) {
+            props.onKeyDown(e);
+        }
+    };
+
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        shouldClearOnInput.current = false;
+        if (!value && value !== 0) {
+            if (props.onValueChange) {
+                props.onValueChange({
+                    value: 0,
+                    originalEvent: e,
+                    target: {
+                        name: name,
+                        id: uniqueId,
+                        value: 0,
+                    },
+                } as any);
+            }
+        }
+        if (props.onBlur) {
+            props.onBlur(e);
+        }
+    };
 
     return (
         <div
@@ -193,14 +240,17 @@ export const CurrencyInput = ({
                     </div>
                 )}
                 <InputNumber
+                    ref={inputRef}
                     inputId={uniqueId}
                     minFractionDigits={2}
                     maxFractionDigits={2}
                     min={0}
                     locale='en-US'
-                    value={value || 0}
+                    value={value === null ? null : value || 0}
                     inputClassName={`${coloredEmptyValue && !value ? "currency-item__input--empty" : ""}`}
                     onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    onKeyDown={handleKeyDown}
                     {...props}
                 />
             </div>
