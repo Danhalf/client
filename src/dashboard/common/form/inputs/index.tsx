@@ -2,7 +2,7 @@ import { CSSProperties, LegacyRef, ReactElement, useEffect, useId, useRef, useSt
 import { debounce } from "common/helpers";
 import { RadioButton, RadioButtonChangeEvent, RadioButtonProps } from "primereact/radiobutton";
 import "./index.css";
-import { InputNumber, InputNumberProps } from "primereact/inputnumber";
+import { InputNumber, InputNumberProps, InputNumberValueChangeEvent } from "primereact/inputnumber";
 import { Checkbox, CheckboxChangeEvent, CheckboxProps } from "primereact/checkbox";
 import { Calendar, CalendarProps } from "primereact/calendar";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
@@ -164,12 +164,12 @@ export const CurrencyInput = ({
     ...props
 }: CurrencyInputProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<any>(null);
+    const inputRef = useRef<InputNumber>(null);
     const uniqueId = useId();
     const shouldClearOnInput = useRef(false);
 
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-        const input = inputRef.current?.getInput();
+        const input = inputRef.current?.getInput() as HTMLInputElement | undefined;
         if (input) {
             requestAnimationFrame(() => {
                 input.setSelectionRange(0, 0);
@@ -186,7 +186,7 @@ export const CurrencyInput = ({
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (shouldClearOnInput?.current && !!e?.key?.length) {
             shouldClearOnInput.current = false;
-            const input = inputRef.current?.getInput();
+            const input = inputRef.current?.getInput() as HTMLInputElement | undefined;
             if (input) {
                 input.select();
             }
@@ -202,13 +202,7 @@ export const CurrencyInput = ({
             if (props.onValueChange) {
                 props.onValueChange({
                     value: 0,
-                    originalEvent: e,
-                    target: {
-                        name: name,
-                        id: uniqueId,
-                        value: 0,
-                    },
-                } as any);
+                } as InputNumberValueChangeEvent);
             }
         }
         if (props.onBlur) {
