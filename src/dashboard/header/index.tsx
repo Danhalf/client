@@ -73,7 +73,7 @@ export const Header = observer((): ReactElement => {
                     : null,
                 { separator: true },
                 showChangeLocation ? { label: "Change Location" } : null,
-                { label: "Users" },
+                { label: "Users", command: () => navigate("users") },
                 { separator: true },
                 {
                     label: "Contact support",

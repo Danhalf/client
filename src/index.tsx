@@ -27,6 +27,7 @@ import { ErrorBoundary } from "http/routes/ErrorBoundary";
 import { ToastProvider } from "dashboard/common/toast";
 import { ServiceUpdate } from "services/service-update";
 import { DealWashout } from "dashboard/deals/form/washout";
+import { Users } from "dashboard/profile/users";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -121,6 +122,14 @@ const AppRouter = (): ReactElement => {
                             element: (
                                 <ProtectedRoute notAllowed={["salesPerson"]}>
                                     <GeneralSettings />
+                                </ProtectedRoute>
+                            ),
+                        },
+                        {
+                            path: "users",
+                            element: (
+                                <ProtectedRoute notAllowed={["salesPerson"]}>
+                                    <Users />
                                 </ProtectedRoute>
                             ),
                         },
