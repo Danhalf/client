@@ -28,6 +28,7 @@ import { ToastProvider } from "dashboard/common/toast";
 import { ServiceUpdate } from "services/service-update";
 import { DealWashout } from "dashboard/deals/form/washout";
 import { Users } from "dashboard/profile/users";
+import { UsersForm } from "dashboard/profile/users/form";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
@@ -129,9 +130,13 @@ const AppRouter = (): ReactElement => {
                             path: "users",
                             element: (
                                 <ProtectedRoute notAllowed={["salesPerson"]}>
-                                    <Users />
+                                    <Outlet />
                                 </ProtectedRoute>
                             ),
+                            children: [
+                                { path: "", element: <Users /> },
+                                { path: ":id", element: <UsersForm /> },
+                            ],
                         },
                         {
                             path: "reports",
