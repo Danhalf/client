@@ -31,3 +31,10 @@ export interface SubUser extends BaseResponseError {
     username: string;
     useruid: string;
 }
+
+export interface GenerateNewPasswordResponse extends BaseResponseError {
+    created: string;
+    mode: string;
+    password: string;
+    useruid: string;
+}

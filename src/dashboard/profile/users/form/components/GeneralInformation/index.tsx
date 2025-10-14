@@ -5,6 +5,11 @@ import { Splitter } from "dashboard/common/display";
 import { DashboardRadio, PhoneInput } from "dashboard/common/form/inputs";
 import { RadioButtonProps } from "primereact/radiobutton";
 import { Password } from "primereact/password";
+import { Button } from "primereact/button";
+import { useStore } from "store/hooks";
+import { generateNewPassword } from "http/services/users";
+import { GenerateNewPasswordResponse } from "common/models/users";
+import { useToastMessage } from "common/hooks";
 
 const ROLE_OPTIONS: RadioButtonProps[] = [
     {
@@ -25,6 +30,9 @@ const ROLE_OPTIONS: RadioButtonProps[] = [
 ];
 
 export const GeneralInformation = observer((): ReactElement => {
+    const userStore = useStore().userStore;
+    const { authUser } = userStore;
+    const { showError, showSuccess } = useToastMessage();
     const [firstName, setFirstName] = useState<string>("");
     const [middleName, setMiddleName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
@@ -33,6 +41,25 @@ export const GeneralInformation = observer((): ReactElement => {
     const [phone, setPhone] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
+
+    const handleGeneratePassword = async () => {
+        if (!authUser) return;
+        const response = await generateNewPassword(authUser.useruid);
+        if (response && !response.error) {
+            const data = response as GenerateNewPasswordResponse;
+            setPassword(data.password);
+            setConfirmPassword(data.password);
+            showSuccess(`Password generated successfully: ${data.password}`);
+        } else {
+            showError(response?.error);
+        }
+    };
+
+    const handleCopyPassword = () => {
+        navigator.clipboard.writeText(password);
+        showSuccess("Password copied to clipboard");
+    };
+
     return (
         <div className='user-form general-information'>
             <h3 className='general-information__title user-form__title'>General Information</h3>
@@ -117,7 +144,7 @@ export const GeneralInformation = observer((): ReactElement => {
                             name='Password'
                             value={password}
                             className='w-full'
-                            autoComplete='off'
+                            autoComplete='new-password'
                             inputClassName='w-full'
                             onChange={(e) => setPassword(e.target.value)}
                         />
@@ -129,13 +156,25 @@ export const GeneralInformation = observer((): ReactElement => {
                         <Password
                             name='Verify Password'
                             className='w-full'
-                            autoComplete='off'
+                            autoComplete='new-password'
                             inputClassName='w-full'
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                         <label className='float-label'>Verify Password (required)</label>
                     </span>
+                </div>
+                <div className='col-4 flex gap-3'>
+                    <Button
+                        tooltip='Generate Password'
+                        icon='icon adms-generate-password'
+                        onClick={handleGeneratePassword}
+                    />
+                    <Button
+                        tooltip='Copy Password'
+                        icon='icon adms-copy'
+                        onClick={handleCopyPassword}
+                    />
                 </div>
             </div>
         </div>

@@ -2,7 +2,7 @@ import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { UserGroup } from "common/models/user";
-import { SubUser, User } from "common/models/users";
+import { GenerateNewPasswordResponse, SubUser, User } from "common/models/users";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
@@ -255,9 +255,9 @@ export const createUser = async (useruid: string, userData: any) => {
 
 export const generateNewPassword = async (useruid: string) => {
     try {
-        const request = await authorizedUserApiInstance.get<
-            BaseResponseError & { password: string }
-        >(`user/${useruid}/newpassword`);
+        const request = await authorizedUserApiInstance.get<GenerateNewPasswordResponse>(
+            `user/${useruid}/newpassword`
+        );
         return request.data;
     } catch (error) {
         if (isAxiosError(error)) {
