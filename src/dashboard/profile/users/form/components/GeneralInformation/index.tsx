@@ -33,12 +33,11 @@ export const GeneralInformation = observer((): ReactElement => {
     const authUserStore = useStore().userStore;
     const { authUser } = authUserStore;
     const usersStore = useStore().usersStore;
-    const { user } = usersStore;
+    const { user, changeUserData } = usersStore;
     const { showError, showSuccess } = useToastMessage();
     const [firstName, setFirstName] = useState<string>("");
     const [middleName, setMiddleName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
-    const [login, setLogin] = useState<string>(user?.username || "");
     const [email, setEmail] = useState<string>("");
     const [phone, setPhone] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -114,8 +113,8 @@ export const GeneralInformation = observer((): ReactElement => {
                     <span className='p-float-label'>
                         <InputText
                             className='w-full'
-                            value={login}
-                            onChange={(e) => setLogin(e.target.value)}
+                            value={user?.username || ""}
+                            onChange={(e) => changeUserData("username", e.target.value)}
                         />
                         <label className='float-label'>Login (required)</label>
                     </span>
