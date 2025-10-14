@@ -2,7 +2,7 @@ import { isAxiosError } from "axios";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { UserGroup } from "common/models/user";
-import { User } from "common/models/users";
+import { SubUser, User } from "common/models/users";
 import { authorizedUserApiInstance } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
@@ -22,10 +22,10 @@ export const getUsersList = async (useruid: string, params?: QueryParams) => {
     }
 };
 
-export const getClientsList = async (useruid: string, params?: QueryParams) => {
+export const getSubUsersList = async (useruid: string, params?: QueryParams) => {
     try {
-        const request = await authorizedUserApiInstance.get<BaseResponseError | User[]>(
-            `user/${useruid}/listclients`,
+        const request = await authorizedUserApiInstance.get<BaseResponseError | SubUser[]>(
+            `user/${useruid}/subusers`,
             { params }
         );
         return request.data;
@@ -33,7 +33,7 @@ export const getClientsList = async (useruid: string, params?: QueryParams) => {
         if (isAxiosError(error)) {
             return {
                 status: Status.ERROR,
-                error: error.response?.data.error || "Error while getting clients list",
+                error: error.response?.data.error || "Error while getting sub users list",
             };
         }
     }

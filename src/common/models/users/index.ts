@@ -20,3 +20,14 @@ export interface User extends BaseResponseError {
     deletereason: string;
     issubuser: 0 | 1;
 }
+
+export interface SubUser extends BaseResponseError {
+    created: string;
+    createdbyuid: string;
+    creatorusername: string;
+    rolename: string;
+    roleuid: string;
+    updated: string;
+    username: string;
+    useruid: string;
+}
