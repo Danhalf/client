@@ -30,13 +30,15 @@ const ROLE_OPTIONS: RadioButtonProps[] = [
 ];
 
 export const GeneralInformation = observer((): ReactElement => {
-    const userStore = useStore().userStore;
-    const { authUser } = userStore;
+    const authUserStore = useStore().userStore;
+    const { authUser } = authUserStore;
+    const usersStore = useStore().usersStore;
+    const { user } = usersStore;
     const { showError, showSuccess } = useToastMessage();
     const [firstName, setFirstName] = useState<string>("");
     const [middleName, setMiddleName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");
-    const [login, setLogin] = useState<string>("");
+    const [login, setLogin] = useState<string>(user?.username || "");
     const [email, setEmail] = useState<string>("");
     const [phone, setPhone] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -130,7 +132,7 @@ export const GeneralInformation = observer((): ReactElement => {
                 </div>
                 <div className='col-4'>
                     <PhoneInput
-                        name='Phone Number'
+                        name='Phone Number (required)'
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                     />

@@ -38,3 +38,15 @@ export interface GenerateNewPasswordResponse extends BaseResponseError {
     password: string;
     useruid: string;
 }
+
+export interface UserData extends BaseResponseError {
+    clientuid: string;
+    created: string;
+    createdbyuseruid: string;
+    creatorusername: string;
+    enabled: 0 | 1;
+    parentname: string;
+    parentuid: string;
+    username: string;
+    useruid: string;
+}

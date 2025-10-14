@@ -1,11 +1,13 @@
 import "./index.css";
 import { ReactElement, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
 import { observer } from "mobx-react-lite";
 import { USERS_PAGE } from "common/constants/links";
 import { GeneralInformation } from "./components/GeneralInformation";
+import { useStore } from "store/hooks";
+import { useToastMessage } from "common/hooks";
 
 interface TabItem {
     settingName: string;
@@ -15,7 +17,18 @@ interface TabItem {
 
 export const UsersForm = observer((): ReactElement => {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const { showError } = useToastMessage();
     const [searchParams, setSearchParams] = useSearchParams();
+    const usersStore = useStore().usersStore;
+    const { getCurrentUser } = usersStore;
+
+    const handleGetCurrentUser = async (useruid: string) => {
+        const response = await getCurrentUser(useruid);
+        if (response && response.error) {
+            showError(response?.error as string);
+        }
+    };
 
     useEffect(() => {
         const defaultTabRoute = tabItems[0].route;
@@ -24,6 +37,11 @@ export const UsersForm = observer((): ReactElement => {
             setSearchParams({ section: defaultTabRoute });
         }
     }, [searchParams, setSearchParams]);
+
+    useEffect(() => {
+        if (!id) return;
+        handleGetCurrentUser(id);
+    }, [id]);
 
     const tabItems: TabItem[] = [
         {
