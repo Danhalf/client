@@ -202,7 +202,10 @@ export const Users = observer((): ReactElement => {
                                             sortable
                                             body={(data: SubUser) => {
                                                 return (
-                                                    <span data-field='username'>
+                                                    <span
+                                                        className={`${!data.enabled ? "users-table-row--disabled" : ""}`}
+                                                        data-field='username'
+                                                    >
                                                         {data.username}
                                                     </span>
                                                 );
@@ -213,7 +216,14 @@ export const Users = observer((): ReactElement => {
                                             header='Role'
                                             sortable
                                             body={(data: SubUser) => {
-                                                return data.rolename;
+                                                return (
+                                                    <span
+                                                        className={`${!data.enabled ? "users-table-row--disabled" : ""}`}
+                                                        data-field='rolename'
+                                                    >
+                                                        {data.rolename}
+                                                    </span>
+                                                );
                                             }}
                                         />
                                         <Column

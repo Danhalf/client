@@ -99,9 +99,10 @@ export const GeneralInformation = observer((): ReactElement => {
             </div>
             <Splitter title='Role' className='my-5' />
             <div className='grid'>
-                <div className='col-9 mt-1'>
+                <div className='col-12 mt-1'>
                     <DashboardRadio
                         radioArray={ROLE_OPTIONS}
+                        justifyContent='start'
                         initialValue={""}
                         onChange={() => {}}
                     />

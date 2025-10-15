@@ -1,5 +1,9 @@
 .users {
     margin: 0;
+
+    .users-table-row--disabled {
+        color: var(--admss-app-light-grey);
+    }
 }
 
 .users__title {
