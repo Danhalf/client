@@ -1,5 +1,5 @@
 import { Password, PasswordProps } from "primereact/password";
-import { PASSWORD_REGEX } from "common/constants/regex";
+import { PASSWORD_REGEX, LATIN_PASSWORD_DISALLOWED_REGEX } from "common/constants/regex";
 import "./index.css";
 import { useId } from "react";
 
@@ -23,21 +23,35 @@ export const PasswordInput = ({
     const hasSpecial = PASSWORD_REGEX.SPECIAL_CHAR_REGEX.test(password || "");
 
     const getRuleClass = (isCorrect: boolean) =>
-        isCorrect ? "password-content__success" : "password-content__error";
+        isCorrect ? "password-field__content--success" : "password-field__content--error";
 
     const passwordContent = (
-        <section className='password-content'>
+        <section className='password-field__content'>
             Password must be
             <span className={getRuleClass(hasValidLength)}>&nbsp;5–64 characters&nbsp;</span>
-            and include at least
+            and include <br /> at least
             <span className={getRuleClass(hasLowercase)}>&nbsp;1 lowercase</span> letter,
-            <span className={getRuleClass(hasUppercase)}>&nbsp;1 uppercase</span> letter,
+            <span className={getRuleClass(hasUppercase)}>&nbsp;1 uppercase</span> letter, <br />
             <span className={getRuleClass(hasNumber)}>&nbsp;1 Number&nbsp;</span>
             and
             <span className={getRuleClass(hasSpecial)}>&nbsp;1 special character&nbsp;</span>
-            (!@#$%^&*()-+)
+            (!@#$%^&*()-+).
         </section>
     );
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const raw = e.target.value || "";
+        const sanitized = raw.replace(LATIN_PASSWORD_DISALLOWED_REGEX, "");
+        setPassword(sanitized);
+    };
+    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+        const text = (e.clipboardData?.getData("text") || "").replace(
+            LATIN_PASSWORD_DISALLOWED_REGEX,
+            ""
+        );
+        e.preventDefault();
+        setPassword(text);
+    };
 
     return (
         <span className='p-float-label'>
@@ -45,13 +59,17 @@ export const PasswordInput = ({
                 inputId={id}
                 name='Password'
                 value={password}
-                className='w-full'
+                className='password-field w-full'
                 toggleMask
                 autoComplete='new-password'
-                inputClassName='w-full'
-                onChange={(e) => setPassword(e.target.value)}
+                inputClassName='password-field-input'
+                onChange={handleChange}
+                onPaste={handlePaste}
                 content={passwordContent}
                 feedback={true}
+                showIcon='adms-show'
+                hideIcon='adms-hide'
+                panelClassName='password-field-panel'
                 {...props}
             />
             <label htmlFor={id} className='float-label'>

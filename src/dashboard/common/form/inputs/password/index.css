@@ -1,4 +1,8 @@
-.password-content {
+.password-field {
+    width: 100%;
+}
+
+.password-field__content {
     max-width: 349px;
     overflow-wrap: break-word;
     white-space: pre-wrap;
@@ -7,14 +11,30 @@
     font-weight: 400;
     font-family: "Open Sans";
 
-    .password-content__success {
+    .password-field__content--success {
         color: var(--admss-app-success);
     }
-    .password-content__error {
+    .password-field__content--error {
         color: var(--admss-app-red);
     }
 }
 
-.p-password-panel {
+.password-field-panel {
     background-color: var(--admss-app-white-blue);
+    padding: 10px;
+}
+
+.password-field-input {
+    width: 100%;
+    + i span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 24px;
+        color: var(--admss-app-light-grey);
+        &:hover {
+            color: var(--admss-app-medium-grey);
+        }
+    }
 }
