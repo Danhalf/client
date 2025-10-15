@@ -7,12 +7,16 @@ interface PasswordInputProps extends PasswordProps {
     label?: string;
     password: string;
     setPassword: (password: string) => void;
+    error?: boolean;
+    errorMessage?: string;
 }
 
 export const PasswordInput = ({
     label = "Password (required)",
     password,
     setPassword,
+    error = false,
+    errorMessage = "Passwords do not match. Please check and try again.",
     ...props
 }: PasswordInputProps) => {
     const id = useId();
@@ -54,15 +58,15 @@ export const PasswordInput = ({
     };
 
     return (
-        <span className='p-float-label'>
+        <span className='p-float-label password-field-container'>
             <Password
                 inputId={id}
                 name='Password'
                 value={password}
-                className='password-field w-full'
+                className={`password-field w-full ${!!error ? "p-invalid" : ""}`}
                 toggleMask
                 autoComplete='new-password'
-                inputClassName='password-field-input'
+                inputClassName={`password-field-input ${!!error ? "p-invalid" : ""}`}
                 onChange={handleChange}
                 onPaste={handlePaste}
                 content={passwordContent}
@@ -75,6 +79,7 @@ export const PasswordInput = ({
             <label htmlFor={id} className='float-label'>
                 {label}
             </label>
+            {!!error && <div className='p-error pt-2'>{errorMessage}</div>}
         </span>
     );
 };

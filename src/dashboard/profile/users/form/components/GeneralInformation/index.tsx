@@ -42,6 +42,16 @@ export const GeneralInformation = observer((): ReactElement => {
     const [phone, setPhone] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
+    const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
+
+    const handlePasswordsBlur = () => {
+        const bothFilled = password.length > 0 && confirmPassword.length > 0;
+        if (bothFilled) {
+            setPasswordsMismatch(password !== confirmPassword);
+        } else {
+            setPasswordsMismatch(false);
+        }
+    };
 
     const handleGeneratePassword = async () => {
         if (!authUser) return;
@@ -50,6 +60,7 @@ export const GeneralInformation = observer((): ReactElement => {
             const data = response as GenerateNewPasswordResponse;
             setPassword(data.password);
             setConfirmPassword(data.password);
+            setPasswordsMismatch(false);
             showSuccess(`Password generated successfully: ${data.password}`);
         } else {
             showError(response?.error);
@@ -141,13 +152,20 @@ export const GeneralInformation = observer((): ReactElement => {
             <Splitter title='Password Setup' className='my-5' />
             <div className='grid'>
                 <div className='col-4'>
-                    <PasswordInput password={password} setPassword={setPassword} />
+                    <PasswordInput
+                        password={password}
+                        setPassword={setPassword}
+                        error={passwordsMismatch}
+                        onBlur={handlePasswordsBlur}
+                    />
                 </div>
                 <div className='col-4'>
                     <PasswordInput
                         label='Verify Password (required)'
                         password={confirmPassword}
                         setPassword={setConfirmPassword}
+                        error={passwordsMismatch}
+                        onBlur={handlePasswordsBlur}
                     />
                 </div>
                 <div className='col-4 flex gap-3'>
