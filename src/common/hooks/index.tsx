@@ -177,29 +177,4 @@ export const useToastMessage = () => {
     };
 };
 
-export const useSelectAllOnFocus = <E extends HTMLInputElement = HTMLInputElement>(
-    externalOnFocus?: (e: React.FocusEvent<E>) => void
-) => {
-    return useCallback(
-        (e: React.FocusEvent<E>) => {
-            const input = e?.target as E;
-            const selectAll = () => input?.select?.();
-
-            const animationFrame = typeGuards.isExist(window) && window?.requestAnimationFrame;
-            const microtask = typeGuards.isExist(window) && window?.queueMicrotask;
-
-            if (typeGuards.isFunction(animationFrame)) {
-                animationFrame(selectAll);
-            } else if (typeGuards.isFunction(microtask)) {
-                microtask(selectAll);
-            } else {
-                setTimeout(selectAll, 0);
-            }
-
-            externalOnFocus?.(e);
-        },
-        [externalOnFocus]
-    );
-};
-
 export { useCreateReport } from "common/hooks/useCreateReport";
