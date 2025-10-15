@@ -1,0 +1,20 @@
+.password-content {
+    max-width: 349px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: "Open Sans";
+
+    .password-content__success {
+        color: var(--admss-app-success);
+    }
+    .password-content__error {
+        color: var(--admss-app-red);
+    }
+}
+
+.p-password-panel {
+    background-color: var(--admss-app-white-blue);
+}

@@ -4,12 +4,12 @@ import { InputText } from "primereact/inputtext";
 import { Splitter } from "dashboard/common/display";
 import { DashboardRadio, PhoneInput } from "dashboard/common/form/inputs";
 import { RadioButtonProps } from "primereact/radiobutton";
-import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
 import { generateNewPassword } from "http/services/users";
 import { GenerateNewPasswordResponse } from "common/models/users";
 import { useToastMessage } from "common/hooks";
+import { PasswordInput } from "dashboard/common/form/inputs/password";
 
 const ROLE_OPTIONS: RadioButtonProps[] = [
     {
@@ -141,30 +141,14 @@ export const GeneralInformation = observer((): ReactElement => {
             <Splitter title='Password Setup' className='my-5' />
             <div className='grid'>
                 <div className='col-4'>
-                    <span className='p-float-label'>
-                        <Password
-                            name='Password'
-                            value={password}
-                            className='w-full'
-                            autoComplete='new-password'
-                            inputClassName='w-full'
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                        <label className='float-label'>Password (required)</label>
-                    </span>
+                    <PasswordInput password={password} setPassword={setPassword} />
                 </div>
                 <div className='col-4'>
-                    <span className='p-float-label'>
-                        <Password
-                            name='Verify Password'
-                            className='w-full'
-                            autoComplete='new-password'
-                            inputClassName='w-full'
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                        />
-                        <label className='float-label'>Verify Password (required)</label>
-                    </span>
+                    <PasswordInput
+                        label='Verify Password (required)'
+                        password={confirmPassword}
+                        setPassword={setConfirmPassword}
+                    />
                 </div>
                 <div className='col-4 flex gap-3'>
                     <Button
