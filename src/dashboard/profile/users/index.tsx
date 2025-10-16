@@ -54,8 +54,6 @@ export const Users = observer((): ReactElement => {
 
     const handleGetUsers = async (params?: QueryParams) => {
         if (!authUser) return;
-
-        setIsLoading(true);
         try {
             const response = (await getSubUsersList(
                 authUser.useruid,
@@ -293,6 +291,10 @@ export const Users = observer((): ReactElement => {
                                                 return (
                                                     <SwitchButton
                                                         checked={!!data?.enabled}
+                                                        tooltip={
+                                                            data.enabled ? "Disable" : "Enable"
+                                                        }
+                                                        tooltipOptions={{ position: "mouse" }}
                                                         onChange={() => {
                                                             openConfirmToggle(data);
                                                         }}
