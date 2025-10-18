@@ -470,7 +470,7 @@ export class InventoryStore {
                 const useruid = this.rootStore.userStore.authUser?.useruid;
                 if (generalSettingsStore.isSettingsChanged) {
                     if (useruid) {
-                        generalSettingsStore.saveSettings();
+                        generalSettingsStore.saveSettings(this._inventory?.itemuid);
                     }
                     generalSettingsStore.isSettingsChanged = false;
                 }
