@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { TasksWidget } from "dashboard/tasks/widget";
 import { useStore } from "store/hooks";
 import { RecentMessages } from "dashboard/home/recent-messages";
+import { LatestUpdates } from "dashboard/home/latest-updates";
 import "./index.css";
 
 export const Home = (): ReactElement => {
@@ -81,19 +82,23 @@ export const Home = (): ReactElement => {
                     </div>
                 </div>
             </div>
-            <div className='col-12'>
+            <div className='col-8'>
                 <div className='card'>
                     <div className='card-content'>
                         <div className='grid justify-content-between'>
-                            <div className='col-12 md:col-9'>
+                            <div className='col-12 md:col-7'>
                                 <TasksWidget />
                             </div>
-                            <div className='col-12 md:col-3 md:text-right task-calendar p-0'>
+
+                            <div className='col-12 md:col-5 md:text-right task-calendar p-0'>
                                 <Calendar className='task-calendar__input' value={date} inline />
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className='col-4'>
+                <LatestUpdates />
             </div>
             <div className='col-12 xl:col-5'>
                 <RecentMessages />

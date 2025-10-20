@@ -1,0 +1,17 @@
+.latest-updates {
+    .latest-updates__list {
+        font-size: 16px;
+        padding-left: 0;
+        list-style: none;
+        margin-bottom: 0;
+        .latest-updates__item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            .latest-updates__item-description {
+                max-width: 70%;
+            }
+        }
+    }
+}
