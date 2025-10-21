@@ -24,6 +24,7 @@ export const LatestUpdates = ({
     const [dialogActive, setDialogActive] = useState<boolean>(false);
     const [newsData, setNewsData] = useState<News[]>([]);
     const [allNewsCount, setAllNewsCount] = useState<number>(0);
+    const [selectedNews, setSelectedNews] = useState<News | null>(null);
 
     const handleGetLatestNews = async () => {
         if (!authUser) return;
@@ -45,6 +46,21 @@ export const LatestUpdates = ({
         handleGetLatestNews();
     }, [authUser]);
 
+    const handleNewsClick = (news: News) => {
+        setSelectedNews(news);
+        setDialogActive(true);
+    };
+
+    const handleSeeMoreClick = () => {
+        setSelectedNews(null);
+        setDialogActive(true);
+    };
+
+    const handleDialogHide = () => {
+        setDialogActive(false);
+        setSelectedNews(null);
+    };
+
     return (
         <section className='card h-full latest-updates'>
             <div className='card-header latest-updates__header'>
@@ -56,6 +72,7 @@ export const LatestUpdates = ({
                         <li
                             className={`latest-updates__item ${news.index <= MAX_NEWS_COUNT_ON_PAGE ? "latest-updates__item--new" : ""}`}
                             key={news.itemuid}
+                            onClick={() => handleNewsClick(news)}
                         >
                             <span className='latest-updates__item-description'>
                                 <TruncatedText withTooltip text={news.description} />
@@ -69,7 +86,7 @@ export const LatestUpdates = ({
                 {allNewsCount > messagesShowCount && (
                     <div className='card-content__footer latest-updates__footer'>
                         <Button
-                            onClick={() => setDialogActive(true)}
+                            onClick={handleSeeMoreClick}
                             className='messages-more latest-updates__button'
                             text
                         >
@@ -78,11 +95,12 @@ export const LatestUpdates = ({
                     </div>
                 )}
             </div>
-            {authUser && (
+            {dialogActive && (
                 <LatestUpdatesDialog
-                    onHide={() => setDialogActive(false)}
+                    onHide={handleDialogHide}
                     visible={dialogActive}
                     totalCount={allNewsCount}
+                    selectedNews={selectedNews}
                 />
             )}
         </section>

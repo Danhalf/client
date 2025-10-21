@@ -3,7 +3,7 @@ import { News } from "common/models/tasks";
 import { DashboardDialog } from "dashboard/common/dialog";
 import { getLatestNews } from "http/services/tasks.service";
 import { Column } from "primereact/column";
-import { DataTableExpandedRows, DataTableRowClickEvent, DataTable } from "primereact/datatable";
+import { DataTableValue, DataTableRowClickEvent, DataTable } from "primereact/datatable";
 import { DialogProps } from "primereact/dialog";
 import { ReactElement, useState, useEffect } from "react";
 import { useStore } from "store/hooks";
@@ -13,17 +13,19 @@ import { TruncatedText } from "dashboard/common/display";
 
 interface LatestUpdatesDialogProps extends DialogProps {
     totalCount: number;
+    selectedNews?: News | null;
 }
 
 export const LatestUpdatesDialog = ({
     visible,
     onHide,
     totalCount,
+    selectedNews,
 }: LatestUpdatesDialogProps): ReactElement => {
     const store = useStore().userStore;
     const { authUser } = store;
     const [newsData, setNewsData] = useState<News[]>([]);
-    const [expandedRows, setExpandedRows] = useState<DataTableExpandedRows[]>([]);
+    const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
     const { showError } = useToastMessage();
 
     const handleGetNews = async () => {
@@ -37,13 +39,24 @@ export const LatestUpdatesDialog = ({
                 setNewsData(newsResponse);
             }
         } catch (error) {
-            showError(error as any);
+            showError(String(error));
         }
     };
 
     useEffect(() => {
         handleGetNews();
     }, []);
+
+    useEffect(() => {
+        if (visible && selectedNews && newsData.length > 0) {
+            const fullNewsData = newsData.find((news) => news.itemuid === selectedNews.itemuid);
+            if (fullNewsData) {
+                setExpandedRows([fullNewsData]);
+            }
+        } else if (visible && !selectedNews) {
+            setExpandedRows([]);
+        }
+    }, [visible, selectedNews, newsData]);
 
     const rowExpansionTemplate = (data: News) => {
         return (
