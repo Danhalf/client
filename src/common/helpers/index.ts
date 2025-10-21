@@ -150,7 +150,7 @@ export const formatDateForServer = (date: Date | number, withTimeZone?: boolean)
 
 export const parseDateFromServer = (
     date: string | number | undefined | null,
-    returnType: "date" | "datetime" = "datetime"
+    returnType: "date" | "date-with-time" | "timestamp" = "timestamp"
 ): number | string => {
     if (!date) return 0;
 
@@ -175,6 +175,10 @@ export const parseDateFromServer = (
             const padNumber = (num: number) => num.toString().padStart(2, "0");
 
             return `${padNumber(day)}.${padNumber(month)}.${year}`;
+        }
+
+        if (returnType === "date-with-time") {
+            return `${dateParts[1]}.${dateParts[0]}.${dateParts[2]} ${timeParts[0]}:${timeParts[1]}:${timeParts[2]}`;
         }
 
         return new Date(

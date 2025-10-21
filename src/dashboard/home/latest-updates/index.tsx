@@ -9,11 +9,16 @@ import { TruncatedText } from "dashboard/common/display";
 import { parseDateFromServer } from "common/helpers";
 import { LatestUpdatesDialog } from "./latest-updates-dialog";
 
+export const MAX_NEWS_COUNT_ON_PAGE = 10;
+const DEFAULT_MESSAGES_SHOW_COUNT = 4;
+
 interface LatestUpdatesProps {
     messagesShowCount?: number;
 }
 
-export const LatestUpdates = ({ messagesShowCount = 4 }: LatestUpdatesProps): ReactElement => {
+export const LatestUpdates = ({
+    messagesShowCount = DEFAULT_MESSAGES_SHOW_COUNT,
+}: LatestUpdatesProps): ReactElement => {
     const store = useStore().userStore;
     const { authUser } = store;
     const [dialogActive, setDialogActive] = useState<boolean>(false);
@@ -47,9 +52,9 @@ export const LatestUpdates = ({ messagesShowCount = 4 }: LatestUpdatesProps): Re
             </div>
             <div className='card-content latest-updates__content'>
                 <ul className='latest-updates__list'>
-                    {newsData.slice(0, messagesShowCount).map((news, index) => (
+                    {newsData.slice(0, messagesShowCount).map((news) => (
                         <li
-                            className={`latest-updates__item ${index === 0 ? "latest-updates__item--new" : ""}`}
+                            className={`latest-updates__item ${news.index <= MAX_NEWS_COUNT_ON_PAGE ? "latest-updates__item--new" : ""}`}
                             key={news.itemuid}
                         >
                             <span className='latest-updates__item-description'>

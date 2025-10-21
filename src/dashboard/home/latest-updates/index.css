@@ -1,7 +1,11 @@
+.latest-updates,
+.dialog-news {
+    --read-color: var(--admss-app-lightest-grey);
+    --unread-color: var(--admss-app-green);
+}
+
 .home-page {
     .latest-updates {
-        --read-color: var(--admss-app-lightest-grey);
-        --unread-color: var(--admss-app-green);
         &.card {
             padding-bottom: 0px;
         }
@@ -57,14 +61,75 @@
 }
 
 .dialog-news {
-    width: 50%;
-    @media (max-width: 1200px) {
-        width: 70%;
+    width: 80%;
+    height: 655px;
+    overflow: hidden;
+    .p-dialog-footer {
+        margin-bottom: 0;
     }
-    @media (max-width: 992px) {
-        width: 90%;
+}
+
+@media screen and (min-width: 1200px) {
+    .dialog-news {
+        width: 50%;
     }
-    @media (max-width: 768px) {
-        width: 100%;
+}
+
+.datatable-news.p-datatable {
+    --font-weight-new: 600;
+    --font-weight-read: 400;
+
+    height: 484px;
+    overflow-y: auto;
+    .p-datatable-thead > tr > th {
+        border: none;
+    }
+
+    .datatable-news__indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+
+        .pi-circle-fill {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            font-size: 10px;
+            &.pi-circle-fill--read {
+                color: var(--read-color);
+            }
+            &.pi-circle-fill--new {
+                color: var(--unread-color);
+            }
+        }
+    }
+
+    .datatable-news__description {
+        &.datatable-news__description--new {
+            font-weight: var(--font-weight-new);
+        }
+        &.datatable-news__description--read {
+            font-weight: var(--font-weight-read);
+        }
+    }
+
+    .datatable-news__date {
+        &.datatable-news__date--new {
+            font-weight: var(--font-weight-new);
+        }
+        &.datatable-news__date--read {
+            font-weight: var(--font-weight-read);
+        }
+    }
+
+    .news-description {
+        padding-left: 36px;
+    }
+
+    .datatable-news__indicator-cell {
+        padding-right: 0;
     }
 }
