@@ -1,17 +1,70 @@
-.latest-updates {
-    .latest-updates__list {
-        font-size: 16px;
-        padding-left: 0;
-        list-style: none;
-        margin-bottom: 0;
-        .latest-updates__item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            .latest-updates__item-description {
-                max-width: 70%;
+.home-page {
+    .latest-updates {
+        --read-color: var(--admss-app-lightest-grey);
+        --unread-color: var(--admss-app-green);
+        &.card {
+            padding-bottom: 0px;
+        }
+        .latest-updates__header {
+            margin-bottom: 0px;
+        }
+        .latest-updates__list {
+            font-size: 16px;
+            padding-left: 26px;
+            list-style: none;
+            margin-bottom: 0;
+            .latest-updates__item {
+                position: relative;
+                &:before {
+                    content: "";
+                    position: absolute;
+                    left: -26px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 10px;
+                    height: 10px;
+                    background-color: var(--read-color);
+                    border-radius: 50%;
+                }
+                cursor: pointer;
+                display: flex;
+                font-weight: 600;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 0;
+                .latest-updates__item-description {
+                    max-width: 70%;
+                }
+                &.latest-updates__item--new {
+                    font-weight: 700;
+                    &:before {
+                        background-color: var(--unread-color);
+                    }
+                }
+
+                &:hover {
+                    color: var(--unread-color);
+                }
             }
         }
+        .latest-updates__footer {
+            .p-button.messages-more {
+                padding: 0;
+                color: var(--admss-app-main-blue);
+            }
+        }
+    }
+}
+
+.dialog-news {
+    width: 50%;
+    @media (max-width: 1200px) {
+        width: 70%;
+    }
+    @media (max-width: 992px) {
+        width: 90%;
+    }
+    @media (max-width: 768px) {
+        width: 100%;
     }
 }

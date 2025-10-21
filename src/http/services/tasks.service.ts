@@ -1,5 +1,5 @@
 import { isAxiosError } from "axios";
-import { BaseResponseError, Status } from "common/models/base-response";
+import { BaseResponseError, Status, TotalListCount } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
 import { News, PostDataTask, Task, TaskStatus, TaskUser } from "common/models/tasks";
 
@@ -127,10 +127,11 @@ export const setTaskStatus = async (taskuid: string, taskStatus: TaskStatus) => 
     }
 };
 
-export const getLatestNews = async (userid: string) => {
+export const getLatestNews = async (userid: string, params?: QueryParams) => {
     try {
-        const request = await authorizedUserApiInstance.get<News[] | BaseResponseError>(
-            `tasks/${userid}/listnews`
+        const request = await authorizedUserApiInstance.get<TotalListCount | News[]>(
+            `tasks/${userid}/listnews`,
+            { params }
         );
         return request.data;
     } catch (error) {

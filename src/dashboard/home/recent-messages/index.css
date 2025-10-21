@@ -4,6 +4,7 @@
     border: none;
     cursor: pointer;
     text-decoration: underline;
+    text-underline-offset: 3px;
     font-weight: 600;
     color: var(--admss-darkest-grey);
     &:enabled:hover {

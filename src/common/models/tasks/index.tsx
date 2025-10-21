@@ -82,7 +82,7 @@ export interface AdvancedSearch {
     date: string;
 }
 
-export interface News extends BaseResponseError {
+export interface News {
     info: string;
     index: number;
     created: string;

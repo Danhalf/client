@@ -1,6 +1,5 @@
-import { useToastMessage } from "common/hooks";
 import { News } from "common/models/tasks";
-import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
+import { TotalListCount } from "common/models/base-response";
 import { getLatestNews } from "http/services/tasks.service";
 import { Button } from "primereact/button";
 import { ReactElement, useEffect, useState } from "react";
@@ -8,6 +7,7 @@ import { useStore } from "store/hooks";
 import "./index.css";
 import { TruncatedText } from "dashboard/common/display";
 import { parseDateFromServer } from "common/helpers";
+import { LatestUpdatesDialog } from "./latest-updates-dialog";
 
 interface LatestUpdatesProps {
     messagesShowCount?: number;
@@ -18,15 +18,21 @@ export const LatestUpdates = ({ messagesShowCount = 4 }: LatestUpdatesProps): Re
     const { authUser } = store;
     const [dialogActive, setDialogActive] = useState<boolean>(false);
     const [newsData, setNewsData] = useState<News[]>([]);
-    const { showError } = useToastMessage();
+    const [allNewsCount, setAllNewsCount] = useState<number>(0);
 
     const handleGetLatestNews = async () => {
         if (!authUser) return;
-        const response = await getLatestNews(authUser.useruid);
-        if (response && Array.isArray(response)) {
-            setNewsData(response);
-        } else {
-            showError(response?.error);
+        const [totalCountResponse, newsResponse] = await Promise.all([
+            getLatestNews(authUser!.useruid, { total: 1 }),
+            getLatestNews(authUser!.useruid, { top: messagesShowCount }),
+        ]);
+
+        if (totalCountResponse && !Array.isArray(totalCountResponse)) {
+            setAllNewsCount((totalCountResponse as TotalListCount).total ?? 0);
+        }
+
+        if (newsResponse && Array.isArray(newsResponse)) {
+            setNewsData(newsResponse as News[]);
         }
     };
 
@@ -41,8 +47,11 @@ export const LatestUpdates = ({ messagesShowCount = 4 }: LatestUpdatesProps): Re
             </div>
             <div className='card-content latest-updates__content'>
                 <ul className='latest-updates__list'>
-                    {newsData.slice(0, messagesShowCount).map((news) => (
-                        <li className='latest-updates__item' key={news.itemuid}>
+                    {newsData.slice(0, messagesShowCount).map((news, index) => (
+                        <li
+                            className={`latest-updates__item ${index === 0 ? "latest-updates__item--new" : ""}`}
+                            key={news.itemuid}
+                        >
                             <span className='latest-updates__item-description'>
                                 <TruncatedText withTooltip text={news.description} />
                             </span>
@@ -52,11 +61,11 @@ export const LatestUpdates = ({ messagesShowCount = 4 }: LatestUpdatesProps): Re
                         </li>
                     ))}
                 </ul>
-                {newsData.length > messagesShowCount && (
+                {allNewsCount > messagesShowCount && (
                     <div className='card-content__footer latest-updates__footer'>
                         <Button
                             onClick={() => setDialogActive(true)}
-                            className='underline messages-more latest-updates__button'
+                            className='messages-more latest-updates__button'
                             text
                         >
                             See more...
@@ -65,9 +74,10 @@ export const LatestUpdates = ({ messagesShowCount = 4 }: LatestUpdatesProps): Re
                 )}
             </div>
             {authUser && (
-                <SupportHistoryDialog
+                <LatestUpdatesDialog
                     onHide={() => setDialogActive(false)}
                     visible={dialogActive}
+                    totalCount={allNewsCount}
                 />
             )}
         </section>

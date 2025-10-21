@@ -82,22 +82,22 @@ export const Home = (): ReactElement => {
                     </div>
                 </div>
             </div>
-            <div className='col-8'>
+            <div className='col-12 lg:col-8 xl:col-7'>
                 <div className='card'>
                     <div className='card-content'>
-                        <div className='grid justify-content-between'>
-                            <div className='col-12 md:col-7'>
+                        <div className='grid lg:justify-content-between md:justify-content-center'>
+                            <div className='col-12 lg:col-6 xl:col-7'>
                                 <TasksWidget />
                             </div>
 
-                            <div className='col-12 md:col-5 md:text-right task-calendar p-0'>
+                            <div className='col-12 lg:col-6 xl:col-5 xl:text-right task-calendar p-0'>
                                 <Calendar className='task-calendar__input' value={date} inline />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='col-4'>
+            <div className='col-12 lg:col-4 xl:col-5'>
                 <LatestUpdates />
             </div>
             <div className='col-12 xl:col-5'>
