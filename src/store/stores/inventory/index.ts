@@ -40,6 +40,7 @@ import {
     getInventoryMediaItem,
     deleteMediaImage,
 } from "http/services/media.service";
+import { updateWatermark } from "http/services/settings.service";
 import { makeAutoObservable, action } from "mobx";
 import { RootStore } from "store";
 
@@ -467,10 +468,22 @@ export class InventoryStore {
                 this._isLoading = true;
 
                 const generalSettingsStore = this.rootStore.generalSettingsStore;
-                const useruid = this.rootStore.userStore.authUser?.useruid;
                 if (generalSettingsStore.isSettingsChanged) {
+                    const useruid = this.rootStore.userStore.authUser?.useruid;
                     if (useruid) {
-                        generalSettingsStore.saveSettings(this._inventory?.itemuid);
+                        const filteredSettings = Object.fromEntries(
+                            Object.entries(generalSettingsStore.settings).filter(
+                                ([key]) => !["index", "created", "updated", "status"].includes(key)
+                            )
+                        );
+
+                        const response = await updateWatermark(
+                            generalSettingsStore.settings.logomediauid,
+                            filteredSettings
+                        );
+                        if (response?.status === Status.ERROR) {
+                            return response;
+                        }
                     }
                     generalSettingsStore.isSettingsChanged = false;
                 }
