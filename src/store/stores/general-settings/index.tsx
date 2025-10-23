@@ -11,7 +11,6 @@ import {
     getWatermark,
     updatePostProcessing,
     updateUserGeneralSettings,
-    updateWatermark,
 } from "http/services/settings.service";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -248,7 +247,7 @@ export class GeneralSettingsStore {
         }
     };
 
-    public saveSettings = action(async (mediauid: string = ""): Promise<BaseResponseError> => {
+    public saveSettings = action(async (): Promise<BaseResponseError> => {
         this._isLoading = true;
         try {
             if (this._isPostProcessingChanged) {
@@ -269,9 +268,7 @@ export class GeneralSettingsStore {
                 )
             );
 
-            const response = mediauid
-                ? await updateWatermark(mediauid, filteredSettings)
-                : await updateUserGeneralSettings(filteredSettings);
+            const response = await updateUserGeneralSettings(filteredSettings);
             if (response?.status === Status.ERROR) {
                 return response;
             }
