@@ -224,7 +224,7 @@ export const ContactsIdentificationInfo = observer((): ReactElement => {
                     />
                 </div>
 
-                <div className='col-3'>
+                <div className='col-3 relative'>
                     <span className='p-float-label'>
                         <InputMask
                             name='Buyer_SS_Number'

@@ -408,6 +408,22 @@ export const ContactForm = observer((): ReactElement => {
                             formikRef.current?.setFieldTouched(formField, true, false);
                             showError(error.message);
                         });
+
+                        const serverErrorFields = response.map((error) =>
+                            error.field.toLowerCase()
+                        );
+                        const currentSectionsWithErrors: string[] = [];
+                        Object.entries(tabFields).forEach(([key, value]) => {
+                            value.forEach((field) => {
+                                const hasError = serverErrorFields.some(
+                                    (errorField) => errorField === field.toLowerCase()
+                                );
+                                if (hasError && !currentSectionsWithErrors.includes(key)) {
+                                    currentSectionsWithErrors.push(key);
+                                }
+                            });
+                        });
+                        setErrorSections(currentSectionsWithErrors);
                     } else {
                         showError(response.error);
                     }
@@ -424,10 +440,10 @@ export const ContactForm = observer((): ReactElement => {
                 const currentSectionsWithErrors: string[] = [];
                 Object.entries(tabFields).forEach(([key, value]) => {
                     value.forEach((field) => {
-                        if (
-                            sectionsWithErrors.includes(field) &&
-                            !currentSectionsWithErrors.includes(key)
-                        ) {
+                        const hasError = sectionsWithErrors.some(
+                            (errorField) => errorField.toLowerCase() === field.toLowerCase()
+                        );
+                        if (hasError && !currentSectionsWithErrors.includes(key)) {
                             currentSectionsWithErrors.push(key);
                         }
                     });
