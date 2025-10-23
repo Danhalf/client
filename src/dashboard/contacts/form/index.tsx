@@ -772,7 +772,7 @@ export const ContactForm = observer((): ReactElement => {
                                         disabled={!isContactChanged}
                                         severity={isContactChanged ? "success" : "secondary"}
                                     >
-                                        Save
+                                        {id ? "Update" : "Save"}
                                     </Button>
                                 )}
                             </div>
