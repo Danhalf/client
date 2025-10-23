@@ -53,12 +53,19 @@ export type PartialContact = Pick<
         | "CoBuyer_Last_Name"
         | "Buyer_Emp_Ext"
         | "Buyer_Emp_Phone"
+        | "Buyer_SS_Number"
     > & {
         separateContact?: boolean;
     };
 
 const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>> = {
-    [ContactAccordionItems.BUYER]: ["firstName", "lastName", "type", "businessName"],
+    [ContactAccordionItems.BUYER]: [
+        "firstName",
+        "lastName",
+        "type",
+        "businessName",
+        "Buyer_SS_Number",
+    ],
     [ContactAccordionItems.CO_BUYER]: ["CoBuyer_First_Name", "CoBuyer_Last_Name"],
     [ContactAccordionItems.CONTACTS]: ["email1", "email2", "phone1", "phone2"],
     [ContactAccordionItems.COMPANY]: ["Buyer_Emp_Ext", "Buyer_Emp_Phone"],
@@ -180,6 +187,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             message: handleValidationMessage("Last name"),
             excludeEmptyString: true,
         }),
+    Buyer_SS_Number: Yup.string(),
     separateContact: Yup.boolean(),
 });
 
@@ -390,7 +398,14 @@ export const ContactForm = observer((): ReactElement => {
                 } else {
                     if (response && Array.isArray(response)) {
                         response.forEach((error) => {
-                            formikRef.current?.setErrors({ [error.field]: error.message });
+                            const serverField = error.field.toLowerCase();
+                            const formField =
+                                Object.keys(formikRef.current?.values || {}).find(
+                                    (field) => field.toLowerCase() === serverField
+                                ) || error.field;
+
+                            formikRef.current?.setErrors({ [formField]: error.message });
+                            formikRef.current?.setFieldTouched(formField, true, false);
                             showError(error.message);
                         });
                     } else {
@@ -635,6 +650,8 @@ export const ContactForm = observer((): ReactElement => {
                                                         contactExtData.CoBuyer_First_Name || "",
                                                     CoBuyer_Last_Name:
                                                         contactExtData.CoBuyer_Last_Name || "",
+                                                    Buyer_SS_Number:
+                                                        contactExtData.Buyer_SS_Number || "",
                                                     separateContact: separateContact || false,
                                                 } as PartialContact
                                             }
