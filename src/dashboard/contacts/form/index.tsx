@@ -54,6 +54,7 @@ export type PartialContact = Pick<
         | "Buyer_Emp_Ext"
         | "Buyer_Emp_Phone"
         | "Buyer_SS_Number"
+        | "CoBuyer_SS_Number"
     > & {
         separateContact?: boolean;
     };
@@ -66,7 +67,11 @@ const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>
         "businessName",
         "Buyer_SS_Number",
     ],
-    [ContactAccordionItems.CO_BUYER]: ["CoBuyer_First_Name", "CoBuyer_Last_Name"],
+    [ContactAccordionItems.CO_BUYER]: [
+        "CoBuyer_First_Name",
+        "CoBuyer_Last_Name",
+        "CoBuyer_SS_Number",
+    ],
     [ContactAccordionItems.CONTACTS]: ["email1", "email2", "phone1", "phone2"],
     [ContactAccordionItems.COMPANY]: ["Buyer_Emp_Ext", "Buyer_Emp_Phone"],
 };
@@ -188,6 +193,7 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
             excludeEmptyString: true,
         }),
     Buyer_SS_Number: Yup.string(),
+    CoBuyer_SS_Number: Yup.string(),
     separateContact: Yup.boolean(),
 });
 
@@ -668,6 +674,8 @@ export const ContactForm = observer((): ReactElement => {
                                                         contactExtData.CoBuyer_Last_Name || "",
                                                     Buyer_SS_Number:
                                                         contactExtData.Buyer_SS_Number || "",
+                                                    CoBuyer_SS_Number:
+                                                        contactExtData.CoBuyer_SS_Number || "",
                                                     separateContact: separateContact || false,
                                                 } as PartialContact
                                             }
