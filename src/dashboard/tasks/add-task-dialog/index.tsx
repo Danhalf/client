@@ -208,6 +208,9 @@ export const AddTaskDialog = observer(
                         onRowClick={(value) => handleInputChange("accountname", value)}
                         getFullInfo={handleGetAccountInfo}
                         name='Account (optional)'
+                        onChange={({ target: { value } }) =>
+                            handleInputChange("accountname", value)
+                        }
                     />
 
                     <DealSearch
@@ -215,6 +218,7 @@ export const AddTaskDialog = observer(
                         onRowClick={(value) => handleInputChange("dealname", value)}
                         getFullInfo={handleGetDealInfo}
                         name='Deal (optional)'
+                        onChange={({ target: { value } }) => handleInputChange("dealname", value)}
                     />
 
                     <CompanySearch
@@ -222,6 +226,9 @@ export const AddTaskDialog = observer(
                         onRowClick={(value) => handleInputChange("contactname", value)}
                         getFullInfo={handleGetCompanyInfo}
                         name='Contact'
+                        onChange={({ target: { value } }) =>
+                            handleInputChange("contactname", value)
+                        }
                     />
                     <InputMask
                         type='tel'
