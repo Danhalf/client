@@ -3,15 +3,13 @@ import { useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
 import { createTask, getTasksSubUserList } from "http/services/tasks.service";
 import { DashboardDialog } from "dashboard/common/dialog";
-import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
-import { TOAST_LIFETIME } from "common/settings";
 import { DateInput } from "dashboard/common/form/inputs";
 import { InputMask } from "primereact/inputmask";
 import { useStore } from "store/hooks";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { DealSearch } from "dashboard/deals/common/deal-search";
-import { AccountSearch } from "dashboard/accounts/common/account-search";
+import { AccountSearch, ALL_FIELDS } from "dashboard/accounts/common/account-search";
 import { PostDataTask, Task, TaskUser } from "common/models/tasks";
 import { formatDateForServer, validateDates } from "common/helpers";
 import "./index.css";
@@ -20,6 +18,8 @@ import { ContactUser } from "common/models/contact";
 import { Deal } from "common/models/deals";
 import { Account } from "common/models/accounts";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { useToastMessage } from "common/hooks";
+
 enum DATE_TYPE {
     START = "startdate",
     DEADLINE = "deadline",
@@ -48,7 +48,7 @@ export const AddTaskDialog = observer(
     ({ visible, onHide, header, currentTask, onAction }: AddTaskDialogProps) => {
         const userStore = useStore().userStore;
         const { authUser } = userStore;
-        const toast = useToast();
+        const { showSuccess, showError } = useToastMessage();
         const [taskState, setTaskState] = useState<Partial<PostDataTask>>(initializeTaskState());
         const [assignToData, setAssignToData] = useState<TaskUser[] | null>(null);
         const [dateError, setDateError] = useState<string>("");
@@ -101,25 +101,22 @@ export const AddTaskDialog = observer(
         const handleSaveTaskData = async () => {
             if (!validateDates(taskState.startdate || "", taskState.deadline || "")) return;
 
+            const payload: Partial<PostDataTask> = {
+                ...taskState,
+                accountname: taskState.accountuid ? taskState.accountname : "",
+                dealname: taskState.dealuid ? taskState.dealname : "",
+                contactname: taskState.contactuid ? taskState.contactname : "",
+            };
+
             setIsSaving(true);
 
-            const response = await createTask(taskState, currentTask?.itemuid);
+            const response = await createTask(payload, currentTask?.itemuid);
 
             if (response?.status === Status.ERROR) {
-                toast.current?.show({
-                    severity: "error",
-                    summary: Status.ERROR,
-                    detail: response.error,
-                    life: TOAST_LIFETIME,
-                });
+                showError(response.error);
                 setDateError("");
             } else {
-                toast.current?.show({
-                    severity: "success",
-                    summary: "Success",
-                    detail: `Task ${currentTask ? "updated" : "created"} successfully!`,
-                    life: TOAST_LIFETIME,
-                });
+                showSuccess(`Task ${currentTask ? "updated" : "created"} successfully!`);
                 onHide();
                 onAction?.();
             }
@@ -205,12 +202,12 @@ export const AddTaskDialog = observer(
 
                     <AccountSearch
                         value={taskState.accountname?.trim() || ""}
-                        onRowClick={(value) => handleInputChange("accountname", value)}
+                        returnedField={ALL_FIELDS}
                         getFullInfo={handleGetAccountInfo}
-                        name='Account (optional)'
                         onChange={({ target: { value } }) =>
                             handleInputChange("accountname", value)
                         }
+                        name='Account (optional)'
                     />
 
                     <DealSearch
@@ -218,7 +215,6 @@ export const AddTaskDialog = observer(
                         onRowClick={(value) => handleInputChange("dealname", value)}
                         getFullInfo={handleGetDealInfo}
                         name='Deal (optional)'
-                        onChange={({ target: { value } }) => handleInputChange("dealname", value)}
                     />
 
                     <CompanySearch
@@ -226,9 +222,6 @@ export const AddTaskDialog = observer(
                         onRowClick={(value) => handleInputChange("contactname", value)}
                         getFullInfo={handleGetCompanyInfo}
                         name='Contact'
-                        onChange={({ target: { value } }) =>
-                            handleInputChange("contactname", value)
-                        }
                     />
                     <InputMask
                         type='tel'
