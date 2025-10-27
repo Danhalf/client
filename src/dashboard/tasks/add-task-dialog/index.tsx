@@ -9,7 +9,7 @@ import { InputMask } from "primereact/inputmask";
 import { useStore } from "store/hooks";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { DealSearch } from "dashboard/deals/common/deal-search";
-import { AccountSearch, ALL_FIELDS } from "dashboard/accounts/common/account-search";
+import { AccountSearch } from "dashboard/accounts/common/account-search";
 import { PostDataTask, Task, TaskUser } from "common/models/tasks";
 import { formatDateForServer, validateDates } from "common/helpers";
 import "./index.css";
@@ -19,6 +19,7 @@ import { Deal } from "common/models/deals";
 import { Account } from "common/models/accounts";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { useToastMessage } from "common/hooks";
+import { ALL_FIELDS } from "common/constants/fields";
 
 enum DATE_TYPE {
     START = "startdate",
@@ -129,6 +130,13 @@ export const AddTaskDialog = observer(
             handleInputChange("accountname", account.name);
         };
 
+        const handleAccountNameChange = (value: string) => {
+            handleInputChange("accountname", value);
+            if (taskState.accountuid) {
+                handleInputChange("accountuid", "");
+            }
+        };
+
         const handleGetCompanyInfo = (contact: ContactUser) => {
             handleInputChange("contactuid", contact.contactuid);
             handleInputChange(
@@ -139,9 +147,23 @@ export const AddTaskDialog = observer(
             );
         };
 
+        const handleContactNameChange = (value: string) => {
+            handleInputChange("contactname", value);
+            if (taskState.contactuid) {
+                handleInputChange("contactuid", "");
+            }
+        };
+
         const handleGetDealInfo = (deal: Deal) => {
             handleInputChange("dealuid", deal.dealuid);
             handleInputChange("dealname", deal.contactinfo);
+        };
+
+        const handleDealNameChange = (value: string) => {
+            handleInputChange("dealname", value);
+            if (taskState.dealuid) {
+                handleInputChange("dealuid", "");
+            }
         };
 
         return (
@@ -204,23 +226,23 @@ export const AddTaskDialog = observer(
                         value={taskState.accountname?.trim() || ""}
                         returnedField={ALL_FIELDS}
                         getFullInfo={handleGetAccountInfo}
-                        onChange={({ target: { value } }) =>
-                            handleInputChange("accountname", value)
-                        }
+                        onChange={({ target: { value } }) => handleAccountNameChange(value)}
                         name='Account (optional)'
                     />
 
                     <DealSearch
                         value={taskState.dealname?.trim() || ""}
-                        onRowClick={(value) => handleInputChange("dealname", value)}
+                        returnedField={ALL_FIELDS}
                         getFullInfo={handleGetDealInfo}
+                        onChange={({ target: { value } }) => handleDealNameChange(value)}
                         name='Deal (optional)'
                     />
 
                     <CompanySearch
                         value={taskState.contactname?.trim() || ""}
-                        onRowClick={(value) => handleInputChange("contactname", value)}
+                        returnedField={ALL_FIELDS}
                         getFullInfo={handleGetCompanyInfo}
+                        onChange={({ target: { value } }) => handleContactNameChange(value)}
                         name='Contact'
                     />
                     <InputMask

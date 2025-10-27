@@ -7,15 +7,13 @@ import { useStore } from "store/hooks";
 import { AccountInfo } from "common/models/accounts";
 import { getAccountsList } from "http/services/accounts.service";
 import { AccountsDataTable } from "dashboard/accounts";
+import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
 
 const FIELD: keyof AccountInfo = "name";
-export const ALL_FIELDS = "allFields" as const;
-
-export type RETURNED_FIELD_TYPE = keyof AccountInfo | typeof ALL_FIELDS;
 
 interface AccountSearchProps extends DropdownProps {
     onRowClick?: (accountName: string) => void;
-    returnedField?: RETURNED_FIELD_TYPE;
+    returnedField?: RETURNED_FIELD_TYPE<AccountInfo>;
     getFullInfo?: (account: AccountInfo) => void;
 }
 
