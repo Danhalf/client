@@ -2,7 +2,7 @@ import { Dialog } from "primereact/dialog";
 import { SearchInput } from "dashboard/common/form/inputs";
 import { QueryParams } from "common/models/query-params";
 import { useState } from "react";
-import { DropdownProps } from "primereact/dropdown";
+import { DropdownChangeEvent, DropdownProps } from "primereact/dropdown";
 import { Deal } from "common/models/deals";
 import { useStore } from "store/hooks";
 import { DealsDataTable } from "dashboard/deals";
@@ -61,7 +61,7 @@ export const DealSearch = ({
         setDialogVisible(false);
     };
 
-    const handleOnChange = (event: any) => {
+    const handleOnChange = (event: DropdownChangeEvent) => {
         const selectedValue = event.value;
 
         if (returnedField === ALL_FIELDS) {

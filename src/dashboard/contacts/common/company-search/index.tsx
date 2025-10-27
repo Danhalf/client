@@ -7,7 +7,7 @@ import { AuthUser } from "http/services/auth.service";
 import { getContacts, getContactsTypeList } from "http/services/contacts-service";
 import { useState, useEffect } from "react";
 import { getKeyValue } from "services/local-storage.service";
-import { DropdownProps } from "primereact/dropdown";
+import { DropdownChangeEvent, DropdownProps } from "primereact/dropdown";
 import { ContactsDataTable } from "dashboard/contacts";
 import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
 
@@ -90,7 +90,7 @@ export const CompanySearch = ({
         setDialogVisible(false);
     };
 
-    const handleOnChange = (event: any) => {
+    const handleOnChange = (event: DropdownChangeEvent) => {
         const selectedValue = event.value;
 
         if (returnedField === ALL_FIELDS) {
