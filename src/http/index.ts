@@ -73,10 +73,14 @@ export function createApiDashboardInstance(navigate: NavigateFunction) {
     );
 }
 
-export type HttpMethod = "get" | "post";
-
 export interface ApiRequestOptions {
-    method?: HttpMethod;
+    url: string;
+    config?: AxiosRequestConfig;
+    defaultError?: string;
+    returnErrorObject?: boolean;
+}
+
+export interface ApiPostOptions extends Omit<ApiRequestOptions, "config"> {
     url: string;
     data?: unknown;
     config?: AxiosRequestConfig;
@@ -84,35 +88,17 @@ export interface ApiRequestOptions {
     returnErrorObject?: boolean;
 }
 
-export const apiRequest = async <T = unknown>(
-    apiInstance: AxiosInstance,
-    options: ApiRequestOptions
-): Promise<T | BaseResponseError | undefined> => {
-    const {
-        method = "get",
-        url,
-        data,
-        config,
-        defaultError = "Unknown error.",
-        returnErrorObject = true,
-    } = options;
+export class ApiRequest {
+    private _defaultError: string = "Unknown error.";
+    private _returnErrorObject: boolean = true;
 
-    try {
-        let response;
+    constructor(private apiInstance: AxiosInstance = authorizedUserApiInstance) {}
 
-        switch (method) {
-            case "get":
-                response = await apiInstance.get<T>(url, config);
-                break;
-            case "post":
-                response = await apiInstance.post<T>(url, data, config);
-                break;
-            default:
-                throw new Error(`Unsupported HTTP method: ${method}`);
-        }
-
-        return response.data;
-    } catch (error) {
+    private handleError(
+        error: unknown,
+        defaultError: string,
+        returnErrorObject: boolean
+    ): BaseResponseError | undefined {
         if (returnErrorObject) {
             const errorMessage = isAxiosError(error)
                 ? error.response?.data?.error || defaultError
@@ -126,4 +112,41 @@ export const apiRequest = async <T = unknown>(
 
         return undefined;
     }
-};
+
+    async get<T = BaseResponseError>(
+        options: ApiRequestOptions
+    ): Promise<T | BaseResponseError | undefined> {
+        const {
+            url,
+            config,
+            defaultError = this._defaultError,
+            returnErrorObject = this._returnErrorObject,
+        } = options;
+
+        try {
+            const response = await this.apiInstance.get<T>(url, config);
+            return response.data;
+        } catch (error) {
+            return this.handleError(error, defaultError, returnErrorObject);
+        }
+    }
+
+    async post<T = BaseResponseError>(
+        options: ApiPostOptions
+    ): Promise<T | BaseResponseError | undefined> {
+        const {
+            url,
+            data,
+            config,
+            defaultError = this._defaultError,
+            returnErrorObject = this._returnErrorObject,
+        } = options;
+
+        try {
+            const response = await this.apiInstance.post<T>(url, data, config);
+            return response.data;
+        } catch (error) {
+            return this.handleError(error, defaultError, returnErrorObject);
+        }
+    }
+}

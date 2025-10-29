@@ -101,3 +101,16 @@ export interface News {
     read: boolean;
     title: string;
 }
+
+export interface Alert {
+    accepted: string;
+    alerttype: number;
+    created: string;
+    deadline: string;
+    description: string;
+    index: number;
+    itemuid: string;
+    startdate: string;
+    updated: string;
+    useruid: string;
+}
