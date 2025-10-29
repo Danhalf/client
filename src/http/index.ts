@@ -1,8 +1,9 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, isAxiosError } from "axios";
 import { getKeyValue } from "services/local-storage.service";
 import { AuthUser } from "./services/auth.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { NavigateFunction } from "react-router-dom";
+import { BaseResponseError, Status } from "common/models/base-response";
 
 export const APP_TYPE: string = process.env.REACT_APP_TYPE || "client";
 export const APP_VERSION: string = process.env.REACT_APP_VERSION || "0.1";
@@ -71,3 +72,58 @@ export function createApiDashboardInstance(navigate: NavigateFunction) {
         (error) => handleErrorResponse(error, navigate)
     );
 }
+
+export type HttpMethod = "get" | "post";
+
+export interface ApiRequestOptions {
+    method?: HttpMethod;
+    url: string;
+    data?: unknown;
+    config?: AxiosRequestConfig;
+    defaultError?: string;
+    returnErrorObject?: boolean;
+}
+
+export const apiRequest = async <T = unknown>(
+    apiInstance: AxiosInstance,
+    options: ApiRequestOptions
+): Promise<T | BaseResponseError | undefined> => {
+    const {
+        method = "get",
+        url,
+        data,
+        config,
+        defaultError = "Unknown error.",
+        returnErrorObject = true,
+    } = options;
+
+    try {
+        let response;
+
+        switch (method) {
+            case "get":
+                response = await apiInstance.get<T>(url, config);
+                break;
+            case "post":
+                response = await apiInstance.post<T>(url, data, config);
+                break;
+            default:
+                throw new Error(`Unsupported HTTP method: ${method}`);
+        }
+
+        return response.data;
+    } catch (error) {
+        if (returnErrorObject) {
+            const errorMessage = isAxiosError(error)
+                ? error.response?.data?.error || defaultError
+                : defaultError;
+
+            return {
+                status: Status.ERROR,
+                error: errorMessage,
+            } as BaseResponseError;
+        }
+
+        return undefined;
+    }
+};

@@ -12,6 +12,11 @@ export enum TaskStatus {
     DELETED = "Deleted",
 }
 
+export enum ALERT_TYPE {
+    INFO,
+    WARNING,
+    ERROR,
+}
 export interface Task {
     accountname: string;
     accountnumber: string;
