@@ -1,5 +1,8 @@
 import { ReactElement, ReactNode, createContext, useContext, useState, useCallback } from "react";
 import { DashboardDialog } from "dashboard/common/dialog";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
+import "./index.css";
+import { NOTIFICATION_TITLE_STATUS } from "common/constants/title-status";
 
 export enum NOTIFICATION_TYPE {
     INFO,
@@ -30,6 +33,8 @@ export const NotificationProvider = ({ children }: NotificationProviderProps): R
     );
     const [notificationDescription, setNotificationDescription] = useState<string>("");
 
+    const [defaultNotificationTitle] = NOTIFICATION_TITLE_STATUS;
+
     const showNotification = useCallback((options: NotificationOptions = {}) => {
         setNotificationType(options.type || NOTIFICATION_TYPE.INFO);
         setNotificationDescription(options.description || "");
@@ -44,14 +49,25 @@ export const NotificationProvider = ({ children }: NotificationProviderProps): R
         <NotificationContext.Provider value={{ showNotification, hideNotification }}>
             {children}
             <DashboardDialog
-                header={notificationType || NOTIFICATION_TYPE.INFO}
+                header={
+                    <div className='notification-header'>
+                        <i className={`pi pi-times-circle notification-header__icon`} />
+                        <div className='notification-header__title'>
+                            {notificationType || defaultNotificationTitle.name}
+                        </div>
+                    </div>
+                }
+                children={
+                    <div className='text-center w-full notification-body'>
+                        {notificationDescription}
+                    </div>
+                }
                 onHide={hideNotification}
+                className='notification'
                 visible={isVisible}
-            >
-                <div>
-                    <p>{notificationDescription}</p>
-                </div>
-            </DashboardDialog>
+                action={hideNotification}
+                footer='Got it'
+            ></DashboardDialog>
         </NotificationContext.Provider>
     );
 };
@@ -59,7 +75,7 @@ export const NotificationProvider = ({ children }: NotificationProviderProps): R
 export const useNotification = () => {
     const context = useContext(NotificationContext);
     if (context === null) {
-        throw new Error("This hook must be used within a NotificationProvider");
+        throw new Error(ERROR_MESSAGES.PROVIDER_ERROR);
     }
     return context;
 };

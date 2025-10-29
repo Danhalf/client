@@ -4,6 +4,7 @@ import { AuthUser } from "./services/auth.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { NavigateFunction } from "react-router-dom";
 import { BaseResponseError, Status } from "common/models/base-response";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 export const APP_TYPE: string = process.env.REACT_APP_TYPE || "client";
 export const APP_VERSION: string = process.env.REACT_APP_VERSION || "0.1";
@@ -89,7 +90,6 @@ export interface ApiPostOptions extends Omit<ApiRequestOptions, "config"> {
 }
 
 export class ApiRequest {
-    private _defaultError: string = "Unknown error.";
     private _returnErrorObject: boolean = true;
 
     constructor(private apiInstance: AxiosInstance = authorizedUserApiInstance) {}
@@ -119,7 +119,7 @@ export class ApiRequest {
         const {
             url,
             config,
-            defaultError = this._defaultError,
+            defaultError = ERROR_MESSAGES.API_ERROR,
             returnErrorObject = this._returnErrorObject,
         } = options;
 
@@ -138,7 +138,7 @@ export class ApiRequest {
             url,
             data,
             config,
-            defaultError = this._defaultError,
+            defaultError = ERROR_MESSAGES.API_ERROR,
             returnErrorObject = this._returnErrorObject,
         } = options;
 

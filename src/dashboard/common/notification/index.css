@@ -1,0 +1,24 @@
+.notification {
+    width: 455px;
+    height: 451px;
+    .notification-header {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .notification-header__icon {
+        font-size: 5rem;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .p-dialog-footer {
+        margin-top: auto;
+    }
+}

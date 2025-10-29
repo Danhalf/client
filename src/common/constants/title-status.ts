@@ -30,3 +30,18 @@ export const TITLE_STATUS_LIST: readonly TypeList[] = [
         id: 6,
     },
 ];
+
+export const NOTIFICATION_TITLE_STATUS: readonly TypeList[] = [
+    {
+        name: "Info",
+        id: 0,
+    },
+    {
+        name: "Warning",
+        id: 1,
+    },
+    {
+        name: "Error",
+        id: 2,
+    },
+];
