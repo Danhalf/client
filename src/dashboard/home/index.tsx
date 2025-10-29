@@ -7,7 +7,7 @@ import { RecentMessages } from "dashboard/home/recent-messages";
 import { LatestUpdates } from "dashboard/home/latest-updates";
 import "./index.css";
 import { getAlerts } from "http/services/tasks.service";
-import { useToastMessage } from "common/hooks";
+import { useNotification, useToastMessage } from "common/hooks";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
@@ -15,7 +15,7 @@ export const Home = (): ReactElement => {
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     const [date] = useState<Date | null>(null);
     const { showError } = useToastMessage();
-
+    const { showNotification } = useNotification();
     const handleGetGlobalData = async () => {
         if (!authUser || !Object.keys(authUser.permissions).length) return;
         const alerts = await getAlerts(authUser.useruid);
@@ -25,7 +25,10 @@ export const Home = (): ReactElement => {
             );
             const randomAlert = filteredAlerts[Math.floor(Math.random() * filteredAlerts.length)];
             if (randomAlert) {
-                showError(randomAlert.description);
+                showNotification({
+                    type: randomAlert.alerttype,
+                    description: randomAlert.description,
+                });
             } else {
                 showError("No alerts found");
             }
