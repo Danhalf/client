@@ -45,15 +45,45 @@ export const NotificationProvider = ({ children }: NotificationProviderProps): R
         setIsVisible(false);
     }, []);
 
+    const getNotificationModifier = () => {
+        switch (notificationType) {
+            case NOTIFICATION_TYPE.INFO:
+                return "notification--info";
+            case NOTIFICATION_TYPE.WARNING:
+                return "notification--warning";
+            case NOTIFICATION_TYPE.ERROR:
+                return "notification--error";
+            default:
+                return "notification--info";
+        }
+    };
+
+    const getNotificationTitle = () => {
+        return NOTIFICATION_TITLE_STATUS.find((title) => title.id === notificationType)?.title;
+    };
+
+    const getNotificationIcon = () => {
+        switch (notificationType) {
+            case NOTIFICATION_TYPE.INFO:
+                return "pi pi-info-circle";
+            case NOTIFICATION_TYPE.WARNING:
+                return "adms-warning";
+            case NOTIFICATION_TYPE.ERROR:
+                return "adms-warning";
+            default:
+                return "adms-info";
+        }
+    };
+
     return (
         <NotificationContext.Provider value={{ showNotification, hideNotification }}>
             {children}
             <DashboardDialog
                 header={
                     <div className='notification-header'>
-                        <i className={`pi pi-times-circle notification-header__icon`} />
+                        <i className={`${getNotificationIcon()} notification-header__icon`} />
                         <div className='notification-header__title'>
-                            {notificationType || defaultNotificationTitle.name}
+                            {getNotificationTitle() || defaultNotificationTitle.name}
                         </div>
                     </div>
                 }
@@ -63,11 +93,11 @@ export const NotificationProvider = ({ children }: NotificationProviderProps): R
                     </div>
                 }
                 onHide={hideNotification}
-                className='notification'
+                className={`notification ${getNotificationModifier()}`}
                 visible={isVisible}
                 action={hideNotification}
                 footer='Got it'
-            ></DashboardDialog>
+            />
         </NotificationContext.Provider>
     );
 };

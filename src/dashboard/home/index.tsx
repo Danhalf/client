@@ -7,32 +7,39 @@ import { RecentMessages } from "dashboard/home/recent-messages";
 import { LatestUpdates } from "dashboard/home/latest-updates";
 import "./index.css";
 import { getAlerts } from "http/services/tasks.service";
-import { useNotification, useToastMessage } from "common/hooks";
+import { useNotification } from "common/hooks";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
     const { authUser } = store;
     const [isSalesPerson, setIsSalesPerson] = useState(true);
     const [date] = useState<Date | null>(null);
-    const { showError } = useToastMessage();
     const { showNotification } = useNotification();
     const handleGetGlobalData = async () => {
         if (!authUser || !Object.keys(authUser.permissions).length) return;
-        const alerts = await getAlerts(authUser.useruid);
-        if (alerts && Array.isArray(alerts)) {
-            const filteredAlerts = alerts.filter(
-                (alert) => alert.description && !alert.description.includes("string")
-            );
-            const randomAlert = filteredAlerts[Math.floor(Math.random() * filteredAlerts.length)];
-            if (randomAlert) {
-                showNotification({
-                    type: randomAlert.alerttype,
-                    description: randomAlert.description,
-                });
-            } else {
-                showError("No alerts found");
+
+        const alertShownKey = `alert_shown_${authUser.useruid}`;
+        const wasAlertShown = sessionStorage.getItem(alertShownKey);
+
+        if (!wasAlertShown) {
+            const alerts = await getAlerts(authUser.useruid);
+            if (alerts && Array.isArray(alerts)) {
+                const filteredAlerts = alerts.filter(
+                    (alert) => alert.description && !alert.description.includes("string")
+                );
+                const lastAlert = filteredAlerts.sort(
+                    (a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
+                )[0];
+                if (lastAlert) {
+                    showNotification({
+                        type: lastAlert.alerttype,
+                        description: lastAlert.description,
+                    });
+                    sessionStorage.setItem(alertShownKey, "true");
+                }
             }
         }
+
         const { permissions } = authUser;
         const { uaSalesPerson, ...otherPermissions } = permissions;
         if (Object.values(otherPermissions).some((permission) => permission === 1)) {
