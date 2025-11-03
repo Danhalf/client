@@ -31,7 +31,7 @@ export const PasswordInput = ({
 
     const isPasswordCorrect = useMemo(() => {
         return hasValidLength && hasLowercase && hasUppercase && hasNumber && hasSpecial;
-    }, [password]);
+    }, [hasValidLength, hasLowercase, hasUppercase, hasNumber, hasSpecial]);
 
     const passwordContent = (
         <section className='password-field__content'>

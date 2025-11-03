@@ -1,8 +1,9 @@
 import { SubUser, UserData, UserRole } from "common/models/users";
 import { Status } from "common/models/base-response";
-import { getUserData, getUserRoles } from "http/services/users";
+import { createUser, getUserData, getUserRoles } from "http/services/users";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
+import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 
 const initialUserData: Partial<UserData> = {
     firstName: "",
@@ -19,6 +20,7 @@ export class UsersStore {
     public rootStore: RootStore;
     private _user: Partial<UserData> = initialUserData;
     private _userRoles: UserRole[] = [] as UserRole[];
+    private _password: string = "";
     private _passwordMismatch: boolean = false;
     protected _isLoading = false;
 
@@ -73,12 +75,29 @@ export class UsersStore {
         }
     );
 
+    public createUser = async () => {
+        const response = await createUser(this.rootStore.userStore.authUser?.useruid || "", {
+            ...this._user,
+            password: this._password,
+        } as Partial<UserData>);
+        if (response && response.status === Status.ERROR) {
+            return {
+                status: Status.ERROR,
+                error: response?.error,
+            };
+        }
+    };
+
     public get user() {
         return this._user;
     }
 
     public get userRoles() {
         return this._userRoles;
+    }
+
+    public get password() {
+        return this._password;
     }
 
     public get isLoading() {
@@ -95,9 +114,13 @@ export class UsersStore {
             !!this._user.firstName &&
             !!this._user.lastName &&
             !!this._user.loginName &&
-            !!this._user.phone1 &&
+            PHONE_NUMBER_REGEX.test(this._user.phone1 || "") &&
             !this._passwordMismatch
         );
+    }
+
+    public set password(password: string) {
+        this._password = password;
     }
 
     public set passwordMismatch(mismatch: boolean) {

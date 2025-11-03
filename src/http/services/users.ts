@@ -9,7 +9,7 @@ import {
     UserData,
     UserRole,
 } from "common/models/users";
-import { authorizedUserApiInstance } from "http/index";
+import { ApiRequest, authorizedUserApiInstance } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
     try {
@@ -243,20 +243,11 @@ export const getUserData = async (useruid: string) => {
 };
 
 export const createUser = async (useruid: string, userData: Partial<UserData>) => {
-    try {
-        const request = await authorizedUserApiInstance.post<BaseResponseError>(
-            `user/${useruid}/user`,
-            userData
-        );
-        return request.data;
-    } catch (error) {
-        if (isAxiosError(error)) {
-            return {
-                status: Status.ERROR,
-                error: error.response?.data.error || "Error while creating user",
-            };
-        }
-    }
+    return new ApiRequest().post({
+        url: `user/${useruid}/user`,
+        data: userData,
+        defaultError: "Error while creating user",
+    });
 };
 
 export const generateNewPassword = async (useruid: string) => {

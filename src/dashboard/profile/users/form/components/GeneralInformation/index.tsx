@@ -33,9 +33,8 @@ export const GeneralInformation = observer((): ReactElement => {
     const authUserStore = useStore().userStore;
     const { authUser } = authUserStore;
     const usersStore = useStore().usersStore;
-    const { user, changeUserData } = usersStore;
+    const { user, changeUserData, password } = usersStore;
     const { showError, showSuccess } = useToastMessage();
-    const [password, setPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
 
@@ -56,7 +55,7 @@ export const GeneralInformation = observer((): ReactElement => {
         const response = await generateNewPassword(authUser.useruid);
         if (response && !response.error) {
             const data = response as GenerateNewPasswordResponse;
-            setPassword(data.password);
+            usersStore.password = data.password;
             setConfirmPassword(data.password);
             setPasswordsMismatch(false);
             usersStore.passwordMismatch = false;
@@ -161,7 +160,7 @@ export const GeneralInformation = observer((): ReactElement => {
                 <div className='col-4'>
                     <PasswordInput
                         password={password}
-                        setPassword={setPassword}
+                        setPassword={(password) => (usersStore.password = password)}
                         error={passwordsMismatch}
                         onBlur={handlePasswordsBlur}
                     />
