@@ -83,7 +83,9 @@
 }
 
 .sidebar-nav__link span {
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
 }
 
 .sidebar-nav__label--hidden {
@@ -105,7 +107,9 @@
     background-position: center;
     background-size: 100%;
     background-repeat: no-repeat;
-    transition: width 0.3s ease, height 0.3s ease;
+    transition:
+        width 0.3s ease,
+        height 0.3s ease;
 }
 
 .sidebar-nav__icon.home {

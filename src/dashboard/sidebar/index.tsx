@@ -19,11 +19,12 @@ export const Sidebar = observer((): ReactElement => {
     const store = useStore().userStore;
     const { authUser, settings } = store;
     const [isSalesPerson, setIsSalesPerson] = useState(true);
+    const [isInitialRender, setIsInitialRender] = useState(true);
 
     useEffect(() => {
         if (authUser) {
-            settings.isSidebarCollapsed = true;
             store.isSettingsLoaded = true;
+            setIsInitialRender(false);
         }
     }, [authUser]);
 
@@ -71,7 +72,7 @@ export const Sidebar = observer((): ReactElement => {
 
     return (
         <aside
-            className={`sidebar hidden lg:block ${settings.isSidebarCollapsed ? "collapsed" : ""}`}
+            className={`sidebar hidden lg:block ${settings.isSidebarCollapsed ? "collapsed" : ""} ${isInitialRender ? "no-transition" : ""}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
