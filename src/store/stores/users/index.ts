@@ -19,12 +19,14 @@ export class UsersStore {
     public rootStore: RootStore;
     private _user: Partial<UserData> = initialUserData;
     private _userRoles: UserRole[] = [] as UserRole[];
+    private _passwordMismatch: boolean = false;
     protected _isLoading = false;
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
     }
+
     public getCurrentUser = async (useruid: string) => {
         this._isLoading = true;
         try {
@@ -87,4 +89,18 @@ export class UsersStore {
         this._user = initialUserData;
         this._userRoles = [] as UserRole[];
     });
+
+    public get isFormValid(): boolean {
+        return (
+            !!this._user.firstName &&
+            !!this._user.lastName &&
+            !!this._user.loginName &&
+            !!this._user.phone1 &&
+            !this._passwordMismatch
+        );
+    }
+
+    public set passwordMismatch(mismatch: boolean) {
+        this._passwordMismatch = mismatch;
+    }
 }

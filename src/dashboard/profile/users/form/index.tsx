@@ -22,9 +22,8 @@ export const UsersForm = observer((): ReactElement => {
     const { showError, showInfo } = useToastMessage();
     const [searchParams, setSearchParams] = useSearchParams();
     const usersStore = useStore().usersStore;
-    const { getCurrentUser, getCurrentUserRoles, currentUserClear, user } = usersStore;
+    const { getCurrentUser, getCurrentUserRoles, currentUserClear, user, isFormValid } = usersStore;
     const hasShownInfo = useRef(false);
-
     const handleGetCurrentUser = async (useruid: string) => {
         const response = await getCurrentUser(useruid);
         if (response && response.error) {
@@ -133,7 +132,12 @@ export const UsersForm = observer((): ReactElement => {
                     >
                         Cancel
                     </Button>
-                    <Button className='uppercase px-6 form__button' severity='success' disabled>
+                    <Button
+                        className='uppercase px-6 form__button'
+                        severity={isFormValid ? "success" : "secondary"}
+                        type='submit'
+                        disabled={!isFormValid}
+                    >
                         Save
                     </Button>
                 </div>

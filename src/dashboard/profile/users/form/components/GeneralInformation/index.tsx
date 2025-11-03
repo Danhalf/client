@@ -42,9 +42,12 @@ export const GeneralInformation = observer((): ReactElement => {
     const handlePasswordsBlur = () => {
         const bothFilled = password.length > 0 && confirmPassword.length > 0;
         if (bothFilled) {
-            setPasswordsMismatch(password !== confirmPassword);
+            const mismatch = password !== confirmPassword;
+            setPasswordsMismatch(mismatch);
+            usersStore.passwordMismatch = mismatch;
         } else {
             setPasswordsMismatch(false);
+            usersStore.passwordMismatch = false;
         }
     };
 
@@ -56,6 +59,7 @@ export const GeneralInformation = observer((): ReactElement => {
             setPassword(data.password);
             setConfirmPassword(data.password);
             setPasswordsMismatch(false);
+            usersStore.passwordMismatch = false;
             showSuccess(`Password generated successfully: ${data.password}`);
         } else {
             showError(response?.error);
