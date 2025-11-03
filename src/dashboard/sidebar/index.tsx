@@ -55,7 +55,15 @@ export const Sidebar = observer((): ReactElement => {
                 )}
                 <Link to={to} id={itemId} className='sidebar-nav__link'>
                     <div className={`sidebar-nav__icon ${iconClass}`}></div>
-                    {!settings.isSidebarCollapsed && <span>{label}</span>}
+                    <span
+                        className={
+                            settings.isSidebarCollapsed
+                                ? "sidebar-nav__label--hidden"
+                                : "sidebar-nav__label--visible"
+                        }
+                    >
+                        {label}
+                    </span>
                 </Link>
             </li>
         );
