@@ -4,16 +4,6 @@ import { CheckboxChangeEvent } from "primereact/checkbox";
 import { ReactElement, useState } from "react";
 
 export const RolesDeals = observer((): ReactElement => {
-    //     Select All
-    // Add Credit and Fees
-    // Add Deals
-    // Add Expenses
-    // Edit Deal Washout
-    // Edit Deals
-    // Print Deals Forms
-    // View Deals
-    // View Costs and Expenses
-    // Delete Deal
     const [selectAll, setSelectAll] = useState<boolean>(false);
     const [addCreditAndFees, setAddCreditAndFees] = useState<boolean>(false);
     const [addDeals, setAddDeals] = useState<boolean>(false);
