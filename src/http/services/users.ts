@@ -122,3 +122,17 @@ export const generateNewPassword = async (useruid: string) => {
         defaultError: "Error while generating new password",
     });
 };
+
+export const deleteUserRole = async (roleuid: string) => {
+    return new ApiRequest().post({
+        url: `user/${roleuid}/deleterole`,
+        defaultError: "Error while deleting user role",
+    });
+};
+
+export const copyUserRole = async (roleuid: string) => {
+    return new ApiRequest().post({
+        url: `user/${roleuid}/copyrole`,
+        defaultError: "Error while copying user role",
+    });
+};

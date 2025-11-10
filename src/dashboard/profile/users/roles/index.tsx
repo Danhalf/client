@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { DataTable } from "primereact/datatable";
-import { getUserRoles } from "http/services/users";
+import { copyUserRole, deleteUserRole, getUserRoles } from "http/services/users";
 import { UserRole } from "common/models/users";
 import { Column, ColumnProps } from "primereact/column";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +25,7 @@ const TABLE_HEIGHT = `calc(100% - ${PAGINATOR_HEIGHT}px)`;
 
 enum USER_ROLE_MODAL_MESSAGE {
     COPY_ROLE = "Do you really want to copy this role?",
-    DELETE_ROLE = "Do you really want to delete this role? This process cannot be undone.",
+    DELETE_ROLE = "Do you really want to delete this role?",
 }
 
 export const UsersRoles = observer((): ReactElement => {
@@ -79,9 +79,21 @@ export const UsersRoles = observer((): ReactElement => {
 
     const executeCopyUserRole = async (data: UserRole) => {
         setConfirmVisible(false);
+        const response = await copyUserRole(data.roleuid);
+        if (response && response.error) {
+            showError(response?.error);
+        } else {
+            handleGetUserRoles();
+        }
     };
 
     const executeDeleteUserRole = async (data: UserRole) => {
+        const response = await deleteUserRole(data.roleuid);
+        if (response && response.error) {
+            showError(response?.error);
+        } else {
+            handleGetUserRoles();
+        }
         setConfirmVisible(false);
     };
 

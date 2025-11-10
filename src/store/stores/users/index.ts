@@ -91,19 +91,34 @@ export class UsersStore {
         }
     };
 
-    public changeUserData = action(
-        (
-            keyOrEntries: keyof UserData | [keyof UserData, string | number][],
-            value?: string | number | undefined
-        ) => {
-            if (value === undefined) value = "";
+    public changeCurrentRole = action(
+        <K extends keyof UserRole>(keyOrEntries: K | [K, UserRole[K]][], value?: UserRole[K]) => {
+            if (!this._currentRole) return;
 
             if (Array.isArray(keyOrEntries)) {
                 keyOrEntries.forEach(([key, val]) => {
-                    this._user[key] = val as never;
+                    if (this._currentRole) {
+                        this._currentRole[key] = val;
+                    }
                 });
             } else {
-                this._user[keyOrEntries] = value as never;
+                if (value !== undefined) {
+                    this._currentRole[keyOrEntries] = value;
+                }
+            }
+        }
+    );
+
+    public changeUserData = action(
+        <K extends keyof UserData>(keyOrEntries: K | [K, UserData[K]][], value?: UserData[K]) => {
+            if (Array.isArray(keyOrEntries)) {
+                keyOrEntries.forEach(([key, val]) => {
+                    this._user[key] = val;
+                });
+            } else {
+                if (value !== undefined) {
+                    this._user[keyOrEntries] = value;
+                }
             }
         }
     );

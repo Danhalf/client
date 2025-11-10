@@ -14,6 +14,7 @@ import { RolesSettings } from "dashboard/profile/users/roles/form/settings";
 import { RolesOther } from "dashboard/profile/users/roles/form/other";
 import { useStore } from "store/hooks";
 import { CREATE_ID, USERS_PAGE } from "common/constants/links";
+import { TruncatedText } from "dashboard/common/display";
 
 interface TabItem {
     tabName: string;
@@ -34,8 +35,7 @@ export const UsersRolesForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
     const usersStore = useStore().usersStore;
-    const { getCurrentRole } = usersStore;
-    const [roleName, setRoleName] = useState<string>("");
+    const { getCurrentRole, currentRole, changeCurrentRole } = usersStore;
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 
     useEffect(() => {
@@ -77,18 +77,34 @@ export const UsersRolesForm = observer((): ReactElement => {
             <div className='col-12'>
                 <div className='card'>
                     <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>CREATE NEW ROLE</h2>
+                        <h2 className='card-header__title uppercase m-0'>
+                            {id === CREATE_ID ? "Create new" : "Edit"} Role
+                        </h2>
                     </div>
                     <div className='roles-content'>
                         <div className='roles-sidebar'>
-                            <div className='roles-list'>New role</div>
+                            <div className='roles-list pr-2'>
+                                <TruncatedText
+                                    text={
+                                        id === CREATE_ID ? "New role" : currentRole?.rolename || ""
+                                    }
+                                    withTooltip={true}
+                                    tooltipOptions={{
+                                        position: "mouse",
+                                        content:
+                                            id === CREATE_ID ? "New role" : currentRole?.rolename,
+                                    }}
+                                />
+                            </div>
                         </div>
                         <div className='roles-main'>
                             <div className='roles-main__header'>
                                 <span className='p-float-label'>
                                     <InputText
-                                        value={roleName}
-                                        onChange={(event) => setRoleName(event.target.value)}
+                                        value={currentRole?.rolename}
+                                        onChange={(event) =>
+                                            changeCurrentRole("rolename", event.target.value)
+                                        }
                                         className='roles-main__input'
                                     />
                                     <label className='float-label'>Role name (required)</label>
@@ -111,36 +127,34 @@ export const UsersRolesForm = observer((): ReactElement => {
                                     );
                                 })}
                             </TabView>
-                            <div className='roles-main__buttons'>
-                                <Button
-                                    onClick={handleBackClick}
-                                    className='uppercase px-6'
-                                    outlined
-                                >
-                                    Back
-                                </Button>
-                                <Button
-                                    onClick={handleNextClick}
-                                    disabled={activeTabIndex >= tabItems.length - 1}
-                                    severity={
-                                        activeTabIndex >= tabItems.length - 1
-                                            ? "secondary"
-                                            : "success"
-                                    }
-                                    className='uppercase px-6'
-                                    outlined
-                                >
-                                    Next
-                                </Button>
-                                <Button
-                                    onClick={handleSaveClick}
-                                    className='uppercase px-6'
-                                    severity='success'
-                                >
-                                    Save
-                                </Button>
-                            </div>
                         </div>
+                    </div>{" "}
+                    <div className='roles-main__buttons'>
+                        <Button
+                            onClick={handleBackClick}
+                            className='form__button uppercase'
+                            outlined
+                        >
+                            Back
+                        </Button>
+                        <Button
+                            onClick={handleNextClick}
+                            disabled={activeTabIndex >= tabItems.length - 1}
+                            severity={
+                                activeTabIndex >= tabItems.length - 1 ? "secondary" : "success"
+                            }
+                            className='form__button uppercase'
+                            outlined
+                        >
+                            Next
+                        </Button>
+                        <Button
+                            onClick={handleSaveClick}
+                            className='form__button uppercase'
+                            severity='success'
+                        >
+                            Save
+                        </Button>
                     </div>
                 </div>
             </div>
