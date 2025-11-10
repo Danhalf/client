@@ -1,62 +1,52 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
-import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
+import { DataTable } from "primereact/datatable";
 import { getUserRoles } from "http/services/users";
 import { UserRole } from "common/models/users";
-import { QueryParams } from "common/models/query-params";
-import { Column } from "primereact/column";
-import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
+import { Column, ColumnProps } from "primereact/column";
 import { useNavigate } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import { Button } from "primereact/button";
-import { ROWS_PER_PAGE } from "common/settings";
 import { useToastMessage } from "common/hooks";
 import { Loader } from "dashboard/common/loader";
 import "./index.css";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { DataTableColumnResizeEndEvent } from "primereact/datatable";
-import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { USERS_PAGE } from "common/constants/links";
-import { UsersUserSettings } from "common/models/user";
 import { TruncatedText } from "dashboard/common/display";
+
+export type UserRoleColumnProps = Omit<ColumnProps, "field"> & {
+    field?: keyof UserRole;
+};
+
+export const UserRoleColumn = (props: UserRoleColumnProps) => <Column {...props} />;
 
 const PAGINATOR_HEIGHT = 86;
 const TABLE_HEIGHT = `calc(100% - ${PAGINATOR_HEIGHT}px)`;
 
 enum USER_ROLE_MODAL_MESSAGE {
-    COPY_ROLE = "Are you sure you want to copy this role?",
-    DELETE_ROLE = "Are you sure you want to delete this role?",
+    COPY_ROLE = "Do you really want to copy this role?",
+    DELETE_ROLE = "Do you really want to delete this role? This process cannot be undone.",
 }
 
 export const UsersRoles = observer((): ReactElement => {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [userRoles, setUserRoles] = useState<UserRole[]>([]);
-    const [totalRecords, setTotalRecords] = useState<number>(0);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const dataTableRef = useRef<DataTable<UserRole[]>>(null);
-    const [columnWidths, setColumnWidths] = useState<{ field: string; width: number }[]>([]);
-    const { serverSettings, setModuleSettings } = useUserProfileSettings<
-        UsersUserSettings,
-        { field: string; header?: unknown }
-    >("users", [
-        { field: "roleName", header: "Role name" },
-        { field: "createdByUsername", header: "Created by" },
-        { field: "created", header: "Date" },
-    ]);
     const { showError } = useToastMessage();
     const navigate = useNavigate();
     const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
     const [selectedUserRole, setSelectedUserRole] = useState<UserRole | null>(null);
+    const [confirmMessage, setConfirmMessage] = useState<string>("");
+    const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
 
-    const handleGetUserRoles = async (params?: QueryParams) => {
+    const handleGetUserRoles = async () => {
         if (!authUser) return;
         setIsLoading(true);
-        const response = await getUserRoles(authUser.useruid, params);
+        const response = await getUserRoles(authUser.useruid);
 
         if (response && Array.isArray(response)) {
-            setTotalRecords(response.length);
             setUserRoles(response);
         } else {
             showError(response?.error);
@@ -67,42 +57,6 @@ export const UsersRoles = observer((): ReactElement => {
     useEffect(() => {
         handleGetUserRoles();
     }, []);
-
-    useEffect(() => {
-        if (dataTableRef.current) {
-            const table = dataTableRef.current.getTable();
-            const columns = table.querySelectorAll("th");
-            const columnWidths = Array.from(columns).map((column, index) => {
-                return {
-                    field: `column_${index}`,
-                    width: column.offsetWidth,
-                };
-            });
-            setColumnWidths(columnWidths);
-        }
-    }, [userRoles]);
-
-    const pageChanged = (event: DataTablePageEvent) => {
-        setLazyState(event);
-    };
-
-    const sortData = (event: DataTableSortEvent) => {
-        setLazyState(event);
-    };
-
-    const handleColumnResize = (event: DataTableColumnResizeEndEvent) => {
-        if (event.column.props.field) {
-            const newColumnWidth = {
-                [event.column.props.field as string]: event.element.offsetWidth,
-            };
-            setModuleSettings({
-                columnWidth: {
-                    ...serverSettings?.users?.columnWidth,
-                    ...newColumnWidth,
-                },
-            });
-        }
-    };
 
     const handleAddNewUserRole = () => {
         navigate(USERS_PAGE.ROLES_CREATE());
@@ -117,9 +71,32 @@ export const UsersRoles = observer((): ReactElement => {
                     content: data.rolename,
                 }}
                 data-field='rolename'
+                className='roles-table-row__rolename'
                 text={data.rolename}
             />
         );
+    };
+
+    const executeCopyUserRole = async (data: UserRole) => {
+        setConfirmVisible(false);
+    };
+
+    const executeDeleteUserRole = async (data: UserRole) => {
+        setConfirmVisible(false);
+    };
+
+    const handleCopyUserRole = (data: UserRole) => {
+        setSelectedUserRole(data);
+        setConfirmVisible(true);
+        setConfirmMessage(USER_ROLE_MODAL_MESSAGE.COPY_ROLE);
+        setConfirmAction(() => () => executeCopyUserRole(data));
+    };
+
+    const handleDeleteUserRole = (data: UserRole) => {
+        setSelectedUserRole(data);
+        setConfirmVisible(true);
+        setConfirmMessage(USER_ROLE_MODAL_MESSAGE.DELETE_ROLE);
+        setConfirmAction(() => () => executeDeleteUserRole(data));
     };
 
     return (
@@ -131,9 +108,9 @@ export const UsersRoles = observer((): ReactElement => {
                     </div>
                     <div className='card-content'>
                         <div className='grid'>
-                            <div className='col-12'>
+                            <div className='col-12 flex justify-content-end'>
                                 <Button
-                                    className='p-button new-role-button ml-auto'
+                                    className='p-button new-role-button'
                                     onClick={handleAddNewUserRole}
                                 >
                                     New Role
@@ -149,23 +126,15 @@ export const UsersRoles = observer((): ReactElement => {
                                         ref={dataTableRef}
                                         showGridlines
                                         value={userRoles}
-                                        lazy
                                         paginator
                                         scrollable
                                         scrollHeight='70vh'
-                                        first={lazyState.first}
-                                        rows={lazyState.rows}
-                                        rowsPerPageOptions={ROWS_PER_PAGE}
-                                        totalRecords={totalRecords || 1}
-                                        onPage={pageChanged}
-                                        onSort={sortData}
-                                        sortOrder={lazyState.sortOrder}
-                                        sortField={lazyState.sortField}
-                                        resizableColumns
-                                        onColumnResizeEnd={handleColumnResize}
+                                        rows={10}
+                                        className='roles-table'
                                         rowClassName={() =>
-                                            "hover:text-primary cursor-pointer users-table-row"
+                                            "hover:text-primary cursor-pointer roles-table-row"
                                         }
+                                        tableStyle={{ tableLayout: "fixed", width: "100%" }}
                                         pt={{
                                             resizeHelper: {
                                                 style: {
@@ -177,11 +146,15 @@ export const UsersRoles = observer((): ReactElement => {
                                         <Column
                                             bodyStyle={{ textAlign: "center" }}
                                             resizeable={false}
-                                            body={({ roleuid }: UserRole) => {
+                                            body={({ roleuid, isDefault }: UserRole) => {
                                                 return (
                                                     <Button
                                                         text
                                                         className='table-edit-button'
+                                                        disabled={!!isDefault}
+                                                        severity={
+                                                            !!isDefault ? "secondary" : "success"
+                                                        }
                                                         icon='adms-edit-item'
                                                         tooltip='Edit role'
                                                         tooltipOptions={{ position: "mouse" }}
@@ -202,52 +175,27 @@ export const UsersRoles = observer((): ReactElement => {
                                                 },
                                             }}
                                         />
-                                        <Column
-                                            field='rolename'
-                                            header='Role name'
-                                            sortable
-                                            body={roleNameColumn}
-                                            pt={{
-                                                root: {
-                                                    style: {
-                                                        width: serverSettings?.users?.columnWidth?.[
-                                                            "rolename"
-                                                        ],
-                                                        maxWidth:
-                                                            serverSettings?.users?.columnWidth?.[
-                                                                "rolename"
-                                                            ],
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                        <Column
+                                        <UserRoleColumn
                                             field='rolename'
                                             header='Role'
-                                            sortable
-                                            resizeable={false}
-                                            body={(data: UserRole) => {
-                                                return (
-                                                    <span data-field='rolename'>
-                                                        {data.rolename}
-                                                    </span>
-                                                );
-                                            }}
-                                            pt={{
-                                                root: {
-                                                    style: {
-                                                        width: serverSettings?.users?.columnWidth?.[
-                                                            "rolename"
-                                                        ],
-                                                        maxWidth:
-                                                            serverSettings?.users?.columnWidth?.[
-                                                                "rolename"
-                                                            ],
-                                                    },
-                                                },
-                                            }}
+                                            body={roleNameColumn}
+                                            className='roles-table-row__rolename'
+                                            style={{ width: "20%", maxWidth: "20%" }}
                                         />
-                                        <Column
+                                        <UserRoleColumn
+                                            field='isDefault'
+                                            body={({ isDefault }: UserRole) => {
+                                                return <span>{isDefault ? "System" : null}</span>;
+                                            }}
+                                            header='Created By'
+                                            style={{ width: "30%" }}
+                                        />
+                                        <UserRoleColumn
+                                            field='created'
+                                            header='Date'
+                                            style={{ width: "30%" }}
+                                        />
+                                        <UserRoleColumn
                                             bodyStyle={{ textAlign: "center" }}
                                             body={(data: UserRole) => {
                                                 return (
@@ -255,21 +203,35 @@ export const UsersRoles = observer((): ReactElement => {
                                                         <Button
                                                             text
                                                             className='table-copy-button'
-                                                            icon='adms-copy-item'
+                                                            disabled={!!data.isDefault}
+                                                            icon='adms-copy'
                                                             tooltip='Copy role'
+                                                            severity={
+                                                                !!data.isDefault
+                                                                    ? "secondary"
+                                                                    : "success"
+                                                            }
                                                             tooltipOptions={{ position: "mouse" }}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
+                                                                handleCopyUserRole(data);
                                                             }}
                                                         />
                                                         <Button
                                                             text
                                                             className='table-delete-button'
-                                                            icon='adms-delete-item'
+                                                            disabled={!!data.isDefault}
+                                                            icon='adms-trash-can'
                                                             tooltip='Delete role'
+                                                            severity={
+                                                                !!data.isDefault
+                                                                    ? "secondary"
+                                                                    : "danger"
+                                                            }
                                                             tooltipOptions={{ position: "mouse" }}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
+                                                                handleDeleteUserRole(data);
                                                             }}
                                                         />
                                                     </>
@@ -296,9 +258,9 @@ export const UsersRoles = observer((): ReactElement => {
                     visible={confirmVisible}
                     onHide={() => setConfirmVisible(false)}
                     icon='adms-warning'
-                    title={USER_ROLE_MODAL_MESSAGE.COPY_ROLE}
-                    bodyMessage={USER_ROLE_MODAL_MESSAGE.COPY_ROLE}
-                    confirmAction={() => {}}
+                    title={`Are you sure?`}
+                    bodyMessage={confirmMessage}
+                    confirmAction={confirmAction}
                     rejectAction={() => setConfirmVisible(false)}
                     rejectLabel='Cancel'
                     acceptLabel='Confirm'

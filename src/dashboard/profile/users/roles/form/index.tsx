@@ -13,7 +13,7 @@ import { RolesReports } from "dashboard/profile/users/roles/form/reports";
 import { RolesSettings } from "dashboard/profile/users/roles/form/settings";
 import { RolesOther } from "dashboard/profile/users/roles/form/other";
 import { useStore } from "store/hooks";
-import { CREATE_ID } from "common/constants/links";
+import { CREATE_ID, USERS_PAGE } from "common/constants/links";
 
 interface TabItem {
     tabName: string;
@@ -51,6 +51,9 @@ export const UsersRolesForm = observer((): ReactElement => {
     const handleBackClick = () => {
         const newIndex = Math.max(activeTabIndex - 1, 0);
         setActiveTabIndex(newIndex);
+        if (newIndex <= 0) {
+            navigate(USERS_PAGE.ROLES());
+        }
     };
 
     const handleNextClick = () => {
@@ -112,8 +115,6 @@ export const UsersRolesForm = observer((): ReactElement => {
                                 <Button
                                     onClick={handleBackClick}
                                     className='uppercase px-6'
-                                    disabled={activeTabIndex <= 0}
-                                    severity={activeTabIndex <= 0 ? "secondary" : "success"}
                                     outlined
                                 >
                                     Back
