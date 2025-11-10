@@ -1,5 +1,6 @@
+import { BaseResponseError } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
-import { UserData } from "common/models/users";
+import { UserData, UserRole } from "common/models/users";
 import { ApiRequest } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
@@ -34,7 +35,7 @@ export const getUserRole = async (useruid: string) => {
 };
 
 export const getRoleInfo = async (roleuid: string) => {
-    return new ApiRequest().get({
+    return new ApiRequest().get<UserRole | BaseResponseError>({
         url: `user/${roleuid}/role`,
         defaultError: "Error while getting role info",
     });

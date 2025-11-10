@@ -1,6 +1,6 @@
 import { SubUser, UserData, UserRole } from "common/models/users";
-import { Status } from "common/models/base-response";
-import { createUser, getUserData, getUserRoles } from "http/services/users";
+import { BaseResponseError, Status } from "common/models/base-response";
+import { createUser, getRoleInfo, getUserData, getUserRoles } from "http/services/users";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 import { PHONE_NUMBER_REGEX } from "common/constants/regex";
@@ -20,14 +20,47 @@ export class UsersStore {
     public rootStore: RootStore;
     private _user: Partial<UserData> = initialUserData;
     private _userRoles: UserRole[] = [] as UserRole[];
+    private _currentRole: UserRole | null = null;
     private _password: string = "";
     private _passwordMismatch: boolean = false;
     protected _isLoading = false;
+
+    public get user() {
+        return this._user;
+    }
+
+    public get userRoles() {
+        return this._userRoles;
+    }
+
+    public get password() {
+        return this._password;
+    }
+
+    public get isLoading() {
+        return this._isLoading;
+    }
+
+    public get currentRole() {
+        return this._currentRole;
+    }
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
     }
+
+    public getCurrentRole = async (roleuid: string) => {
+        const response = await getRoleInfo(roleuid);
+        if (response && "status" in response && response.status === Status.ERROR) {
+            return {
+                status: Status.ERROR,
+                error: (response as BaseResponseError).error,
+            };
+        } else {
+            this._currentRole = response as UserRole;
+        }
+    };
 
     public getCurrentUser = async (useruid: string) => {
         this._isLoading = true;
@@ -88,22 +121,6 @@ export class UsersStore {
         }
     };
 
-    public get user() {
-        return this._user;
-    }
-
-    public get userRoles() {
-        return this._userRoles;
-    }
-
-    public get password() {
-        return this._password;
-    }
-
-    public get isLoading() {
-        return this._isLoading;
-    }
-
     public currentUserClear = action(() => {
         this._user = initialUserData;
         this._userRoles = [] as UserRole[];
@@ -125,5 +142,9 @@ export class UsersStore {
 
     public set passwordMismatch(mismatch: boolean) {
         this._passwordMismatch = mismatch;
+    }
+
+    public set currentRole(role: UserRole | null) {
+        this._currentRole = role;
     }
 }
