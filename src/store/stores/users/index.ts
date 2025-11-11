@@ -161,6 +161,23 @@ export class UsersStore {
         return this._currentRole.permissions[permissionName] === 1;
     };
 
+    public togglePermissionsGroup = action((permissionKeys?: readonly PermissionKey[]): boolean => {
+        if (!this._currentRole) return false;
+
+        const keysToToggle = permissionKeys ?? PERMISSION_KEYS;
+        const allChecked = keysToToggle.every((key) => this.hasRolePermission(key));
+        const newValue = allChecked ? 0 : 1;
+
+        const updatedPermissions = { ...this._currentRole.permissions };
+        keysToToggle.forEach((key) => {
+            updatedPermissions[key] = newValue;
+        });
+
+        this._currentRole.permissions = updatedPermissions;
+
+        return !allChecked;
+    });
+
     public get currentRolePermissions(): Record<PermissionKey, 0 | 1> | {} {
         if (!this._currentRole) return {};
         return this._currentRole.permissions;

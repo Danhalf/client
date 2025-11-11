@@ -37,8 +37,14 @@ export const UsersRolesForm = observer((): ReactElement => {
     const { id } = useParams();
     const usersStore = useStore().usersStore;
     const { showError, showSuccess } = useToastMessage();
-    const { getCurrentRole, currentRole, changeCurrentRole, saveCurrentRole, createNewRole } =
-        usersStore;
+    const {
+        getCurrentRole,
+        currentRole,
+        changeCurrentRole,
+        saveCurrentRole,
+        createNewRole,
+        togglePermissionsGroup,
+    } = usersStore;
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 
     useEffect(() => {
@@ -126,7 +132,10 @@ export const UsersRolesForm = observer((): ReactElement => {
                                     <label className='float-label'>Role name (required)</label>
                                 </span>
                                 <label className='roles-main__select-all'>
-                                    <input type='checkbox' />
+                                    <input
+                                        type='checkbox'
+                                        onChange={() => togglePermissionsGroup()}
+                                    />
                                     <span>Select All</span>
                                 </label>
                             </div>
