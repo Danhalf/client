@@ -15,6 +15,7 @@ import { RolesOther } from "dashboard/profile/users/roles/form/other";
 import { useStore } from "store/hooks";
 import { CREATE_ID, USERS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
+import { useToastMessage } from "common/hooks";
 
 interface TabItem {
     tabName: string;
@@ -35,11 +36,15 @@ export const UsersRolesForm = observer((): ReactElement => {
     const navigate = useNavigate();
     const { id } = useParams();
     const usersStore = useStore().usersStore;
-    const { getCurrentRole, currentRole, changeCurrentRole } = usersStore;
+    const { showError, showSuccess } = useToastMessage();
+    const { getCurrentRole, currentRole, changeCurrentRole, saveCurrentRole, createNewRole } =
+        usersStore;
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 
     useEffect(() => {
-        if (id && id !== CREATE_ID) {
+        if (id === CREATE_ID) {
+            createNewRole();
+        } else if (id) {
             getCurrentRole(id);
         }
     }, [id]);
@@ -61,14 +66,25 @@ export const UsersRolesForm = observer((): ReactElement => {
         setActiveTabIndex(newIndex);
     };
 
-    const handleSaveClick = () => {};
+    const handleSaveClick = async () => {
+        if (!currentRole) return;
+        const response = await saveCurrentRole();
+        if (response && response.error) {
+            showError(response?.error);
+        } else {
+            showSuccess(
+                id === CREATE_ID ? "Role created successfully" : "Role updated successfully"
+            );
+            navigate(USERS_PAGE.ROLES());
+        }
+    };
 
     const handleCloseClick = () => {
         navigate(-1);
     };
 
     return (
-        <div className='grid roles-page'>
+        <div className='grid roles-page relative'>
             <Button
                 icon='pi pi-times'
                 className='p-button close-button'
