@@ -1,7 +1,7 @@
 import { Dialog } from "primereact/dialog";
 import { SearchInput } from "dashboard/common/form/inputs";
 import { QueryParams } from "common/models/query-params";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { DropdownChangeEvent, DropdownProps } from "primereact/dropdown";
 import { Deal } from "common/models/deals";
 import { useStore } from "store/hooks";
@@ -11,6 +11,11 @@ import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
 import { useToastMessage } from "common/hooks";
 
 const FIELD: keyof Deal = "contactinfo";
+const TIMEOUT_DELAY = 300;
+enum DEAL_MESSAGE {
+    NOT_FOUND = "Deal not found.",
+    NOT_FOUND_SELECTED = "Deal not found. Only existing deals can be selected in this field.",
+}
 
 interface DealSearchProps extends DropdownProps {
     onRowClick?: (dealName: string) => void;
@@ -19,6 +24,7 @@ interface DealSearchProps extends DropdownProps {
     getFullInfo?: (deal: Deal) => void;
     onClear?: () => void;
     validateOnBlur?: boolean;
+    hasValidSelection?: boolean;
 }
 
 export const DealSearch = ({
@@ -31,6 +37,7 @@ export const DealSearch = ({
     getFullInfo,
     onClear,
     validateOnBlur = false,
+    hasValidSelection = false,
     ...props
 }: DealSearchProps) => {
     const [options, setOptions] = useState<Deal[]>([]);
@@ -39,6 +46,8 @@ export const DealSearch = ({
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [isSearched, setIsSearched] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const isJustSelectedRef = useRef<boolean>(false);
+    const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const { showWarning } = useToastMessage();
 
     const handleDealInputChange = async (searchValue: string) => {
@@ -47,6 +56,7 @@ export const DealSearch = ({
             setOptions([]);
             return;
         }
+        isJustSelectedRef.current = false;
         setIsLoading(true);
         const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
         const qry = `${searchValue}.${field}`;
@@ -77,10 +87,15 @@ export const DealSearch = ({
     const handleOnChange = (event: DropdownChangeEvent) => {
         const selectedValue = event.value;
 
+        if (selectedValue === "Deal not found") {
+            return;
+        }
+
         if (returnedField === ALL_FIELDS) {
             const selectedDeal = options.find((deal) => deal[FIELD] === selectedValue);
 
             if (selectedDeal && getFullInfo) {
+                isJustSelectedRef.current = true;
                 getFullInfo(selectedDeal);
             }
         }
@@ -96,27 +111,28 @@ export const DealSearch = ({
             return;
         }
 
-        const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
-        const matchedDeal = options.find((deal) => deal[field] === value);
+        if (blurTimeoutRef.current) {
+            clearTimeout(blurTimeoutRef.current);
+        }
 
-        if (matchedDeal) {
-            if (returnedField === ALL_FIELDS && getFullInfo) {
-                getFullInfo(matchedDeal);
+        blurTimeoutRef.current = setTimeout(() => {
+            if (hasValidSelection || isJustSelectedRef.current) {
+                return;
             }
-        } else if (value.trim()) {
-            showWarning("Deal not found. Only existing deals can be selected in this field.");
+
+            showWarning(DEAL_MESSAGE.NOT_FOUND_SELECTED);
             if (onClear) {
                 onClear();
             } else if (onChange) {
                 onChange({ value: "" } as DropdownChangeEvent);
             }
-        }
-        setIsSearched(false);
+            setIsSearched(false);
+        }, TIMEOUT_DELAY);
     };
 
     const displayOptions =
         validateOnBlur && isSearched && options.length === 0
-            ? [{ [FIELD]: "Deal not found" } as Deal]
+            ? [{ [FIELD]: DEAL_MESSAGE.NOT_FOUND } as Deal]
             : options;
 
     return (

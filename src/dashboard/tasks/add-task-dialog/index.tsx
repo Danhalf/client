@@ -242,6 +242,7 @@ export const AddTaskDialog = observer(
                         onChange={({ target: { value } }) => handleAccountNameChange(value)}
                         onClear={handleAccountClear}
                         validateOnBlur
+                        hasValidSelection={!!taskState.accountuid}
                         name='Account (optional)'
                     />
 
@@ -252,6 +253,7 @@ export const AddTaskDialog = observer(
                         onChange={({ target: { value } }) => handleDealNameChange(value)}
                         onClear={handleDealClear}
                         validateOnBlur
+                        hasValidSelection={!!taskState.dealuid}
                         name='Deal (optional)'
                     />
 
