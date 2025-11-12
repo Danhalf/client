@@ -8,6 +8,7 @@ import { AccountInfo } from "common/models/accounts";
 import { getAccountsList } from "http/services/accounts.service";
 import { AccountsDataTable } from "dashboard/accounts";
 import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
+import { useToastMessage } from "common/hooks";
 
 const FIELD: keyof AccountInfo = "name";
 
@@ -15,6 +16,8 @@ interface AccountSearchProps extends DropdownProps {
     onRowClick?: (accountName: string) => void;
     returnedField?: RETURNED_FIELD_TYPE<AccountInfo>;
     getFullInfo?: (account: AccountInfo) => void;
+    onClear?: () => void;
+    validateOnBlur?: boolean;
 }
 
 export const AccountSearch = ({
@@ -24,17 +27,25 @@ export const AccountSearch = ({
     onChange,
     returnedField,
     getFullInfo,
+    onClear,
+    validateOnBlur = false,
     ...props
 }: AccountSearchProps) => {
     const [options, setOptions] = useState<AccountInfo[]>([]);
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+    const [isSearched, setIsSearched] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { showWarning } = useToastMessage();
 
     const handleAccountInputChange = async (searchValue: string) => {
         if (!searchValue.trim()) {
+            setIsSearched(false);
+            setOptions([]);
             return;
         }
+        setIsLoading(true);
         const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
         const qry = `${searchValue}.${field}`;
         const params: QueryParams = {
@@ -47,6 +58,8 @@ export const AccountSearch = ({
         } else {
             setOptions([]);
         }
+        setIsSearched(true);
+        setIsLoading(false);
     };
 
     const handleOnRowClick = (accountName: string) => {
@@ -73,7 +86,36 @@ export const AccountSearch = ({
         if (onChange) {
             onChange(event);
         }
+        setIsSearched(false);
     };
+
+    const handleBlur = () => {
+        if (!validateOnBlur || !value || !value.trim() || isLoading) {
+            return;
+        }
+
+        const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
+        const matchedAccount = options.find((account) => account[field] === value);
+
+        if (matchedAccount) {
+            if (returnedField === ALL_FIELDS && getFullInfo) {
+                getFullInfo(matchedAccount);
+            }
+        } else if (value.trim()) {
+            showWarning("Account not found. Only existing accounts can be selected in this field.");
+            if (onClear) {
+                onClear();
+            } else if (onChange) {
+                onChange({ value: "" } as DropdownChangeEvent);
+            }
+        }
+        setIsSearched(false);
+    };
+
+    const displayOptions =
+        validateOnBlur && isSearched && options.length === 0
+            ? [{ [FIELD]: "Account not found" } as AccountInfo]
+            : options;
 
     return (
         <>
@@ -82,10 +124,11 @@ export const AccountSearch = ({
                 title={name}
                 optionValue={returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD}
                 optionLabel={FIELD}
-                options={options}
+                options={displayOptions}
                 onInputChange={handleAccountInputChange}
                 value={value}
                 onChange={handleOnChange}
+                onBlur={validateOnBlur ? handleBlur : undefined}
                 onIconClick={() => {
                     setDialogVisible(true);
                 }}

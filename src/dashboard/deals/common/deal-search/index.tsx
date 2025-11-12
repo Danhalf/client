@@ -8,6 +8,7 @@ import { useStore } from "store/hooks";
 import { DealsDataTable } from "dashboard/deals";
 import { getDealsList } from "http/services/deals.service";
 import { ALL_FIELDS, RETURNED_FIELD_TYPE } from "common/constants/fields";
+import { useToastMessage } from "common/hooks";
 
 const FIELD: keyof Deal = "contactinfo";
 
@@ -16,6 +17,8 @@ interface DealSearchProps extends DropdownProps {
     originalPath?: string;
     returnedField?: RETURNED_FIELD_TYPE<Deal>;
     getFullInfo?: (deal: Deal) => void;
+    onClear?: () => void;
+    validateOnBlur?: boolean;
 }
 
 export const DealSearch = ({
@@ -26,17 +29,25 @@ export const DealSearch = ({
     originalPath,
     returnedField,
     getFullInfo,
+    onClear,
+    validateOnBlur = false,
     ...props
 }: DealSearchProps) => {
     const [options, setOptions] = useState<Deal[]>([]);
     const userStore = useStore().userStore;
     const { authUser } = userStore;
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+    const [isSearched, setIsSearched] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { showWarning } = useToastMessage();
 
     const handleDealInputChange = async (searchValue: string) => {
         if (!searchValue.trim()) {
+            setIsSearched(false);
+            setOptions([]);
             return;
         }
+        setIsLoading(true);
         const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
         const qry = `${searchValue}.${field}`;
         const params: QueryParams = {
@@ -49,6 +60,8 @@ export const DealSearch = ({
         } else {
             setOptions([]);
         }
+        setIsSearched(true);
+        setIsLoading(false);
     };
 
     const handleOnRowClick = (dealName: string) => {
@@ -75,7 +88,36 @@ export const DealSearch = ({
         if (onChange) {
             onChange(event);
         }
+        setIsSearched(false);
     };
+
+    const handleBlur = () => {
+        if (!validateOnBlur || !value || !value.trim() || isLoading) {
+            return;
+        }
+
+        const field = returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD;
+        const matchedDeal = options.find((deal) => deal[field] === value);
+
+        if (matchedDeal) {
+            if (returnedField === ALL_FIELDS && getFullInfo) {
+                getFullInfo(matchedDeal);
+            }
+        } else if (value.trim()) {
+            showWarning("Deal not found. Only existing deals can be selected in this field.");
+            if (onClear) {
+                onClear();
+            } else if (onChange) {
+                onChange({ value: "" } as DropdownChangeEvent);
+            }
+        }
+        setIsSearched(false);
+    };
+
+    const displayOptions =
+        validateOnBlur && isSearched && options.length === 0
+            ? [{ [FIELD]: "Deal not found" } as Deal]
+            : options;
 
     return (
         <>
@@ -84,10 +126,11 @@ export const DealSearch = ({
                 title={name}
                 optionValue={returnedField === ALL_FIELDS ? FIELD : returnedField || FIELD}
                 optionLabel={FIELD}
-                options={options}
+                options={displayOptions}
                 onInputChange={handleDealInputChange}
                 value={value}
                 onChange={handleOnChange}
+                onBlur={validateOnBlur ? handleBlur : undefined}
                 onIconClick={() => {
                     setDialogVisible(true);
                 }}

@@ -139,6 +139,11 @@ export const AddTaskDialog = observer(
             }
         };
 
+        const handleAccountClear = () => {
+            handleInputChange("accountname", "");
+            handleInputChange("accountuid", "");
+        };
+
         const handleGetCompanyInfo = (contact: ContactUser) => {
             handleInputChange("contactuid", contact.contactuid);
             handleInputChange(
@@ -166,6 +171,11 @@ export const AddTaskDialog = observer(
             if (taskState.dealuid) {
                 handleInputChange("dealuid", "");
             }
+        };
+
+        const handleDealClear = () => {
+            handleInputChange("dealname", "");
+            handleInputChange("dealuid", "");
         };
 
         return (
@@ -230,6 +240,8 @@ export const AddTaskDialog = observer(
                         returnedField={ALL_FIELDS}
                         getFullInfo={handleGetAccountInfo}
                         onChange={({ target: { value } }) => handleAccountNameChange(value)}
+                        onClear={handleAccountClear}
+                        validateOnBlur
                         name='Account (optional)'
                     />
 
@@ -238,6 +250,8 @@ export const AddTaskDialog = observer(
                         returnedField={ALL_FIELDS}
                         getFullInfo={handleGetDealInfo}
                         onChange={({ target: { value } }) => handleDealNameChange(value)}
+                        onClear={handleDealClear}
+                        validateOnBlur
                         name='Deal (optional)'
                     />
 
