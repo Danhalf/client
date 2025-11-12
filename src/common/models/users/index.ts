@@ -1,5 +1,6 @@
 import { BaseResponseError } from "common/models/base-response";
 import { TypeList } from "common/models";
+import { PermissionKey } from "common/constants/permissions";
 
 export interface User extends BaseResponseError {
     index: number;
@@ -90,6 +91,7 @@ export interface UserData extends BaseResponseError {
 }
 
 export interface Permission extends TypeList {
+    name: PermissionKey;
     description: string;
 }
 
@@ -97,9 +99,15 @@ export interface UserRole {
     created: string;
     deleted: string;
     isDefault: 0 | 1;
-    permissions: (Permission | null)[];
+    name: string;
+    permissions: Record<PermissionKey, 0 | 1>;
     rolename: string;
     roleuid: string;
     updated: string;
     useruid: string;
+}
+
+export interface UserRolePayload {
+    rolename: string;
+    permissions: Record<PermissionKey, 0 | 1>;
 }
