@@ -8,15 +8,7 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import AuditHeader from "./components/AuditHeader";
 import { useCreateReport } from "common/hooks";
-
-interface AuditRecord {
-    accountName: string;
-    lineNumber: string;
-    user: string;
-    date: string;
-    debit: string;
-    credit: string;
-}
+import { AuditRecord } from "http/services/accounts.service";
 
 const columns = [
     { field: "accountName", header: "Account" },
