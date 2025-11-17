@@ -75,7 +75,18 @@
     }
 }
 
-.accounts-filter__item {
+.audit-filter {
+    width: 300px;
+}
+
+.audit-filter__panel {
+    .p-dropdown-item .accounts-filter__item {
+        white-space: nowrap;
+    }
+}
+
+.accounts-filter__item,
+.audit-filter__item {
     width: 180px;
     white-space: normal;
     line-height: 1.2;

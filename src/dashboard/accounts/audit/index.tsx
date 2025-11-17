@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
 import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -7,27 +7,43 @@ import { Loader } from "dashboard/common/loader";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import AuditHeader from "./components/AuditHeader";
-import { useCreateReport } from "common/hooks";
-import { AuditRecord } from "http/services/accounts.service";
+import { useCreateReport, useToastMessage } from "common/hooks";
+import { AuditRecord, getAccountAudit } from "http/services/accounts.service";
 
 const columns = [
-    { field: "accountName", header: "Account" },
-    { field: "lineNumber", header: "Line#" },
-    { field: "user", header: "User" },
-    { field: "date", header: "Date" },
-    { field: "debit", header: "Debit" },
-    { field: "credit", header: "Credit" },
+    { field: "name", header: "Account" },
+    { field: "accountnumber", header: "Line#" },
+    { field: "accounttype", header: "User" },
+    { field: "created", header: "Date" },
+    { field: "startingballance", header: "Debit" },
+    { field: "downpayment", header: "Credit" },
 ];
 
 export const AccountsAudit = observer((): ReactElement => {
-    const [auditRecords] = useState<AuditRecord[]>([]);
     const userStore = useStore().userStore;
     const { authUser } = userStore;
+    const { showError } = useToastMessage();
     const [totalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
     const [lazyState, setLazyState] = useState<DatatableQueries>(initialDataTableQueries);
     const [isLoading] = useState<boolean>(false);
     const { createReport } = useCreateReport<AuditRecord>();
+    const [auditRecords, setAuditRecords] = useState<AuditRecord[]>([]);
+
+    const getAuditRecords = async () => {
+        if (!authUser) return;
+        const response = await getAccountAudit(authUser.useruid);
+        if (Array.isArray(response)) {
+            setAuditRecords(response);
+        } else {
+            setAuditRecords([]);
+            showError(response?.error);
+        }
+    };
+
+    useEffect(() => {
+        getAuditRecords();
+    }, []);
 
     const printTableData = async (print: boolean = false) => {
         if (!authUser) return;

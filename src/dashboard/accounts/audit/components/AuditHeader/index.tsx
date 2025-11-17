@@ -24,14 +24,16 @@ export default function AuditHeader({
     onAccountTypeChange,
 }: AuditHeaderProps): ReactElement {
     const accountTypeOptions = [
-        { name: "Buy Here Pay Here", value: "Buy Here Pay Here" },
-        { name: "Cash Deal", value: "Cash Deal" },
-        { name: "Cash Deal with Outside Financing", value: "Cash Deal with Outside Financing" },
-        { name: "Cash Deal with Outside Lease", value: "Cash Deal with Outside Lease" },
-        { name: "Cash Deal for Related Finance", value: "Cash Deal for Related Finance" },
-        { name: "Wholesale", value: "Wholesale" },
-        { name: "Dismantled", value: "Dismantled" },
-        { name: "Lease Here Pay Here", value: "Lease Here Pay Here" },
+        { name: "Activity For Today", value: "Activity For Today" },
+        { name: "Activity In Past 7 Days", value: "Activity In Past 7 Days" },
+        { name: "Activity In Past 31 Days", value: "Activity In Past 31 Days" },
+        { name: "Insurance Missing", value: "Insurance Missing" },
+        { name: "Missing Policies", value: "Missing Policies" },
+        { name: "Missing Titles", value: "Missing Titles" },
+        { name: "Notes Taken Today", value: "Notes Taken Today" },
+        { name: "Notes Taken Yesterday", value: "Notes Taken Yesterday" },
+        { name: "Promises Taken Today", value: "Promises Taken Today" },
+        { name: "Promises Taken Yesterday", value: "Promises Taken Yesterday" },
     ];
 
     const accountTypeItemTemplate = (option: { name: string; value: string }) => {
@@ -54,11 +56,13 @@ export default function AuditHeader({
                     value={selectedAccountType}
                     options={accountTypeOptions}
                     valueTemplate={accountTypeSelectedItemTemplate}
-                    className='accounts-filter'
+                    className='audit-filter'
                     itemTemplate={accountTypeItemTemplate}
                     onChange={(e: DropdownChangeEvent) => {
                         onAccountTypeChange(e.value);
                     }}
+                    panelClassName='audit-filter__panel'
+                    scrollHeight='calc(100vh - 200px)'
                 />
                 <label className='float-label' htmlFor='account-type-input'>
                     Filter by
@@ -67,7 +71,7 @@ export default function AuditHeader({
                     <Button
                         icon='pi pi-times'
                         type='button'
-                        className='accounts-filter__clear-button'
+                        className='audit-filter__clear-button'
                         onClick={() => onAccountTypeChange("")}
                     />
                 )}
