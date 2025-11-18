@@ -131,9 +131,21 @@ export const USERS_PAGE: Readonly<UsersPage> = {
 
 interface SettingsPage {
     readonly MAIN: string;
+    ROLES(): string;
+    ROLES_CREATE(): string;
+    ROLES_EDIT(id: string): string;
 }
 export const SETTINGS_PAGE: Readonly<SettingsPage> = {
     MAIN: `${DASHBOARD_PAGE}/settings`,
+    ROLES() {
+        return `${this.MAIN}?section=user-roles`;
+    },
+    ROLES_CREATE() {
+        return `${this.MAIN}/roles${CREATE_PATH}`;
+    },
+    ROLES_EDIT(id: string) {
+        return `${this.MAIN}/roles/${id}`;
+    },
 };
 
 interface SidebarPage {
