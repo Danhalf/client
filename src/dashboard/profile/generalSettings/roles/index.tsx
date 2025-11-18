@@ -11,7 +11,7 @@ import { useToastMessage } from "common/hooks";
 import { Loader } from "dashboard/common/loader";
 import "./index.css";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { USERS_PAGE } from "common/constants/links";
+import { SETTINGS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
 
 export type UserRoleColumnProps = Omit<ColumnProps, "field"> & {
@@ -59,7 +59,7 @@ export const UsersRoles = observer((): ReactElement => {
     }, []);
 
     const handleAddNewUserRole = () => {
-        navigate(USERS_PAGE.ROLES_CREATE());
+        navigate(SETTINGS_PAGE.ROLES_CREATE());
     };
 
     const roleNameColumn = (data: UserRole) => {
@@ -157,7 +157,7 @@ export const UsersRoles = observer((): ReactElement => {
                                     }}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        navigate(USERS_PAGE.ROLES_EDIT(roleuid));
+                                        navigate(SETTINGS_PAGE.ROLES_EDIT(roleuid));
                                     }}
                                 />
                             );

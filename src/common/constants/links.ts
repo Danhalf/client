@@ -105,9 +105,6 @@ interface UsersPage {
     readonly MAIN: string;
     CREATE(): string;
     EDIT(id: string): string;
-    ROLES(): string;
-    ROLES_CREATE(): string;
-    ROLES_EDIT(id: string): string;
 }
 
 export const USERS_PAGE: Readonly<UsersPage> = {
@@ -117,15 +114,6 @@ export const USERS_PAGE: Readonly<UsersPage> = {
     },
     EDIT(id: string) {
         return `${this.MAIN}/${id}`;
-    },
-    ROLES() {
-        return `${this.MAIN}/roles`;
-    },
-    ROLES_CREATE() {
-        return `${this.MAIN}/roles${CREATE_PATH}`;
-    },
-    ROLES_EDIT(id: string) {
-        return `${this.MAIN}/roles/${id}`;
     },
 };
 
@@ -138,7 +126,7 @@ interface SettingsPage {
 export const SETTINGS_PAGE: Readonly<SettingsPage> = {
     MAIN: `${DASHBOARD_PAGE}/settings`,
     ROLES() {
-        return `${this.MAIN}?section=user-roles`;
+        return `${this.MAIN}?section=roles`;
     },
     ROLES_CREATE() {
         return `${this.MAIN}/roles${CREATE_PATH}`;
