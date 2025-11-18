@@ -127,7 +127,6 @@ export const UsersRoles = observer((): ReactElement => {
                     value={userRoles}
                     paginator
                     scrollable
-                    scrollHeight='50vh'
                     rows={10}
                     className='roles-table'
                     rowClassName={() => "hover:text-primary cursor-pointer roles-table-row"}
