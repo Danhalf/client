@@ -308,42 +308,60 @@ export class DealStore {
     );
 
     public changeDealFinances = action(
-        ({ key, value }: { key: keyof DealFinance; value: string | number }) => {
+        async ({ key, value }: { key: keyof DealFinance; value: string | number }) => {
             const dealStore = this.rootStore.dealStore;
             if (dealStore) {
                 const { dealFinances } = dealStore;
                 (dealFinances as Record<typeof key, string | number>)[key] = value;
+
+                if (dealStore._dealID) {
+                    await dealStore.recalculateAndUpdateWashout(dealStore._dealID);
+                }
             }
         }
     );
 
-    public changeDealWashout = action((key: keyof DealWashout, value: string | number) => {
+    public changeDealWashout = action(async (key: keyof DealWashout, value: string | number) => {
         const dealStore = this.rootStore.dealStore;
         if (dealStore) {
             const { dealWashout } = dealStore;
             (dealWashout as Record<typeof key, string | number>)[key] = value;
-        }
-    });
 
-    public toggleIncludeCheckbox = action((fieldName: string, option: INCLUDE_OPTIONS | null) => {
-        const dealStore = this.rootStore.dealStore;
-        if (dealStore) {
-            const { dealWashout } = dealStore;
-            const check1Field = `${fieldName}Check1` as keyof DealWashout;
-            const check2Field = `${fieldName}Check2` as keyof DealWashout;
-
-            if (option === INCLUDE_OPTIONS.COMMISSION1) {
-                (dealWashout as any)[check1Field] = 1;
-                (dealWashout as any)[check2Field] = 0;
-            } else if (option === INCLUDE_OPTIONS.COMMISSION) {
-                (dealWashout as any)[check1Field] = 0;
-                (dealWashout as any)[check2Field] = 1;
-            } else {
-                (dealWashout as any)[check1Field] = 0;
-                (dealWashout as any)[check2Field] = 0;
+            if (dealStore._dealID) {
+                await dealStore.recalculateAndUpdateWashout(dealStore._dealID);
             }
         }
     });
+
+    public toggleIncludeCheckbox = action(
+        async (fieldName: string, option: INCLUDE_OPTIONS | null) => {
+            const dealStore = this.rootStore.dealStore;
+            if (dealStore) {
+                const { dealWashout } = dealStore;
+                const check1Field = `${fieldName}Check1` as keyof DealWashout;
+                const check2Field = `${fieldName}Check2` as keyof DealWashout;
+                const dealWashoutRecord = dealWashout as unknown as Record<
+                    typeof check1Field | typeof check2Field,
+                    number
+                >;
+
+                if (option === INCLUDE_OPTIONS.COMMISSION1) {
+                    dealWashoutRecord[check1Field] = 1;
+                    dealWashoutRecord[check2Field] = 0;
+                } else if (option === INCLUDE_OPTIONS.COMMISSION) {
+                    dealWashoutRecord[check1Field] = 0;
+                    dealWashoutRecord[check2Field] = 1;
+                } else {
+                    dealWashoutRecord[check1Field] = 0;
+                    dealWashoutRecord[check2Field] = 0;
+                }
+
+                if (dealStore._dealID) {
+                    await dealStore.recalculateAndUpdateWashout(dealStore._dealID);
+                }
+            }
+        }
+    );
 
     public getIncludeCheckboxValue = (fieldName: string): INCLUDE_OPTIONS | null => {
         const dealStore = this.rootStore.dealStore;
@@ -351,11 +369,14 @@ export class DealStore {
             const { dealWashout } = dealStore;
             const check1Field = `${fieldName}Check1` as keyof DealWashout;
             const check2Field = `${fieldName}Check2` as keyof DealWashout;
-
-            if ((dealWashout as any)[check1Field] === 1) {
+            const dealWashoutRecord = dealWashout as unknown as Record<
+                typeof check1Field | typeof check2Field,
+                number
+            >;
+            if (dealWashoutRecord[check1Field] === 1) {
                 return INCLUDE_OPTIONS.COMMISSION1;
             }
-            if ((dealWashout as any)[check2Field] === 1) {
+            if (dealWashoutRecord[check2Field] === 1) {
                 return INCLUDE_OPTIONS.COMMISSION;
             }
             return null;
@@ -406,14 +427,38 @@ export class DealStore {
             const response = await dealFinancesRecalculate(dealuid, payload);
             if (response && response.status === Status.OK) {
                 this._dealFinances = response as DealFinance;
+                return true;
             } else {
                 const { error } = response as BaseResponseError;
                 this._dealErrorMessage = error!;
+                return false;
             }
         } catch (error) {
+            return false;
         } finally {
             this._isLoading = false;
         }
+    });
+
+    public recalculateAndUpdateWashout = action(async (dealuid: string) => {
+        const currentWashoutState = JSON.parse(JSON.stringify(this._dealWashout));
+        const recalculateSuccess = await this.recalculateFinances(dealuid);
+        if (recalculateSuccess) {
+            const washoutResponse = await getDealWashout(dealuid);
+            if (washoutResponse && washoutResponse.status === Status.OK) {
+                const updatedWashout = washoutResponse as DealWashout;
+                const checkboxFields = Object.keys(currentWashoutState).filter(
+                    (key) => key.endsWith("Check1") || key.endsWith("Check2")
+                );
+                checkboxFields.forEach((field) => {
+                    (updatedWashout as unknown as Record<typeof field, number>)[field] = (
+                        currentWashoutState as unknown as Record<typeof field, number>
+                    )[field];
+                });
+                this._dealWashout = updatedWashout;
+            }
+        }
+        return recalculateSuccess;
     });
 
     public clearWashoutState = action(() => {
