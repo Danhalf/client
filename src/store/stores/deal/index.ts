@@ -5,6 +5,7 @@ import {
     Deal,
     DealExtData,
     DealFinance,
+    DealFinanceRecalculatePayload,
     DealPickupPayment,
     DealPrintForm,
     DealWashout,
@@ -12,6 +13,7 @@ import {
 } from "common/models/deals";
 import { Inventory } from "common/models/inventory";
 import {
+    dealFinancesRecalculate,
     getDealFinance,
     getDealInfo,
     getDealPayments,
@@ -374,6 +376,43 @@ export class DealStore {
         if (this._temporaryWashoutState && this._isWashoutStatePreserved) {
             this._dealWashout = JSON.parse(JSON.stringify(this._temporaryWashoutState));
             this._temporaryWashoutState = null;
+        }
+    });
+
+    public recalculateFinances = action(async (dealuid: string) => {
+        try {
+            this._isLoading = true;
+            this._dealErrorMessage = "";
+            const recalculateKeys: (keyof DealFinanceRecalculatePayload)[] = [
+                "CashPrice",
+                "TradeAllowance",
+                "TaxRate",
+                "Taxes",
+                "Accessory",
+                "Tags",
+                "Title",
+                "LicenseAndReg",
+                "Warranty",
+                "Gap",
+                "DocFee",
+                "TradeInPayoff",
+                "NetTradeAllowance",
+                "CashDown",
+            ];
+            const payload = recalculateKeys.reduce((accumulator, key) => {
+                accumulator[key] = this._dealFinances[key];
+                return accumulator;
+            }, {} as DealFinanceRecalculatePayload);
+            const response = await dealFinancesRecalculate(dealuid, payload);
+            if (response && response.status === Status.OK) {
+                this._dealFinances = response as DealFinance;
+            } else {
+                const { error } = response as BaseResponseError;
+                this._dealErrorMessage = error!;
+            }
+        } catch (error) {
+        } finally {
+            this._isLoading = false;
         }
     });
 
