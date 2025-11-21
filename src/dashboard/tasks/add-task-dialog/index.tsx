@@ -1,8 +1,7 @@
-import { DialogProps } from "primereact/dialog";
+import { Dialog, DialogProps } from "primereact/dialog";
 import { useEffect, useState } from "react";
 import { InputTextarea } from "primereact/inputtextarea";
 import { createTask, getTasksSubUserList } from "http/services/tasks.service";
-import { DashboardDialog } from "dashboard/common/dialog";
 import { Status } from "common/models/base-response";
 import { DateInput, PhoneInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
@@ -19,6 +18,10 @@ import { Account } from "common/models/accounts";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { useToastMessage } from "common/hooks";
 import { ALL_FIELDS } from "common/constants/fields";
+import { SplitButton } from "primereact/splitbutton";
+import { TASKS_STATUS_LIST } from "../common";
+import { FilterOptions } from "dashboard/common/filter";
+import { Button } from "primereact/button";
 
 enum DATE_TYPE {
     START = "startdate",
@@ -54,6 +57,7 @@ export const AddTaskDialog = observer(
         const [dateError, setDateError] = useState<string>("");
         const [isFormChanged, setIsFormChanged] = useState<boolean>(false);
         const [isSaving, setIsSaving] = useState<boolean>(false);
+        const [currentTaskStatus, setCurrentTaskStatus] = useState<FilterOptions | null>(null);
 
         const isSubmitDisabled = !!dateError || !isFormChanged || isSaving || !taskState.useruid;
 
@@ -178,18 +182,25 @@ export const AddTaskDialog = observer(
             handleInputChange("dealuid", "");
         };
 
+        const taskFilterOptions = (): FilterOptions[] => {
+            return TASKS_STATUS_LIST.map((status) => ({
+                label: status.name,
+                value: status.value,
+                icon: "pi pi-check",
+                command: () => setCurrentTaskStatus({ label: status.name, value: status.value }),
+            }));
+        };
+
         return (
-            <DashboardDialog
+            <Dialog
+                draggable={false}
                 position='top'
                 onHide={onHide}
                 visible={visible}
                 header={header}
-                className={"dialog__add-task"}
-                footer='Save'
-                action={handleSaveTaskData}
-                buttonDisabled={isSubmitDisabled}
+                className='dialog dialog__add-task task-dialog'
             >
-                <>
+                <div className='p-dialog-content-body' tabIndex={0}>
                     <ComboBox
                         label='Assign to (required)'
                         value={taskState.useruid || authUser?.useruid || ""}
@@ -278,8 +289,22 @@ export const AddTaskDialog = observer(
                         />
                         <label className='float-label'>Description</label>
                     </span>
-                </>
-            </DashboardDialog>
+                </div>
+
+                <div className='task-dialog__footer'>
+                    <SplitButton
+                        outlined
+                        label={`${currentTaskStatus?.label ? currentTaskStatus.label : "Task Status"}`}
+                        onClick={handleSaveTaskData}
+                        model={taskFilterOptions()}
+                    />
+                    <Button
+                        label={`${currentTask ? "Update" : "Save"}`}
+                        onClick={handleSaveTaskData}
+                        disabled={isSubmitDisabled}
+                    />
+                </div>
+            </Dialog>
         );
     }
 );
