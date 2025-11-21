@@ -8,7 +8,7 @@ import { useStore } from "store/hooks";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { DealSearch } from "dashboard/deals/common/deal-search";
 import { AccountSearch } from "dashboard/accounts/common/account-search";
-import { PostDataTask, Task, TaskUser } from "common/models/tasks";
+import { PostDataTask, Task, TaskStatus, TaskUser } from "common/models/tasks";
 import { formatDateForServer, validateDates } from "common/helpers";
 import "./index.css";
 import { observer } from "mobx-react-lite";
@@ -45,6 +45,7 @@ const initializeTaskState = (task?: Task): Partial<PostDataTask> => ({
     contactname: task?.contactname || "",
     phone: task?.phone || "",
     description: task?.description || "",
+    status: task?.task_status as TaskStatus,
 });
 
 export const AddTaskDialog = observer(
@@ -57,7 +58,6 @@ export const AddTaskDialog = observer(
         const [dateError, setDateError] = useState<string>("");
         const [isFormChanged, setIsFormChanged] = useState<boolean>(false);
         const [isSaving, setIsSaving] = useState<boolean>(false);
-        const [currentTaskStatus, setCurrentTaskStatus] = useState<FilterOptions | null>(null);
 
         const isSubmitDisabled = !!dateError || !isFormChanged || isSaving || !taskState.useruid;
 
@@ -188,13 +188,16 @@ export const AddTaskDialog = observer(
                 value: status.value,
                 icon: "pi pi-circle",
                 iconClassName: `pi-circle--${status.value}`,
-                command: () => setCurrentTaskStatus({ label: status.name, value: status.value }),
+                command: () => {
+                    setTaskState((prev) => ({ ...prev, status: status.name as TaskStatus }));
+                    setIsFormChanged(true);
+                },
             }));
         };
 
         const getStatusClassName = (): string => {
-            if (!currentTaskStatus?.label) return "";
-            const statusName = currentTaskStatus.label.toLowerCase().replace(/ /g, "-");
+            if (!taskState.status) return "";
+            const statusName = taskState.status.toLowerCase().replace(/ /g, "-");
             return `task-status--${statusName}`;
         };
 
@@ -301,14 +304,14 @@ export const AddTaskDialog = observer(
                 <div className='task-dialog__footer'>
                     <SplitButton
                         outlined
-                        label={`${currentTaskStatus?.label ? currentTaskStatus.label : "Task Status"}`}
-                        onClick={handleSaveTaskData}
+                        label={`${taskState.status ? taskState.status : "Status"}`}
                         model={taskFilterOptions()}
                         className={`task-dialog__status-button status-button ${getStatusClassName()}`}
                     />
                     <Button
                         label={`${currentTask ? "Update" : "Save"}`}
                         onClick={handleSaveTaskData}
+                        className='task-dialog__save-button'
                         disabled={isSubmitDisabled}
                     />
                 </div>
