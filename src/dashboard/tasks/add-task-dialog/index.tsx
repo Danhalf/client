@@ -305,6 +305,7 @@ export const AddTaskDialog = observer(
                     <SplitButton
                         outlined
                         label={`${taskState.status ? taskState.status : "Status"}`}
+                        dropdownIcon='adms-arrow-bottom'
                         model={taskFilterOptions()}
                         className={`task-dialog__status-button status-button ${getStatusClassName()}`}
                     />

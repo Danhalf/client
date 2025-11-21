@@ -39,13 +39,11 @@
         display: inline-flex;
         width: var(--admss-app-dialog-button-width);
         height: var(--admss-app-dialog-button-height);
-        margin-bottom: 10px;
     }
 
     .status-button {
         width: var(--admss-app-dialog-button-width);
         height: var(--admss-app-dialog-button-height);
-        margin-bottom: 10px;
         flex-direction: row-reverse;
         .p-button.p-splitbutton-defaultbutton {
             font-weight: 700;
@@ -71,6 +69,7 @@
             }
         }
         .p-button.p-splitbutton-menubutton {
+            width: 60px;
             border-left: 1px solid;
             border-right: none;
             border-radius: 5px 0 0 5px;
@@ -79,6 +78,14 @@
             &:focus,
             &:hover {
                 box-shadow: none;
+            }
+            .p-button-icon {
+                width: 20px;
+                height: 20px;
+                transition: transform 0.3s ease;
+            }
+            &[aria-expanded="true"] .p-button-icon {
+                transform: rotate(180deg);
             }
         }
 
@@ -119,6 +126,7 @@
         }
     }
     .task-dialog__footer {
+        padding-top: 34px;
         display: flex;
         gap: 10px;
         justify-content: center;
