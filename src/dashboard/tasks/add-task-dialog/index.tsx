@@ -191,6 +191,12 @@ export const AddTaskDialog = observer(
             }));
         };
 
+        const getStatusClassName = (): string => {
+            if (!currentTaskStatus?.label) return "";
+            const statusName = currentTaskStatus.label.toLowerCase().replace(/ /g, "-");
+            return `task-status--${statusName}`;
+        };
+
         return (
             <Dialog
                 draggable={false}
@@ -297,6 +303,7 @@ export const AddTaskDialog = observer(
                         label={`${currentTaskStatus?.label ? currentTaskStatus.label : "Task Status"}`}
                         onClick={handleSaveTaskData}
                         model={taskFilterOptions()}
+                        className={`task-dialog__status-button status-button ${getStatusClassName()}`}
                     />
                     <Button
                         label={`${currentTask ? "Update" : "Save"}`}

@@ -39,6 +39,26 @@
         height: 59px;
         margin-bottom: 10px;
     }
+
+    .status-button {
+        width: 220px;
+        height: 59px;
+        margin-bottom: 10px;
+
+        &[class*="task-status--"] {
+            .p-splitbutton-defaultbutton,
+            .p-splitbutton-menubutton {
+                border-color: inherit;
+                color: inherit;
+
+                &:hover:enabled {
+                    border-color: color-mix(in srgb, currentColor 85%, black);
+                    color: color-mix(in srgb, currentColor 85%, black);
+                    background: color-mix(in srgb, currentColor 5%, transparent);
+                }
+            }
+        }
+    }
 }
 
 .p-dialog .p-dialog-description {
