@@ -19,7 +19,7 @@ import { ComboBox } from "dashboard/common/form/dropdown";
 import { useToastMessage } from "common/hooks";
 import { ALL_FIELDS } from "common/constants/fields";
 import { SplitButton } from "primereact/splitbutton";
-import { TASKS_STATUS_LIST } from "../common";
+import { TASKS_STATUS_LIST } from "dashboard/tasks/common";
 import { FilterOptions } from "dashboard/common/filter";
 import { Button } from "primereact/button";
 
