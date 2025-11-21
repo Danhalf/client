@@ -44,12 +44,26 @@
         width: 220px;
         height: 59px;
         margin-bottom: 10px;
+        flex-direction: row-reverse;
+        .p-button.p-splitbutton-defaultbutton {
+            border-left: none;
+            border-right: 1px solid;
+            border-radius: 0 5px 5px 0;
+        }
+        .p-button.p-splitbutton-menubutton {
+            border-left: 1px solid;
+            border-radius: 5px 0 0 5px;
+        }
 
         &[class*="task-status--"] {
             .p-splitbutton-defaultbutton,
             .p-splitbutton-menubutton {
                 border-color: inherit;
                 color: inherit;
+
+                .p-button-icon {
+                    color: inherit;
+                }
 
                 &:hover:enabled {
                     border-color: color-mix(in srgb, currentColor 85%, black);
@@ -64,4 +78,52 @@
 .p-dialog .p-dialog-description {
     width: 100%;
     height: 130px;
+}
+
+.p-menuitem-link {
+    &[aria-label="Default"] {
+        .p-menuitem-icon {
+            color: var(--admss-app-statuses-default) !important;
+        }
+    }
+    &[aria-label="Started"] {
+        .p-menuitem-icon {
+            color: var(--admss-app-statuses-started) !important;
+        }
+    }
+    &[aria-label="In Progress"] {
+        .p-menuitem-icon {
+            color: var(--admss-app-statuses-in-progress) !important;
+        }
+    }
+    &[aria-label="Cancelled"] {
+        .p-menuitem-icon {
+            color: var(--admss-app-statuses-cancelled) !important;
+        }
+    }
+    &[aria-label="Postponed"] {
+        .p-menuitem-icon {
+            color: var(--admss-app-statuses-postponed) !important;
+        }
+    }
+    &[aria-label="Paused"] {
+        .p-menuitem-icon {
+            color: var(--admss-app-statuses-paused) !important;
+        }
+    }
+    &[aria-label="Completed"] {
+        .p-menuitem-icon {
+            color: var(--admss-app-statuses-completed) !important;
+        }
+    }
+    &[aria-label="Outdated"] {
+        .p-menuitem-icon {
+            color: var(--admss-app-statuses-outdated) !important;
+        }
+    }
+    &[aria-label="Deleted"] {
+        .p-menuitem-icon {
+            color: var(--admss-app-statuses-deleted) !important;
+        }
+    }
 }

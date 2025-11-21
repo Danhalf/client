@@ -186,7 +186,8 @@ export const AddTaskDialog = observer(
             return TASKS_STATUS_LIST.map((status) => ({
                 label: status.name,
                 value: status.value,
-                icon: "pi pi-check",
+                icon: "pi pi-circle",
+                iconClassName: `pi-circle--${status.value}`,
                 command: () => setCurrentTaskStatus({ label: status.name, value: status.value }),
             }));
         };
