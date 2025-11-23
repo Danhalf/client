@@ -22,6 +22,7 @@ import {
     setDeal,
     setDealFinance,
     setDealPayments,
+    setDealWashout,
 } from "http/services/deals.service";
 import { getInventoryInfo } from "http/services/inventory-service";
 import { action, makeAutoObservable } from "mobx";
@@ -81,6 +82,23 @@ export class DealStore {
 
     private _dealFirstTradeOverwrite: boolean = false;
     private _dealSecondTradeOverwrite: boolean = false;
+
+    private readonly _recalculateKeys: (keyof DealFinanceRecalculatePayload)[] = [
+        "CashPrice",
+        "TradeAllowance",
+        "TaxRate",
+        "Taxes",
+        "Accessory",
+        "Tags",
+        "Title",
+        "LicenseAndReg",
+        "Warranty",
+        "Gap",
+        "DocFee",
+        "TradeInPayoff",
+        "NetTradeAllowance",
+        "CashDown",
+    ];
 
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
@@ -310,13 +328,27 @@ export class DealStore {
     public changeDealFinances = action(
         async ({ key, value }: { key: keyof DealFinance; value: string | number }) => {
             const dealStore = this.rootStore.dealStore;
-            if (dealStore) {
+            if (dealStore && dealStore._dealID) {
+                const isRecalculateField = this._recalculateKeys.includes(
+                    key as keyof DealFinanceRecalculatePayload
+                );
+
+                if (isRecalculateField) {
+                    const currentWashoutState = JSON.parse(JSON.stringify(dealStore.dealWashout));
+                    const saveResponse = await setDealWashout(
+                        dealStore._dealID,
+                        currentWashoutState
+                    );
+
+                    if (saveResponse?.error) {
+                        return;
+                    }
+                }
+
                 const { dealFinances } = dealStore;
                 (dealFinances as Record<typeof key, string | number>)[key] = value;
 
-                if (dealStore._dealID) {
-                    await dealStore.recalculateAndUpdateWashout(dealStore._dealID);
-                }
+                await dealStore.recalculateAndUpdateWashout(dealStore._dealID);
             }
         }
     );
@@ -328,7 +360,13 @@ export class DealStore {
             (dealWashout as Record<typeof key, string | number>)[key] = value;
 
             if (dealStore._dealID) {
-                await dealStore.recalculateAndUpdateWashout(dealStore._dealID);
+                const isRecalculateField = this._recalculateKeys.includes(
+                    key as keyof DealFinanceRecalculatePayload
+                );
+
+                if (isRecalculateField) {
+                    await dealStore.recalculateAndUpdateWashout(dealStore._dealID);
+                }
             }
         }
     });
@@ -336,7 +374,14 @@ export class DealStore {
     public toggleIncludeCheckbox = action(
         async (fieldName: string, option: INCLUDE_OPTIONS | null) => {
             const dealStore = this.rootStore.dealStore;
-            if (dealStore) {
+            if (dealStore && dealStore._dealID) {
+                const currentWashoutState = JSON.parse(JSON.stringify(dealStore.dealWashout));
+                const saveResponse = await setDealWashout(dealStore._dealID, currentWashoutState);
+
+                if (saveResponse?.error) {
+                    return;
+                }
+
                 const { dealWashout } = dealStore;
                 const check1Field = `${fieldName}Check1` as keyof DealWashout;
                 const check2Field = `${fieldName}Check2` as keyof DealWashout;
@@ -356,9 +401,7 @@ export class DealStore {
                     dealWashoutRecord[check2Field] = 0;
                 }
 
-                if (dealStore._dealID) {
-                    await dealStore.recalculateAndUpdateWashout(dealStore._dealID);
-                }
+                await dealStore.recalculateAndUpdateWashout(dealStore._dealID);
             }
         }
     );
@@ -404,23 +447,7 @@ export class DealStore {
         try {
             this._isLoading = true;
             this._dealErrorMessage = "";
-            const recalculateKeys: (keyof DealFinanceRecalculatePayload)[] = [
-                "CashPrice",
-                "TradeAllowance",
-                "TaxRate",
-                "Taxes",
-                "Accessory",
-                "Tags",
-                "Title",
-                "LicenseAndReg",
-                "Warranty",
-                "Gap",
-                "DocFee",
-                "TradeInPayoff",
-                "NetTradeAllowance",
-                "CashDown",
-            ];
-            const payload = recalculateKeys.reduce((accumulator, key) => {
+            const payload = this._recalculateKeys.reduce((accumulator, key) => {
                 accumulator[key] = this._dealFinances[key];
                 return accumulator;
             }, {} as DealFinanceRecalculatePayload);
