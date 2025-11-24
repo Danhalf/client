@@ -308,7 +308,6 @@ export const AddTaskDialog = observer(
                         dropdownIcon='adms-arrow-bottom'
                         model={taskFilterOptions()}
                         className={`task-dialog__status-button status-button ${getStatusClassName()}`}
-                        menuStyle={{ transformOrigin: "bottom", top: "auto" }}
                         appendTo='self'
                         menuClassName='status-button__menu'
                     />
