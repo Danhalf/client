@@ -335,10 +335,9 @@ export class DealStore {
         ({ key, value }: { key: keyof DealFinance; value: string | number }) => {
             const dealStore = this.rootStore.dealStore;
             if (dealStore && dealStore._dealID) {
+                this._isFormChanged = true;
                 const { dealFinances } = dealStore;
                 (dealFinances as Record<typeof key, string | number>)[key] = value;
-
-                dealStore._debouncedRecalculate(dealStore._dealID);
             }
         }
     );
