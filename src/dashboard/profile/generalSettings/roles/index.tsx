@@ -25,7 +25,7 @@ const PAGINATOR_HEIGHT = 86;
 const TABLE_HEIGHT = `calc(100% - ${PAGINATOR_HEIGHT}px)`;
 
 enum USER_ROLE_MODAL_MESSAGE {
-    COPY_ROLE = "Do you really want to copy this role?",
+    COPY_ROLE = "Do you really want to duplicate this role?",
     DELETE_ROLE = "Do you really want to delete this role?",
 }
 
@@ -205,13 +205,13 @@ export const UsersRoles = observer((): ReactElement => {
                         bodyStyle={{ textAlign: "center" }}
                         body={(data: UserRole) => {
                             return (
-                                <>
+                                <div className='roles-table-row__buttons'>
                                     <Button
                                         text
                                         className='table-copy-button'
                                         disabled={!!data.isDefault}
                                         icon='adms-copy'
-                                        tooltip='Copy role'
+                                        tooltip='Duplicate role'
                                         severity={!!data.isDefault ? "secondary" : "success"}
                                         tooltipOptions={{
                                             position: "mouse",
@@ -236,14 +236,14 @@ export const UsersRoles = observer((): ReactElement => {
                                             handleDeleteUserRole(data);
                                         }}
                                     />
-                                </>
+                                </div>
                             );
                         }}
                         pt={{
                             root: {
                                 className: "border-left-none",
                                 style: {
-                                    width: "120px",
+                                    width: "60px",
                                 },
                             },
                         }}
@@ -254,14 +254,14 @@ export const UsersRoles = observer((): ReactElement => {
                 <ConfirmModal
                     visible={confirmVisible}
                     onHide={() => setConfirmVisible(false)}
-                    icon='adms-warning'
+                    icon='adms-error'
                     title={`Are you sure?`}
                     bodyMessage={confirmMessage}
                     confirmAction={confirmAction}
                     rejectAction={() => setConfirmVisible(false)}
                     rejectLabel='Cancel'
-                    acceptLabel='Confirm'
-                    className='users-confirm-dialog'
+                    acceptLabel='OK'
+                    className='roles-confirm-dialog'
                 />
             ) : null}
         </div>
