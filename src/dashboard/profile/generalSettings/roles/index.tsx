@@ -26,7 +26,8 @@ const TABLE_HEIGHT = `calc(100% - ${PAGINATOR_HEIGHT}px)`;
 
 enum USER_ROLE_MODAL_MESSAGE {
     COPY_ROLE = "Do you really want to duplicate this role?",
-    DELETE_ROLE = "Do you really want to delete this role?",
+    DELETE_ROLE = "Do you really want to delete this role? This process cannot be undone.",
+    DELETE_ROLE_SUCCESS = "Role is successfully deleted!",
 }
 
 export const UsersRoles = observer((): ReactElement => {
@@ -35,16 +36,16 @@ export const UsersRoles = observer((): ReactElement => {
     const [userRoles, setUserRoles] = useState<UserRole[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const dataTableRef = useRef<DataTable<UserRole[]>>(null);
-    const { showError } = useToastMessage();
+    const { showError, showSuccess } = useToastMessage();
     const navigate = useNavigate();
     const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
     const [selectedUserRole, setSelectedUserRole] = useState<UserRole | null>(null);
     const [confirmMessage, setConfirmMessage] = useState<string>("");
     const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
 
-    const handleGetUserRoles = async () => {
+    const handleGetUserRoles = async (withLoading: boolean = true) => {
         if (!authUser) return;
-        setIsLoading(true);
+        if (withLoading) setIsLoading(true);
         const response = await getUserRoles(authUser.useruid);
 
         if (response && Array.isArray(response)) {
@@ -93,7 +94,8 @@ export const UsersRoles = observer((): ReactElement => {
         if (response && response.error) {
             showError(response?.error);
         } else {
-            handleGetUserRoles();
+            handleGetUserRoles(false);
+            showSuccess(USER_ROLE_MODAL_MESSAGE.DELETE_ROLE_SUCCESS);
         }
         setConfirmVisible(false);
     };
