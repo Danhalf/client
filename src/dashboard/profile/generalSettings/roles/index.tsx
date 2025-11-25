@@ -13,6 +13,7 @@ import "./index.css";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { SETTINGS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
+import { DateFormat, DateReturnType, DateSeparator, parseDateFromServer } from "common/helpers";
 
 export type UserRoleColumnProps = Omit<ColumnProps, "field"> & {
     field?: keyof UserRole;
@@ -116,7 +117,7 @@ export const UsersRoles = observer((): ReactElement => {
             {isLoading && <Loader overlay />}
             <div className='settings-form__title'>Roles</div>
             <div className='flex justify-content-end mb-4'>
-                <Button className='settings-form__button' outlined onClick={handleAddNewUserRole}>
+                <Button className='settings-form__button' onClick={handleAddNewUserRole}>
                     New Role
                 </Button>
             </div>
@@ -184,7 +185,22 @@ export const UsersRoles = observer((): ReactElement => {
                         header='Created By'
                         style={{ width: "30%" }}
                     />
-                    <UserRoleColumn field='created' header='Date' style={{ width: "30%" }} />
+                    <UserRoleColumn
+                        field='created'
+                        header='Date'
+                        body={(data: UserRole) => {
+                            return (
+                                <span>
+                                    {parseDateFromServer(data.created, {
+                                        returnType: DateReturnType.DATE,
+                                        separator: DateSeparator.SLASH,
+                                        format: DateFormat.MM_DD_YYYY,
+                                    })}
+                                </span>
+                            );
+                        }}
+                        style={{ width: "30%" }}
+                    />
                     <UserRoleColumn
                         bodyStyle={{ textAlign: "center" }}
                         body={(data: UserRole) => {
