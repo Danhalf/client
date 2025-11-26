@@ -4,13 +4,6 @@
         gap: 20px;
     }
 
-    .account__card {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        margin-bottom: 45px;
-    }
-
     .accounts-dropdown {
         width: 230px;
         height: 50px;
