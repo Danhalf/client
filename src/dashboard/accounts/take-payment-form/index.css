@@ -25,7 +25,6 @@
 .take-payment__card {
     display: flex;
     flex-direction: column;
-    flex: 0 1 494px;
     max-width: 494px;
     row-gap: 18px;
     padding: 20px;
