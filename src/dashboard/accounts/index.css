@@ -17,7 +17,7 @@
 
     .account__accordion {
         border: none;
-        width: 343px;
+        width: var(--admss-app-card-sidebar-width);
     }
 
     .account__accordion .p-accordion-header .p-accordion-header-link,
