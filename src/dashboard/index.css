@@ -223,6 +223,12 @@
 
 .p-datatable .p-datatable-thead > tr > th {
     border: 1px solid var(--admss-app-medium-blue);
+    width: 1px;
+    white-space: nowrap;
+}
+
+.p-datatable .p-datatable-thead > tr > th:last-child {
+    width: auto;
 }
 
 .p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th {
