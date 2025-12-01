@@ -11,8 +11,8 @@ interface AuditHeaderProps {
     onPrint: () => void;
     onDownload: () => void;
     isLoading: boolean;
-    selectedAccountType: string;
-    onAccountTypeChange: (type: string) => void;
+    selectedAccountType: ACCOUNT_AUDIT_TYPES | undefined;
+    onAccountTypeChange: (type: ACCOUNT_AUDIT_TYPES) => void;
 }
 
 export default function AuditHeader({
@@ -68,14 +68,6 @@ export default function AuditHeader({
                 <label className='float-label' htmlFor='account-type-input'>
                     Filter by
                 </label>
-                {selectedAccountType && (
-                    <Button
-                        icon='pi pi-times'
-                        type='button'
-                        className='audit-filter__clear-button'
-                        onClick={() => onAccountTypeChange("")}
-                    />
-                )}
             </span>
             <Button
                 severity='success'
