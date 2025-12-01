@@ -11,6 +11,7 @@ import { useCreateReport, useToastMessage } from "common/hooks";
 import { AuditRecord, getAccountAudit } from "http/services/accounts.service";
 import { AccountsAuditUserSettings, ServerUserSettings } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { ACCOUNT_AUDIT_TYPES } from "common/constants/account-options";
 
 const columns = [
     { field: "name", header: "Account" },
@@ -33,9 +34,9 @@ export const AccountsAudit = observer((): ReactElement => {
     const [auditRecords, setAuditRecords] = useState<AuditRecord[]>([]);
     const [serverSettings, setServerSettings] = useState<ServerUserSettings>();
 
-    const getAuditRecords = async () => {
+    const getAuditRecords = async (type: ACCOUNT_AUDIT_TYPES) => {
         if (!authUser) return;
-        const response = await getAccountAudit(authUser.useruid);
+        const response = await getAccountAudit(type);
         if (Array.isArray(response)) {
             setAuditRecords(response);
         } else {
@@ -45,7 +46,7 @@ export const AccountsAudit = observer((): ReactElement => {
     };
 
     useEffect(() => {
-        getAuditRecords();
+        getAuditRecords(ACCOUNT_AUDIT_TYPES.ACTIVITY_FOR_TODAY);
     }, []);
 
     const printTableData = async (print: boolean = false) => {
