@@ -420,7 +420,7 @@ export const AccountPromiseToPay = observer((): ReactElement => {
                         resizableColumns
                         scrollable
                         rowExpansionTemplate={(data: AccountPromise) =>
-                            rowExpansionTemplate(data.notes, "Note: ")
+                            rowExpansionTemplate({ text: data.notes, label: "Note: " })
                         }
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}

@@ -192,7 +192,7 @@ export const AccountNotes = observer((): ReactElement => {
                         resizableColumns
                         scrollable
                         rowExpansionTemplate={(data: AccountNote) =>
-                            rowExpansionTemplate(data.Note || "", "Note: ")
+                            rowExpansionTemplate({ text: data.Note, label: "Note: " })
                         }
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}

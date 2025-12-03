@@ -27,3 +27,13 @@
     + td {
     border-left: none;
 }
+
+.expanded-row {
+    width: 100%;
+    display: flex;
+    padding-left: var(--expanded-row-left-padding, 60px);
+    column-gap: 20px;
+    .expanded-row__label {
+        font-weight: 700;
+    }
+}

@@ -405,7 +405,7 @@ export const AccountPaymentHistory = observer((): ReactElement => {
                         resizableColumns
                         scrollable
                         rowExpansionTemplate={(data: AccountHistory) =>
-                            rowExpansionTemplate(data.Comment || "", "Payment comment: ")
+                            rowExpansionTemplate({ text: data.Comment, label: "Payment comment: " })
                         }
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}

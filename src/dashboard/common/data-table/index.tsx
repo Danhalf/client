@@ -1,13 +1,53 @@
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
-import { ReactElement } from "react";
+import { Tooltip } from "primereact/tooltip";
+import { ReactElement, CSSProperties } from "react";
+import { truncateText } from "common/helpers";
 import "./index.css";
 
-export const rowExpansionTemplate = (text: string, label: string = "Description: ") => {
+interface RowExpansionTemplateProps {
+    text: string;
+    label?: string;
+    wrap?: "wrap" | "nowrap";
+    leftPadding?: number;
+    limitTextLength?: number;
+}
+
+export const rowExpansionTemplate = ({
+    text,
+    label,
+    wrap,
+    leftPadding,
+    limitTextLength,
+}: RowExpansionTemplateProps) => {
+    const safeText = text || "";
+    const isLimitProvided = typeof limitTextLength === "number";
+    const textToDisplay = isLimitProvided ? truncateText(safeText, limitTextLength) : safeText;
+    const tooltipText =
+        isLimitProvided && safeText.length > (limitTextLength ?? 0) ? safeText : undefined;
+    const tooltipId = `expanded-row-tooltip-${Math.random().toString(36).slice(2)}`;
+
+    const expandedRowStyle: CSSProperties | undefined = leftPadding
+        ? ({ "--expanded-row-left-padding": `${leftPadding}px` } as CSSProperties)
+        : undefined;
+
     return (
-        <div className='expanded-row'>
-            <div className='expanded-row__label'>{label}</div>
-            <div className='expanded-row__text'>{text || ""}</div>
+        <div className='expanded-row' style={expandedRowStyle}>
+            <div className='expanded-row__label'>{label || "Description: "}</div>
+
+            <div
+                className={`expanded-row__text text-${wrap || "wrap"}`}
+                data-tooltip-id={tooltipId}
+            >
+                {textToDisplay}
+                {tooltipText && (
+                    <Tooltip
+                        target={`[data-tooltip-id="${tooltipId}"]`}
+                        content={tooltipText}
+                        position='mouse'
+                    />
+                )}
+            </div>
         </div>
     );
 };

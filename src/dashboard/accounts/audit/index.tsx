@@ -13,7 +13,8 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
 import AuditHeader from "./components/AuditHeader";
 import { useCreateReport, useToastMessage } from "common/hooks";
-import { AuditRecord, getAccountAudit } from "http/services/accounts.service";
+import { getAccountAudit } from "http/services/accounts.service";
+import { AuditRecord } from "common/models/accounts";
 import { AccountsAuditUserSettings } from "common/models/user";
 import { ACCOUNT_AUDIT_TYPES } from "common/constants/account-options";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
@@ -21,7 +22,7 @@ import { TableColumn } from "dashboard/common/filter";
 import { Task } from "common/models/tasks";
 import { ExpansionColumn, rowExpansionTemplate } from "dashboard/common/data-table";
 
-const columns = [
+const columns: { field: keyof AuditRecord; header: string }[] = [
     { field: "name", header: "Account" },
     { field: "accountnumber", header: "Line#" },
     { field: "accounttype", header: "User" },
@@ -139,13 +140,15 @@ export const AccountsAudit = observer((): ReactElement => {
                             reorderableColumns
                             expandedRows={expandedRows}
                             rowExpansionTemplate={(data: AuditRecord) =>
-                                rowExpansionTemplate(data.accountName || "", "Note: ")
+                                rowExpansionTemplate({
+                                    text: data.notes,
+                                    limitTextLength: 128,
+                                })
                             }
                             resizableColumns
                             sortOrder={lazyState.sortOrder}
                             sortField={lazyState.sortField}
                             rowClassName={() => "hover:text-primary cursor-pointer"}
-                            emptyMessage='No data selected to display. Please use the filter field to select the necessary data table.'
                             onColumnResizeEnd={(event) => {
                                 if (authUser && event && event.column?.props?.field) {
                                     saveColumnWidth(
