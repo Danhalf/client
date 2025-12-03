@@ -29,6 +29,13 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isScanning, setIsScanning] = useState<boolean>(false);
 
+    const handleFieldChange = async (field: keyof ContactExtData, value: string) => {
+        changeContactExtData(field, value);
+        await setFieldValue(field, value, true);
+        await validateField(field);
+        setFieldTouched(field, true, true);
+    };
+
     const shouldDisableNameFields = useMemo(() => {
         return (
             !!contactExtData.CoBuyer_Emp_Company && contactExtData.CoBuyer_Emp_Company.trim() !== ""
@@ -234,13 +241,9 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                 <TextInput
                     className={`general-info__text-input w-full ${shouldShowNameRequired && touched.CoBuyer_First_Name && (!contactExtData.CoBuyer_First_Name || !contactExtData.CoBuyer_First_Name.trim()) ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_First_Name || ""}
-                    onChange={({ target: { value } }) => {
-                        setFieldValue("CoBuyer_First_Name", value, true).then(() => {
-                            changeContactExtData("CoBuyer_First_Name", value);
-                            validateField("CoBuyer_First_Name");
-                            setFieldTouched("CoBuyer_First_Name", true, true);
-                        });
-                    }}
+                    onChange={({ target: { value } }) =>
+                        handleFieldChange("CoBuyer_First_Name", value)
+                    }
                     onBlur={handleOfacCheck}
                     name={`First Name${shouldShowNameRequired ? " (required)" : ""}`}
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
@@ -262,13 +265,9 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     name='Middle Name'
                     className={`general-info__text-input w-full ${errors.CoBuyer_Middle_Name ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Middle_Name || ""}
-                    onChange={({ target: { value } }) => {
-                        setFieldValue("CoBuyer_Middle_Name", value, true).then(() => {
-                            changeContactExtData("CoBuyer_Middle_Name", value);
-                            validateField("CoBuyer_Middle_Name");
-                            setFieldTouched("CoBuyer_Middle_Name", true, true);
-                        });
-                    }}
+                    onChange={({ target: { value } }) =>
+                        handleFieldChange("CoBuyer_Middle_Name", value)
+                    }
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
                     disabled={shouldDisableNameFields}
                     clearButton
@@ -281,13 +280,9 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     name={`Last Name${shouldShowNameRequired ? " (required)" : ""}`}
                     className={`general-info__text-input w-full ${shouldShowNameRequired && touched.CoBuyer_Last_Name && (!contactExtData.CoBuyer_Last_Name || !contactExtData.CoBuyer_Last_Name.trim()) ? "p-invalid" : ""}`}
                     value={contactExtData.CoBuyer_Last_Name || ""}
-                    onChange={({ target: { value } }) => {
-                        setFieldValue("CoBuyer_Last_Name", value, true).then(() => {
-                            changeContactExtData("CoBuyer_Last_Name", value);
-                            validateField("CoBuyer_Last_Name");
-                            setFieldTouched("CoBuyer_Last_Name", true, true);
-                        });
-                    }}
+                    onChange={({ target: { value } }) =>
+                        handleFieldChange("CoBuyer_Last_Name", value)
+                    }
                     onBlur={handleOfacCheck}
                     tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
                     disabled={shouldDisableNameFields}

@@ -858,6 +858,7 @@ export class ContactStore {
 
     public set separateContact(state: boolean) {
         this._separateContact = state;
+        this._isContactChanged = true;
     }
 
     public set uploadFileDocuments(files: UploadMediaItem) {
