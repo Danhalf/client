@@ -155,30 +155,7 @@ export const AccountsAudit = observer((): ReactElement => {
                                 }
                             }}
                         >
-                            {/* <Column
-                                bodyStyle={{ textAlign: "center" }}
-                                reorderable={false}
-                                resizeable={false}
-                                body={(audit) => {
-                                    return (
-                                        <div className={`flex gap-3 align-items-center`}>
-                                            <Button
-                                                className='text export-web__icon-button'
-                                                icon='pi pi-angle-down'
-                                                onClick={() => handleRowExpansion(audit)}
-                                            />
-                                        </div>
-                                    );
-                                }}
-                                pt={{
-                                    root: {
-                                        style: {
-                                            width: "60px",
-                                        },
-                                    },
-                                }}
-                            /> */}
-                            <ExpansionColumn handleRowExpansion={handleRowExpansion} />
+                            {ExpansionColumn({ handleRowExpansion })}
                             {columns.map(({ field, header }) => {
                                 const savedWidth = moduleSettings?.columnWidth?.[field];
 

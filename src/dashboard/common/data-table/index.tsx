@@ -1,6 +1,7 @@
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
 import { ReactElement } from "react";
+import "./index.css";
 
 export const rowExpansionTemplate = (text: string, label: string = "Description: ") => {
     return (
@@ -19,12 +20,13 @@ interface ExpansionColumnProps extends ColumnProps {
 export const ExpansionColumn = (props: ExpansionColumnProps): ReactElement => {
     return (
         <Column
+            className='expansion-column-cell'
             bodyStyle={{ textAlign: "center" }}
             reorderable={props.reorderable ?? false}
             resizeable={props.resizeable ?? false}
             body={(rowData) => {
                 return (
-                    <div className={`expansion-column flex gap-3 align-items-center`}>
+                    <div className={`expansion-column`}>
                         <Button
                             className='text expansion-column__button'
                             icon='pi pi-angle-down'
