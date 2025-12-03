@@ -1,0 +1,9 @@
+.expansion-column {
+    .expansion-column__button.p-button {
+        color: var(--admss-app-primary-main-green);
+        background: transparent;
+        width: 20px;
+        height: 20px;
+        border: none;
+    }
+}

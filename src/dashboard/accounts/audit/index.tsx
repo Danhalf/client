@@ -1,6 +1,11 @@
 import { ReactElement, useEffect, useState } from "react";
 import { DatatableQueries, initialDataTableQueries } from "common/models/datatable-queries";
-import { DataTable, DataTablePageEvent, DataTableSortEvent } from "primereact/datatable";
+import {
+    DataTable,
+    DataTablePageEvent,
+    DataTableSortEvent,
+    DataTableValue,
+} from "primereact/datatable";
 import { Column } from "primereact/column";
 import { ROWS_PER_PAGE } from "common/settings";
 import { Loader } from "dashboard/common/loader";
@@ -13,6 +18,8 @@ import { AccountsAuditUserSettings } from "common/models/user";
 import { ACCOUNT_AUDIT_TYPES } from "common/constants/account-options";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { TableColumn } from "dashboard/common/filter";
+import { Task } from "common/models/tasks";
+import { ExpansionColumn, rowExpansionTemplate } from "dashboard/common/data-table";
 
 const columns = [
     { field: "name", header: "Account" },
@@ -38,6 +45,7 @@ export const AccountsAudit = observer((): ReactElement => {
     const [selectedAuditType, setSelectedAuditType] = useState<ACCOUNT_AUDIT_TYPES | undefined>(
         undefined
     );
+    const [expandedRows, setExpandedRows] = useState<DataTableValue[]>([]);
 
     const getAuditRecords = async (type: ACCOUNT_AUDIT_TYPES) => {
         if (!authUser) return;
@@ -93,6 +101,12 @@ export const AccountsAudit = observer((): ReactElement => {
         setModuleSettings({ selectedAuditType: type });
     };
 
+    const handleRowExpansion = (task: Task) => {
+        setExpandedRows((prev) =>
+            prev.includes(task) ? prev.filter((t) => t !== task) : [...prev, task]
+        );
+    };
+
     return (
         <div className='card-content'>
             <AuditHeader
@@ -123,6 +137,10 @@ export const AccountsAudit = observer((): ReactElement => {
                             onPage={pageChanged}
                             onSort={sortData}
                             reorderableColumns
+                            expandedRows={expandedRows}
+                            rowExpansionTemplate={(data: AuditRecord) =>
+                                rowExpansionTemplate(data.accountName || "", "Note: ")
+                            }
                             resizableColumns
                             sortOrder={lazyState.sortOrder}
                             sortField={lazyState.sortField}
@@ -137,6 +155,30 @@ export const AccountsAudit = observer((): ReactElement => {
                                 }
                             }}
                         >
+                            {/* <Column
+                                bodyStyle={{ textAlign: "center" }}
+                                reorderable={false}
+                                resizeable={false}
+                                body={(audit) => {
+                                    return (
+                                        <div className={`flex gap-3 align-items-center`}>
+                                            <Button
+                                                className='text export-web__icon-button'
+                                                icon='pi pi-angle-down'
+                                                onClick={() => handleRowExpansion(audit)}
+                                            />
+                                        </div>
+                                    );
+                                }}
+                                pt={{
+                                    root: {
+                                        style: {
+                                            width: "60px",
+                                        },
+                                    },
+                                }}
+                            /> */}
+                            <ExpansionColumn handleRowExpansion={handleRowExpansion} />
                             {columns.map(({ field, header }) => {
                                 const savedWidth = moduleSettings?.columnWidth?.[field];
 
