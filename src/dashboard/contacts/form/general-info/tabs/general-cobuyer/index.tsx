@@ -6,9 +6,7 @@ import { Contact, ContactExtData, ContactOFAC, ScanBarcodeDL } from "common/mode
 import { checkContactOFAC, scanContactDL } from "http/services/contacts-service";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
-import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
-import { TOAST_LIFETIME } from "common/settings";
 import { TextInput } from "dashboard/common/form/inputs";
 import { useFormikContext } from "formik";
 import { parseCustomDate } from "common/helpers";
@@ -17,6 +15,7 @@ import { TOOLTIP_MESSAGE } from "dashboard/contacts/form/general-info/tabs/gener
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { Loader } from "dashboard/common/loader";
 import "./index.css";
+import { useToastMessage } from "common/hooks";
 
 export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
     const { id } = useParams();
@@ -25,7 +24,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
 
     const { setFieldValue, validateField, setFieldTouched, errors, touched } =
         useFormikContext<ContactExtData>();
-    const toast = useToast();
+    const { showError } = useToastMessage();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isScanning, setIsScanning] = useState<boolean>(false);
@@ -135,15 +134,9 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
             }
             handleOfacCheck();
         } catch (error) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail:
-                    error instanceof Error
-                        ? error.message
-                        : "Failed to parse date from driver license",
-                life: TOAST_LIFETIME,
-            });
+            showError(
+                error instanceof Error ? error.message : "Failed to parse date from driver license"
+            );
         } finally {
             setIsScanning(false);
             event.target.value = "";
@@ -170,12 +163,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
         };
         const response = await checkContactOFAC(id, contactData as Contact);
         if (response?.status === Status.ERROR) {
-            toast.current?.show({
-                severity: "error",
-                summary: Status.ERROR,
-                detail: response.error,
-                life: TOAST_LIFETIME,
-            });
+            showError(response.error);
         } else {
             store.coBuyerContactOFAC = response as ContactOFAC;
         }
