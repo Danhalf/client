@@ -1,8 +1,8 @@
-import { InputMask } from "primereact/inputmask";
 import { Button } from "primereact/button";
 import { FormikProps } from "formik";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
+import { PhoneInput } from "dashboard/common/form/inputs";
 import { ProgressIndicator } from "../ProgressIndicator";
 
 interface TwoFactorAuthForm {
@@ -27,24 +27,18 @@ export const PhoneNumberStep = observer(({ formik }: PhoneNumberStepProps) => {
             </p>
             <form onSubmit={formik.handleSubmit}>
                 <div className='two-factor-auth__input space pt-2 pb-2'>
-                    <span className='w-full p-float-label'>
-                        <InputMask
-                            mask='999-999-9999'
-                            placeholder='Phone number'
-                            className={`sign__input ${
-                                formik.touched.phoneNumber && formik.errors.phoneNumber
-                                    ? "p-invalid"
-                                    : ""
-                            }`}
-                            id='phoneNumber'
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            value={formik.values.phoneNumber}
-                            autoClear={false}
-                            unmask={false}
-                        />
-                        <label htmlFor='phoneNumber'>Phone number</label>
-                    </span>
+                    <PhoneInput
+                        name='Phone number'
+                        className={`sign__input ${
+                            formik.touched.phoneNumber && formik.errors.phoneNumber
+                                ? "p-invalid"
+                                : ""
+                        }`}
+                        id='phoneNumber'
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.phoneNumber}
+                    />
                     {formik.touched.phoneNumber && formik.errors.phoneNumber ? (
                         <small className='p-error error-space'>{formik.errors.phoneNumber}</small>
                     ) : null}

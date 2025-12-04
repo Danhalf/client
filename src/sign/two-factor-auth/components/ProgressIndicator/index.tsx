@@ -1,4 +1,3 @@
-
 interface ProgressIndicatorProps {
     currentStep: number;
 }
@@ -18,4 +17,3 @@ export const ProgressIndicator = ({ currentStep }: ProgressIndicatorProps) => {
         </div>
     );
 };
-
