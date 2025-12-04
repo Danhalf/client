@@ -1,6 +1,8 @@
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { FormikProps } from "formik";
+import { observer } from "mobx-react-lite";
+import { useStore } from "store/hooks";
 import { ProgressIndicator } from "../ProgressIndicator";
 
 interface TwoFactorAuthForm {
@@ -11,27 +13,11 @@ interface TwoFactorAuthForm {
 
 interface VerificationCodeStepProps {
     formik: FormikProps<TwoFactorAuthForm>;
-    currentStep: number;
-    phoneNumber: string;
-    verificationCode: string[];
-    codeInputRefs: React.MutableRefObject<(HTMLInputElement | null)[]>;
-    resendTimer: number;
-    onCodeChange: (index: number, value: string) => void;
-    onCodeKeyDown: (index: number, e: React.KeyboardEvent<HTMLInputElement>) => void;
-    onResendCode: () => void;
 }
 
-export const VerificationCodeStep = ({
-    formik,
-    currentStep,
-    phoneNumber,
-    verificationCode,
-    codeInputRefs,
-    resendTimer,
-    onCodeChange,
-    onCodeKeyDown,
-    onResendCode,
-}: VerificationCodeStepProps) => {
+export const VerificationCodeStep = observer(({ formik }: VerificationCodeStepProps) => {
+    const twoFactorAuthStore = useStore().userStore.twoFactorAuth;
+
     const formatPhoneNumber = (phone: string): string => {
         const digits = phone.replace(/\D/g, "");
         if (digits.length === 10) {
@@ -40,22 +26,31 @@ export const VerificationCodeStep = ({
         return phone;
     };
 
+    const handleCodeChange = (index: number, value: string) => {
+        twoFactorAuthStore.handleCodeChange(index, value);
+        formik.setFieldValue("verificationCode", twoFactorAuthStore.verificationCode);
+    };
+
     return (
         <>
-            <ProgressIndicator currentStep={currentStep} />
+            <ProgressIndicator currentStep={twoFactorAuthStore.currentStep} />
             <h1 className='two-factor-auth__title'>Authentication</h1>
             <p className='two-factor-auth__description'>
-                Enter the code we just sent to {phoneNumber ? formatPhoneNumber(phoneNumber) : "your phone"} to verify your identity.
+                Enter the code we just sent to{" "}
+                {twoFactorAuthStore.phoneNumber
+                    ? formatPhoneNumber(twoFactorAuthStore.phoneNumber)
+                    : "your phone"}{" "}
+                to verify your identity.
             </p>
             <form onSubmit={formik.handleSubmit}>
                 <div className='two-factor-auth__code-inputs'>
-                    {verificationCode.map((code, index) => (
+                    {twoFactorAuthStore.verificationCode.map((code, index) => (
                         <InputText
                             key={index}
-                            ref={(el) => (codeInputRefs.current[index] = el)}
+                            ref={(el) => twoFactorAuthStore.setCodeInputRef(index, el)}
                             value={code}
-                            onChange={(e) => onCodeChange(index, e.target.value)}
-                            onKeyDown={(e) => onCodeKeyDown(index, e)}
+                            onChange={(e) => handleCodeChange(index, e.target.value)}
+                            onKeyDown={(e) => twoFactorAuthStore.handleCodeKeyDown(index, e)}
                             className='two-factor-auth__code-input'
                             maxLength={1}
                         />
@@ -74,15 +69,15 @@ export const VerificationCodeStep = ({
                 </div>
                 <div className='two-factor-auth__resend'>
                     <span>Didn't receive a code? </span>
-                    {resendTimer > 0 ? (
+                    {twoFactorAuthStore.resendTimer > 0 ? (
                         <span className='two-factor-auth__resend-timer'>
-                            Resend code in {resendTimer} seconds
+                            Resend code in {twoFactorAuthStore.resendTimer} seconds
                         </span>
                     ) : (
                         <button
                             type='button'
                             className='two-factor-auth__resend-link'
-                            onClick={onResendCode}
+                            onClick={() => twoFactorAuthStore.handleResendCode()}
                         >
                             Resend code
                         </button>
@@ -91,5 +86,4 @@ export const VerificationCodeStep = ({
             </form>
         </>
     );
-};
-
+});

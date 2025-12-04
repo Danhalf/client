@@ -1,26 +1,18 @@
 import { Button } from "primereact/button";
+import { observer } from "mobx-react-lite";
+import { useStore } from "store/hooks";
 import { ProgressIndicator } from "sign/two-factor-auth/components/ProgressIndicator";
 
 interface BackupCodesStepProps {
-    currentStep: number;
-    backupCodes: string[];
-    onSave: () => void;
-    onPrint: () => void;
-    onCopy: () => void;
     onComplete: () => void;
 }
 
-export const BackupCodesStep = ({
-    currentStep,
-    backupCodes,
-    onSave,
-    onPrint,
-    onCopy,
-    onComplete,
-}: BackupCodesStepProps) => {
+export const BackupCodesStep = observer(({ onComplete }: BackupCodesStepProps) => {
+    const twoFactorAuthStore = useStore().userStore.twoFactorAuth;
+
     return (
         <>
-            <ProgressIndicator currentStep={currentStep} />
+            <ProgressIndicator currentStep={twoFactorAuthStore.currentStep} />
             <div className='two-factor-auth__success-icon'>
                 <i className='icon adms-check' />
             </div>
@@ -32,20 +24,32 @@ export const BackupCodesStep = ({
                 if you can't receive verification codes on your phone.
             </p>
             <div className='two-factor-auth__backup-codes'>
-                {backupCodes.map((code, index) => (
+                {twoFactorAuthStore.backupCodes.map((code, index) => (
                     <div key={index} className='two-factor-auth__backup-code'>
                         {code}
                     </div>
                 ))}
             </div>
             <div className='two-factor-auth__backup-actions'>
-                <button type='button' className='two-factor-auth__backup-action' onClick={onSave}>
+                <button
+                    type='button'
+                    className='two-factor-auth__backup-action'
+                    onClick={() => twoFactorAuthStore.handleSaveBackupCodes()}
+                >
                     Save
                 </button>
-                <button type='button' className='two-factor-auth__backup-action' onClick={onPrint}>
+                <button
+                    type='button'
+                    className='two-factor-auth__backup-action'
+                    onClick={() => twoFactorAuthStore.handlePrintBackupCodes()}
+                >
                     Print
                 </button>
-                <button type='button' className='two-factor-auth__backup-action' onClick={onCopy}>
+                <button
+                    type='button'
+                    className='two-factor-auth__backup-action'
+                    onClick={() => twoFactorAuthStore.handleCopyBackupCodes()}
+                >
                     Copy
                 </button>
             </div>
@@ -59,4 +63,4 @@ export const BackupCodesStep = ({
             </div>
         </>
     );
-};
+});

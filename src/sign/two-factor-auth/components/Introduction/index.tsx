@@ -1,24 +1,20 @@
 import { Button } from "primereact/button";
+import { observer } from "mobx-react-lite";
+import { useStore } from "store/hooks";
+import twoFactorAuthImage from "assets/images/2fa_mobile.svg";
 
-interface IntroductionStepProps {
-    onContinue: () => void;
-}
+export const IntroductionStep = observer(() => {
+    const twoFactorAuthStore = useStore().userStore.twoFactorAuth;
 
-export const IntroductionStep = ({ onContinue }: IntroductionStepProps) => {
     return (
         <>
             <div className='two-factor-auth__icon'>
-                <div className='two-factor-auth__icon-devices'>
-                    <div className='two-factor-auth__icon-device two-factor-auth__icon-device--desktop'>
-                        <i className='icon adms-check' />
-                    </div>
-                    <div className='two-factor-auth__icon-lock'>
-                        <i className='icon adms-lock' />
-                    </div>
-                    <div className='two-factor-auth__icon-device two-factor-auth__icon-device--phone'>
-                        <i className='icon adms-check' />
-                    </div>
-                </div>
+                <img
+                    src={twoFactorAuthImage}
+                    alt='Two-factor authentication'
+                    width={106}
+                    height={101}
+                />
             </div>
             <h1 className='two-factor-auth__title'>Two-factor authentication</h1>
             <p className='two-factor-auth__description'>
@@ -28,10 +24,9 @@ export const IntroductionStep = ({ onContinue }: IntroductionStepProps) => {
             <Button
                 label='Continue'
                 severity='success'
-                onClick={onContinue}
+                onClick={() => twoFactorAuthStore.handleContinue()}
                 className='two-factor-auth__button two-factor-auth__button--primary'
             />
         </>
     );
-};
-
+});

@@ -1,6 +1,8 @@
 import { InputMask } from "primereact/inputmask";
 import { Button } from "primereact/button";
 import { FormikProps } from "formik";
+import { observer } from "mobx-react-lite";
+import { useStore } from "store/hooks";
 import { ProgressIndicator } from "../ProgressIndicator";
 
 interface TwoFactorAuthForm {
@@ -11,13 +13,14 @@ interface TwoFactorAuthForm {
 
 interface PhoneNumberStepProps {
     formik: FormikProps<TwoFactorAuthForm>;
-    currentStep: number;
 }
 
-export const PhoneNumberStep = ({ formik, currentStep }: PhoneNumberStepProps) => {
+export const PhoneNumberStep = observer(({ formik }: PhoneNumberStepProps) => {
+    const twoFactorAuthStore = useStore().userStore.twoFactorAuth;
+
     return (
         <>
-            <ProgressIndicator currentStep={currentStep} />
+            <ProgressIndicator currentStep={twoFactorAuthStore.currentStep} />
             <h1 className='two-factor-auth__title'>Add Your Number</h1>
             <p className='two-factor-auth__description'>
                 Enter your phone number, and we'll send you a verification code via text message.
@@ -57,5 +60,4 @@ export const PhoneNumberStep = ({ formik, currentStep }: PhoneNumberStepProps) =
             </form>
         </>
     );
-};
-
+});
