@@ -56,7 +56,11 @@ export const SignIn = () => {
                     }
                     try {
                         userStore.storedUser = response;
-                        navigate("/2fa");
+                        if (userStore.twoFactorAuth.isEnabled) {
+                            navigate("/2fa");
+                        } else {
+                            navigate("/dashboard");
+                        }
                     } catch (error) {
                         showError(String(error));
                         return;
@@ -140,7 +144,14 @@ export const SignIn = () => {
                                     checked={formik.values.rememberme}
                                     onChange={(e) => formik.setFieldValue("rememberme", e.checked)}
                                 />
-                                <label htmlFor='rememberme' className='ml-2 user-help__label'>
+                                <label
+                                    htmlFor='rememberme'
+                                    onClick={() =>
+                                        (userStore.twoFactorAuth.isEnabled =
+                                            !userStore.twoFactorAuth.isEnabled)
+                                    }
+                                    className='ml-2 user-help__label'
+                                >
                                     Remember me
                                 </label>
                             </div>

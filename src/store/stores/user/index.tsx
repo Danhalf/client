@@ -39,6 +39,7 @@ class TwoFactorAuth {
     private _backupCodes: string[] = [];
     private _resendTimer: number = 60;
     private _codeInputRefs: (HTMLInputElement | null)[] = [];
+    private _isEnabled: boolean = false;
 
     constructor() {
         makeAutoObservable(this);
@@ -76,8 +77,16 @@ class TwoFactorAuth {
         this._phoneNumber = value;
     }
 
+    public get isEnabled() {
+        return this._isEnabled;
+    }
+
     public set verificationCode(value: string[]) {
         this._verificationCode = value;
+    }
+
+    public set isEnabled(value: boolean) {
+        this._isEnabled = value;
     }
 
     public set backupCodes(value: string[]) {
