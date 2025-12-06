@@ -452,6 +452,10 @@ export const ContactForm = observer((): ReactElement => {
                     showSuccess("Contact saved successfully");
                 } else {
                     if (response && Array.isArray(response)) {
+                        const formErrors: Record<string, string> = {};
+                        let ssnDuplicateErrorShown = false;
+                        const touchedFields: string[] = [];
+
                         response.forEach((error) => {
                             const serverField = error.field.toLowerCase();
                             const formField =
@@ -459,14 +463,45 @@ export const ContactForm = observer((): ReactElement => {
                                     (field) => field.toLowerCase() === serverField
                                 ) || error.field;
 
-                            formikRef.current?.setErrors({ [formField]: error.message });
-                            formikRef.current?.setFieldTouched(formField, true, false);
-                            showError(error.message);
+                            const isSSNDuplicateError =
+                                (error.field === "Buyer_SS_Number" ||
+                                    error.field === "CoBuyer_SS_Number") &&
+                                error.message.includes("must not be equal");
+
+                            if (isSSNDuplicateError) {
+                                if (!ssnDuplicateErrorShown) {
+                                    formErrors["Buyer_SS_Number"] = ERROR_MESSAGES.SSN_DUPLICATE;
+                                    formErrors["CoBuyer_SS_Number"] = ERROR_MESSAGES.SSN_DUPLICATE;
+                                    touchedFields.push("Buyer_SS_Number", "CoBuyer_SS_Number");
+                                    showError(ERROR_MESSAGES.SSN_DUPLICATE);
+                                    ssnDuplicateErrorShown = true;
+                                }
+                            } else {
+                                formErrors[formField] = error.message;
+                                touchedFields.push(formField);
+                                showError(error.message);
+                            }
                         });
 
-                        const serverErrorFields = response.map((error) =>
-                            error.field.toLowerCase()
-                        );
+                        if (Object.keys(formErrors).length > 0) {
+                            formikRef.current?.setErrors(formErrors);
+                            touchedFields.forEach((field) => {
+                                formikRef.current?.setFieldTouched(field, true, false);
+                            });
+                        }
+
+                        const serverErrorFields = response
+                            .map((error) => {
+                                const isSSNDuplicateError =
+                                    (error.field === "Buyer_SS_Number" ||
+                                        error.field === "CoBuyer_SS_Number") &&
+                                    error.message.includes("must not be equal");
+                                if (isSSNDuplicateError) {
+                                    return ["buyer_ss_number", "cobuyer_ss_number"];
+                                }
+                                return error.field.toLowerCase();
+                            })
+                            .flat();
                         const currentSectionsWithErrors: string[] = [];
                         Object.entries(tabFields).forEach(([key, value]) => {
                             value.forEach((field) => {
