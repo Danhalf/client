@@ -57,9 +57,7 @@ export type PartialContact = Pick<
         | "Buyer_Emp_Phone"
         | "Buyer_SS_Number"
         | "CoBuyer_SS_Number"
-    > & {
-        separateContact?: boolean;
-    };
+    >;
 
 const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>> = {
     [ContactAccordionItems.BUYER]: [
@@ -176,46 +174,40 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
     CoBuyer_First_Name: Yup.string()
         .trim()
         .test("coBuyerFirstNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
-            const { CoBuyer_Last_Name, CoBuyer_Middle_Name, type, separateContact } = this.parent;
-            if (type !== BUYER_ID && !separateContact) return true;
-            if (
-                separateContact ||
-                (type === BUYER_ID && (CoBuyer_Last_Name?.trim() || CoBuyer_Middle_Name?.trim()))
-            ) {
+            const { CoBuyer_Last_Name, CoBuyer_Middle_Name, type } = this.parent;
+            if (type !== BUYER_ID) return true;
+            if (type === BUYER_ID && (CoBuyer_Last_Name?.trim() || CoBuyer_Middle_Name?.trim())) {
                 return !!value?.trim();
             }
             return true;
         })
         .test("coBuyerFirstNameFormat", handleValidationMessage("First name"), function (value) {
-            const { type, separateContact } = this.parent;
-            if (type !== BUYER_ID && !separateContact) return true;
+            const { type } = this.parent;
+            if (type !== BUYER_ID) return true;
             if (!value || !value.trim()) return true;
             return LETTERS_NUMBERS_SIGNS_REGEX.test(value);
         }),
     CoBuyer_Middle_Name: Yup.string()
         .trim()
         .test("coBuyerMiddleNameFormat", handleValidationMessage("Middle name"), function (value) {
-            const { type, separateContact } = this.parent;
-            if (type !== BUYER_ID && !separateContact) return true;
+            const { type } = this.parent;
+            if (type !== BUYER_ID) return true;
             if (!value || !value.trim()) return true;
             return LETTERS_NUMBERS_SIGNS_REGEX.test(value);
         }),
     CoBuyer_Last_Name: Yup.string()
         .trim()
         .test("coBuyerLastNameRequired", ERROR_MESSAGES.REQUIRED, function (value) {
-            const { CoBuyer_First_Name, CoBuyer_Middle_Name, type, separateContact } = this.parent;
-            if (type !== BUYER_ID && !separateContact) return true;
-            if (
-                separateContact ||
-                (type === BUYER_ID && (CoBuyer_First_Name?.trim() || CoBuyer_Middle_Name?.trim()))
-            ) {
+            const { CoBuyer_First_Name, CoBuyer_Middle_Name, type } = this.parent;
+            if (type !== BUYER_ID) return true;
+            if (type === BUYER_ID && (CoBuyer_First_Name?.trim() || CoBuyer_Middle_Name?.trim())) {
                 return !!value?.trim();
             }
             return true;
         })
         .test("coBuyerLastNameFormat", handleValidationMessage("Last name"), function (value) {
-            const { type, separateContact } = this.parent;
-            if (type !== BUYER_ID && !separateContact) return true;
+            const { type } = this.parent;
+            if (type !== BUYER_ID) return true;
             if (!value || !value.trim()) return true;
             return LETTERS_NUMBERS_SIGNS_REGEX.test(value);
         }),
@@ -233,15 +225,14 @@ export const ContactFormSchema: Yup.ObjectSchema<Partial<PartialContact>> = Yup.
         "ssnFormat",
         handleValidationMessage("Co-Buyer SSN", true),
         function (value) {
-            const { type, separateContact } = this.parent;
-            if (type !== BUYER_ID && !separateContact) return true;
+            const { type } = this.parent;
+            if (type !== BUYER_ID) return true;
             if (!value || !value.trim().length) return true;
             const digitsOnly = value.replace(/\D/g, "");
             if (!!digitsOnly.length && digitsOnly.length < SSN_VALID_LENGTH) return false;
             return SSN_REGEX.test(value);
         }
     ),
-    separateContact: Yup.boolean(),
 });
 
 const DialogBody = ({ type }: { type: ERROR_TYPE }): ReactElement => {
@@ -295,7 +286,6 @@ export const ContactForm = observer((): ReactElement => {
         deleteReason,
         activeTab,
         tabLength,
-        separateContact,
     } = store;
     const navigate = useNavigate();
     const formikRef = useRef<FormikProps<PartialContact>>(null);
@@ -441,7 +431,7 @@ export const ContactForm = observer((): ReactElement => {
             const allErrors = { ...errors, ...coBuyerValidationErrors };
 
             if (!Object.keys(allErrors).length) {
-                if (contact.type !== BUYER_ID && !store.separateContact) {
+                if (contact.type !== BUYER_ID) {
                     store.changeContactExtData([
                         ["CoBuyer_First_Name", ""],
                         ["CoBuyer_Middle_Name", ""],
@@ -450,13 +440,7 @@ export const ContactForm = observer((): ReactElement => {
                     ]);
                 }
 
-                let response;
-
-                if (store.separateContact) {
-                    response = await store.createSeparateCoBuyerContact();
-                } else {
-                    response = await saveContact();
-                }
+                const response = await saveContact();
 
                 if (response && response.status === Status.OK) {
                     if (memoRoute) {
@@ -746,7 +730,6 @@ export const ContactForm = observer((): ReactElement => {
                                                         contactExtData.Buyer_SS_Number || "",
                                                     CoBuyer_SS_Number:
                                                         contactExtData.CoBuyer_SS_Number || "",
-                                                    separateContact: separateContact || false,
                                                 } as PartialContact
                                             }
                                             enableReinitialize
