@@ -82,9 +82,15 @@ export const TwoFactorAuth = observer(() => {
         twoFactorAuthStore.currentStep === TwoFactorAuthStep.PHONE_NUMBER ||
         twoFactorAuthStore.currentStep === TwoFactorAuthStep.VERIFICATION_CODE;
 
+    const isSuccessStep = twoFactorAuthStore.currentStep === TwoFactorAuthStep.SUCCESS;
+
     return (
         <section className='sign'>
-            <div className={`two-factor-auth ${isCompactStep ? "two-factor-auth--compact" : ""}`}>
+            <div
+                className={`two-factor-auth ${isCompactStep ? "two-factor-auth--compact" : ""} ${
+                    isSuccessStep ? "two-factor-auth--success" : ""
+                }`}
+            >
                 <div className='two-factor-auth-wrapper'>
                     {twoFactorAuthStore.currentStep === TwoFactorAuthStep.INTRODUCTION && (
                         <IntroductionStep />
