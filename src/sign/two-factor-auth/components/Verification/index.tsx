@@ -33,25 +33,30 @@ export const VerificationCodeStep = observer(({ formik }: VerificationCodeStepPr
 
     return (
         <>
-            <ProgressIndicator currentStep={twoFactorAuthStore.currentStep} />
+            <ProgressIndicator currentStep={2} />
             <h1 className='two-factor-auth__title'>Authentication</h1>
-            <p className='two-factor-auth__description'>
-                Enter the code we just sent to{" "}
+            <p className='two-factor-auth__description two-factor-auth__description--verification'>
+                Enter the code we just sent <br /> to &nbsp;
                 {twoFactorAuthStore.phoneNumber
                     ? formatPhoneNumber(twoFactorAuthStore.phoneNumber)
-                    : "your phone"}{" "}
-                to verify your identity.
+                    : "your phone"}
+                &nbsp; to verify your identity.
             </p>
-            <form onSubmit={formik.handleSubmit}>
+            <form className='auth-verification' onSubmit={formik.handleSubmit}>
                 <div className='two-factor-auth__code-inputs'>
                     {twoFactorAuthStore.verificationCode.map((code, index) => (
                         <InputText
                             key={index}
                             ref={(el) => twoFactorAuthStore.setCodeInputRef(index, el)}
                             value={code}
-                            onChange={(e) => handleCodeChange(index, e.target.value)}
+                            onChange={(e) => {
+                                handleCodeChange(index, e.target.value);
+                                formik.setFieldTouched("verificationCode", true, false);
+                            }}
                             onKeyDown={(e) => twoFactorAuthStore.handleCodeKeyDown(index, e)}
-                            className='two-factor-auth__code-input'
+                            className={`two-factor-auth__code-input ${
+                                !code ? "two-factor-auth__code-input--empty" : ""
+                            }`}
                             maxLength={1}
                         />
                     ))}
@@ -59,14 +64,21 @@ export const VerificationCodeStep = observer(({ formik }: VerificationCodeStepPr
                 {formik.touched.verificationCode && formik.errors.verificationCode ? (
                     <small className='p-error'>{formik.errors.verificationCode}</small>
                 ) : null}
-                <div className='text-center'>
-                    <Button
-                        label='Continue'
-                        severity='secondary'
-                        type='submit'
-                        className='two-factor-auth__button two-factor-auth__button--secondary'
-                    />
-                </div>
+                <Button
+                    label='Continue'
+                    severity={
+                        !formik.errors.verificationCode &&
+                        formik.values.verificationCode.every((code) => code.trim())
+                            ? "success"
+                            : "secondary"
+                    }
+                    disabled={
+                        !formik.values.verificationCode.every((code) => code.trim()) ||
+                        !!formik.errors.verificationCode
+                    }
+                    type='submit'
+                    className='two-factor-auth__button mt-4'
+                />
                 <div className='two-factor-auth__resend'>
                     <span>Didn't receive a code? </span>
                     {twoFactorAuthStore.resendTimer > 0 ? (

@@ -20,7 +20,7 @@ export const PhoneNumberStep = observer(({ formik }: PhoneNumberStepProps) => {
 
     return (
         <>
-            <ProgressIndicator currentStep={twoFactorAuthStore.currentStep} />
+            <ProgressIndicator currentStep={1} />
             <h1 className='two-factor-auth__title'>Add Your Number</h1>
             <p className='two-factor-auth__description'>
                 Enter your phone number, and we'll send you a verification code via text message.
@@ -56,7 +56,7 @@ export const PhoneNumberStep = observer(({ formik }: PhoneNumberStepProps) => {
                     }
                     disabled={!formik.values.phoneNumber || !!formik.errors.phoneNumber}
                     type='submit'
-                    className='two-factor-auth__button'
+                    className='two-factor-auth__button mt-4'
                 />
             </form>
         </>
