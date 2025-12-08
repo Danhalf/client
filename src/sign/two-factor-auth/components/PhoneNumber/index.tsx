@@ -35,22 +35,29 @@ export const PhoneNumberStep = observer(({ formik }: PhoneNumberStepProps) => {
                                 : ""
                         }`}
                         id='phoneNumber'
-                        onChange={formik.handleChange}
+                        onChange={(e) => {
+                            formik.handleChange(e);
+                            formik.setFieldTouched("phoneNumber", true, false);
+                        }}
                         onBlur={formik.handleBlur}
                         value={formik.values.phoneNumber}
+                        mask='(999) 999-9999'
                     />
                     {formik.touched.phoneNumber && formik.errors.phoneNumber ? (
                         <small className='p-error error-space'>{formik.errors.phoneNumber}</small>
                     ) : null}
                 </div>
-                <div className='text-center'>
-                    <Button
-                        label='Continue'
-                        severity='secondary'
-                        type='submit'
-                        className='two-factor-auth__button two-factor-auth__button--secondary'
-                    />
-                </div>
+                <Button
+                    label='Continue'
+                    severity={
+                        !formik.errors.phoneNumber && formik.values.phoneNumber
+                            ? "success"
+                            : "secondary"
+                    }
+                    disabled={!formik.values.phoneNumber || !!formik.errors.phoneNumber}
+                    type='submit'
+                    className='two-factor-auth__button'
+                />
             </form>
         </>
     );

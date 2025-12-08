@@ -9,6 +9,12 @@
     box-sizing: border-box;
 }
 
+.two-factor-auth--compact {
+    width: 450px;
+    height: 480px;
+    min-height: 480px;
+}
+
 .two-factor-auth-wrapper {
     width: 100%;
     height: 100%;
@@ -26,14 +32,14 @@
 }
 
 .two-factor-auth__progress-dot {
-    width: 8px;
-    height: 8px;
+    width: 13px;
+    height: 13px;
     border-radius: 50%;
     background: var(--admss-app-light-grey);
 }
 
 .two-factor-auth__progress-dot--active {
-    background: var(--admss-app-main-blue);
+    background: var(--admss-app-primary-main-green);
 }
 
 .two-factor-auth__icon {
@@ -98,36 +104,27 @@
 }
 
 .two-factor-auth__description {
-    color: var(--admss-app-medium-grey);
     text-align: center;
     font-size: 0.9rem;
     line-height: 1.5;
     margin-bottom: 30px;
-    max-width: 400px;
+    max-width: 338px;
 }
 
 .two-factor-auth__input {
     width: 100%;
     margin-bottom: 20px;
+    position: relative;
 }
 
 .two-factor-auth__button {
-    width: 100%;
-    max-width: 240px;
-    font-size: 1rem;
-    font-weight: bold;
-    padding: 12px;
-}
-
-.two-factor-auth__button--primary {
-    background: var(--admss-app-main-blue);
-    border-color: var(--admss-app-main-blue);
-}
-
-.two-factor-auth__button--secondary {
-    background: var(--admss-app-light-grey);
-    border-color: var(--admss-app-light-grey);
-    color: var(--admss-app-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 340px;
+    height: 60px;
+    font-weight: 700;
+    font-size: 24px;
 }
 
 .two-factor-auth__code-inputs {

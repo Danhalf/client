@@ -5,6 +5,7 @@ import { observer } from "mobx-react-lite";
 import "../index.css";
 import "./index.css";
 import { DASHBOARD_PAGE } from "common/constants/links";
+import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 import { useStore } from "store/hooks";
 import { TwoFactorAuthStep } from "store/stores/user";
 import { IntroductionStep } from "./components/Introduction";
@@ -28,12 +29,19 @@ export const TwoFactorAuth = observer(() => {
             verificationCode: ["", "", "", "", "", ""],
             backupCodes: [],
         },
+        validateOnChange: true,
+        validateOnBlur: true,
         validate: (data) => {
             let errors: any = {};
 
             if (twoFactorAuthStore.currentStep === TwoFactorAuthStep.PHONE_NUMBER) {
                 if (!data.phoneNumber.trim()) {
                     errors.phoneNumber = "Phone number is required.";
+                } else {
+                    const cleanedPhone = data.phoneNumber.replace(/[\s()]/g, "");
+                    if (!PHONE_NUMBER_REGEX.test(cleanedPhone)) {
+                        errors.phoneNumber = "Invalid phone number. Please try again.";
+                    }
                 }
             }
 
@@ -70,9 +78,13 @@ export const TwoFactorAuth = observer(() => {
         navigate(DASHBOARD_PAGE);
     };
 
+    const isCompactStep =
+        twoFactorAuthStore.currentStep === TwoFactorAuthStep.PHONE_NUMBER ||
+        twoFactorAuthStore.currentStep === TwoFactorAuthStep.VERIFICATION_CODE;
+
     return (
         <section className='sign'>
-            <div className='two-factor-auth'>
+            <div className={`two-factor-auth ${isCompactStep ? "two-factor-auth--compact" : ""}`}>
                 <div className='two-factor-auth-wrapper'>
                     {twoFactorAuthStore.currentStep === TwoFactorAuthStep.INTRODUCTION && (
                         <IntroductionStep />
