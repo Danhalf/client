@@ -1,7 +1,6 @@
 import { Button } from "primereact/button";
 import { FormikProps } from "formik";
 import { observer } from "mobx-react-lite";
-import { useStore } from "store/hooks";
 import { PhoneInput } from "dashboard/common/form/inputs";
 import { ProgressIndicator } from "../ProgressIndicator";
 
@@ -16,8 +15,6 @@ interface PhoneNumberStepProps {
 }
 
 export const PhoneNumberStep = observer(({ formik }: PhoneNumberStepProps) => {
-    const twoFactorAuthStore = useStore().userStore.twoFactorAuth;
-
     return (
         <>
             <ProgressIndicator currentStep={1} />

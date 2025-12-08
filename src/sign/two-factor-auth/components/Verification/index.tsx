@@ -27,8 +27,28 @@ export const VerificationCodeStep = observer(({ formik }: VerificationCodeStepPr
     };
 
     const handleCodeChange = (index: number, value: string) => {
-        twoFactorAuthStore.handleCodeChange(index, value);
+        const currentValue = twoFactorAuthStore.verificationCode[index];
+        if (currentValue && value.length > 0 && value !== currentValue) {
+            const newChar = value.replace(/\D/g, "").slice(-1);
+            if (newChar) {
+                twoFactorAuthStore.handleCodeChange(index, newChar);
+            }
+        } else if (!currentValue) {
+            const newChar = value.replace(/\D/g, "").slice(-1);
+            if (newChar) {
+                twoFactorAuthStore.handleCodeChange(index, newChar);
+            }
+        }
         formik.setFieldValue("verificationCode", twoFactorAuthStore.verificationCode);
+    };
+
+    const handleFocus = (_: number, e: React.FocusEvent<HTMLInputElement>) => {
+        const input = e.target;
+        if (input.value) {
+            setTimeout(() => {
+                input.setSelectionRange(0, 1);
+            }, 0);
+        }
     };
 
     return (
@@ -53,6 +73,7 @@ export const VerificationCodeStep = observer(({ formik }: VerificationCodeStepPr
                                 handleCodeChange(index, e.target.value);
                                 formik.setFieldTouched("verificationCode", true, false);
                             }}
+                            onFocus={(e) => handleFocus(index, e)}
                             onKeyDown={(e) => twoFactorAuthStore.handleCodeKeyDown(index, e)}
                             className={`two-factor-auth__code-input ${
                                 !code ? "two-factor-auth__code-input--empty" : ""
