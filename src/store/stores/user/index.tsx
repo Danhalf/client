@@ -1,8 +1,8 @@
-import { LS_APP_USER } from "common/constants/localStorage";
+import { LS_APP_USER, LS_REMEMBER_ME } from "common/constants/localStorage";
 import { UserPermissionsResponse } from "common/models/user";
 import { AuthUser } from "http/services/auth.service";
 import { makeAutoObservable } from "mobx";
-import { getKeyValue, setKey } from "services/local-storage.service";
+import { getKeyValue, localStorageClear, setKey } from "services/local-storage.service";
 import { RootStore } from "store";
 
 class Settings {
@@ -194,6 +194,7 @@ class TwoFactorAuth {
 export class UserStore {
     public rootStore: RootStore;
     private _storedUser: AuthUser | null = null;
+    private _rememberMe: Partial<AuthUser> | null = null;
     public settings: Settings = new Settings();
     public twoFactorAuth: TwoFactorAuth = new TwoFactorAuth();
     private _isSettingsLoaded: boolean = false;
@@ -203,6 +204,7 @@ export class UserStore {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
         this.initializeStoredUser();
+        this.initializeRememberMe();
     }
 
     private initializeStoredUser() {
@@ -216,12 +218,32 @@ export class UserStore {
         }
     }
 
+    private initializeRememberMe() {
+        try {
+            const rememberedData = getKeyValue(LS_REMEMBER_ME);
+            if (rememberedData) {
+                this._rememberMe = rememberedData;
+            }
+        } catch {
+            this._rememberMe = null;
+        }
+    }
+
     public get authUser() {
         return this._storedUser;
     }
 
     public get isSettingsLoaded(): boolean {
         return this._isSettingsLoaded;
+    }
+
+    public get rememberMe(): Partial<AuthUser> | null {
+        return this._rememberMe;
+    }
+
+    public set rememberMe(value: Partial<AuthUser> | null) {
+        this._rememberMe = value;
+        this.setRememberMe();
     }
 
     public set storedUser(user: AuthUser | null) {
@@ -260,6 +282,14 @@ export class UserStore {
 
     public isFirstVisit(pageId: string): boolean {
         return !this._visitedPages.has(pageId);
+    }
+
+    private setRememberMe(): void {
+        if (this._rememberMe) {
+            setKey(LS_REMEMBER_ME, JSON.stringify(this._rememberMe));
+        } else {
+            localStorageClear(LS_REMEMBER_ME);
+        }
     }
 
     public markPageAsVisited(pageId: string): void {
