@@ -29,7 +29,7 @@ export const SignIn = () => {
     const formik = useFormik<LoginForm>({
         initialValues: {
             username: userStore.rememberMe?.username || "",
-            password: "",
+            password: userStore.getDecryptedPassword() || "",
             rememberme: !!userStore.rememberMe?.username,
             application: APP_TYPE,
             version: APP_VERSION,
@@ -58,9 +58,10 @@ export const SignIn = () => {
                     try {
                         userStore.storedUser = response;
                         if (formik.values.rememberme) {
-                            userStore.rememberMe = {
-                                username: formik.values.username,
-                            };
+                            userStore.setRememberMeWithPassword(
+                                formik.values.username,
+                                formik.values.password
+                            );
                         } else {
                             userStore.rememberMe = null;
                         }
@@ -85,10 +86,8 @@ export const SignIn = () => {
 
     const handleRememberMeChange = (checked: boolean) => {
         formik.setFieldValue("rememberme", checked);
-        if (checked && formik.values.username) {
-            userStore.rememberMe = {
-                username: formik.values.username,
-            };
+        if (checked && formik.values.username && formik.values.password) {
+            userStore.setRememberMeWithPassword(formik.values.username, formik.values.password);
         } else if (!checked) {
             userStore.rememberMe = null;
         }

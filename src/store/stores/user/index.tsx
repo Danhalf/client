@@ -4,6 +4,12 @@ import { AuthUser } from "http/services/auth.service";
 import { makeAutoObservable } from "mobx";
 import { getKeyValue, localStorageClear, setKey } from "services/local-storage.service";
 import { RootStore } from "store";
+import { decryptPassword, encryptPassword } from "services/encryption.service";
+
+export interface RememberMeData {
+    username: string;
+    encryptedPassword?: string;
+}
 
 class Settings {
     private _isSidebarCollapsed: boolean = true;
@@ -194,7 +200,7 @@ class TwoFactorAuth {
 export class UserStore {
     public rootStore: RootStore;
     private _storedUser: AuthUser | null = null;
-    private _rememberMe: Partial<AuthUser> | null = null;
+    private _rememberMe: RememberMeData | null = null;
     public settings: Settings = new Settings();
     public twoFactorAuth: TwoFactorAuth = new TwoFactorAuth();
     private _isSettingsLoaded: boolean = false;
@@ -222,7 +228,14 @@ export class UserStore {
         try {
             const rememberedData = getKeyValue(LS_REMEMBER_ME);
             if (rememberedData) {
-                this._rememberMe = rememberedData;
+                if (rememberedData.username) {
+                    this._rememberMe = {
+                        username: rememberedData.username,
+                        encryptedPassword: rememberedData.encryptedPassword,
+                    };
+                } else {
+                    this._rememberMe = null;
+                }
             }
         } catch {
             this._rememberMe = null;
@@ -237,12 +250,27 @@ export class UserStore {
         return this._isSettingsLoaded;
     }
 
-    public get rememberMe(): Partial<AuthUser> | null {
+    public get rememberMe(): RememberMeData | null {
         return this._rememberMe;
     }
 
-    public set rememberMe(value: Partial<AuthUser> | null) {
+    public set rememberMe(value: RememberMeData | null) {
         this._rememberMe = value;
+        this.setRememberMe();
+    }
+
+    public getDecryptedPassword(): string {
+        if (this._rememberMe?.encryptedPassword) {
+            return decryptPassword(this._rememberMe.encryptedPassword);
+        }
+        return "";
+    }
+
+    public setRememberMeWithPassword(username: string, password: string): void {
+        this._rememberMe = {
+            username,
+            encryptedPassword: encryptPassword(password),
+        };
         this.setRememberMe();
     }
 
