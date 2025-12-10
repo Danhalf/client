@@ -12,6 +12,8 @@
 }
 
 .inventory-group__header {
+    display: flex;
+    align-items: center;
     background: var(--admss-app-light-blue);
     height: 60px;
     font-weight: 600;
@@ -45,44 +47,64 @@
     justify-content: center;
 }
 
-.settings-form__button.p-button {
-    width: 245px;
-    height: 54px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: 700;
+.group-actions__favorite.p-button.p-button-secondary {
+    width: 40px;
 }
 
-.inventory-group__delete.p-button.p-button-danger {
+.group-actions__delete.p-button.p-button-danger {
     color: var(--admss-app-red);
 }
 
-.group-order {
+.inventory-group__navigation {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 80px;
 }
 
-.settings-form .group-order__button {
+.settings-inventory .inventory-group__navigation__button {
     padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.settings-form .group-order__button .pi {
-    font-size: 22px;
+.settings-inventory .inventory-group__navigation__button .pi {
+    font-size: 20px;
 }
 
-.group-order__button.p-button.p-button-icon-only.p-button-rounded.p-button-text,
-.group-order__button.p-button.p-button-success.p-button-text:enabled:focus,
-.group-order__button.p-button.p-button-success.p-button-text:enabled:active,
-.group-order__button.p-button.p-button-success.p-button-text:enabled:hover {
+.inventory-group__navigation__button.p-button.p-button-icon-only.p-button-rounded.p-button-text,
+.inventory-group__navigation__button.p-button.p-button-success.p-button-text:enabled:focus,
+.inventory-group__navigation__button.p-button.p-button-success.p-button-text:enabled:active,
+.inventory-group__navigation__button.p-button.p-button-success.p-button-text:enabled:hover {
     font-size: 18px;
     border-radius: 50%;
     border: none;
     background: transparent;
     box-shadow: none;
+}
+
+.inventory-group__checkbox {
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.inventory-group__name {
+    flex: 1;
+}
+
+.inventory-group__actions {
+    flex: 0 0 220px;
+    min-width: 220px;
+    display: flex;
+    gap: 15px;
+    .p-button {
+        height: 40px;
+    }
 }
 
 .inventory-group__body {
@@ -100,6 +122,8 @@
 
 .layout {
     width: 100%;
+    margin-left: 10px;
+    margin-top: 10px;
 }
 
 .relative {

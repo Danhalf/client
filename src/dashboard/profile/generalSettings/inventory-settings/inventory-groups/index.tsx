@@ -6,19 +6,18 @@ import { addUserGroupList, deleteUserGroupList } from "http/services/auth-user.s
 import { UserGroup } from "common/models/user";
 import { Checkbox, CheckboxChangeEvent } from "primereact/checkbox";
 import { BaseResponseError, Status } from "common/models/base-response";
-import { TOAST_LIFETIME } from "common/settings";
-import { useToast } from "dashboard/common/toast";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { Layout, Responsive, ResponsiveProps, WidthProvider } from "react-grid-layout";
+import { useToastMessage } from "common/hooks";
 
 const ResponsiveReactGridLayout = WidthProvider<ResponsiveProps>(Responsive);
 
 const NEW_ITEM = "new";
 
 export const SettingsInventoryGroups = observer((): ReactElement => {
-    const toast = useToast();
     const store = useStore().generalSettingsStore;
+    const { showError, showSuccess } = useToastMessage();
     const userStore = useStore().userStore;
     const { inventoryGroups, getUserGroupList, changeInventoryGroups } = store;
     const { authUser } = userStore;
@@ -58,23 +57,17 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
         }
     };
 
-    const handleSaveGroup = () => {
-        addUserGroupList(authUser!.useruid, {
+    const handleSaveGroup = async () => {
+        const response = await addUserGroupList(authUser!.useruid, {
             description: editedItem.description,
             itemuid: editedItem.itemuid === NEW_ITEM ? undefined : editedItem.itemuid,
-        }).then((response) => {
-            if (response?.status === Status.ERROR) {
-                const { error, status } = response as BaseResponseError;
-                toast.current?.show({
-                    severity: "error",
-                    summary: status,
-                    detail: error,
-                    life: TOAST_LIFETIME,
-                });
-            }
-            getUserGroupList().then(() => {
-                setEditedItem({});
-            });
+        });
+        if (response?.status === Status.ERROR) {
+            const { error, status } = response as BaseResponseError;
+            status === Status.ERROR ? showError(error) : showSuccess(error);
+        }
+        getUserGroupList().then(() => {
+            setEditedItem({});
         });
     };
 
@@ -142,12 +135,7 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
         } catch (error) {
             const errorMessage =
                 error instanceof Error ? error.message : "Failed to update group order";
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: errorMessage,
-                life: TOAST_LIFETIME,
-            });
+            showError(errorMessage);
             setLayoutKey(!layoutKey);
         }
     };
@@ -177,16 +165,16 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
             </div>
             <div className='grid inventory-group p-2'>
                 <div className='col-12'>
-                    <div className='inventory-group__header grid'>
-                        <div className='group-order'></div>
-                        <div className='col-1 flex justify-content-center align-items-center'>
+                    <div className='inventory-group__header'>
+                        <div className='inventory-group__navigation'></div>
+                        <div className='inventory-group__checkbox'>
                             <Checkbox
                                 checked={inventoryGroups.every((item) => item.enabled)}
                                 onChange={handleCheckAllGroups}
                             />
                         </div>
-                        <div className='col-7 flex align-items-center'>Group</div>
-                        <div className='col-3 flex align-items-center p-0'>Actions</div>
+                        <div className='inventory-group__name'>Group</div>
+                        <div className='inventory-group__actions'>Actions</div>
                     </div>
                     <ResponsiveReactGridLayout
                         key={layoutKey.toString()}
@@ -207,14 +195,14 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                                 key={item.itemuid}
                                 className='inventory-group__row grid col-12 cursor-pointer'
                             >
-                                <div className='group-order'>
+                                <div className='inventory-group__navigation'>
                                     <Button
                                         icon='pi pi-arrow-circle-up'
                                         rounded
                                         text
                                         severity='success'
                                         tooltip='Move up'
-                                        className='p-button-text group-order__button'
+                                        className='p-button-text inventory-group__navigation__button'
                                         onClick={() => handleMoveItem(item as UserGroup, "up")}
                                         disabled={index === 0 || item.itemuid === NEW_ITEM}
                                     />
@@ -224,7 +212,7 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                                         text
                                         severity='success'
                                         tooltip='Move down'
-                                        className='p-button-text group-order__button'
+                                        className='p-button-text inventory-group__navigation__button'
                                         onClick={() => handleMoveItem(item as UserGroup, "down")}
                                         disabled={
                                             index === inventoryGroups.length - 1 ||
@@ -232,14 +220,14 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                                         }
                                     />
                                 </div>
-                                <div className='col-1 flex justify-content-center align-items-center'>
+                                <div className='inventory-group__checkbox'>
                                     <Checkbox
                                         checked={!!item.enabled}
                                         tooltip='Select visible inventory groups'
                                         onClick={() => handleToggleGroupVisible(item as UserGroup)}
                                     />
                                 </div>
-                                <div className='col-7 flex align-items-center'>
+                                <div className='inventory-group__name'>
                                     {editedItem.itemuid === item.itemuid ? (
                                         <div className='flex row-edit'>
                                             <InputText
@@ -264,9 +252,9 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                                         item.description
                                     )}
                                 </div>
-                                <div className='col-3 flex align-items-center column-gap-3'>
+                                <div className='inventory-group__actions group-actions'>
                                     <Button
-                                        className='p-button'
+                                        className='group-actions__favorite'
                                         icon={`pi pi-star${!!item.isdefault ? "-fill" : ""}`}
                                         tooltip='Make default'
                                         outlined
@@ -275,7 +263,7 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                                         onClick={() => handleSetGroupDefault(item as UserGroup)}
                                     />
                                     <Button
-                                        className='p-button'
+                                        className='group-actions__edit'
                                         outlined
                                         onClick={() => {
                                             editedItem.itemuid
@@ -288,7 +276,7 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                                         Edit
                                     </Button>
                                     <Button
-                                        className='p-button inventory-group__delete'
+                                        className='group-actions__delete'
                                         outlined
                                         disabled={!!item.isdefault || !item.useruid}
                                         severity={
