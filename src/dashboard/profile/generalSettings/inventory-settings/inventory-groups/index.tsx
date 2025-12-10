@@ -1,6 +1,6 @@
 import "./index.css";
 import { Button } from "primereact/button";
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, useMemo } from "react";
 import { InputText } from "primereact/inputtext";
 import { addUserGroupList, deleteUserGroupList } from "http/services/auth-user.service";
 import { UserGroup } from "common/models/user";
@@ -10,6 +10,9 @@ import { TOAST_LIFETIME } from "common/settings";
 import { useToast } from "dashboard/common/toast";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
+import { Layout, Responsive, ResponsiveProps, WidthProvider } from "react-grid-layout";
+
+const ResponsiveReactGridLayout = WidthProvider<ResponsiveProps>(Responsive);
 
 const NEW_ITEM = "new";
 
@@ -20,6 +23,19 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
     const { inventoryGroups, getUserGroupList, changeInventoryGroups } = store;
     const { authUser } = userStore;
     const [editedItem, setEditedItem] = useState<Partial<UserGroup>>({});
+    const [layoutKey, setLayoutKey] = useState<boolean>(false);
+
+    const layouts = useMemo(() => {
+        return {
+            lg: inventoryGroups.map((item, index) => ({
+                i: item.itemuid || `${index}`,
+                x: 0,
+                y: index,
+                w: 1,
+                h: 1,
+            })),
+        };
+    }, [inventoryGroups]);
 
     const handleMoveItem = async (currentItem: UserGroup, direction: "up" | "down") => {
         if (currentItem) {
@@ -91,6 +107,51 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
         });
     };
 
+    const handleDragItem = async (layout: Layout[], oldItem: Layout, newItem: Layout) => {
+        if (
+            (oldItem.x === newItem.x && oldItem.y === newItem.y) ||
+            oldItem.i === editedItem?.itemuid
+        ) {
+            return;
+        }
+
+        const sortedLayout = [...layout].sort((a, b) => a.y - b.y);
+
+        const updatedGroups = sortedLayout
+            .map((layoutItem, index) => {
+                const originalItem = inventoryGroups.find(
+                    (group) => group.itemuid === layoutItem.i
+                );
+                if (!originalItem) return null;
+
+                return {
+                    ...originalItem,
+                    order: index + 1,
+                };
+            })
+            .filter(Boolean) as UserGroup[];
+
+        try {
+            for (const group of updatedGroups) {
+                await addUserGroupList(authUser!.useruid, {
+                    ...group,
+                    order: group.order,
+                });
+            }
+            getUserGroupList();
+        } catch (error) {
+            const errorMessage =
+                error instanceof Error ? error.message : "Failed to update group order";
+            toast.current?.show({
+                severity: "error",
+                summary: "Error",
+                detail: errorMessage,
+                life: TOAST_LIFETIME,
+            });
+            setLayoutKey(!layoutKey);
+        }
+    };
+
     return (
         <>
             <div className='flex justify-content-end mb-4'>
@@ -114,10 +175,10 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                     New Group
                 </Button>
             </div>
-            <div className='grid settings-inventory p-2'>
+            <div className='grid inventory-group p-2'>
                 <div className='col-12'>
-                    <div className='settings-inventory__header grid'>
-                        <div className='col-1'></div>
+                    <div className='inventory-group__header grid'>
+                        <div className='group-order'></div>
                         <div className='col-1 flex justify-content-center align-items-center'>
                             <Checkbox
                                 checked={inventoryGroups.every((item) => item.enabled)}
@@ -127,10 +188,26 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                         <div className='col-7 flex align-items-center'>Group</div>
                         <div className='col-3 flex align-items-center p-0'>Actions</div>
                     </div>
-                    <div className='settings-inventory__body grid'>
+                    <ResponsiveReactGridLayout
+                        key={layoutKey.toString()}
+                        className='layout relative inventory-group__body'
+                        layouts={layouts}
+                        cols={{ lg: 1, md: 1, sm: 1, xs: 1, xxs: 1 }}
+                        rowHeight={61}
+                        width={600}
+                        margin={[0, 0]}
+                        compactType='vertical'
+                        isDraggable={!editedItem || !Object.keys(editedItem).length}
+                        isDroppable={!editedItem || Object.keys(editedItem).length === 0}
+                        onDragStop={handleDragItem}
+                        draggableCancel='.p-button, .row-edit'
+                    >
                         {inventoryGroups.map((item, index) => (
-                            <div key={item.itemuid} className='settings-inventory__row grid col-12'>
-                                <div className='col-1 group-order'>
+                            <div
+                                key={item.itemuid}
+                                className='inventory-group__row grid col-12 cursor-pointer'
+                            >
+                                <div className='group-order'>
                                     <Button
                                         icon='pi pi-arrow-circle-up'
                                         rounded
@@ -211,7 +288,7 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                                         Edit
                                     </Button>
                                     <Button
-                                        className='p-button settings-inventory__delete'
+                                        className='p-button inventory-group__delete'
                                         outlined
                                         disabled={!!item.isdefault || !item.useruid}
                                         severity={
@@ -226,7 +303,7 @@ export const SettingsInventoryGroups = observer((): ReactElement => {
                                 </div>
                             </div>
                         ))}
-                    </div>
+                    </ResponsiveReactGridLayout>
                 </div>
             </div>
         </>

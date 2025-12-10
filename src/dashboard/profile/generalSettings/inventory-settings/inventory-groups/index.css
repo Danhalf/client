@@ -1,4 +1,4 @@
-.settings-inventory {
+.inventory-group {
     .row-edit__button.p-button {
         display: inline-flex;
         align-items: center;
@@ -6,23 +6,24 @@
         justify-content: center;
         font-weight: 600;
     }
+    .col-12 {
+        padding-top: 0;
+    }
 }
 
-.settings-inventory__header {
+.inventory-group__header {
     background: var(--admss-app-light-blue);
     height: 60px;
     font-weight: 600;
     margin-bottom: 6px;
 }
 
-.settings-inventory__row {
+.inventory-group__row {
     border-bottom: 1px solid var(--admss-app-light-grey);
     display: flex;
     align-items: center;
-    margin-left: 2px;
     padding-left: 0;
     padding-bottom: 0px;
-    padding-top: 10px;
 }
 
 .settings-form .p-button {
@@ -54,7 +55,7 @@
     font-weight: 700;
 }
 
-.settings-inventory__delete.p-button.p-button-danger {
+.inventory-group__delete.p-button.p-button-danger {
     color: var(--admss-app-red);
 }
 
@@ -62,6 +63,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 80px;
 }
 
 .settings-form .group-order__button {
@@ -72,11 +74,34 @@
     font-size: 22px;
 }
 
-.group-order__button.p-button-icon-only,
-.group-order__button.p-button.p-button-success:enabled:focus {
+.group-order__button.p-button.p-button-icon-only.p-button-rounded.p-button-text,
+.group-order__button.p-button.p-button-success.p-button-text:enabled:focus,
+.group-order__button.p-button.p-button-success.p-button-text:enabled:active,
+.group-order__button.p-button.p-button-success.p-button-text:enabled:hover {
     font-size: 18px;
     border-radius: 50%;
     border: none;
     background: transparent;
     box-shadow: none;
+}
+
+.inventory-group__body {
+    .react-grid-item.react-grid-placeholder {
+        background-color: var(--admss-app-lightest-grey);
+        z-index: 1;
+        border-bottom: 1px solid var(--admss-app-medium-blue);
+        position: relative;
+    }
+
+    .react-draggable-dragging {
+        z-index: 2;
+    }
+}
+
+.layout {
+    width: 100%;
+}
+
+.relative {
+    position: relative;
 }
