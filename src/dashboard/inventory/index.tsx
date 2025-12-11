@@ -4,6 +4,7 @@ import {
     DataTableColReorderEvent,
     DataTableColumnResizeEndEvent,
     DataTablePageEvent,
+    DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
 import { getInventoryList, getInventoryLocations } from "http/services/inventory-service";
@@ -385,7 +386,7 @@ export default function Inventories({
         return <span data-field={field}>{title}</span>;
     };
 
-    const columnEditButton = ({ itemuid }: Inventory) => {
+    const columnEditButton = (itemuid: string) => {
         return (
             <Button
                 text
@@ -426,6 +427,24 @@ export default function Inventories({
             changeSettings({
                 columnWidth: { ...serverSettings?.inventory?.columnWidth, ...newColumnWidth },
             });
+        }
+    };
+
+    const handleOnRowClick = ({ data }: DataTableRowClickEvent): void => {
+        const selectedText = window.getSelection()?.toString();
+
+        if (!!selectedText?.length) {
+            return;
+        }
+
+        if (getFullInfo) {
+            getFullInfo(data as Inventory);
+        }
+        if (onRowClick) {
+            const value = returnedField ? data[returnedField] : data.Make;
+            onRowClick(value);
+        } else {
+            navigate(data.itemuid);
         }
     };
 
@@ -503,6 +522,7 @@ export default function Inventories({
                                         rowClassName={() => "hover:text-primary cursor-pointer"}
                                         onColReorder={handleColumnReorder}
                                         onColumnResizeEnd={handleColumnResize}
+                                        onRowClick={handleOnRowClick}
                                     >
                                         <Column
                                             bodyStyle={{ textAlign: "center" }}
@@ -517,7 +537,7 @@ export default function Inventories({
                                                 },
                                             }}
                                         />
-                                        {activeColumns.map(({ field, header }) => {
+                                        {activeColumns.map(({ field, header }, index) => {
                                             const savedWidth =
                                                 serverSettings?.inventory?.columnWidth?.[field];
 
