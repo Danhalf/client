@@ -272,7 +272,7 @@ export const AccountsAudit = observer((): ReactElement => {
                             resizableColumns
                             sortOrder={lazyState.sortOrder}
                             sortField={lazyState.sortField}
-                            rowClassName={() => "hover:text-primary cursor-pointer"}
+                            rowClassName={() => "table-row"}
                             onRowClick={({ data }: DataTableRowClickEvent) =>
                                 navigate(ACCOUNTS_PAGE.EDIT(data.accountuid))
                             }

@@ -394,6 +394,7 @@ export const TasksDataTable = observer((): ReactElement => {
                             sortOrder={lazyState.sortOrder}
                             sortField={lazyState.sortField}
                             expandedRows={expandedRows}
+                            rowClassName={() => "table-row"}
                             onRowToggle={(e: DataTableValue) => setExpandedRows(e.data)}
                             rowExpansionTemplate={rowExpansionTemplate}
                             onColumnResizeEnd={(event) => {

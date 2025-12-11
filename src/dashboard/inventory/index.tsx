@@ -519,7 +519,7 @@ export default function Inventories({
                                         reorderableColumns
                                         resizableColumns
                                         header={header}
-                                        rowClassName={() => "hover:text-primary cursor-pointer"}
+                                        rowClassName={() => "table-row"}
                                         onColReorder={handleColumnReorder}
                                         onColumnResizeEnd={handleColumnResize}
                                         onRowClick={handleOnRowClick}
@@ -529,13 +529,7 @@ export default function Inventories({
                                             reorderable={false}
                                             resizeable={false}
                                             body={columnEditButton}
-                                            pt={{
-                                                root: {
-                                                    style: {
-                                                        width: "80px",
-                                                    },
-                                                },
-                                            }}
+                                            className='table-edit-button-column'
                                         />
                                         {activeColumns.map(({ field, header }, index) => {
                                             const savedWidth =

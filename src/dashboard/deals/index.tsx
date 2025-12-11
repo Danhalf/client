@@ -548,7 +548,7 @@ export const DealsDataTable = observer(
                                 onSort={sortData}
                                 reorderableColumns
                                 resizableColumns
-                                rowClassName={() => "hover:text-primary cursor-pointer"}
+                                rowClassName={() => "table-row"}
                                 onRowClick={handleOnRowClick}
                                 onColumnResizeEnd={(event) => {
                                     if (

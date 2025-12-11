@@ -736,6 +736,7 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                         resizableColumns
                         sortOrder={lazyState.sortOrder}
                         className='export-web-table'
+                        rowClassName={() => "table-row"}
                         sortField={lazyState.sortField}
                         onColReorder={handleColumnReorder}
                         onColumnResizeEnd={handleColumnResize}

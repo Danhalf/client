@@ -168,7 +168,7 @@ export const AccountsDataTable = observer(
                                 resizableColumns
                                 sortOrder={lazyState.sortOrder}
                                 sortField={lazyState.sortField}
-                                rowClassName={() => "hover:text-primary cursor-pointer"}
+                                rowClassName={() => "table-row"}
                                 onRowClick={handleOnRowClick}
                                 onColumnResizeEnd={(event) => {
                                     if (

@@ -282,6 +282,7 @@ export const ExportHistory = (): ReactElement => {
                         reorderableColumns
                         resizableColumns
                         className='export-web-table'
+                        rowClassName={() => "table-row"}
                         paginator
                         first={lazyState.first}
                         rows={lazyState.rows}
