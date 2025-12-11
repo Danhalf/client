@@ -2,8 +2,8 @@ import { ReactElement, useEffect, useRef, useState } from "react";
 import {
     DataTable,
     DataTableColReorderEvent,
+    DataTableColumnResizeEndEvent,
     DataTablePageEvent,
-    DataTableRowClickEvent,
     DataTableSortEvent,
 } from "primereact/datatable";
 import { getInventoryList, getInventoryLocations } from "http/services/inventory-service";
@@ -381,26 +381,52 @@ export default function Inventories({
         />
     );
 
-    const handleOnRowClick = ({ data }: DataTableRowClickEvent): void => {
-        const selectedText = window.getSelection()?.toString();
+    const columnHeader = (title: string, field: string) => {
+        return <span data-field={field}>{title}</span>;
+    };
 
-        if (!!selectedText?.length) {
-            return;
-        }
+    const columnEditButton = ({ itemuid }: Inventory) => {
+        return (
+            <Button
+                text
+                className='table-edit-button'
+                icon='adms-edit-item'
+                tooltip='Edit inventory'
+                tooltipOptions={{ position: "mouse" }}
+                onClick={() => navigate(INVENTORY_PAGE.EDIT(itemuid))}
+            />
+        );
+    };
 
-        if (getFullInfo) {
-            getFullInfo(data as Inventory);
-        }
-        if (onRowClick) {
-            const value = returnedField ? data[returnedField] : data.Make;
-            onRowClick(value);
-        } else {
-            navigate(data.itemuid);
+    const handleColumnReorder = (event: DataTableColReorderEvent) => {
+        if (Array.isArray(event.columns)) {
+            const orderArray = event.columns?.map((column: Column) => column.props.field);
+
+            const newActiveColumns = orderArray
+                .map((field: string | undefined) => {
+                    return activeColumns.find((column) => column.field === field) || null;
+                })
+                .filter(
+                    (column: TableColumnsList | null): column is TableColumnsList => column !== null
+                );
+
+            setActiveColumns(newActiveColumns);
+
+            changeSettings({
+                activeColumns: newActiveColumns.map(({ field }) => field),
+            });
         }
     };
 
-    const columnHeader = (title: string, field: string) => {
-        return <span data-field={field}>{title}</span>;
+    const handleColumnResize = (event: DataTableColumnResizeEndEvent) => {
+        if (event.column.props.field) {
+            const newColumnWidth = {
+                [event.column.props.field as string]: event.element.offsetWidth,
+            };
+            changeSettings({
+                columnWidth: { ...serverSettings?.inventory?.columnWidth, ...newColumnWidth },
+            });
+        }
     };
 
     return (
@@ -475,70 +501,14 @@ export default function Inventories({
                                         resizableColumns
                                         header={header}
                                         rowClassName={() => "hover:text-primary cursor-pointer"}
-                                        onRowClick={handleOnRowClick}
-                                        onColReorder={(event: DataTableColReorderEvent) => {
-                                            if (authUser && Array.isArray(event.columns)) {
-                                                const orderArray = event.columns?.map(
-                                                    (column: Column) => column.props.field
-                                                );
-
-                                                const newActiveColumns = orderArray
-                                                    .map((field: string | undefined) => {
-                                                        return (
-                                                            activeColumns.find(
-                                                                (column) => column.field === field
-                                                            ) || null
-                                                        );
-                                                    })
-                                                    .filter(
-                                                        (
-                                                            column: TableColumnsList | null
-                                                        ): column is TableColumnsList =>
-                                                            column !== null
-                                                    );
-
-                                                setActiveColumns(newActiveColumns);
-
-                                                changeSettings({
-                                                    activeColumns: newActiveColumns.map(
-                                                        ({ field }) => field
-                                                    ),
-                                                });
-                                            }
-                                        }}
-                                        onColumnResizeEnd={(event) => {
-                                            if (authUser && event) {
-                                                const newColumnWidth = {
-                                                    [event.column?.props?.field as string]:
-                                                        event.element?.offsetWidth,
-                                                };
-                                                changeSettings({
-                                                    columnWidth: {
-                                                        ...serverSettings?.inventory?.columnWidth,
-                                                        ...newColumnWidth,
-                                                    },
-                                                });
-                                            }
-                                        }}
+                                        onColReorder={handleColumnReorder}
+                                        onColumnResizeEnd={handleColumnResize}
                                     >
                                         <Column
                                             bodyStyle={{ textAlign: "center" }}
                                             reorderable={false}
                                             resizeable={false}
-                                            body={({ itemuid }: Inventory) => {
-                                                return (
-                                                    <Button
-                                                        text
-                                                        className='table-edit-button'
-                                                        icon='adms-edit-item'
-                                                        tooltip='Edit inventory'
-                                                        tooltipOptions={{ position: "mouse" }}
-                                                        onClick={() =>
-                                                            navigate(INVENTORY_PAGE.EDIT(itemuid))
-                                                        }
-                                                    />
-                                                );
-                                            }}
+                                            body={columnEditButton}
                                             pt={{
                                                 root: {
                                                     style: {
@@ -547,7 +517,7 @@ export default function Inventories({
                                                 },
                                             }}
                                         />
-                                        {activeColumns.map(({ field, header }, index) => {
+                                        {activeColumns.map(({ field, header }) => {
                                             const savedWidth =
                                                 serverSettings?.inventory?.columnWidth?.[field];
 
