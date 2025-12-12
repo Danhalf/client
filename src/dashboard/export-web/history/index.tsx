@@ -20,6 +20,7 @@ import { getUserSettings, setUserSettings } from "http/services/auth-user.servic
 import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/models/user";
 import { Status } from "common/models/base-response";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
+import { TruncatedText } from "dashboard/common/display";
 
 interface HistoryColumnProps extends ColumnProps {
     field: keyof ExportWebHistoryList;
@@ -304,6 +305,10 @@ export const ExportHistory = (): ReactElement => {
                                     sortable
                                     header={header}
                                     reorderable={false}
+                                    body={(data) => {
+                                        const value = String(data[field] || "");
+                                        return <TruncatedText text={value} withTooltip />;
+                                    }}
                                     pt={{
                                         root: {
                                             style: savedWidth

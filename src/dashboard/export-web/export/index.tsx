@@ -40,6 +40,7 @@ import { InputNumber } from "primereact/inputnumber";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { setInventoryExportWeb } from "http/services/inventory-service";
 import { printExportTableData, rowExpansionTemplate } from "./common";
+import { TruncatedText } from "dashboard/common/display";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof (ExportWebList & { mediacount: number });
@@ -901,7 +902,10 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                                                         onBlur={handleChangePrice}
                                                     />
                                                 ) : (
-                                                    value
+                                                    <TruncatedText
+                                                        text={String(value || "")}
+                                                        withTooltip
+                                                    />
                                                 )}
                                             </div>
                                         );

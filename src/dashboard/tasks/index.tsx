@@ -33,6 +33,7 @@ import { createStringifySearchQuery, isObjectValuesEmpty } from "common/helpers"
 import { ColumnSelector } from "dashboard/common/filter";
 import { ServerUserSettings, TasksUserSettings } from "common/models/user";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
+import { TruncatedText } from "dashboard/common/display";
 
 const alwaysActiveColumns: TableColumnsList[] = [
     { field: "assignedto", header: "Assigned To", checked: true },
@@ -450,9 +451,8 @@ export const TasksDataTable = observer((): ReactElement => {
                                         key={field}
                                         sortable
                                         body={(data) => {
-                                            let value: string | number;
-                                            value = data[field];
-                                            return <div>{value}</div>;
+                                            const value = String(data[field] || "");
+                                            return <TruncatedText text={value} withTooltip />;
                                         }}
                                         headerClassName='cursor-move'
                                         pt={{
@@ -486,9 +486,8 @@ export const TasksDataTable = observer((): ReactElement => {
                                         key={field}
                                         sortable
                                         body={(data) => {
-                                            let value: string | number;
-                                            value = data[field];
-                                            return <div>{value}</div>;
+                                            const value = String(data[field] || "");
+                                            return <TruncatedText text={value} withTooltip />;
                                         }}
                                         headerClassName='cursor-move'
                                         pt={{
