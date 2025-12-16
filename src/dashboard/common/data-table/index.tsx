@@ -3,9 +3,41 @@ import { Column, ColumnProps } from "primereact/column";
 import { Tooltip } from "primereact/tooltip";
 import { ReactElement, CSSProperties, ReactNode } from "react";
 import { truncateText } from "common/helpers";
+import { DEFAULT_MAX_COLUMN_WIDTH } from "common/settings";
 import { DataTable } from "primereact/datatable";
 import "./index.css";
 import { ROWS_PER_PAGE } from "common/settings";
+
+interface GetColumnPtStylesOptions {
+    savedWidth?: number;
+    isLastColumn?: boolean;
+    additionalStyles?: CSSProperties;
+}
+
+export const getColumnPtStyles = ({
+    savedWidth,
+    isLastColumn = false,
+    additionalStyles = {},
+}: GetColumnPtStylesOptions) => {
+    return {
+        root: {
+            style: savedWidth
+                ? {
+                      width: `${savedWidth}px`,
+                      maxWidth: `${savedWidth}px`,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      ...additionalStyles,
+                  }
+                : {
+                      maxWidth: isLastColumn ? "none" : `${DEFAULT_MAX_COLUMN_WIDTH}px`,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      ...additionalStyles,
+                  },
+        },
+    };
+};
 
 interface RowExpansionTemplateProps {
     text: string;
