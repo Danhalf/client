@@ -1,9 +1,11 @@
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
 import { Tooltip } from "primereact/tooltip";
-import { ReactElement, CSSProperties } from "react";
+import { ReactElement, CSSProperties, ReactNode } from "react";
 import { truncateText } from "common/helpers";
+import { DataTable } from "primereact/datatable";
 import "./index.css";
+import { ROWS_PER_PAGE } from "common/settings";
 
 interface RowExpansionTemplateProps {
     text: string;
@@ -83,5 +85,26 @@ export const ExpansionColumn = (props: ExpansionColumnProps): ReactElement => {
                 },
             }}
         />
+    );
+};
+
+interface DataTableWrapperProps {
+    children: ReactNode;
+    rows?: number;
+    paginator?: boolean;
+}
+
+export const DataTableWrapper = ({
+    children,
+    rows = ROWS_PER_PAGE[0],
+    paginator = true,
+    ...dataTableProps
+}: DataTableWrapperProps): ReactElement => {
+    return (
+        <div className='data-table-wrapper'>
+            <DataTable {...dataTableProps} rows={rows} paginator={paginator}>
+                {children}
+            </DataTable>
+        </div>
     );
 };
