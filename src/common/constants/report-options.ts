@@ -7,5 +7,4 @@ export enum MOVE_DIRECTION {
     DOWN = "down",
 }
 
-export const MOVE_ID: string = "move";
 export const NEW_ITEM: string = "new";
