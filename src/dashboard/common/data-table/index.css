@@ -67,12 +67,13 @@
     .p-datatable-wrapper {
         height: calc(
             (var(--data-table-rows-count, 10) + 1) * var(--data-table-row-height, 60px) +
-                (var(--data-table-rows-count, 10) + 1) * 1px
+                (var(--data-table-rows-count, 10) + 1) * 1px + scrollbar-width
         );
         max-height: calc(
             (var(--data-table-rows-count, 10) + 1) * var(--data-table-row-height, 60px) +
-                (var(--data-table-rows-count, 10) + 1) * 1px
+                (var(--data-table-rows-count, 10) + 1) * 1px + scrollbar-width
         );
         overflow-y: auto;
+        scrollbar-gutter: stable;
     }
 }
