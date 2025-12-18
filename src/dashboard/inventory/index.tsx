@@ -33,6 +33,7 @@ import { useStore } from "store/hooks";
 import { INVENTORY_PAGE } from "common/constants/links";
 import { Button } from "primereact/button";
 import { TruncatedText } from "dashboard/common/display";
+import { DataTableWrapper } from "dashboard/common/data-table";
 import { getColumnPtStyles } from "dashboard/common/data-table";
 
 const DATA_FIELD = "data-field";
@@ -451,136 +452,115 @@ export default function Inventories({
     };
 
     return (
-        <div className='grid'>
-            <div className='col-12'>
-                <div className='card inventory'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title inventory__title uppercase m-0'>
-                            Inventory
-                        </h2>
-                        {locations.length > 0 && (
-                            <SplitButton
-                                label={currentLocation?.locName || "Any Location"}
-                                className='inventory-location'
-                                model={[
-                                    {
-                                        label: "Any Location",
-                                        command: () => {
-                                            setCurrentLocation({} as InventoryLocations);
-                                            changeSettings({
-                                                currentLocation: "",
-                                            });
-                                        },
-                                    },
-                                    ...locations.map((location) => ({
-                                        label: location.locName,
-                                        command: () => {
-                                            setCurrentLocation(location);
-                                            changeSettings({
-                                                currentLocation: location.locationuid,
-                                            });
+        <DataTableWrapper className='card inventory'>
+            <div className='card-header'>
+                <h2 className='card-header__title inventory__title uppercase m-0'>Inventory</h2>
+                {locations.length > 0 && (
+                    <SplitButton
+                        label={currentLocation?.locName || "Any Location"}
+                        className='inventory-location'
+                        model={[
+                            {
+                                label: "Any Location",
+                                command: () => {
+                                    setCurrentLocation({} as InventoryLocations);
+                                    changeSettings({
+                                        currentLocation: "",
+                                    });
+                                },
+                            },
+                            ...locations.map((location) => ({
+                                label: location.locName,
+                                command: () => {
+                                    setCurrentLocation(location);
+                                    changeSettings({
+                                        currentLocation: location.locationuid,
+                                    });
 
-                                            store.currentLocation = location.locationuid;
-                                        },
-                                    })),
-                                ]}
-                                rounded
-                                menuStyle={{ transform: "translateX(164px)" }}
-                                pt={{
-                                    menu: {
-                                        className: "inventory-location__menu",
-                                    },
-                                }}
-                            />
-                        )}
-                    </div>
-                    <div className='card-content'>
-                        <div className='grid'>
-                            <div className='col-12'>
-                                {isLoading ? (
-                                    <div className='dashboard-loader__wrapper'>
-                                        <Loader />
-                                    </div>
-                                ) : (
-                                    <DataTable
-                                        ref={dataTableRef}
-                                        showGridlines
-                                        value={inventories}
-                                        lazy
-                                        paginator
-                                        scrollable
-                                        scrollHeight='70vh'
-                                        first={lazyState.first}
-                                        rows={lazyState.rows}
-                                        rowsPerPageOptions={ROWS_PER_PAGE}
-                                        totalRecords={totalRecords || 1}
-                                        onPage={pageChanged}
-                                        onSort={sortData}
-                                        sortOrder={lazyState.sortOrder}
-                                        sortField={lazyState.sortField}
-                                        reorderableColumns
-                                        resizableColumns
-                                        header={header}
-                                        rowClassName={() => "table-row"}
-                                        onColReorder={handleColumnReorder}
-                                        onColumnResizeEnd={handleColumnResize}
-                                        onRowClick={handleOnRowClick}
-                                    >
-                                        <Column
-                                            bodyStyle={{ textAlign: "center" }}
-                                            reorderable={false}
-                                            resizeable={false}
-                                            body={columnEditButton}
-                                            className='table-edit-button-column'
-                                        />
-                                        {activeColumns.map(({ field, header }, index) => {
-                                            const savedWidth =
-                                                serverSettings?.inventory?.columnWidth?.[field];
-                                            const isLastColumn = index === activeColumns.length - 1;
-
-                                            return (
-                                                <Column
-                                                    field={field}
-                                                    header={() =>
-                                                        columnHeader(header as string, field)
-                                                    }
-                                                    key={field}
-                                                    sortable
-                                                    reorderable
-                                                    headerClassName='cursor-move'
-                                                    body={(data) => {
-                                                        const value = handleFormatField(
-                                                            field,
-                                                            data[field]
-                                                        );
-                                                        return (
-                                                            <TruncatedText
-                                                                text={value}
-                                                                withTooltip
-                                                            />
-                                                        );
-                                                    }}
-                                                    pt={getColumnPtStyles({
-                                                        savedWidth,
-                                                        isLastColumn,
-                                                    })}
-                                                />
-                                            );
-                                        })}
-                                    </DataTable>
-                                )}
-                            </div>
-                            <InventoryAdvancedSearch
-                                visible={dialogVisible}
-                                onClose={() => setDialogVisible(false)}
-                                lazyState={lazyState}
-                                setIsLoading={setIsLoading}
-                                handleGetInventoryList={handleGetInventoryList}
-                            />
-                        </div>
-                    </div>
-                </div>
+                                    store.currentLocation = location.locationuid;
+                                },
+                            })),
+                        ]}
+                        rounded
+                        menuStyle={{ transform: "translateX(164px)" }}
+                        pt={{
+                            menu: {
+                                className: "inventory-location__menu",
+                            },
+                        }}
+                    />
+                )}
             </div>
-        </div>
+            <div className='card-content'>
+                {isLoading ? (
+                    <div className='dashboard-loader__wrapper'>
+                        <Loader />
+                    </div>
+                ) : (
+                    <DataTable
+                        ref={dataTableRef}
+                        showGridlines
+                        value={inventories}
+                        lazy
+                        paginator
+                        scrollable
+                        scrollHeight='691px'
+                        first={lazyState.first}
+                        rows={lazyState.rows}
+                        rowsPerPageOptions={ROWS_PER_PAGE}
+                        totalRecords={totalRecords || 1}
+                        onPage={pageChanged}
+                        onSort={sortData}
+                        sortOrder={lazyState.sortOrder}
+                        sortField={lazyState.sortField}
+                        reorderableColumns
+                        resizableColumns
+                        header={header}
+                        rowClassName={() => "table-row"}
+                        onColReorder={handleColumnReorder}
+                        onColumnResizeEnd={handleColumnResize}
+                        onRowClick={handleOnRowClick}
+                    >
+                        <Column
+                            bodyStyle={{ textAlign: "center" }}
+                            reorderable={false}
+                            resizeable={false}
+                            body={columnEditButton}
+                            className='table-edit-button-column'
+                        />
+                        {activeColumns.map(({ field, header }, index) => {
+                            const savedWidth = serverSettings?.inventory?.columnWidth?.[field];
+                            const isLastColumn = index === activeColumns.length - 1;
+
+                            return (
+                                <Column
+                                    field={field}
+                                    header={() => columnHeader(header as string, field)}
+                                    key={field}
+                                    sortable
+                                    reorderable
+                                    headerClassName='cursor-move'
+                                    body={(data) => {
+                                        const value = handleFormatField(field, data[field]);
+                                        return <TruncatedText text={value} withTooltip />;
+                                    }}
+                                    pt={getColumnPtStyles({
+                                        savedWidth,
+                                        isLastColumn,
+                                    })}
+                                />
+                            );
+                        })}
+                    </DataTable>
+                )}
+                <InventoryAdvancedSearch
+                    visible={dialogVisible}
+                    onClose={() => setDialogVisible(false)}
+                    lazyState={lazyState}
+                    setIsLoading={setIsLoading}
+                    handleGetInventoryList={handleGetInventoryList}
+                />
+            </div>
+        </DataTableWrapper>
     );
 }

@@ -4,9 +4,7 @@ import { Tooltip } from "primereact/tooltip";
 import { ReactElement, CSSProperties, ReactNode } from "react";
 import { truncateText } from "common/helpers";
 import { DEFAULT_MAX_COLUMN_WIDTH } from "common/settings";
-import { DataTable } from "primereact/datatable";
 import "./index.css";
-import { ROWS_PER_PAGE } from "common/settings";
 
 interface GetColumnPtStylesOptions {
     savedWidth?: number;
@@ -122,21 +120,9 @@ export const ExpansionColumn = (props: ExpansionColumnProps): ReactElement => {
 
 interface DataTableWrapperProps {
     children: ReactNode;
-    rows?: number;
-    paginator?: boolean;
+    className?: string;
 }
 
-export const DataTableWrapper = ({
-    children,
-    rows = ROWS_PER_PAGE[0],
-    paginator = true,
-    ...dataTableProps
-}: DataTableWrapperProps): ReactElement => {
-    return (
-        <div className='data-table-wrapper'>
-            <DataTable {...dataTableProps} rows={rows} paginator={paginator}>
-                {children}
-            </DataTable>
-        </div>
-    );
+export const DataTableWrapper = ({ children, className }: DataTableWrapperProps): ReactElement => {
+    return <div className={`data-table-wrapper ${className}`}>{children}</div>;
 };
