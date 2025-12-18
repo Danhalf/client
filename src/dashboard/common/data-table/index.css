@@ -40,11 +40,11 @@
 
 .data-table-wrapper {
     max-width: 1670px;
-    padding: 40px;
-    height: 983px;
+    height: var(--admss-app-default-card-height);
     max-height: 80vh;
     border-radius: 15px;
     overflow: hidden;
+    padding: 40px;
 
     .p-paginator {
         padding-top: 42px;

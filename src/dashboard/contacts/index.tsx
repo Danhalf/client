@@ -603,7 +603,7 @@ export const ContactsDataTable = ({
 
 export const Contacts = () => {
     return (
-        <DataTableWrapper className='card contacts' rowsCount={10} rowHeight={60}>
+        <DataTableWrapper className='card contacts'>
             <div className='card-header'>
                 <h2 className='card-header__title uppercase m-0'>Contacts</h2>
             </div>

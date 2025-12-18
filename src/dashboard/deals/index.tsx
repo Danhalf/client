@@ -10,7 +10,7 @@ import { QueryParams } from "common/models/query-params";
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
 import { getDealsList, TotalDealsList } from "http/services/deals.service";
-import { DEFAULT_ROW_HEIGHT, ROWS_PER_PAGE } from "common/settings";
+import { ROWS_PER_PAGE } from "common/settings";
 import { useNavigate } from "react-router-dom";
 import { Deal } from "common/models/deals";
 import { Loader } from "dashboard/common/loader";
@@ -639,7 +639,7 @@ export const DealsDataTable = observer(
 
 export const Deals = () => {
     return (
-        <DataTableWrapper className='card deals' rowsCount={10} rowHeight={DEFAULT_ROW_HEIGHT}>
+        <DataTableWrapper className='card deals'>
             <div className='card-header'>
                 <h2 className='card-header__title uppercase m-0'>Deals</h2>
             </div>

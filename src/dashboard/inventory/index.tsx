@@ -15,7 +15,7 @@ import { DatatableQueries, initialDataTableQueries } from "common/models/datatab
 import { useNavigate } from "react-router-dom";
 import "./index.css";
 import InventoryHeader from "dashboard/inventory/components/InventoryHeader";
-import { DEFAULT_ROW_HEIGHT, ROWS_PER_PAGE } from "common/settings";
+import { ROWS_PER_PAGE } from "common/settings";
 import { InventoryAdvancedSearch } from "dashboard/inventory/components/AdvancedSearch";
 import { getUserSettings, setUserSettings } from "http/services/auth-user.service";
 import {
@@ -459,7 +459,7 @@ export default function Inventories({
     };
 
     return (
-        <DataTableWrapper className='card inventory' rowsCount={10} rowHeight={DEFAULT_ROW_HEIGHT}>
+        <DataTableWrapper className='card inventory'>
             <div className='card-header'>
                 <h2 className='card-header__title inventory__title uppercase m-0'>Inventory</h2>
                 {locations.length > 0 && (

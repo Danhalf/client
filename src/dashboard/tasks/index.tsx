@@ -10,7 +10,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
-import { DEFAULT_ROW_HEIGHT, ROWS_PER_PAGE } from "common/settings";
+import { ROWS_PER_PAGE } from "common/settings";
 import "./index.css";
 import { Loader } from "dashboard/common/loader";
 import { observer } from "mobx-react-lite";
@@ -513,7 +513,7 @@ export const TasksDataTable = observer((): ReactElement => {
 
 export const Tasks = (): ReactElement => {
     return (
-        <DataTableWrapper className='card tasks' rowsCount={10} rowHeight={DEFAULT_ROW_HEIGHT}>
+        <DataTableWrapper className='card tasks'>
             <div className='card-header'>
                 <h2 className='card-header__title uppercase m-0'>Tasks</h2>
             </div>

@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { TabPanel, TabView } from "primereact/tabview";
 import { AccountsDataTable } from "./account-list";
 import { AccountsAudit } from "./audit";
-import { DEFAULT_ROW_HEIGHT } from "common/settings";
 import { DataTableWrapper } from "dashboard/common/data-table";
 
 export { AccountsDataTable } from "./account-list";
@@ -42,8 +41,8 @@ export const Accounts = () => {
     };
 
     return (
-        <DataTableWrapper className='grid accounts' rowsCount={10} rowHeight={DEFAULT_ROW_HEIGHT}>
-            <TabView className='card' activeIndex={activeIndex} onTabChange={handleTabChange}>
+        <DataTableWrapper className='card accounts'>
+            <TabView activeIndex={activeIndex} onTabChange={handleTabChange}>
                 {tabItems.map(({ tabName, component }) => (
                     <TabPanel
                         header={tabName}
