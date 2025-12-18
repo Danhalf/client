@@ -21,7 +21,7 @@ import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/mo
 import { Status } from "common/models/base-response";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { TruncatedText } from "dashboard/common/display";
-import { getColumnPtStyles } from "dashboard/common/data-table";
+import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 
 interface HistoryColumnProps extends ColumnProps {
     field: keyof ExportWebHistoryList;
@@ -228,7 +228,7 @@ export const ExportHistory = (): ReactElement => {
     };
 
     return (
-        <div className='card-content history'>
+        <DataTableWrapper className='card-content history' rowsCount={10} rowHeight={58}>
             <div className='datatable-controls'>
                 <GlobalSearchInput
                     value={globalSearch}
@@ -272,52 +272,48 @@ export const ExportHistory = (): ReactElement => {
                     />
                 </div>
             </div>
-            <div className='grid'>
-                <div className='col-12'>
-                    <DataTable
-                        showGridlines
-                        lazy
-                        value={historyList}
-                        scrollable
-                        scrollHeight='70vh'
-                        rowsPerPageOptions={ROWS_PER_PAGE}
-                        reorderableColumns
-                        resizableColumns
-                        className='export-web-table'
-                        rowClassName={() => "table-row"}
-                        paginator
-                        first={lazyState.first}
-                        rows={lazyState.rows}
-                        totalRecords={totalRecords || 1}
-                        onPage={pageChanged}
-                        onSort={sortData}
-                        sortOrder={lazyState.sortOrder}
-                        sortField={lazyState.sortField}
-                        onColReorder={handleColumnReorder}
-                        onColumnResizeEnd={handleColumnResize}
-                    >
-                        {activeHistoryColumns.map(({ field, header }, index) => {
-                            const savedWidth = serverSettings?.exportHistory?.columnWidth?.[field];
-                            const isLastColumn = index === activeHistoryColumns.length - 1;
+            <DataTable
+                showGridlines
+                lazy
+                value={historyList}
+                scrollable
+                scrollHeight='auto'
+                rowsPerPageOptions={ROWS_PER_PAGE}
+                reorderableColumns
+                resizableColumns
+                className='export-web-table'
+                rowClassName={() => "table-row"}
+                paginator
+                first={lazyState.first}
+                rows={lazyState.rows}
+                totalRecords={totalRecords || 1}
+                onPage={pageChanged}
+                onSort={sortData}
+                sortOrder={lazyState.sortOrder}
+                sortField={lazyState.sortField}
+                onColReorder={handleColumnReorder}
+                onColumnResizeEnd={handleColumnResize}
+            >
+                {activeHistoryColumns.map(({ field, header }, index) => {
+                    const savedWidth = serverSettings?.exportHistory?.columnWidth?.[field];
+                    const isLastColumn = index === activeHistoryColumns.length - 1;
 
-                            return (
-                                <Column
-                                    field={field}
-                                    key={field}
-                                    sortable
-                                    header={header}
-                                    reorderable={false}
-                                    body={(data) => {
-                                        const value = String(data[field] || "");
-                                        return <TruncatedText text={value} withTooltip />;
-                                    }}
-                                    pt={getColumnPtStyles({ savedWidth, isLastColumn })}
-                                />
-                            );
-                        })}
-                    </DataTable>
-                </div>
-            </div>
-        </div>
+                    return (
+                        <Column
+                            field={field}
+                            key={field}
+                            sortable
+                            header={header}
+                            reorderable={false}
+                            body={(data) => {
+                                const value = String(data[field] || "");
+                                return <TruncatedText text={value} withTooltip />;
+                            }}
+                            pt={getColumnPtStyles({ savedWidth, isLastColumn })}
+                        />
+                    );
+                })}
+            </DataTable>
+        </DataTableWrapper>
     );
 };
