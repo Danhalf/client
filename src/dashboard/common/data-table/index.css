@@ -41,4 +41,16 @@
 .data-table-wrapper {
     max-width: 1670px;
     height: 983px;
+    max-height: 80vh;
+    overflow: hidden;
+}
+
+.data-table-wrapper .p-datatable {
+    height: 100%;
+}
+
+.data-table-wrapper .p-datatable-wrapper {
+    height: calc((var(--data-table-rows-count, 10) + 1) * var(--data-table-row-height, 40px));
+    max-height: calc((var(--data-table-rows-count, 10) + 1) * var(--data-table-row-height, 40px));
+    overflow-y: auto;
 }

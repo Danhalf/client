@@ -121,8 +121,27 @@ export const ExpansionColumn = (props: ExpansionColumnProps): ReactElement => {
 interface DataTableWrapperProps {
     children: ReactNode;
     className?: string;
+    rowsCount?: number;
+    rowHeight?: number;
 }
 
-export const DataTableWrapper = ({ children, className }: DataTableWrapperProps): ReactElement => {
-    return <div className={`data-table-wrapper ${className}`}>{children}</div>;
+export const DataTableWrapper = ({
+    children,
+    className,
+    rowsCount = 10,
+    rowHeight = 58,
+}: DataTableWrapperProps): ReactElement => {
+    return (
+        <div
+            className={`data-table-wrapper ${className || ""}`}
+            style={
+                {
+                    "--data-table-rows-count": rowsCount,
+                    "--data-table-row-height": `${rowHeight}px`,
+                } as CSSProperties
+            }
+        >
+            {children}
+        </div>
+    );
 };

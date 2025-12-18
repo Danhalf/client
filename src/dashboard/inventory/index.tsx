@@ -163,17 +163,17 @@ export default function Inventories({
                         } else {
                             setActiveColumns(columns.filter(({ checked }) => checked));
                         }
-                        settings?.table &&
+                        if (settings?.table) {
+                            const table = settings.table;
                             setLazyState({
-                                first: settings.table.first || initialDataTableQueries.first,
-                                rows: settings.table.rows || initialDataTableQueries.rows,
-                                page: settings.table.page || initialDataTableQueries.page,
-                                column: settings.table.column || initialDataTableQueries.column,
-                                sortField:
-                                    settings.table.sortField || initialDataTableQueries.sortField,
-                                sortOrder:
-                                    settings.table.sortOrder || initialDataTableQueries.sortOrder,
+                                first: table.first || initialDataTableQueries.first,
+                                rows: table.rows || initialDataTableQueries.rows,
+                                page: table.page || initialDataTableQueries.page,
+                                column: table.column || initialDataTableQueries.column,
+                                sortField: table.sortField || initialDataTableQueries.sortField,
+                                sortOrder: table.sortOrder || initialDataTableQueries.sortOrder,
                             });
+                        }
                         if (settings?.selectedFilterOptions) {
                             setSelectedFilterOptions(settings.selectedFilterOptions);
                         }
@@ -322,8 +322,11 @@ export default function Inventories({
             ...(lazyState.sortOrder === 1 && { type: "asc" }),
             ...(lazyState.sortOrder === -1 && { type: "desc" }),
             ...(lazyState.sortField && { column: lazyState.sortField }),
-            skip: lazyState.skip || initialDataTableQueries.skip,
-            top: lazyState.top || initialDataTableQueries.top,
+            skip:
+                typeof lazyState.first === "number"
+                    ? lazyState.first
+                    : initialDataTableQueries.first,
+            top: typeof lazyState.rows === "number" ? lazyState.rows : initialDataTableQueries.rows,
         };
 
         if (qry.length > 0) {
@@ -339,6 +342,10 @@ export default function Inventories({
         selectedInventoryType,
         authUser,
         locations.length,
+        lazyState.first,
+        lazyState.rows,
+        lazyState.sortField,
+        lazyState.sortOrder,
     ]);
 
     const handleAddNewInventory = () => {
@@ -452,7 +459,7 @@ export default function Inventories({
     };
 
     return (
-        <DataTableWrapper className='card inventory'>
+        <DataTableWrapper className='card inventory' rowsCount={10} rowHeight={58}>
             <div className='card-header'>
                 <h2 className='card-header__title inventory__title uppercase m-0'>Inventory</h2>
                 {locations.length > 0 && (
@@ -504,7 +511,7 @@ export default function Inventories({
                         lazy
                         paginator
                         scrollable
-                        scrollHeight='691px'
+                        scrollHeight='auto'
                         first={lazyState.first}
                         rows={lazyState.rows}
                         rowsPerPageOptions={ROWS_PER_PAGE}
