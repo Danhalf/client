@@ -10,7 +10,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Column } from "primereact/column";
 import { QueryParams } from "common/models/query-params";
-import { ROWS_PER_PAGE } from "common/settings";
+import { DEFAULT_ROW_HEIGHT, ROWS_PER_PAGE } from "common/settings";
 import "./index.css";
 import { Loader } from "dashboard/common/loader";
 import { observer } from "mobx-react-lite";
@@ -303,7 +303,7 @@ export const TasksDataTable = observer((): ReactElement => {
     };
 
     return (
-        <DataTableWrapper className='card-content tasks' rowsCount={10} rowHeight={58}>
+        <section className='card-content'>
             <div className='datatable-controls flex flex-wrap justify-content-between align-items-center gap-3'>
                 <div className='flex align-items-center gap-3 flex-wrap'>
                     <span className='p-input-icon-right tasks-search'>
@@ -507,21 +507,17 @@ export const TasksDataTable = observer((): ReactElement => {
                 fields={searchFields as SearchField<AdvancedSearch>[]}
                 searchForm={SEARCH_FORM_TYPE.ACCOUNTS}
             />
-        </DataTableWrapper>
+        </section>
     );
 });
 
 export const Tasks = (): ReactElement => {
     return (
-        <div className='grid'>
-            <div className='col-12'>
-                <div className='card'>
-                    <div className='card-header'>
-                        <h2 className='card-header__title uppercase m-0'>Tasks</h2>
-                    </div>
-                    <TasksDataTable />
-                </div>
+        <DataTableWrapper className='card tasks' rowsCount={10} rowHeight={DEFAULT_ROW_HEIGHT}>
+            <div className='card-header'>
+                <h2 className='card-header__title uppercase m-0'>Tasks</h2>
             </div>
-        </div>
+            <TasksDataTable />
+        </DataTableWrapper>
     );
 };

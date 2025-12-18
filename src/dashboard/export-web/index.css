@@ -6,6 +6,10 @@
     border: none;
 }
 
+.data-table-wrapper.export-web {
+    padding: 6px;
+}
+
 .export-web {
     .column-picker {
         height: 50px;

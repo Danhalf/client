@@ -21,7 +21,7 @@ import { ExportWebUserSettings, ServerUserSettings, TableState } from "common/mo
 import { Status } from "common/models/base-response";
 import { GlobalSearchInput } from "dashboard/common/form/inputs";
 import { TruncatedText } from "dashboard/common/display";
-import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 interface HistoryColumnProps extends ColumnProps {
     field: keyof ExportWebHistoryList;
@@ -228,7 +228,7 @@ export const ExportHistory = (): ReactElement => {
     };
 
     return (
-        <DataTableWrapper className='card-content history' rowsCount={10} rowHeight={58}>
+        <section className='card-content history'>
             <div className='datatable-controls'>
                 <GlobalSearchInput
                     value={globalSearch}
@@ -314,6 +314,6 @@ export const ExportHistory = (): ReactElement => {
                     );
                 })}
             </DataTable>
-        </DataTableWrapper>
+        </section>
     );
 };

@@ -41,7 +41,7 @@ import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { setInventoryExportWeb } from "http/services/inventory-service";
 import { printExportTableData, rowExpansionTemplate } from "./common";
 import { TruncatedText } from "dashboard/common/display";
-import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof (ExportWebList & { mediacount: number });
@@ -602,9 +602,9 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
     };
 
     return (
-        <DataTableWrapper className='card-content' rowsCount={10} rowHeight={58}>
-            <div className='grid datatable-controls'>
-                <div className='col-12 export-web-controls'>
+        <section className='card-content'>
+            <div className='datatable-controls'>
+                <div className='export-web-controls'>
                     <Button
                         className='export-web-controls__button px-6 uppercase'
                         severity='success'
@@ -917,6 +917,6 @@ export const ExportWeb = ({ countCb }: ExportWebProps): ReactElement => {
                 className='price-change-confirm-dialog'
                 onHide={() => setConfirmActive(false)}
             />
-        </DataTableWrapper>
+        </section>
     );
 };

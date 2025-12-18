@@ -28,7 +28,7 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { TruncatedText } from "dashboard/common/display";
-import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 interface ScheduleColumnProps extends ColumnProps {
     field: keyof ExportWebScheduleList;
@@ -282,9 +282,9 @@ export const ExportSchedule = (): ReactElement => {
     };
 
     return (
-        <DataTableWrapper className='card-content schedule' rowsCount={10} rowHeight={58}>
-            <div className='grid datatable-controls'>
-                <div className='col-12 export-web-controls'>
+        <section className='card-content schedule'>
+            <div className='datatable-controls'>
+                <div className='export-web-controls'>
                     <div className='export-web-controls__input'>
                         <MultiSelect
                             showSelectAll={false}
@@ -426,6 +426,6 @@ export const ExportSchedule = (): ReactElement => {
                 className='schedule-confirm-dialog'
                 onHide={() => setDeletedId(null)}
             />
-        </DataTableWrapper>
+        </section>
     );
 };

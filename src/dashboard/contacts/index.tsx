@@ -397,7 +397,7 @@ export const ContactsDataTable = ({
     };
 
     return (
-        <DataTableWrapper className='card-content' rowsCount={10} rowHeight={58}>
+        <div className='card-content'>
             <div className='table-controls contact-controls'>
                 <GlobalSearchInput
                     value={globalSearch}
@@ -597,17 +597,17 @@ export const ContactsDataTable = ({
                 fields={searchFields}
                 searchForm={SEARCH_FORM_TYPE.CONTACTS}
             />
-        </DataTableWrapper>
+        </div>
     );
 };
 
 export const Contacts = () => {
     return (
-        <div className='card contacts'>
+        <DataTableWrapper className='card contacts' rowsCount={10} rowHeight={60}>
             <div className='card-header'>
                 <h2 className='card-header__title uppercase m-0'>Contacts</h2>
             </div>
             <ContactsDataTable />
-        </div>
+        </DataTableWrapper>
     );
 };

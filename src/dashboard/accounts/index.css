@@ -1,3 +1,7 @@
+.data-table-wrapper.accounts {
+    padding: 6px;
+}
+
 .accounts {
     --accounts-filter-width: 250px;
     .datatable-controls {

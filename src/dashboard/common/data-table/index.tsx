@@ -3,7 +3,7 @@ import { Column, ColumnProps } from "primereact/column";
 import { Tooltip } from "primereact/tooltip";
 import { ReactElement, CSSProperties, ReactNode } from "react";
 import { truncateText } from "common/helpers";
-import { DEFAULT_MAX_COLUMN_WIDTH } from "common/settings";
+import { DEFAULT_MAX_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT } from "common/settings";
 import "./index.css";
 
 interface GetColumnPtStylesOptions {
@@ -129,7 +129,7 @@ export const DataTableWrapper = ({
     children,
     className,
     rowsCount = 10,
-    rowHeight = 58,
+    rowHeight = DEFAULT_ROW_HEIGHT,
 }: DataTableWrapperProps): ReactElement => {
     return (
         <div

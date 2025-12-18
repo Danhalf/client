@@ -25,7 +25,7 @@ import { Button } from "primereact/button";
 import { AccountsUserSettings } from "common/models/user";
 import { useUserProfileSettings } from "common/hooks/useUserProfileSettings";
 import { TruncatedText } from "dashboard/common/display";
-import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 interface AccountsDataTableProps {
     onRowClick?: (accountName: string) => void;
@@ -132,7 +132,7 @@ export const AccountsDataTable = observer(
         };
 
         return (
-            <DataTableWrapper className='card-content' rowsCount={10} rowHeight={58}>
+            <section className='card-content'>
                 <AccountsHeader
                     searchValue={globalSearch}
                     onSearchChange={setGlobalSearch}
@@ -233,7 +233,7 @@ export const AccountsDataTable = observer(
                     onAccountsUpdate={setAccounts}
                     lazyState={lazyState}
                 />
-            </DataTableWrapper>
+            </section>
         );
     }
 );
