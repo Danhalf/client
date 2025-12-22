@@ -11,6 +11,9 @@ import { Status } from "common/models/base-response";
 import { useStore } from "store/hooks";
 import { useToastMessage } from "common/hooks";
 import { DASHBOARD_PAGE } from "common/constants/links";
+import { LS_LAST_ROUTE_PATH, LS_LAST_ROUTE_TIMESTAMP } from "common/constants/localStorage";
+import { ROUTE_RESTORE_TIMEOUT_HOURS } from "common/settings";
+import { convertTimeToMilliseconds } from "common/helpers";
 
 export interface LoginForm {
     username: string;
@@ -68,6 +71,26 @@ export const SignIn = () => {
                         if (userStore.twoFactorAuth.isEnabled) {
                             navigate("/2fa");
                         } else {
+                            const storedPath = localStorage.getItem(LS_LAST_ROUTE_PATH);
+                            const storedTimestamp = localStorage.getItem(LS_LAST_ROUTE_TIMESTAMP);
+                            if (storedPath && storedTimestamp) {
+                                const currentTime = Date.now();
+                                const storedTime = Number(storedTimestamp);
+                                const routeAgeInMilliseconds = currentTime - storedTime;
+                                const routeRestoreTimeoutInMilliseconds = convertTimeToMilliseconds(
+                                    ROUTE_RESTORE_TIMEOUT_HOURS
+                                );
+                                if (
+                                    storedTime > 0 &&
+                                    routeAgeInMilliseconds > 0 &&
+                                    routeAgeInMilliseconds <= routeRestoreTimeoutInMilliseconds
+                                ) {
+                                    navigate(storedPath);
+                                    return;
+                                }
+                            }
+                            localStorage.removeItem(LS_LAST_ROUTE_PATH);
+                            localStorage.removeItem(LS_LAST_ROUTE_TIMESTAMP);
                             navigate(DASHBOARD_PAGE);
                         }
                     } catch (error) {

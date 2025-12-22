@@ -1,7 +1,11 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, isAxiosError } from "axios";
 import { getKeyValue } from "services/local-storage.service";
 import { AuthUser } from "./services/auth.service";
-import { LS_APP_USER } from "common/constants/localStorage";
+import {
+    LS_APP_USER,
+    LS_LAST_ROUTE_PATH,
+    LS_LAST_ROUTE_TIMESTAMP,
+} from "common/constants/localStorage";
 import { NavigateFunction } from "react-router-dom";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
@@ -27,6 +31,10 @@ export const nonAuthorizedUserApiInstance = axios.create({
 
 const handleErrorResponse = (error: AxiosError, navigate: NavigateFunction) => {
     if (error.response && error.response.status === 401) {
+        const currentPath = window.location.pathname + window.location.search;
+        const currentTimestamp = Date.now().toString();
+        localStorage.setItem(LS_LAST_ROUTE_PATH, currentPath);
+        localStorage.setItem(LS_LAST_ROUTE_TIMESTAMP, currentTimestamp);
         localStorage.removeItem("useruid");
         navigate("/");
         return Promise.reject(error.response);
