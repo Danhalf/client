@@ -7,11 +7,7 @@ import userCabinet from "assets/images/icons/header/user-cabinet.svg";
 import { AuthUser, logout } from "http/services/auth.service";
 import { useLocation, useNavigate } from "react-router-dom";
 import { localStorageClear } from "services/local-storage.service";
-import {
-    LS_APP_USER,
-    LS_LAST_ROUTE_PATH,
-    LS_LAST_ROUTE_TIMESTAMP,
-} from "common/constants/localStorage";
+import { LS_APP_USER, LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { UserProfileDialog } from "dashboard/profile/userProfile";
@@ -52,10 +48,13 @@ export const Header = observer((): ReactElement => {
 
     const signOut = ({ useruid }: AuthUser) => {
         logout(useruid).finally(() => {
-            const currentPath = window.location.pathname + window.location.search;
-            const currentTimestamp = Date.now().toString();
-            localStorage.setItem(LS_LAST_ROUTE_PATH, currentPath);
-            localStorage.setItem(LS_LAST_ROUTE_TIMESTAMP, currentTimestamp);
+            const currentPath = location.pathname + location.search;
+            const routeData: LastRouteData = {
+                path: currentPath,
+                timestamp: Date.now(),
+                useruid,
+            };
+            localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
             localStorageClear(LS_APP_USER);
             navigate("/");
         });
