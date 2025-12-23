@@ -28,25 +28,34 @@ export const useGoogleMaps = (): boolean => {
             }
         };
 
-        const script = document.querySelector('script[src*="maps.googleapis.com/maps/api/js"]');
+        let existingScript = document.querySelector(
+            'script[src*="maps.googleapis.com/maps/api/js"]'
+        ) as HTMLScriptElement;
 
-        if (script) {
-            script.addEventListener("load", checkGoogleMaps);
+        if (existingScript) {
+            existingScript.addEventListener("load", checkGoogleMaps);
             checkGoogleMaps();
-        } else {
-            const intervalId = setInterval(() => {
-                if (window.google && window.google.maps && window.google.maps.places) {
-                    setIsLoaded(true);
-                    clearInterval(intervalId);
-                }
-            }, 100);
-
-            return () => clearInterval(intervalId);
+            return () => {
+                existingScript.removeEventListener("load", checkGoogleMaps);
+            };
         }
 
+        const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+        if (!apiKey) {
+            return;
+        }
+
+        const script = document.createElement("script");
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
+        script.async = true;
+        script.defer = true;
+        script.onload = checkGoogleMaps;
+
+        document.head.appendChild(script);
+
         return () => {
-            if (script) {
-                script.removeEventListener("load", checkGoogleMaps);
+            if (script.parentNode) {
+                script.parentNode.removeChild(script);
             }
         };
     }, []);
