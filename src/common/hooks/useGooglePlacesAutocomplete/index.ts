@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo } from "react";
-import { useMapsLibrary } from "@vis.gl/react-google-maps";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
+import { useMapsLibrary, useApiIsLoaded } from "@vis.gl/react-google-maps";
 
 export interface AddressSuggestion {
     description: string;
@@ -20,49 +20,160 @@ export interface ParsedAddress {
 
 export const useGooglePlacesAutocomplete = () => {
     const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
+    const isApiLoaded = useApiIsLoaded();
     const places = useMapsLibrary("places");
-    const autocompleteService = useMemo(() => {
-        if (!places) return null;
-        return new places.AutocompleteService();
-    }, [places]);
+    const autocompleteSuggestionAvailableRef = useRef<boolean>(false);
 
-    const completeMethod = useCallback(
-        (event: { query: string }) => {
-            if (!autocompleteService || !event.query.trim()) {
-                setSuggestions([]);
-                return;
-            }
+    useEffect(() => {
+        if (
+            typeof window !== "undefined" &&
+            window.google &&
+            window.google.maps &&
+            window.google.maps.importLibrary
+        ) {
+            window.google.maps.importLibrary("places").then((placesLibrary: any) => {
+                if (placesLibrary.AutocompleteSuggestion) {
+                    autocompleteSuggestionAvailableRef.current = true;
+                }
+            });
+        }
+    }, [isApiLoaded]);
 
-            autocompleteService.getPlacePredictions(
-                {
-                    input: event.query,
-                    types: ["address"],
-                    componentRestrictions: { country: "us" },
-                },
-                (predictions, status) => {
-                    if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-                        const formattedSuggestions: AddressSuggestion[] = predictions.map(
-                            (prediction) => ({
-                                description: prediction.description,
-                                placeId: prediction.place_id,
-                                structuredFormatting: prediction.structured_formatting
+    const isReady = useMemo(() => {
+        return (
+            isApiLoaded &&
+            (autocompleteSuggestionAvailableRef.current ||
+                (typeof window !== "undefined" &&
+                    window.google &&
+                    window.google.maps &&
+                    window.google.maps.places &&
+                    window.google.maps.places.AutocompleteService))
+        );
+    }, [isApiLoaded]);
+
+    const completeMethod = useCallback(async (event: { query: string }) => {
+        const query = event.query?.trim() || "";
+
+        const hasNewAPI =
+            autocompleteSuggestionAvailableRef.current &&
+            typeof window !== "undefined" &&
+            window.google &&
+            window.google.maps &&
+            window.google.maps.importLibrary;
+
+        if (query.length < 3) {
+            setSuggestions([]);
+            return;
+        }
+
+        if (hasNewAPI) {
+            try {
+                const placesLibrary = await window.google.maps.importLibrary("places");
+                const AutocompleteSuggestion = (placesLibrary as any).AutocompleteSuggestion;
+
+                if (!AutocompleteSuggestion) {
+                    return;
+                }
+
+                const request = {
+                    input: query,
+                    includedRegionCodes: ["us"],
+                    includedPrimaryTypes: ["street_address"],
+                };
+
+                const response = await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
+
+                const responseSuggestions = response?.suggestions || [];
+
+                if (responseSuggestions.length > 0) {
+                    const formattedSuggestions: AddressSuggestion[] = responseSuggestions
+                        .map((suggestion: any) => {
+                            const placePrediction = suggestion.placePrediction;
+                            if (!placePrediction) {
+                                return null;
+                            }
+
+                            const description =
+                                placePrediction.text?.text || placePrediction.description || "";
+                            const placeId =
+                                placePrediction.placeId || placePrediction.place_id || "";
+
+                            const structuredFormat =
+                                placePrediction.structuredFormat ||
+                                placePrediction.structured_formatting;
+
+                            return {
+                                description,
+                                placeId,
+                                structuredFormatting: structuredFormat
                                     ? {
-                                          mainText: prediction.structured_formatting.main_text,
+                                          mainText:
+                                              structuredFormat.mainText ||
+                                              structuredFormat.main_text ||
+                                              "",
                                           secondaryText:
-                                              prediction.structured_formatting.secondary_text || "",
+                                              structuredFormat.secondaryText ||
+                                              structuredFormat.secondary_text ||
+                                              "",
                                       }
                                     : undefined,
-                            })
-                        );
-                        setSuggestions(formattedSuggestions);
-                    } else {
-                        setSuggestions([]);
-                    }
+                            };
+                        })
+                        .filter((s: AddressSuggestion | null) => s !== null) as AddressSuggestion[];
+
+                    setSuggestions(formattedSuggestions);
+                } else {
+                    setSuggestions([]);
                 }
-            );
-        },
-        [autocompleteService]
-    );
+                return;
+            } catch (error) {}
+        }
+
+        if (
+            typeof window !== "undefined" &&
+            window.google &&
+            window.google.maps &&
+            window.google.maps.places &&
+            window.google.maps.places.AutocompleteService
+        ) {
+            try {
+                const service = new window.google.maps.places.AutocompleteService();
+
+                service.getPlacePredictions(
+                    {
+                        input: query,
+                        types: ["address"],
+                        componentRestrictions: { country: "us" },
+                    },
+                    (predictions, status) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+                            const formattedSuggestions: AddressSuggestion[] = predictions.map(
+                                (prediction) => ({
+                                    description: prediction.description,
+                                    placeId: prediction.place_id,
+                                    structuredFormatting: prediction.structured_formatting
+                                        ? {
+                                              mainText: prediction.structured_formatting.main_text,
+                                              secondaryText:
+                                                  prediction.structured_formatting.secondary_text ||
+                                                  "",
+                                          }
+                                        : undefined,
+                                })
+                            );
+                            setSuggestions(formattedSuggestions);
+                        } else {
+                            setSuggestions([]);
+                        }
+                    }
+                );
+            } catch (error) {
+                setSuggestions([]);
+            }
+        } else {
+            setSuggestions([]);
+        }
+    }, []);
 
     const getPlaceDetails = useCallback(
         (placeId: string): Promise<ParsedAddress | null> => {
@@ -129,5 +240,6 @@ export const useGooglePlacesAutocomplete = () => {
         suggestions,
         completeMethod,
         getPlaceDetails,
+        isReady,
     };
 };

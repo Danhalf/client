@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
+import { AutoComplete } from "primereact/autocomplete";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
@@ -8,6 +9,7 @@ import { Checkbox } from "primereact/checkbox";
 import { BUYER_ID, GENERAL_CONTACT_TYPE } from "dashboard/contacts/form/general-info";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { StateDropdown } from "dashboard/common/form/inputs";
+import { useGooglePlacesAutocomplete, AddressSuggestion } from "common/hooks";
 
 const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 
@@ -19,6 +21,71 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
     const store = useStore().contactStore;
     const { contact, changeContact, contactExtData, changeContactExtData } = store;
     const [isSameAsMailing, setIsSameAsMailing] = useState<boolean>(false);
+
+    const primaryAddressAutocomplete = useGooglePlacesAutocomplete();
+    const mailingAddressAutocomplete = useGooglePlacesAutocomplete();
+
+    useEffect(() => {
+        if (primaryAddressAutocomplete.isReady) {
+        }
+    }, [primaryAddressAutocomplete.isReady]);
+
+    const handlePrimaryAddressSelect = async (selected: AddressSuggestion | string) => {
+        if (typeof selected === "string") {
+            if (type === BUYER) {
+                changeContact("streetAddress", selected);
+            } else {
+                changeContactExtData("CoBuyer_Res_Address", selected);
+            }
+            return;
+        }
+
+        const addressDetails = await primaryAddressAutocomplete.getPlaceDetails(selected.placeId);
+        if (addressDetails) {
+            if (type === BUYER) {
+                changeContact("streetAddress", addressDetails.streetAddress);
+                if (addressDetails.city) changeContact("city", addressDetails.city);
+                if (addressDetails.state) changeContact("state", addressDetails.state);
+                if (addressDetails.zipCode) changeContact("ZIP", addressDetails.zipCode);
+            } else {
+                changeContactExtData("CoBuyer_Res_Address", addressDetails.streetAddress);
+                if (addressDetails.city) changeContactExtData("CoBuyer_City", addressDetails.city);
+                if (addressDetails.state)
+                    changeContactExtData("CoBuyer_State", addressDetails.state);
+                if (addressDetails.zipCode)
+                    changeContactExtData("CoBuyer_Zip_Code", addressDetails.zipCode);
+            }
+        }
+    };
+
+    const handleMailingAddressSelect = async (selected: AddressSuggestion | string) => {
+        if (typeof selected === "string") {
+            if (type === BUYER) {
+                changeContact("mailStreetAddress", selected);
+            } else {
+                changeContactExtData("CoBuyer_Mailing_Address", selected);
+            }
+            return;
+        }
+
+        const addressDetails = await mailingAddressAutocomplete.getPlaceDetails(selected.placeId);
+        if (addressDetails) {
+            if (type === BUYER) {
+                changeContact("mailStreetAddress", addressDetails.streetAddress);
+                if (addressDetails.city) changeContact("mailCity", addressDetails.city);
+                if (addressDetails.state) changeContact("mailState", addressDetails.state);
+                if (addressDetails.zipCode) changeContact("mailZIP", addressDetails.zipCode);
+            } else {
+                changeContactExtData("CoBuyer_Mailing_Address", addressDetails.streetAddress);
+                if (addressDetails.city)
+                    changeContactExtData("CoBuyer_Mailing_City", addressDetails.city);
+                if (addressDetails.state)
+                    changeContactExtData("CoBuyer_Mailing_State", addressDetails.state);
+                if (addressDetails.zipCode)
+                    changeContactExtData("CoBuyer_Mailing_Zip", addressDetails.zipCode);
+            }
+        }
+    };
 
     useEffect(() => {
         if (isSameAsMailing) {
@@ -58,19 +125,45 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
         <div className='grid address-info row-gap-2'>
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <InputText
+                    <AutoComplete
                         className='address-info__text-input w-full'
                         value={
                             (type === BUYER
                                 ? contact.streetAddress
                                 : contactExtData.CoBuyer_Res_Address) || ""
                         }
-                        onChange={({ target: { value } }) =>
-                            type === BUYER
-                                ? changeContact("streetAddress", value)
-                                : changeContactExtData("CoBuyer_Res_Address", value)
+                        suggestions={primaryAddressAutocomplete.suggestions}
+                        completeMethod={(e) => {
+                            primaryAddressAutocomplete.completeMethod(e);
+                        }}
+                        onChange={({ value }) => {
+                            const stringValue =
+                                typeof value === "string"
+                                    ? value
+                                    : (value as AddressSuggestion)?.description || "";
+                            if (type === BUYER) {
+                                changeContact("streetAddress", stringValue);
+                            } else {
+                                changeContactExtData("CoBuyer_Res_Address", stringValue);
+                            }
+                            if (stringValue.length >= 3) {
+                                primaryAddressAutocomplete.completeMethod({ query: stringValue });
+                            }
+                        }}
+                        onSelect={(e) => {
+                            const selected = e.value;
+                            if (selected && typeof selected === "object" && "placeId" in selected) {
+                                handlePrimaryAddressSelect(selected as AddressSuggestion);
+                            }
+                        }}
+                        itemTemplate={(suggestion: AddressSuggestion) => suggestion.description}
+                        selectedItemTemplate={(suggestion: AddressSuggestion) =>
+                            suggestion.description
                         }
                         disabled={isControlDisabled}
+                        dropdown
+                        minLength={3}
+                        delay={300}
                     />
                     <label className='float-label'>Street Address</label>
                 </span>
@@ -147,19 +240,39 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
 
             <div className='col-6'>
                 <span className='p-float-label'>
-                    <InputText
+                    <AutoComplete
                         className='mailing-address-info__text-input w-full'
                         value={
                             (type === BUYER
                                 ? contact.mailStreetAddress
                                 : contactExtData.CoBuyer_Mailing_Address) || ""
                         }
-                        onChange={({ target: { value } }) =>
-                            type === BUYER
-                                ? changeContact("mailStreetAddress", value)
-                                : changeContactExtData("CoBuyer_Mailing_Address", value)
+                        suggestions={mailingAddressAutocomplete.suggestions}
+                        completeMethod={mailingAddressAutocomplete.completeMethod}
+                        onChange={({ value }) => {
+                            const stringValue =
+                                typeof value === "string"
+                                    ? value
+                                    : (value as AddressSuggestion)?.description || "";
+                            if (type === BUYER) {
+                                changeContact("mailStreetAddress", stringValue);
+                            } else {
+                                changeContactExtData("CoBuyer_Mailing_Address", stringValue);
+                            }
+                        }}
+                        onSelect={(e) => {
+                            const selected = e.value;
+                            if (selected && typeof selected === "object" && "placeId" in selected) {
+                                handleMailingAddressSelect(selected as AddressSuggestion);
+                            }
+                        }}
+                        itemTemplate={(suggestion: AddressSuggestion) => suggestion.description}
+                        selectedItemTemplate={(suggestion: AddressSuggestion) =>
+                            suggestion.description
                         }
                         disabled={isSameAsMailing || isControlDisabled}
+                        minLength={3}
+                        delay={300}
                     />
                     <label className='float-label'>Street address</label>
                 </span>

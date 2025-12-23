@@ -19,7 +19,7 @@ export const AppProvider = ({ children }: AppProviderProps): ReactElement => {
     }
 
     return (
-        <APIProvider apiKey={apiKey}>
+        <APIProvider apiKey={apiKey} libraries={["places"]}>
             <ToastProvider>
                 <NotificationProvider>{children}</NotificationProvider>
             </ToastProvider>

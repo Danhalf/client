@@ -179,4 +179,8 @@ export const useToastMessage = () => {
 
 export { useCreateReport } from "common/hooks/useCreateReport";
 export { useNotification } from "dashboard/common/notification";
-export { useGooglePlacesAutocomplete } from "common/hooks/useGooglePlacesAutocomplete";
+export {
+    useGooglePlacesAutocomplete,
+    type AddressSuggestion,
+    type ParsedAddress,
+} from "common/hooks/useGooglePlacesAutocomplete";
