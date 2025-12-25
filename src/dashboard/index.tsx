@@ -23,11 +23,25 @@ export const Dashboard = observer((): ReactElement => {
         const storedUser: AuthUser = getKeyValue(LS_APP_USER);
         if (storedUser) {
             createApiDashboardInstance(navigate);
-            setUser(storedUser);
+            if (!store.storedUser || store.storedUser.useruid !== storedUser.useruid) {
+                store.storedUser = storedUser;
+            }
+            if (!user || user.useruid !== storedUser.useruid) {
+                setUser(storedUser);
+            }
         } else {
+            if (authUser) {
+                store.storedUser = null;
+            }
             navigate("/");
         }
-    }, []);
+    }, [navigate, store]);
+
+    useEffect(() => {
+        if (authUser && (!user || user.useruid !== authUser.useruid)) {
+            setUser(authUser);
+        }
+    }, [authUser]);
 
     if (!user || !authUser) {
         return <Loader overlay />;
