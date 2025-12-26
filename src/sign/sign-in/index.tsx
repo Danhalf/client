@@ -61,7 +61,11 @@ export const SignIn = () => {
         onSubmit: async () => {
             try {
                 const response = await auth(formik.values);
-                if (response.status === Status.OK) {
+                if (!response) {
+                    showError("Authentication failed");
+                    return;
+                }
+                if (response.status === Status.OK && "token" in response) {
                     if (!response.token) {
                         await Promise.reject(new Error("Invalid credentials"));
                         return;
@@ -102,6 +106,7 @@ export const SignIn = () => {
                                             routeAgeInMilliseconds <=
                                                 routeRestoreTimeoutInMilliseconds
                                         ) {
+                                            localStorage.removeItem(LS_LAST_ROUTE);
                                             navigate(storedRouteData.path, { replace: true });
                                             return;
                                         }
