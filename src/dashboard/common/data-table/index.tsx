@@ -1,9 +1,10 @@
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
 import { Tooltip } from "primereact/tooltip";
-import { ReactElement, CSSProperties, ReactNode } from "react";
+import { ReactElement, CSSProperties, ReactNode, useMemo } from "react";
 import { truncateText } from "common/helpers";
-import { DEFAULT_MAX_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT } from "common/settings";
+import { DEFAULT_MAX_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT, BASE_CARD_HEIGHT } from "common/settings";
+import { useWindowSize } from "common/hooks";
 import "./index.css";
 
 interface GetColumnPtStylesOptions {
@@ -131,13 +132,22 @@ export const DataTableWrapper = ({
     rowsCount = 10,
     rowHeight = DEFAULT_ROW_HEIGHT,
 }: DataTableWrapperProps): ReactElement => {
+    const { height: windowHeight } = useWindowSize();
+
+    const calculatedRowHeight = useMemo(() => {
+        if (windowHeight >= BASE_CARD_HEIGHT) {
+            return rowHeight;
+        }
+        return Math.floor((windowHeight / BASE_CARD_HEIGHT) * rowHeight);
+    }, [windowHeight, rowHeight]);
+
     return (
         <div
             className={`data-table-wrapper ${className || ""}`}
             style={
                 {
                     "--data-table-rows-count": rowsCount,
-                    "--data-table-row-height": `${rowHeight}px`,
+                    "--data-table-row-height": `${calculatedRowHeight}px`,
                 } as CSSProperties
             }
         >
