@@ -1,30 +1,31 @@
 import { LoginForm } from "sign/sign-in";
 import { ApiRequest, nonAuthorizedUserApiInstance } from "../index";
 import { BaseResponseError } from "common/models/base-response";
-import { UserPermissionsResponse } from "common/models/user";
+import {
+    AuthUser,
+    TwoFASetupResponse,
+    TwoFAVerifyResponse,
+    TwoFactorCheckEndpointRequest,
+    TwoFactorCheckRequest,
+    TwoFactorCheckResponse,
+    TwoFactorElevateRequest,
+    TwoFactorPreferenceRequest,
+    TwoFactorResendRequest,
+    TwoFactorSetupRequest,
+    TwoFactorTrustedDeviceRemoveRequest,
+    TwoFactorVerifyRequest,
+} from "common/models/user";
 
-export interface AuthUser {
-    companyname: string;
-    firstname: string;
-    isadmin: 0 | 1;
-    islocaladmin: 0 | 1;
-    ismanager: 0 | 1;
-    issalesperson: 0 | 1;
-    lastname: string;
-    loginname: string;
-    locationname: string;
-    locationuid: string;
-    modified: string;
-    sessionuid: string;
-    started: string;
-    status: "OK";
-    token: string;
-    username: string;
-    useruid: string;
-    permissions: UserPermissionsResponse;
-}
-
-export const auth = async ({ username, password, rememberme, application, version }: LoginForm) => {
+export const auth = async ({
+    username,
+    password,
+    rememberme,
+    application,
+    version,
+    deviceuid,
+    devicename,
+    verification_token,
+}: LoginForm) => {
     return new ApiRequest(nonAuthorizedUserApiInstance).post<AuthUser | BaseResponseError>({
         url: "user",
         data: {
@@ -33,6 +34,9 @@ export const auth = async ({ username, password, rememberme, application, versio
             rememberme,
             application,
             version,
+            deviceuid,
+            devicename,
+            verification_token,
         },
         defaultError: "Authentication failed",
     });
@@ -52,32 +56,38 @@ export const checkToken = async (token: string) => {
     });
 };
 
-export const resend2FA = async (data?: unknown) => {
-    return new ApiRequest().post({
+export const resend2FA = async (data?: TwoFactorResendRequest) => {
+    return new ApiRequest(nonAuthorizedUserApiInstance).post({
         url: "user/2fa-resend",
         data,
         defaultError: "Failed to resend 2FA verification code",
     });
 };
 
-export const check2FA = async (data?: unknown) => {
-    return new ApiRequest().post({
+export const check2FA = async (data?: TwoFactorCheckRequest) => {
+    return new ApiRequest(nonAuthorizedUserApiInstance).post<
+        TwoFactorCheckResponse | BaseResponseError
+    >({
         url: "user/2fa-check",
         data,
         defaultError: "Failed to check 2FA requirement",
     });
 };
 
-export const setup2FA = async (data?: unknown) => {
-    return new ApiRequest().post({
+export const setup2FA = async (data?: TwoFactorSetupRequest) => {
+    return new ApiRequest(nonAuthorizedUserApiInstance).post<
+        TwoFASetupResponse | BaseResponseError
+    >({
         url: "user/2fa-setup",
         data,
         defaultError: "Failed to setup 2FA verification method",
     });
 };
 
-export const verify2FA = async (data?: unknown) => {
-    return new ApiRequest().post({
+export const verify2FA = async (data?: TwoFactorVerifyRequest) => {
+    return new ApiRequest(nonAuthorizedUserApiInstance).post<
+        TwoFAVerifyResponse | BaseResponseError
+    >({
         url: "user/2fa-verify",
         data,
         defaultError: "Failed to verify 2FA code",
@@ -91,7 +101,10 @@ export const get2FATrustedDevices = async (useruid: string) => {
     });
 };
 
-export const remove2FATrustedDevice = async (useruid: string, data?: unknown) => {
+export const remove2FATrustedDevice = async (
+    useruid: string,
+    data?: TwoFactorTrustedDeviceRemoveRequest
+) => {
     return new ApiRequest().post({
         url: `user/${useruid}/2fa-trusted-devices-remove`,
         data,
@@ -113,7 +126,7 @@ export const get2FASettings = async (useruid: string) => {
     });
 };
 
-export const set2FAPreference = async (useruid: string, data?: unknown) => {
+export const set2FAPreference = async (useruid: string, data?: TwoFactorPreferenceRequest) => {
     return new ApiRequest().post({
         url: `user/${useruid}/2fa-preference`,
         data,
@@ -121,7 +134,7 @@ export const set2FAPreference = async (useruid: string, data?: unknown) => {
     });
 };
 
-export const confirm2FA = async (useruid: string, data?: unknown) => {
+export const confirm2FA = async (useruid: string, data?: TwoFactorVerifyRequest) => {
     return new ApiRequest().post({
         url: `user/${useruid}/2fa-confirm`,
         data,
@@ -129,7 +142,7 @@ export const confirm2FA = async (useruid: string, data?: unknown) => {
     });
 };
 
-export const disable2FA = async (useruid: string, data?: unknown) => {
+export const disable2FA = async (useruid: string, data?: TwoFactorVerifyRequest) => {
     return new ApiRequest().post({
         url: `user/${useruid}/2fa-disable`,
         data,
@@ -144,7 +157,7 @@ export const regenerate2FABackupCodes = async (useruid: string) => {
     });
 };
 
-export const elevate2FA = async (useruid: string, data?: unknown) => {
+export const elevate2FA = async (useruid: string, data?: TwoFactorElevateRequest) => {
     return new ApiRequest().post({
         url: `user/${useruid}/2fa-elevate`,
         data,
@@ -159,7 +172,7 @@ export const get2FAElevationStatus = async (useruid: string) => {
     });
 };
 
-export const check2FAEndpoint = async (useruid: string, data?: unknown) => {
+export const check2FAEndpoint = async (useruid: string, data?: TwoFactorCheckEndpointRequest) => {
     return new ApiRequest().post({
         url: `user/${useruid}/2fa-check-endpoint`,
         data,
