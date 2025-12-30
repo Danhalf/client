@@ -1,10 +1,16 @@
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
 import { Tooltip } from "primereact/tooltip";
-import { ReactElement, CSSProperties, ReactNode } from "react";
+import { ReactElement, CSSProperties, ReactNode, useMemo } from "react";
 import { truncateText } from "common/helpers";
-import { DEFAULT_MAX_COLUMN_WIDTH, DEFAULT_ROW_HEIGHT } from "common/settings";
-import "./index.css";
+import {
+    DEFAULT_MAX_COLUMN_WIDTH,
+    DEFAULT_CARD_HEIGHT,
+    BASE_CARD_HEIGHT,
+    BASE_CARD_WIDTH,
+} from "common/settings";
+import { useWindowSize } from "common/hooks";
+import "dashboard/common/data-table/index.css";
 
 interface GetColumnPtStylesOptions {
     savedWidth?: number;
@@ -121,23 +127,35 @@ export const ExpansionColumn = (props: ExpansionColumnProps): ReactElement => {
 interface DataTableWrapperProps {
     children: ReactNode;
     className?: string;
-    rowsCount?: number;
-    rowHeight?: number;
 }
 
-export const DataTableWrapper = ({
-    children,
-    className,
-    rowsCount = 10,
-    rowHeight = DEFAULT_ROW_HEIGHT,
-}: DataTableWrapperProps): ReactElement => {
+export const DataTableWrapper = ({ children, className }: DataTableWrapperProps): ReactElement => {
+    const { height: windowHeight } = useWindowSize();
+
+    const calculatedCardHeight = useMemo(() => {
+        return Math.min(
+            DEFAULT_CARD_HEIGHT,
+            Math.floor((windowHeight / BASE_CARD_HEIGHT) * DEFAULT_CARD_HEIGHT)
+        );
+    }, [windowHeight]);
+
+    const paddings = useMemo(() => {
+        const ratio = Math.min(1, windowHeight / BASE_CARD_HEIGHT);
+        return {
+            wrapper: Math.max(20, Math.floor(40 * ratio)),
+            paginator: Math.max(10, Math.floor(50 * ratio)),
+        };
+    }, [windowHeight]);
+
     return (
         <div
             className={`data-table-wrapper ${className || ""}`}
             style={
                 {
-                    "--data-table-rows-count": rowsCount,
-                    "--data-table-row-height": `${rowHeight}px`,
+                    "--data-table-base-card-width": `${BASE_CARD_WIDTH}px`,
+                    "--data-table-wrapper-height": `${calculatedCardHeight}px`,
+                    "--data-table-padding": `${paddings.wrapper}px`,
+                    "--data-table-paginator-padding-top": `${paddings.paginator}px`,
                 } as CSSProperties
             }
         >
