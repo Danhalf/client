@@ -10,6 +10,9 @@
 
 .media-images__image {
     border-radius: 5px;
+    .presentation {
+        height: 100%;
+    }
 }
 
 .media-images__item {
@@ -68,6 +71,9 @@
     border: none;
     color: var(--admss-app-medium-grey);
     background-color: transparent;
+    &.media-images__close--green {
+        color: var(--admss-app-primary-main-green);
+    }
 }
 
 .media-images__close i {
@@ -100,6 +106,18 @@
     border-radius: 5px;
     font-size: 14px;
     padding: 0 4px;
+    .presentation__content {
+        display: flex;
+        align-items: center;
+        width: 88%;
+        gap: 10px;
+        .presentation__label {
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
 }
 
 .presentation__image {
