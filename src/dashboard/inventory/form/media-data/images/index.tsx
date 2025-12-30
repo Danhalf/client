@@ -20,10 +20,11 @@ import { InventoryMediaPostData, MediaLimitations } from "common/models/inventor
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
-import { useToast } from "dashboard/common/toast";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { useToastMessage } from "common/hooks";
+import { TruncatedText } from "dashboard/common/display";
 
 const limitations: MediaLimitations = {
     formats: ["PNG", "JPEG", "TIFF"],
@@ -31,6 +32,7 @@ const limitations: MediaLimitations = {
     maxResolution: "8192x8192",
     maxSize: 8,
     maxUpload: 16,
+    maxImagesCount: 99,
 };
 
 enum ModalInfo {
@@ -43,7 +45,6 @@ const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export const ImagesMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
-    const toast = useToast();
     const {
         saveInventoryImages,
         uploadFileImages,
@@ -61,6 +62,7 @@ export const ImagesMedia = observer((): ReactElement => {
     const fileUploadRef = useRef<FileUpload>(null);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [itemuid, setItemuid] = useState<string>("");
+    const { showError } = useToastMessage();
 
     useEffect(() => {
         fetchImages();
@@ -79,13 +81,9 @@ export const ImagesMedia = observer((): ReactElement => {
 
     useEffect(() => {
         if (formErrorMessage) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: formErrorMessage,
-            });
+            showError(formErrorMessage);
         }
-    }, [formErrorMessage, toast]);
+    }, [formErrorMessage, showError]);
 
     const onTemplateSelect = (e: FileUploadSelectEvent) => {
         store.uploadFileImages = {
@@ -131,11 +129,7 @@ export const ImagesMedia = observer((): ReactElement => {
 
     const handleUploadFiles = async () => {
         if (formErrorMessage) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: formErrorMessage,
-            });
+            showError(formErrorMessage);
             return;
         }
         const res = await saveInventoryImages();
@@ -180,7 +174,7 @@ export const ImagesMedia = observer((): ReactElement => {
         const file = inFile as File;
         return (
             <div className='flex align-items-center presentation'>
-                <div className='flex align-items-center'>
+                <div className='presentation__content'>
                     <img
                         alt={file.name}
                         src={URL.createObjectURL(file)}
@@ -189,9 +183,7 @@ export const ImagesMedia = observer((): ReactElement => {
                         height={29}
                         className='presentation__image'
                     />
-                    <span className='presentation__label flex flex-column text-left ml-3'>
-                        {file.name}
-                    </span>
+                    <TruncatedText className='presentation__label' text={file.name} withTooltip />
                 </div>
                 <Button
                     type='button'
@@ -331,7 +323,7 @@ export const ImagesMedia = observer((): ReactElement => {
                         images.length && "uploaded-count--blue"
                     }`}
                 >
-                    ({images.length})
+                    ({images.length}/{limitations.maxImagesCount})
                 </span>
                 <hr className='media-uploaded__line flex-1' />
                 <label className='cursor-pointer media-uploaded__label'>
@@ -423,7 +415,7 @@ export const ImagesMedia = observer((): ReactElement => {
                                     </div>
                                     <button
                                         type='button'
-                                        className='media-images__close'
+                                        className={`media-images__close ${imagesChecked[index] ? "media-images__close--green" : ""}`}
                                         onClick={() => handleModalOpen(itemuid)}
                                     >
                                         <i className='pi pi-times' />

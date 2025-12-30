@@ -4,6 +4,16 @@
     border-radius: 5px;
     display: flex;
     flex-direction: column-reverse;
+
+    &.p-fileupload-advanced {
+        height: 343px;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+        .p-fileupload-content {
+            flex: 1;
+        }
+    }
 }
 
 .p-button.media__button {
@@ -137,6 +147,7 @@
 .uploaded-count {
     font-weight: 600;
     font-size: 18px;
+    color: var(--admss-app-lightest-grey);
 }
 
 .uploaded-count--blue {
