@@ -32,7 +32,7 @@ const limitations: MediaLimitations = {
     maxResolution: "8192x8192",
     maxSize: 8,
     maxUpload: 16,
-    maxImagesCount: 99,
+    maxMediaCount: 99,
 };
 
 enum ModalInfo {
@@ -197,9 +197,9 @@ export const ImagesMedia = observer((): ReactElement => {
 
     const chooseTemplate = ({ chooseButton }: FileUploadHeaderTemplateOptions) => {
         return (
-            <div className='w-full flex justify-content-center flex-wrap mb-3 image-choose'>
+            <div className='w-full flex justify-content-center flex-wrap mb-3 media-choose'>
                 {totalCount ? (
-                    <div className='image-choose__selected flex align-items-center'>
+                    <div className='media-choose__selected flex align-items-center'>
                         To upload more drag and drop images
                         <span className='bold mx-3'>or</span>
                         {chooseButton}
@@ -316,14 +316,14 @@ export const ImagesMedia = observer((): ReactElement => {
                     Save
                 </Button>
             </div>
-            <div className='media__uploaded media-uploaded'>
+            <div className='col-12 media__uploaded media-uploaded'>
                 <h2 className='media-uploaded__title uppercase m-0'>uploaded images</h2>
                 <span
                     className={`media-uploaded__label mx-2 uploaded-count ${
                         images.length && "uploaded-count--blue"
                     }`}
                 >
-                    ({images.length}/{limitations.maxImagesCount})
+                    ({images.length}/{limitations.maxMediaCount})
                 </span>
                 <hr className='media-uploaded__line flex-1' />
                 <label className='cursor-pointer media-uploaded__label'>
@@ -335,7 +335,7 @@ export const ImagesMedia = observer((): ReactElement => {
                     Export to Web
                 </label>
             </div>
-            <div className='media-images'>
+            <div className='media-grid'>
                 {isLoading && <Loader />}
                 {!isLoading && images?.length ? (
                     <ResponsiveReactGridLayout
@@ -347,7 +347,7 @@ export const ImagesMedia = observer((): ReactElement => {
                         cols={{ lg: 3, md: 3, sm: 3, xs: 2, xxs: 1 }}
                         draggableCancel='
                         .media-uploaded__checkbox,
-                        .media-images__close,
+                        .media-close,
                         .p-image,
                         .p-image-mask,
                         .media-images__preview'
@@ -355,7 +355,7 @@ export const ImagesMedia = observer((): ReactElement => {
                     >
                         {images.map(({ itemuid, src, info }, index: number) => {
                             return (
-                                <div key={itemuid} className='media-images__item'>
+                                <div key={itemuid} className='media-item media-images__item'>
                                     {checked && (
                                         <Checkbox
                                             checked={imagesChecked[index]}
@@ -382,12 +382,12 @@ export const ImagesMedia = observer((): ReactElement => {
                                             },
                                         }}
                                     />
-                                    <div className='media-images__info image-info'>
-                                        <div className='image-info__item'>
-                                            <span className='image-info__icon'>
+                                    <div className='media-info'>
+                                        <div className='media-info__item'>
+                                            <span className='media-info__icon'>
                                                 <i className='icon adms-category' />
                                             </span>
-                                            <span className='image-info__text--bold'>
+                                            <span className='media-info__text--bold'>
                                                 {
                                                     CATEGORIES.find(
                                                         (category) =>
@@ -396,26 +396,26 @@ export const ImagesMedia = observer((): ReactElement => {
                                                 }
                                             </span>
                                         </div>
-                                        <div className='image-info__item'>
-                                            <span className='image-info__icon'>
-                                                <span className='image-info__icon'>
+                                        <div className='media-info__item'>
+                                            <span className='media-info__icon'>
+                                                <span className='media-info__icon'>
                                                     <i className='icon adms-comment' />
                                                 </span>
                                             </span>
-                                            <span className='image-info__text'>{info?.notes}</span>
+                                            <span className='media-info__text'>{info?.notes}</span>
                                         </div>
-                                        <div className='image-info__item'>
-                                            <span className='image-info__icon'>
+                                        <div className='media-info__item'>
+                                            <span className='media-info__icon'>
                                                 <i className='icon adms-calendar' />
                                             </span>
-                                            <span className='image-info__text'>
+                                            <span className='media-info__text'>
                                                 {info?.created}
                                             </span>
                                         </div>
                                     </div>
                                     <button
                                         type='button'
-                                        className={`media-images__close ${imagesChecked[index] ? "media-images__close--green" : ""}`}
+                                        className={`media-close ${imagesChecked[index] ? "media-close--green" : ""}`}
                                         onClick={() => handleModalOpen(itemuid)}
                                     >
                                         <i className='pi pi-times' />
