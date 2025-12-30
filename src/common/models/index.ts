@@ -32,5 +32,5 @@ export interface MediaLimits {
     maxDuration?: number;
     maxSize: number;
     maxUpload?: number;
-    maxImagesCount?: number;
+    maxMediaCount?: number;
 }
