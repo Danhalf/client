@@ -59,6 +59,8 @@ export const VideoMedia = observer((): ReactElement => {
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [videoPlayerVisible, setVideoPlayerVisible] = useState<boolean>(false);
+    const [activeVideoSrc, setActiveVideoSrc] = useState<string>("");
     const [itemuid, setItemuid] = useState<string>("");
     const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
     const [loadingThumbnails, setLoadingThumbnails] = useState<Set<string>>(new Set());
@@ -206,6 +208,16 @@ export const VideoMedia = observer((): ReactElement => {
     const handleModalOpen = (mediauid: string) => {
         setItemuid(mediauid);
         setModalVisible(true);
+    };
+
+    const handleVideoPlayerOpen = (src: string) => {
+        setActiveVideoSrc(src);
+        setVideoPlayerVisible(true);
+    };
+
+    const handleVideoPlayerClose = () => {
+        setVideoPlayerVisible(false);
+        setActiveVideoSrc("");
     };
 
     const handleDeleteVideo = (mediauid: string) => {
@@ -383,17 +395,22 @@ export const VideoMedia = observer((): ReactElement => {
                                         <i className='icon adms-play-prev media-video__placeholder-icon' />
                                     </div>
                                 ) : (
-                                    <Image
-                                        src={thumbnails[itemuid] || src}
-                                        alt='inventory-item'
-                                        width='75'
-                                        height='75'
-                                        pt={{
-                                            image: {
-                                                className: "media-video__image",
-                                            },
-                                        }}
-                                    />
+                                    <div
+                                        className='media-video__clickable'
+                                        onClick={() => handleVideoPlayerOpen(src)}
+                                    >
+                                        <Image
+                                            src={thumbnails[itemuid] || src}
+                                            alt='inventory-item'
+                                            width='75'
+                                            height='75'
+                                            pt={{
+                                                image: {
+                                                    className: "media-video__image",
+                                                },
+                                            }}
+                                        />
+                                    </div>
                                 )}
                                 <div className='media-info'>
                                     <div className='media-info__item'>
@@ -454,6 +471,24 @@ export const VideoMedia = observer((): ReactElement => {
                 className={`media-warning`}
                 onHide={() => setModalVisible(false)}
             />
+
+            {videoPlayerVisible && (
+                <div className='video-modal' onClick={handleVideoPlayerClose}>
+                    <div className='video-modal__content' onClick={(e) => e.stopPropagation()}>
+                        <button
+                            type='button'
+                            className='video-modal__close'
+                            onClick={handleVideoPlayerClose}
+                        >
+                            <i className='pi pi-times' />
+                        </button>
+                        <video className='video-modal__video' controls autoPlay>
+                            <source src={activeVideoSrc} type='video/mp4' />
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            )}
         </div>
     );
 });
