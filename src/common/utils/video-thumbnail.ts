@@ -1,48 +1,3 @@
-export const generateVideoThumbnail = async (
-    videoSrc: string,
-    timeInSeconds: number = 1
-): Promise<string | null> => {
-    return new Promise((resolve) => {
-        const video = document.createElement("video");
-        video.crossOrigin = "anonymous";
-        video.preload = "metadata";
-        video.muted = true;
-        video.playsInline = true;
-
-        video.addEventListener("loadedmetadata", () => {
-            video.currentTime = Math.min(timeInSeconds, video.duration || 1);
-        });
-
-        video.addEventListener("seeked", () => {
-            try {
-                const canvas = document.createElement("canvas");
-                canvas.width = video.videoWidth || 640;
-                canvas.height = video.videoHeight || 360;
-
-                const context = canvas.getContext("2d");
-                if (context) {
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    const thumbnailDataUrl = canvas.toDataURL("image/jpeg", 0.8);
-                    resolve(thumbnailDataUrl);
-                } else {
-                    resolve(null);
-                }
-            } catch (error) {
-                resolve(null);
-            } finally {
-                video.src = "";
-                video.load();
-            }
-        });
-
-        video.addEventListener("error", () => {
-            resolve(null);
-        });
-
-        video.src = videoSrc;
-    });
-};
-
 export const generateVideoThumbnailFromFirstSeconds = async (
     videoSrc: string,
     maxSeconds: number = 5
@@ -132,4 +87,3 @@ export const generateVideoThumbnailFromFirstSeconds = async (
         video.src = videoSrc;
     });
 };
-
