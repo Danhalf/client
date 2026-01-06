@@ -1,12 +1,13 @@
-.media-audio__image {
-    border-radius: 5px;
-}
-
 .media-audio__item {
     width: 48%;
+    height: 108px;
     & > .media-uploaded__checkbox {
         margin-left: 0;
     }
+}
+
+.media-audio__item--active {
+    padding: 0;
 }
 
 .presentation__audio {
@@ -16,4 +17,151 @@
 
 .media-choose .info-panel__panel {
     min-width: 418px;
+}
+
+.media-audio__icon-container {
+    width: 75px;
+    height: 75px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    gap: 4px;
+}
+
+.media-audio__icon {
+    color: var(--admss-app-primary-main-green);
+    font-size: 32px;
+}
+
+.media-audio__duration {
+    color: var(--admss-app-light-grey);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.custom-audio-player {
+    padding: 15px 20px;
+    border-radius: 5px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.player-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    width: 100%;
+}
+
+.player-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 50px;
+}
+
+.player-play-pause {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--admss-app-primary-main-green);
+    font-size: 28px;
+    padding: 0;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-time {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--admss-app-dark-grey);
+}
+
+.player-center {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    overflow: hidden;
+}
+
+.waveform-container {
+    width: 100%;
+    height: 40px;
+}
+
+.player-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 65px;
+}
+
+.player-right-top {
+    display: flex;
+    gap: 5px;
+}
+
+.player-speed {
+    color: var(--admss-app-primary-main-green);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+    min-width: 30px;
+    margin-bottom: 5px;
+}
+
+.player-edit,
+.player-close-btn,
+.media-audio__action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-edit,
+.media-audio__action:first-of-type {
+    color: var(--admss-app-primary-main-green);
+    font-size: 18px;
+}
+
+.player-close-btn,
+.media-audio__action:last-of-type {
+    color: var(--admss-app-light-grey);
+    font-size: 20px;
+}
+
+.player-close-btn:hover,
+.media-audio__action:last-of-type:hover {
+    color: var(--admss-app-primary);
+}
+
+.media-audio__actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.media-audio__clickable {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.media-audio__clickable:hover {
+    transform: scale(1.02);
 }
