@@ -17,6 +17,7 @@ import { MediaLimitations } from "common/models/inventory";
 import { useStore } from "store/hooks";
 import WaveSurfer from "wavesurfer.js";
 import { CATEGORIES } from "common/constants/media-categories";
+import { AppColors } from "common/models/css-variables";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ComboBox } from "dashboard/common/form/dropdown";
@@ -319,7 +320,6 @@ export const AudioMedia = observer((): ReactElement => {
                                     <AudioPlayer
                                         audio={audio}
                                         onClose={() => setActiveItemuid(null)}
-                                        onDelete={() => handleModalOpen(itemuid)}
                                     />
                                 ) : (
                                     <>
@@ -411,10 +411,9 @@ export const AudioMedia = observer((): ReactElement => {
 interface AudioPlayerProps {
     audio: any;
     onClose: () => void;
-    onDelete: () => void;
 }
 
-const AudioPlayer = ({ audio, onClose, onDelete }: AudioPlayerProps) => {
+const AudioPlayer = ({ audio, onClose }: AudioPlayerProps) => {
     const { src } = audio;
     const containerRef = useRef<HTMLDivElement>(null);
     const wavesurferRef = useRef<WaveSurfer | null>(null);
@@ -427,8 +426,12 @@ const AudioPlayer = ({ audio, onClose, onDelete }: AudioPlayerProps) => {
 
         const ws = WaveSurfer.create({
             container: containerRef.current,
-            waveColor: "#e0e6ed",
-            progressColor: "#295dc2",
+            waveColor: getComputedStyle(document.documentElement).getPropertyValue(
+                `--admss-app-${AppColors.LIGHT_BLUE}`
+            ),
+            progressColor: getComputedStyle(document.documentElement).getPropertyValue(
+                `--admss-app-${AppColors.MAIN_BLUE}`
+            ),
             cursorColor: "transparent",
             barWidth: 2,
             barGap: 3,
@@ -478,23 +481,21 @@ const AudioPlayer = ({ audio, onClose, onDelete }: AudioPlayerProps) => {
                     <button type='button' className='player-play-pause' onClick={togglePlay}>
                         <i className={`icon ${isPlaying ? "adms-pause" : "adms-play"}`} />
                     </button>
-                    <span className='player-time'>{formatDuration(currentTime)}</span>
+                    <span className={`player-time ${isPlaying ? "player-time--playing" : ""}`}>
+                        {formatDuration(currentTime)}
+                    </span>
                 </div>
 
                 <div className='player-center'>
                     <div ref={containerRef} className='waveform-container' />
-                </div>
-
-                <div className='player-right'>
-                    <div className='player-right-top'>
-                        <button type='button' className='player-close-btn' onClick={onClose}>
-                            <i className='pi pi-times' />
-                        </button>
-                    </div>
                     <span className='player-speed' onClick={changePlaybackRate}>
                         {playbackRate === 1 ? "1x" : `${playbackRate}x`}
                     </span>
                 </div>
+
+                <button type='button' className='player-close-btn' onClick={onClose}>
+                    <i className='pi pi-times' />
+                </button>
             </div>
         </div>
     );
