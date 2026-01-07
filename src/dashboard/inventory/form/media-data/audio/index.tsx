@@ -1,5 +1,5 @@
 import "./index.css";
-import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
+import { ChangeEvent, ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { Button } from "primereact/button";
@@ -11,17 +11,23 @@ import {
     FileUploadHeaderTemplateOptions,
     FileUploadSelectEvent,
 } from "primereact/fileupload";
-import { Image } from "primereact/image";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
 import { useStore } from "store/hooks";
-import { Checkbox } from "primereact/checkbox";
+import WaveSurfer from "wavesurfer.js";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
+
+const formatDuration = (seconds?: number) => {
+    if (!seconds) return "00:00";
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+};
 
 const limitations: MediaLimitations = {
     formats: ["WAV", "MP3", "MP4"],
@@ -51,16 +57,44 @@ export const AudioMedia = observer((): ReactElement => {
     } = store;
     const [totalCount, setTotalCount] = useState(0);
     const fileUploadRef = useRef<FileUpload>(null);
-    const [checked, setChecked] = useState<boolean>(true);
-    const [audioChecked, setAudioChecked] = useState<boolean[]>([]);
-    const audiosSet = new Set();
-    const uniqueAudio = audios.filter((aud) => {
-        if (!aud.itemuid || audiosSet.has(aud.itemuid)) return false;
-        audiosSet.add(aud.itemuid);
-        return true;
-    });
+    const [activeItemuid, setActiveItemuid] = useState<string | null>(null);
+
+    const uniqueAudio = useMemo(() => {
+        const audiosSet = new Set();
+        return audios.filter((aud) => {
+            if (!aud.itemuid || audiosSet.has(aud.itemuid)) return false;
+            audiosSet.add(aud.itemuid);
+            return true;
+        });
+    }, [audios]);
+
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [itemuid, setItemuid] = useState<string>("");
+    const [audioDurations, setAudioDurations] = useState<Record<string, number>>({});
+
+    useEffect(() => {
+        uniqueAudio.forEach((audio) => {
+            const currentItemuid = audio.itemuid;
+            if (
+                currentItemuid &&
+                audio.src &&
+                !audio.info?.duration &&
+                audioDurations[currentItemuid] === undefined
+            ) {
+                const audioObject = new Audio();
+                audioObject.preload = "metadata";
+                audioObject.src = audio.src;
+                audioObject.onloadedmetadata = () => {
+                    if (audioObject.duration && !isNaN(audioObject.duration)) {
+                        setAudioDurations((prev) => ({
+                            ...prev,
+                            [currentItemuid]: audioObject.duration,
+                        }));
+                    }
+                };
+            }
+        });
+    }, [uniqueAudio, audioDurations]);
 
     useEffect(() => {
         fetchAudios();
@@ -118,24 +152,6 @@ export const AudioMedia = observer((): ReactElement => {
                 fileUploadRef.current?.clear();
             }
         });
-    };
-
-    const handleCheckedChange = (index?: number) => {
-        const updatedAudioChecked = [...audioChecked];
-
-        if (index === undefined && !checked) {
-            setChecked(true);
-            const allChecked = updatedAudioChecked.map(() => true);
-            setAudioChecked(allChecked);
-        } else if (index === undefined && checked) {
-            setChecked(false);
-            const allUnchecked = updatedAudioChecked.map(() => false);
-            setAudioChecked(allUnchecked);
-        } else if (index !== undefined) {
-            const updatedCheckboxState = [...updatedAudioChecked];
-            updatedCheckboxState[index] = !updatedCheckboxState[index];
-            setAudioChecked(updatedCheckboxState);
-        }
     };
 
     const handleDeleteAudio = (mediauid: string) => {
@@ -240,8 +256,9 @@ export const AudioMedia = observer((): ReactElement => {
                 ref={fileUploadRef}
                 multiple
                 accept='audio/*'
+                maxFileSize={limitations.maxSize * 1000000}
                 onUpload={onTemplateUpload}
-                headerTemplate={chooseTemplate}
+                headerTemplate={limitations.maxUpload > totalCount ? chooseTemplate : <div></div>}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate("audio files")}
                 onSelect={onTemplateSelect}
@@ -256,13 +273,13 @@ export const AudioMedia = observer((): ReactElement => {
                     optionLabel={"name"}
                     optionValue={"id"}
                     options={[...CATEGORIES]}
-                    value={uploadFileAudios?.data?.contenttype}
+                    value={uploadFileAudios?.data?.contenttype || 0}
                     onChange={handleCategorySelect}
                 />
                 <InputText
                     className='media-input__text'
                     placeholder='Comment'
-                    value={uploadFileAudios?.data?.notes}
+                    value={uploadFileAudios?.data?.notes || ""}
                     onChange={handleCommentaryChange}
                 />
                 <Button
@@ -288,62 +305,81 @@ export const AudioMedia = observer((): ReactElement => {
             <div className='media-grid'>
                 {isLoading && <Loader />}
                 {!isLoading && uniqueAudio.length ? (
-                    uniqueAudio.map(({ itemuid, src, info }, index: number) => {
+                    uniqueAudio.map((audio, index: number) => {
+                        const { itemuid, info } = audio;
+                        const isActive = activeItemuid === itemuid;
                         return (
-                            <div key={itemuid} className='media-item media-audio__item'>
-                                {checked && (
-                                    <Checkbox
-                                        checked={audioChecked[index]}
-                                        onChange={() => handleCheckedChange(index)}
-                                        className='media-uploaded__checkbox'
+                            <div
+                                key={itemuid}
+                                className={`media-item media-audio__item ${
+                                    isActive ? "media-audio__item--active" : ""
+                                }`}
+                            >
+                                {isActive ? (
+                                    <AudioPlayer
+                                        audio={audio}
+                                        onClose={() => setActiveItemuid(null)}
+                                        onDelete={() => handleModalOpen(itemuid)}
                                     />
+                                ) : (
+                                    <>
+                                        <div
+                                            className='media-audio__clickable'
+                                            onClick={() => setActiveItemuid(itemuid)}
+                                        >
+                                            <div className='media-audio__icon-container'>
+                                                <i className='icon adms-play media-audio__icon' />
+                                                <span className='media-audio__duration'>
+                                                    {formatDuration(
+                                                        info?.duration || audioDurations[itemuid]
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className='media-info'>
+                                            <div className='media-info__item'>
+                                                <span className='media-info__icon'>
+                                                    <i className='pi pi-th-large' />
+                                                </span>
+                                                <span className='media-info__text--bold'>
+                                                    {
+                                                        CATEGORIES.find(
+                                                            (category) =>
+                                                                category.id === info?.contenttype
+                                                        )?.name
+                                                    }
+                                                </span>
+                                            </div>
+                                            <div className='media-info__item'>
+                                                <span className='media-info__icon'>
+                                                    <span className='media-info__icon'>
+                                                        <i className='pi pi-comment' />
+                                                    </span>
+                                                </span>
+                                                <span className='media-info__text'>
+                                                    {info?.notes}
+                                                </span>
+                                            </div>
+                                            <div className='media-info__item'>
+                                                <span className='media-info__icon'>
+                                                    <i className='pi pi-calendar' />
+                                                </span>
+                                                <span className='media-info__text'>
+                                                    {info?.created}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className='media-audio__actions'>
+                                            <button
+                                                type='button'
+                                                className='media-audio__action'
+                                                onClick={() => handleModalOpen(itemuid)}
+                                            >
+                                                <i className='pi pi-times' />
+                                            </button>
+                                        </div>
+                                    </>
                                 )}
-                                <Image
-                                    src={src}
-                                    alt='inventory-item'
-                                    width='75'
-                                    height='75'
-                                    pt={{
-                                        image: {
-                                            className: "media-audio__image",
-                                        },
-                                    }}
-                                />
-                                <div className='media-info'>
-                                    <div className='media-info__item'>
-                                        <span className='media-info__icon'>
-                                            <i className='pi pi-th-large' />
-                                        </span>
-                                        <span className='media-info__text--bold'>
-                                            {
-                                                CATEGORIES.find(
-                                                    (category) => category.id === info?.contenttype
-                                                )?.name
-                                            }
-                                        </span>
-                                    </div>
-                                    <div className='media-info__item'>
-                                        <span className='media-info__icon'>
-                                            <span className='media-info__icon'>
-                                                <i className='pi pi-comment' />
-                                            </span>
-                                        </span>
-                                        <span className='media-info__text'>{info?.notes}</span>
-                                    </div>
-                                    <div className='media-info__item'>
-                                        <span className='media-info__icon'>
-                                            <i className='pi pi-calendar' />
-                                        </span>
-                                        <span className='media-info__text'>{info?.created}</span>
-                                    </div>
-                                </div>
-                                <button
-                                    type='button'
-                                    className='media-close'
-                                    onClick={() => handleModalOpen(itemuid)}
-                                >
-                                    <i className='pi pi-times' />
-                                </button>
                             </div>
                         );
                     })
@@ -371,3 +407,95 @@ export const AudioMedia = observer((): ReactElement => {
         </div>
     );
 });
+
+interface AudioPlayerProps {
+    audio: any;
+    onClose: () => void;
+    onDelete: () => void;
+}
+
+const AudioPlayer = ({ audio, onClose, onDelete }: AudioPlayerProps) => {
+    const { src } = audio;
+    const containerRef = useRef<HTMLDivElement>(null);
+    const wavesurferRef = useRef<WaveSurfer | null>(null);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [playbackRate, setPlaybackRate] = useState(1);
+
+    useEffect(() => {
+        if (!containerRef.current) return;
+
+        const ws = WaveSurfer.create({
+            container: containerRef.current,
+            waveColor: "#e0e6ed",
+            progressColor: "#295dc2",
+            cursorColor: "transparent",
+            barWidth: 2,
+            barGap: 3,
+            barRadius: 2,
+            height: 40,
+            url: src,
+        });
+
+        wavesurferRef.current = ws;
+
+        ws.on("play", () => setIsPlaying(true));
+        ws.on("pause", () => setIsPlaying(false));
+        ws.on("timeupdate", (time) => setCurrentTime(time));
+        ws.on("ready", () => {
+            ws.play();
+        });
+
+        ws.on("finish", () => {
+            setIsPlaying(false);
+            ws.setTime(0);
+        });
+
+        return () => {
+            ws.destroy();
+        };
+    }, [src]);
+
+    const togglePlay = () => {
+        if (wavesurferRef.current) {
+            wavesurferRef.current.playPause();
+        }
+    };
+
+    const changePlaybackRate = () => {
+        const rates = [1, 1.5, 2];
+        const nextRate = rates[(rates.indexOf(playbackRate) + 1) % rates.length];
+        setPlaybackRate(nextRate);
+        if (wavesurferRef.current) {
+            wavesurferRef.current.setPlaybackRate(nextRate);
+        }
+    };
+
+    return (
+        <div className='custom-audio-player'>
+            <div className='player-main'>
+                <div className='player-left'>
+                    <button type='button' className='player-play-pause' onClick={togglePlay}>
+                        <i className={`icon ${isPlaying ? "adms-pause" : "adms-play"}`} />
+                    </button>
+                    <span className='player-time'>{formatDuration(currentTime)}</span>
+                </div>
+
+                <div className='player-center'>
+                    <div ref={containerRef} className='waveform-container' />
+                </div>
+
+                <div className='player-right'>
+                    <div className='player-right-top'>
+                        <button type='button' className='player-close-btn' onClick={onClose}>
+                            <i className='pi pi-times' />
+                        </button>
+                    </div>
+                    <span className='player-speed' onClick={changePlaybackRate}>
+                        {playbackRate === 1 ? "1x" : `${playbackRate}x`}
+                    </span>
+                </div>
+            </div>
+        </div>
+    );
+};
