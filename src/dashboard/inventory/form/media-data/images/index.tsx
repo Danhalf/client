@@ -18,7 +18,7 @@ import { Checkbox } from "primereact/checkbox";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
 import { InventoryMediaPostData, MediaLimitations } from "common/models/inventory";
 import { Layout, Responsive, WidthProvider } from "react-grid-layout";
-import { CATEGORIES } from "common/constants/media-categories";
+import { CATEGORIES, UPLOAD_TEXT } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ComboBox } from "dashboard/common/form/dropdown";
@@ -40,8 +40,6 @@ enum ModalInfo {
     BODY = "Do you really want to delete this image? This process cannot be undone.",
     ACCEPT = "Delete",
 }
-
-const INSTRUCTION_TEXT = "Fill the fields below to save uploaded images";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -292,7 +290,7 @@ export const ImagesMedia = observer((): ReactElement => {
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
                 className='col-12'
-                style={{ "--instruction-text": `"${INSTRUCTION_TEXT}"` } as React.CSSProperties}
+                style={{ "--upload-text": `"${UPLOAD_TEXT.IMAGES}"` } as React.CSSProperties}
             />
             <div className='col-12 mt-4 media-input'>
                 <ComboBox

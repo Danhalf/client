@@ -18,7 +18,7 @@ import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
 import { useStore } from "store/hooks";
-import { CATEGORIES } from "common/constants/media-categories";
+import { CATEGORIES, UPLOAD_TEXT } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ComboBox } from "dashboard/common/form/dropdown";
@@ -42,8 +42,6 @@ enum ModalInfo {
     BODY = "Do you really want to delete this video file? This process cannot be undone.",
     ACCEPT = "Delete",
 }
-
-const INSTRUCTION_TEXT = "Fill the fields below to save uploaded video files";
 
 export const VideoMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -332,7 +330,7 @@ export const VideoMedia = observer((): ReactElement => {
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
                 className='col-12 video-upload'
-                style={{ "--instruction-text": `"${INSTRUCTION_TEXT}"` } as React.CSSProperties}
+                style={{ "--upload-text": `"${UPLOAD_TEXT.VIDEO}"` } as React.CSSProperties}
             />
             <div className='col-12 mt-4 media-input'>
                 <ComboBox
