@@ -15,7 +15,7 @@ import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
 import { MediaLimitations } from "common/models/inventory";
 import { useStore } from "store/hooks";
-import { CATEGORIES } from "common/constants/media-categories";
+import { CATEGORIES, UPLOAD_TEXT } from "common/constants/media-categories";
 import { Checkbox } from "primereact/checkbox";
 import { Image } from "primereact/image";
 import { Loader } from "dashboard/common/loader";
@@ -35,8 +35,6 @@ enum ModalInfo {
     BODY = "Do you really want to delete this document? This process cannot be undone.",
     ACCEPT = "Delete",
 }
-
-const INSTRUCTION_TEXT = "Fill the fields below to save uploaded documents";
 
 export const DocumentsMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
@@ -244,7 +242,7 @@ export const DocumentsMedia = observer((): ReactElement => {
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
                 className='col-12'
-                style={{ "--instruction-text": `"${INSTRUCTION_TEXT}"` } as React.CSSProperties}
+                style={{ "--upload-text": `"${UPLOAD_TEXT.DOCUMENTS}"` } as React.CSSProperties}
             />
             <div className='col-12 mt-4 media-input'>
                 <ComboBox

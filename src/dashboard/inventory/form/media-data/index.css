@@ -170,7 +170,7 @@
 }
 
 .media .p-fileupload-content:has(.p-fileupload-row)::before {
-    content: var(--instruction-text);
+    content: var(--upload-text);
     display: block;
     width: 100%;
     text-align: center;
