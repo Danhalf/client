@@ -43,6 +43,8 @@ enum ModalInfo {
     ACCEPT = "Delete",
 }
 
+const INSTRUCTION_TEXT = "Fill the fields below to save uploaded video files";
+
 export const VideoMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const {
@@ -329,9 +331,8 @@ export const VideoMedia = observer((): ReactElement => {
                 onSelect={onTemplateSelect}
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
-                className={`col-12 video-upload ${
-                    totalCount === 1 ? "video-upload--center" : "video-upload--start"
-                }`}
+                className='col-12 video-upload'
+                style={{ "--instruction-text": `"${INSTRUCTION_TEXT}"` } as React.CSSProperties}
             />
             <div className='col-12 mt-4 media-input'>
                 <ComboBox
