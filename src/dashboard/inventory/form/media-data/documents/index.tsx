@@ -36,6 +36,8 @@ enum ModalInfo {
     ACCEPT = "Delete",
 }
 
+const INSTRUCTION_TEXT = "Fill the fields below to save uploaded documents";
+
 export const DocumentsMedia = observer((): ReactElement => {
     const store = useStore().inventoryStore;
     const {
@@ -242,6 +244,7 @@ export const DocumentsMedia = observer((): ReactElement => {
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
                 className='col-12'
+                style={{ "--instruction-text": `"${INSTRUCTION_TEXT}"` } as React.CSSProperties}
             />
             <div className='col-12 mt-4 media-input'>
                 <ComboBox

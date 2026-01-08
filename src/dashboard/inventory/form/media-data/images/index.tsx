@@ -41,6 +41,8 @@ enum ModalInfo {
     ACCEPT = "Delete",
 }
 
+const INSTRUCTION_TEXT = "Fill the fields below to save uploaded images";
+
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export const ImagesMedia = observer((): ReactElement => {
@@ -290,6 +292,7 @@ export const ImagesMedia = observer((): ReactElement => {
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
                 className='col-12'
+                style={{ "--instruction-text": `"${INSTRUCTION_TEXT}"` } as React.CSSProperties}
             />
             <div className='col-12 mt-4 media-input'>
                 <ComboBox
