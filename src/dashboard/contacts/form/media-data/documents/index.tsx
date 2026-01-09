@@ -20,6 +20,7 @@ import { ContactDocumentsLimitations } from "common/models/contact";
 import { Loader } from "dashboard/common/loader";
 import { ContactDocumentTemplate } from "./document-template";
 import { TruncatedText } from "dashboard/common/display";
+import { UPLOAD_TEXT } from "common/constants/media-categories";
 
 const limitations: ContactDocumentsLimitations = {
     formats: ["PDF", "PNG", "JPEG", "TIFF"],
@@ -237,6 +238,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                 chooseOptions={chooseOptions}
                 progressBarTemplate={<></>}
                 className='col-12'
+                style={{ "--upload-text": `"${UPLOAD_TEXT.IMAGES}"` } as React.CSSProperties}
             />
             <div className='col-12 mt-4 media-input'>
                 <InputText

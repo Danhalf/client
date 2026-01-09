@@ -58,6 +58,37 @@ export const ContactDocumentTemplate = ({
         });
     }, [src, notes, itemuid, type, showError]);
 
+    const handlePdfClick = useCallback(
+        (event: React.MouseEvent) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (!src) return;
+
+            try {
+                const dataUrlParts = src.split(",");
+                const base64String = atob(dataUrlParts[1]);
+                const base64Length = base64String.length;
+                const bytesArray = new Uint8Array(base64Length);
+                for (let byteIndex = 0; byteIndex < base64Length; byteIndex++) {
+                    bytesArray[byteIndex] = base64String.charCodeAt(byteIndex);
+                }
+                const blob = new Blob([bytesArray], { type: "application/pdf" });
+                const blobUrl = window.URL.createObjectURL(blob);
+                window.open(
+                    blobUrl,
+                    "_blank",
+                    "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=100,width=1280,height=720"
+                );
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 1000);
+            } catch (error) {
+                showError("Failed to open PDF");
+            }
+        },
+        [src, showError]
+    );
+
     const handleDeleteClick = (event: React.MouseEvent) => {
         event.stopPropagation();
         if (mediauid) {
@@ -93,7 +124,11 @@ export const ContactDocumentTemplate = ({
                 />
             )}
             {type === MediaType.mtDocument && (
-                <div className='media-documents__icon'>
+                <div
+                    className='media-documents__icon'
+                    onClick={handlePdfClick}
+                    style={{ cursor: "pointer" }}
+                >
                     <i className='adms-pdf' />
                 </div>
             )}
