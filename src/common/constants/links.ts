@@ -1,6 +1,7 @@
 export const HELP_PAGE: string = "https://www.admss.com/";
 export const CONTACT_SUPPORT: string = "contact-support";
 export const CREATE_ID: string = "create";
+export const HOME_PAGE: string = "/";
 
 export const DASHBOARD_PAGE: string = "/dashboard";
 export const CREATE_PATH: string = `/${CREATE_ID}`;
