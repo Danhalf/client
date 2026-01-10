@@ -5,7 +5,7 @@ import { LS_APP_USER, LS_LAST_ROUTE, LastRouteData } from "common/constants/loca
 import { NavigateFunction } from "react-router-dom";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
-import { HOME_PAGE } from "common/constants/links";
+import { HOME_PAGE, SERVICE_UPDATE_PAGE } from "common/constants/links";
 
 export const APP_TYPE: string = process.env.REACT_APP_TYPE || "client";
 export const APP_VERSION: string = process.env.REACT_APP_VERSION || "0.1";
@@ -63,10 +63,10 @@ const handleErrorResponse = (error: AxiosError, navigate: NavigateFunction) => {
             };
             localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
         }
-        navigate("/");
+        navigate(HOME_PAGE);
         return Promise.reject(error.response);
     } else if (error.response && error.response.status === 500) {
-        navigate("/service-update");
+        navigate(SERVICE_UPDATE_PAGE);
         return Promise.reject(error.response);
     } else {
         return Promise.reject(error);
