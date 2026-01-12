@@ -1,12 +1,87 @@
-.user-profile {
-    width: 567px;
+.user-profile-page {
+    --card-height: var(--admss-app-default-card-height);
+    --content-height: 680px;
+    --title-height: 63px;
+
+    &.data-table-wrapper .p-tabview {
+        flex-direction: row;
+    }
 }
 
-.profile-row {
+.user-profile-page .card {
+    padding: 40px;
+    padding-right: 30px;
+    height: calc(var(--card-height) + var(--title-height));
+    max-height: var(--card-max-height);
+    display: flex;
+    flex-direction: column;
+}
+
+.user-profile-page__tabs {
+    display: flex;
+    border-right: 2px solid var(--admss-app-light-blue);
+}
+
+.user-profile-page__tabs .p-tabview-nav {
+    flex-direction: column;
+    flex: 0 0;
+    width: var(--admss-app-card-sidebar-width);
+    border: none;
+    min-height: 527px;
+    height: 100%;
+    gap: 10px;
+}
+
+.user-profile-page__tabs .p-tabview-panels {
+    flex: 1;
+    padding: 0;
+    padding-left: 40px;
+    min-height: 566px;
+    border-left: 2px solid var(--admss-app-light-blue);
+    border-radius: 0;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+
+.user-profile-page__tabs > .p-tabview-nav-container a.p-tabview-nav-link {
+    color: var(--admss-app-primary);
+    border: none;
+}
+
+.p-tabview .p-tabview-nav .p-tabview-selected .p-tabview-nav-link:not(.p-disabled):focus {
+    box-shadow: none;
+}
+
+.user-profile-page__tabs > .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+    color: var(--admss-app-primary);
+    background: var(--admss-app-light-blue);
+    border-radius: 0;
+}
+
+.user-profile-page .card-header__title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.user-profile-page__buttons {
+    display: flex;
+    margin-top: auto;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 25px;
+    padding-right: 30px;
+}
+
+.user-profile__content {
+    padding-right: 30px;
+}
+
+.user-profile__row {
     display: flex;
     align-items: center;
-    width: 462px;
+    width: 100%;
     font-size: 18px;
+    margin-bottom: 30px;
 }
 
 .profile-row__label {
@@ -36,4 +111,38 @@
     margin-left: auto;
     margin-top: -20px;
     border-bottom: 1px var(--admss-app-main-blue) dashed;
+}
+
+.profile__forgot-password {
+    color: var(--admss-app-main-blue);
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.user-profile__section {
+    margin-bottom: 40px;
+}
+
+.user-profile__section:last-child {
+    margin-bottom: 0;
+}
+
+.user-profile__section-title {
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    color: var(--admss-app-primary);
+}
+
+.user-profile__section-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--admss-app-primary);
+    margin: 0;
+}
+
+.user-profile__link {
+    color: var(--admss-app-main-blue);
+    text-decoration: none;
 }
