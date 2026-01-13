@@ -63,19 +63,19 @@ export const UserProfile = observer((): ReactElement => {
     };
 
     return (
-        <DataTableWrapper className='grid p-0 relative user-profile-page'>
+        <DataTableWrapper className='grid user-profile'>
             <Button
                 icon='pi pi-times'
-                className='p-button close-button'
+                className='user-profile__close-button'
                 onClick={handleCloseClick}
             />
             <div className='col-12'>
-                <div className='card'>
-                    <div className='card-header flex'>
-                        <h2 className='card-header__title uppercase m-0'>MY PROFILE</h2>
+                <div className='card user-profile__card'>
+                    <div className='card-header user-profile__header'>
+                        <h2 className='user-profile__title'>MY PROFILE</h2>
                     </div>
                     <TabView
-                        className='user-profile-page__tabs'
+                        className='user-profile__tabs'
                         activeIndex={activeTabIndex}
                         onTabChange={(e) => handleTabChange(e.index)}
                     >
@@ -85,14 +85,14 @@ export const UserProfile = observer((): ReactElement => {
                                     header={settingName}
                                     children={component}
                                     key={settingName}
-                                    className='user-profile-page__panel'
+                                    className='user-profile__panel'
                                 />
                             );
                         })}
                     </TabView>
-                    <div className='user-profile-page__buttons'>
+                    <div className='user-profile__buttons'>
                         <Button
-                            className='uppercase px-6 form__button'
+                            className='user-profile__update-button'
                             onClick={handleSave}
                             severity='success'
                         >
