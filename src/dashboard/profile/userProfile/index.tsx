@@ -92,9 +92,10 @@ export const UserProfile = observer((): ReactElement => {
                     </TabView>
                     <div className='user-profile__buttons'>
                         <Button
-                            className='user-profile__update-button'
+                            className='user-profile__update-button form-nav__button'
                             onClick={handleSave}
-                            severity='success'
+                            disabled
+                            severity='secondary'
                         >
                             UPDATE
                         </Button>
