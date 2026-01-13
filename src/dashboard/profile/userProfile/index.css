@@ -99,7 +99,6 @@
 
 .user-profile__buttons {
     display: flex;
-    height: 150px;
     margin-top: auto;
     align-items: flex-end;
     justify-content: flex-end;
@@ -114,7 +113,7 @@
 }
 
 .user-profile__content {
-    padding-right: 30px;
+    padding: 0 2rem;
 }
 
 .user-profile__section {

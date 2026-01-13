@@ -2,8 +2,13 @@ import { ReactElement, useState } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { PhoneInput, StateDropdown, TextInput } from "dashboard/common/form/inputs";
+import { ProfileAvatar } from "dashboard/profile/common/profile-avatar";
 import "./index.css";
 import { Splitter } from "dashboard/common/display";
+
+const INFO_MESSAGE = `At least one contact method is required - phone number or email. 
+Without this information, two-factor authentication cannot be set up for the user in the future. 
+If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
 
 export const PersonalInformation = observer((): ReactElement => {
     const store = useStore().userStore;
@@ -42,68 +47,50 @@ export const PersonalInformation = observer((): ReactElement => {
                     />
                 </div>
                 <div className='col-6 user-profile-personal__avatar'>
-                    <div className='user-profile-avatar'>
-                        <div className='user-profile-avatar__placeholder'>
-                            <i className='pi pi-user' />
-                        </div>
-                        <div className='user-profile-avatar__choose'>
-                            <i className='pi pi-camera' />
-                        </div>
-                    </div>
+                    <ProfileAvatar />
                 </div>
             </div>
 
             <Splitter className='col-12' />
 
             <div className='user-profile-contact grid'>
-                <div className='col-6'>
-                    <TextInput
-                        name='Location (address)'
-                        value={address}
-                        onChange={(event) => setAddress(event.target.value)}
-                    />
-                </div>
+                <TextInput
+                    name='Location (address)'
+                    colWidth={6}
+                    value={address}
+                    onChange={(event) => setAddress(event.target.value)}
+                />
 
-                <div className='col-6'>
-                    <StateDropdown
-                        name='State'
-                        showClear={!!state}
-                        className='w-full'
-                        value={state}
-                        onChange={({ value }) => setState(value || "")}
-                    />
-                </div>
-                <div className='col-6'>
-                    <TextInput
-                        name='Zip Code'
-                        value={zipCode}
-                        onChange={(event) => setZipCode(event.target.value)}
-                    />
-                </div>
-                <div className='col-6'>
-                    <PhoneInput
-                        name='Phone Number'
-                        required
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                    />
-                </div>
-                <div className='col-6'>
-                    <TextInput
-                        name='E-mail'
-                        type='email'
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
+                <StateDropdown
+                    name='State'
+                    showClear={!!state}
+                    colWidth={3}
+                    value={state}
+                    onChange={({ value }) => setState(value || "")}
+                />
+                <TextInput
+                    name='Zip Code'
+                    colWidth={3}
+                    value={zipCode}
+                    onChange={(event) => setZipCode(event.target.value)}
+                />
+                <PhoneInput
+                    name='Phone Number'
+                    colWidth={3}
+                    required
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+                <TextInput
+                    name='E-mail'
+                    colWidth={6}
+                    type='email'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
                 <div className='col-12 user-profile-info-message'>
-                    <i className='pi pi-info-circle user-profile-info-message__icon' />
-                    <span className='user-profile-info-message__text'>
-                        At least one contact method is required - phone number or email. Without
-                        this information, two-factor authentication cannot be set up for the user in
-                        the future. If both fields are filled in, the user will be able to choose
-                        their preferred two-factor authentication method.
-                    </span>
+                    <i className='adms-info user-profile-info-message__icon' />
+                    <span className='user-profile-info-message__text'>{INFO_MESSAGE}</span>
                 </div>
             </div>
         </div>
