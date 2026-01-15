@@ -20,7 +20,7 @@ export const Security = (): ReactElement => {
             <div className='user-profile__header'>
                 <h3 className='user-profile__section-title'>Security</h3>
             </div>
-            <Splitter className='col-12' title='Change Password' />
+            <Splitter className='col-12 px-0' title='Change Password' />
 
             <div className='user-profile-password grid'>
                 <div className='col-3'>
@@ -66,7 +66,7 @@ export const Security = (): ReactElement => {
                 </div>
             </div>
 
-            <Splitter className='col-12' title='Two-Factor Authentication' />
+            <Splitter className='col-12 mt-2 px-0' title='Two-Factor Authentication' />
 
             <div className='user-profile-two-factor'>
                 <p className='user-profile-two-factor__text'>
