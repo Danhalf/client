@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { InputText } from "primereact/inputtext";
 import { AutoComplete } from "primereact/autocomplete";
-import { ReactElement, useEffect, useMemo, useState } from "react";
+import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { STATES_LIST } from "common/constants/states";
@@ -24,6 +24,9 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
 
     const primaryAddressAutocomplete = useGooglePlacesAutocomplete();
     const mailingAddressAutocomplete = useGooglePlacesAutocomplete();
+
+    const primaryAutoCompleteRef = useRef<AutoComplete>(null);
+    const mailingAutoCompleteRef = useRef<AutoComplete>(null);
 
     useEffect(() => {
         if (primaryAddressAutocomplete.isReady) {
@@ -218,6 +221,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
             <div className='col-6'>
                 <span className='p-float-label'>
                     <AutoComplete
+                        ref={primaryAutoCompleteRef}
                         className='address-info__text-input w-full'
                         value={
                             (type === BUYER
@@ -248,12 +252,27 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 handlePrimaryAddressSelect(selected as AddressSuggestion);
                             }
                         }}
+                        onDropdownClick={(e) => {
+                            const currentValue =
+                                type === BUYER
+                                    ? contact.streetAddress
+                                    : contactExtData.CoBuyer_Res_Address;
+                            if (currentValue && currentValue.length >= 3) {
+                                primaryAddressAutocomplete.completeMethod({ query: currentValue });
+                                setTimeout(() => {
+                                    if (primaryAutoCompleteRef.current) {
+                                        (primaryAutoCompleteRef.current as any).show();
+                                    }
+                                }, 100);
+                            }
+                        }}
                         itemTemplate={(suggestion: AddressSuggestion) => suggestion.description}
                         selectedItemTemplate={(suggestion: AddressSuggestion) =>
                             suggestion.description
                         }
                         disabled={isControlDisabled}
                         dropdown
+                        forceSelection={false}
                         minLength={3}
                         delay={300}
                     />
@@ -329,6 +348,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
             <div className='col-6'>
                 <span className='p-float-label'>
                     <AutoComplete
+                        ref={mailingAutoCompleteRef}
                         className='mailing-address-info__text-input w-full'
                         value={
                             (type === BUYER
@@ -347,6 +367,9 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                             } else {
                                 changeContactExtData("CoBuyer_Mailing_Address", stringValue);
                             }
+                            if (stringValue.length >= 3) {
+                                mailingAddressAutocomplete.completeMethod({ query: stringValue });
+                            }
                         }}
                         onSelect={(e) => {
                             const selected = e.value;
@@ -354,11 +377,27 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 handleMailingAddressSelect(selected as AddressSuggestion);
                             }
                         }}
+                        onDropdownClick={(e) => {
+                            const currentValue =
+                                type === BUYER
+                                    ? contact.mailStreetAddress
+                                    : contactExtData.CoBuyer_Mailing_Address;
+                            if (currentValue && currentValue.length >= 3) {
+                                mailingAddressAutocomplete.completeMethod({ query: currentValue });
+                                setTimeout(() => {
+                                    if (mailingAutoCompleteRef.current) {
+                                        (mailingAutoCompleteRef.current as any).show();
+                                    }
+                                }, 100);
+                            }
+                        }}
                         itemTemplate={(suggestion: AddressSuggestion) => suggestion.description}
                         selectedItemTemplate={(suggestion: AddressSuggestion) =>
                             suggestion.description
                         }
                         disabled={isSameAsMailing || isControlDisabled}
+                        dropdown
+                        forceSelection={false}
                         minLength={3}
                         delay={300}
                     />
