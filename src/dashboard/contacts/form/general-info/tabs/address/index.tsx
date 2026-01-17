@@ -87,6 +87,98 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
         }
     };
 
+    const fetchAddressByZipCode = async (
+        zipCode: string
+    ): Promise<{ city: string; state: string } | null> => {
+        if (!zipCode || zipCode.length < 5) {
+            return null;
+        }
+
+        return new Promise((resolve) => {
+            if (typeof window === "undefined" || !window.google || !window.google.maps) {
+                resolve(null);
+                return;
+            }
+
+            const geocoder = new google.maps.Geocoder();
+
+            geocoder.geocode(
+                {
+                    address: zipCode,
+                    componentRestrictions: { country: "US" },
+                },
+                (results, status) => {
+                    if (status === google.maps.GeocoderStatus.OK && results && results.length > 0) {
+                        let city = "";
+                        let state = "";
+
+                        results[0].address_components?.forEach((component) => {
+                            const types = component.types;
+                            if (types.includes("locality")) {
+                                city = component.long_name;
+                            }
+                            if (types.includes("administrative_area_level_1")) {
+                                state = component.short_name;
+                            }
+                        });
+
+                        if (city && state) {
+                            resolve({ city, state });
+                        } else {
+                            resolve(null);
+                        }
+                    } else {
+                        resolve(null);
+                    }
+                }
+            );
+        });
+    };
+
+    const handlePrimaryZipCodeChange = async (value: string) => {
+        if (type === BUYER) {
+            changeContact("ZIP", value);
+        } else {
+            changeContactExtData("CoBuyer_Zip_Code", value);
+        }
+
+        if (value.length === 5) {
+            const addressData = await fetchAddressByZipCode(value);
+            if (addressData) {
+                if (type === BUYER) {
+                    if (addressData.city) changeContact("city", addressData.city);
+                    if (addressData.state) changeContact("state", addressData.state);
+                } else {
+                    if (addressData.city) changeContactExtData("CoBuyer_City", addressData.city);
+                    if (addressData.state) changeContactExtData("CoBuyer_State", addressData.state);
+                }
+            }
+        }
+    };
+
+    const handleMailingZipCodeChange = async (value: string) => {
+        if (type === BUYER) {
+            changeContact("mailZIP", value);
+        } else {
+            changeContactExtData("CoBuyer_Mailing_Zip", value);
+        }
+
+        if (value.length === 5) {
+            const addressData = await fetchAddressByZipCode(value);
+            if (addressData) {
+                if (type === BUYER) {
+                    if (addressData.city) changeContact("mailCity", addressData.city);
+                    if (addressData.state) changeContact("mailState", addressData.state);
+                } else {
+                    if (addressData.city)
+                        changeContactExtData("CoBuyer_Mailing_City", addressData.city);
+                    if (addressData.state)
+                        changeContactExtData("CoBuyer_Mailing_State", addressData.state);
+                }
+            }
+        }
+    };
+
     useEffect(() => {
         if (isSameAsMailing) {
             if (type === BUYER) {
@@ -206,11 +298,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                         value={
                             (type === BUYER ? contact.ZIP : contactExtData.CoBuyer_Zip_Code) || ""
                         }
-                        onChange={({ target: { value } }) =>
-                            type === BUYER
-                                ? changeContact("ZIP", value)
-                                : changeContactExtData("CoBuyer_Zip_Code", value)
-                        }
+                        onChange={({ target: { value } }) => handlePrimaryZipCodeChange(value)}
                         disabled={isControlDisabled}
                     />
                     <label className='float-label'>Zip Code</label>
@@ -332,11 +420,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 ? contact.mailZIP
                                 : contactExtData.CoBuyer_Mailing_Zip) || ""
                         }
-                        onChange={({ target: { value } }) =>
-                            type === BUYER
-                                ? changeContact("mailZIP", value)
-                                : changeContactExtData("CoBuyer_Mailing_Zip", value)
-                        }
+                        onChange={({ target: { value } }) => handleMailingZipCodeChange(value)}
                         disabled={isSameAsMailing || isControlDisabled}
                     />
                     <label className='float-label'>Zip Code</label>

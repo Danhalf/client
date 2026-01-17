@@ -23,6 +23,7 @@ export const useGooglePlacesAutocomplete = () => {
     const isApiLoaded = useApiIsLoaded();
     const places = useMapsLibrary("places");
     const autocompleteSuggestionAvailableRef = useRef<boolean>(false);
+    const newApiFailedRef = useRef<boolean>(false);
 
     useEffect(() => {
         if (
@@ -31,11 +32,14 @@ export const useGooglePlacesAutocomplete = () => {
             window.google.maps &&
             window.google.maps.importLibrary
         ) {
-            window.google.maps.importLibrary("places").then((placesLibrary: any) => {
-                if (placesLibrary.AutocompleteSuggestion) {
-                    autocompleteSuggestionAvailableRef.current = true;
-                }
-            });
+            window.google.maps
+                .importLibrary("places")
+                .then((placesLibrary: any) => {
+                    if (placesLibrary.AutocompleteSuggestion) {
+                        autocompleteSuggestionAvailableRef.current = true;
+                    }
+                })
+                .catch(() => {});
         }
     }, [isApiLoaded]);
 
@@ -54,25 +58,26 @@ export const useGooglePlacesAutocomplete = () => {
     const completeMethod = useCallback(async (event: { query: string }) => {
         const query = event.query?.trim() || "";
 
-        const hasNewAPI =
+        if (query.length < 3) {
+            setSuggestions([]);
+            return;
+        }
+
+        const shouldTryNewAPI =
+            !newApiFailedRef.current &&
             autocompleteSuggestionAvailableRef.current &&
             typeof window !== "undefined" &&
             window.google &&
             window.google.maps &&
             window.google.maps.importLibrary;
 
-        if (query.length < 3) {
-            setSuggestions([]);
-            return;
-        }
-
-        if (hasNewAPI) {
+        if (shouldTryNewAPI) {
             try {
                 const placesLibrary = await window.google.maps.importLibrary("places");
                 const AutocompleteSuggestion = (placesLibrary as any).AutocompleteSuggestion;
 
                 if (!AutocompleteSuggestion) {
-                    return;
+                    throw new Error("AutocompleteSuggestion not available");
                 }
 
                 const request = {
@@ -82,7 +87,6 @@ export const useGooglePlacesAutocomplete = () => {
                 };
 
                 const response = await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
-
                 const responseSuggestions = response?.suggestions || [];
 
                 if (responseSuggestions.length > 0) {
@@ -126,7 +130,9 @@ export const useGooglePlacesAutocomplete = () => {
                     setSuggestions([]);
                 }
                 return;
-            } catch (error) {}
+            } catch (error) {
+                newApiFailedRef.current = true;
+            }
         }
 
         if (
