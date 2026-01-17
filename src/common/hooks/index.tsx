@@ -185,4 +185,3 @@ export {
     type AddressSuggestion,
     type ParsedAddress,
 } from "common/hooks/useGooglePlacesAutocomplete";
-export { useWindowSize } from "common/hooks/useWindowSize";
