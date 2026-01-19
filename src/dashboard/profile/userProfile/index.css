@@ -107,7 +107,6 @@
 .user-profile__tabs > .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
     color: var(--admss-app-primary);
     background: var(--admss-app-light-blue);
-    width: 473;
     border-radius: 5px 0 0 5px;
 }
 
