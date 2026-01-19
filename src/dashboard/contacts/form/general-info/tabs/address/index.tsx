@@ -13,6 +13,11 @@ import { useGooglePlacesAutocomplete, AddressSuggestion } from "common/hooks";
 
 const { BUYER, CO_BUYER } = GENERAL_CONTACT_TYPE;
 
+const MIN_AUTOCOMPLETE_LENGTH = 3;
+const AUTOCOMPLETE_DELAY_MS = 300;
+const DROPDOWN_SHOW_DELAY_MS = 100;
+const ZIP_CODE_LENGTH = 5;
+
 interface ContactsAddressInfoProps {
     type?: typeof BUYER | typeof CO_BUYER;
 }
@@ -93,7 +98,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
     const fetchAddressByZipCode = async (
         zipCode: string
     ): Promise<{ city: string; state: string } | null> => {
-        if (!zipCode || zipCode.length < 5) {
+        if (!zipCode || zipCode.length < ZIP_CODE_LENGTH) {
             return null;
         }
 
@@ -145,7 +150,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
             changeContactExtData("CoBuyer_Zip_Code", value);
         }
 
-        if (value.length === 5) {
+        if (value.length === ZIP_CODE_LENGTH) {
             const addressData = await fetchAddressByZipCode(value);
             if (addressData) {
                 if (type === BUYER) {
@@ -166,7 +171,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
             changeContactExtData("CoBuyer_Mailing_Zip", value);
         }
 
-        if (value.length === 5) {
+        if (value.length === ZIP_CODE_LENGTH) {
             const addressData = await fetchAddressByZipCode(value);
             if (addressData) {
                 if (type === BUYER) {
@@ -242,7 +247,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                             } else {
                                 changeContactExtData("CoBuyer_Res_Address", stringValue);
                             }
-                            if (stringValue.length >= 3) {
+                            if (stringValue.length >= MIN_AUTOCOMPLETE_LENGTH) {
                                 primaryAddressAutocomplete.completeMethod({ query: stringValue });
                             }
                         }}
@@ -257,13 +262,13 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 type === BUYER
                                     ? contact.streetAddress
                                     : contactExtData.CoBuyer_Res_Address;
-                            if (currentValue && currentValue.length >= 3) {
+                            if (currentValue && currentValue.length >= MIN_AUTOCOMPLETE_LENGTH) {
                                 primaryAddressAutocomplete.completeMethod({ query: currentValue });
                                 setTimeout(() => {
                                     if (primaryAutoCompleteRef.current) {
                                         (primaryAutoCompleteRef.current as any).show();
                                     }
-                                }, 100);
+                                }, DROPDOWN_SHOW_DELAY_MS);
                             }
                         }}
                         itemTemplate={(suggestion: AddressSuggestion) => suggestion.description}
@@ -273,8 +278,8 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                         disabled={isControlDisabled}
                         dropdown
                         forceSelection={false}
-                        minLength={3}
-                        delay={300}
+                        minLength={MIN_AUTOCOMPLETE_LENGTH}
+                        delay={AUTOCOMPLETE_DELAY_MS}
                     />
                     <label className='float-label'>Street Address</label>
                 </span>
@@ -367,7 +372,7 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                             } else {
                                 changeContactExtData("CoBuyer_Mailing_Address", stringValue);
                             }
-                            if (stringValue.length >= 3) {
+                            if (stringValue.length >= MIN_AUTOCOMPLETE_LENGTH) {
                                 mailingAddressAutocomplete.completeMethod({ query: stringValue });
                             }
                         }}
@@ -382,13 +387,13 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                                 type === BUYER
                                     ? contact.mailStreetAddress
                                     : contactExtData.CoBuyer_Mailing_Address;
-                            if (currentValue && currentValue.length >= 3) {
+                            if (currentValue && currentValue.length >= MIN_AUTOCOMPLETE_LENGTH) {
                                 mailingAddressAutocomplete.completeMethod({ query: currentValue });
                                 setTimeout(() => {
                                     if (mailingAutoCompleteRef.current) {
                                         (mailingAutoCompleteRef.current as any).show();
                                     }
-                                }, 100);
+                                }, DROPDOWN_SHOW_DELAY_MS);
                             }
                         }}
                         itemTemplate={(suggestion: AddressSuggestion) => suggestion.description}
@@ -398,8 +403,8 @@ export const ContactsAddressInfo = observer(({ type }: ContactsAddressInfoProps)
                         disabled={isSameAsMailing || isControlDisabled}
                         dropdown
                         forceSelection={false}
-                        minLength={3}
-                        delay={300}
+                        minLength={MIN_AUTOCOMPLETE_LENGTH}
+                        delay={AUTOCOMPLETE_DELAY_MS}
                     />
                     <label className='float-label'>Street address</label>
                 </span>
