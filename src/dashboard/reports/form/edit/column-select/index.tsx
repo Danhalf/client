@@ -204,12 +204,6 @@ export const ReportColumnSelect = observer((): ReactElement => {
                                 }}
                                 label='Data Set'
                             />
-                            <InfoOverlayPanel
-                                panelTitle='Note it'
-                                className='data-set__info dataset-info'
-                            >
-                                <DataSetInfoTemplate />
-                            </InfoOverlayPanel>
                         </div>
 
                         <ReportSelect
@@ -230,7 +224,10 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         />
                     </div>
                 </div>
-                <div className='report-control'>
+                <div className='report-control report-control__move'>
+                    <InfoOverlayPanel panelTitle='Note it' className='data-set__info dataset-info'>
+                        <DataSetInfoTemplate />
+                    </InfoOverlayPanel>
                     {ControlButton(
                         MOVE_DIRECTION.RIGHT,
                         () =>
