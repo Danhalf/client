@@ -30,10 +30,10 @@ export class ProfileStore {
         return this._profile;
     }
 
-    public changeProfile<K extends keyof ExtendedProfile>(key: K, value: ExtendedProfile[K]) {
+    public changeProfile = <K extends keyof ExtendedProfile>(key: K, value: ExtendedProfile[K]) => {
         this._profile[key] = value as never;
         this._isProfileChanged = true;
-    }
+    };
 
     public get isProfileChanged() {
         return this._isProfileChanged;

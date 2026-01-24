@@ -13,7 +13,9 @@ If both fields are filled in, the user will be able to choose their preferred tw
 
 export const PersonalInformation = observer((): ReactElement => {
     const profileStore = useStore().profileStore;
+    const user = useStore().userStore;
     const { profile, changeProfile } = profileStore;
+    const { authUser } = user;
 
     return (
         <div className='user-profile__content'>
@@ -22,10 +24,14 @@ export const PersonalInformation = observer((): ReactElement => {
             </div>
             <div className='user-profile-personal grid'>
                 <div className='col-6 user-profile-personal__info'>
-                    <TextInput name='Username' value={profile?.loginname || ""} disabled />
+                    <TextInput
+                        name='Username'
+                        value={authUser?.loginname || profile?.loginname || ""}
+                        disabled
+                    />
                     <TextInput
                         name='Company Name'
-                        value={profile?.companyname}
+                        value={authUser?.companyname || profile?.companyname || ""}
                         onChange={(event) => changeProfile("companyname", event.target.value)}
                     />
                     <TextInput
