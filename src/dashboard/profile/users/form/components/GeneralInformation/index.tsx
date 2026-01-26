@@ -1,14 +1,15 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
+import { Skeleton } from "primereact/skeleton";
 import { Splitter } from "dashboard/common/display";
 import { DashboardRadio, EmailInput, PhoneInput } from "dashboard/common/form/inputs";
 import { RadioButtonProps } from "primereact/radiobutton";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
-import { generateNewPassword, getUserRoles } from "http/services/users";
-import { GenerateNewPasswordResponse, UserRole } from "common/models/users";
+import { generateNewPassword } from "http/services/users";
+import { GenerateNewPasswordResponse } from "common/models/users";
 import { useToastMessage } from "common/hooks";
 import { PasswordInput } from "dashboard/common/form/inputs/password";
 import InfoIcon from "assets/images/info-icon.svg";
@@ -29,56 +30,33 @@ export const ROLE_MAPPING = [
 
 export const SALES_PERSON_ROLE = ROLE_MAPPING[2];
 
-export const GeneralInformation = observer((): ReactElement => {
+export const GeneralInformation = observer((): ReactElement | null => {
     const navigate = useNavigate();
+    const usersStore = useStore().usersStore;
     const authUserStore = useStore().userStore;
     const { authUser } = authUserStore;
-    const usersStore = useStore().usersStore;
-    const { user, changeUserData, password } = usersStore;
-    const { showError, showSuccess } = useToastMessage();
+    const { user, changeUserData, password, availableRoles, isLoading } = usersStore;
+    const { showSuccess } = useToastMessage();
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
-    const [roleOptions, setRoleOptions] = useState<RoleOption[]>([]);
 
     const hasEmail = !!user?.email1;
     const hasPhone = !!user?.phone1;
 
-    useEffect(() => {
-        const loadRoles = async () => {
-            const ERROR_MESSAGE = "Failed to load roles";
-            if (!authUser) return;
-            try {
-                const response = await getUserRoles(authUser.useruid);
-                if (response && Array.isArray(response)) {
-                    const apiRoles = (response as UserRole[]).slice(0, 4);
-                    const mappedRoles: RoleOption[] = [];
-
-                    ROLE_MAPPING.forEach((mapping, index) => {
-                        const apiRole = apiRoles.find((role) =>
-                            role.rolename.toLowerCase().includes(mapping.keyword)
-                        );
-                        if (apiRole) {
-                            mappedRoles.push({
-                                name: mapping.displayName,
-                                title: mapping.displayTitle,
-                                value: index,
-                                roleuid: apiRole.roleuid,
-                                apiRoleName: apiRole.rolename,
-                            });
-                        }
-                    });
-
-                    setRoleOptions(mappedRoles);
-                } else {
-                    showError(ERROR_MESSAGE);
-                }
-            } catch (error) {
-                showError(ERROR_MESSAGE);
-            }
-        };
-
-        loadRoles();
-    }, [authUser]);
+    const roleOptions: RoleOption[] = ROLE_MAPPING.map((mapping, index) => {
+        const apiRole = availableRoles.find((role) =>
+            role.rolename.toLowerCase().includes(mapping.keyword)
+        );
+        return apiRole
+            ? {
+                  name: mapping.displayName,
+                  title: mapping.displayTitle,
+                  value: index,
+                  roleuid: apiRole.roleuid,
+                  apiRoleName: apiRole.rolename,
+              }
+            : null;
+    }).filter(Boolean) as RoleOption[];
 
     const handlePasswordsBlur = () => {
         const bothFilled = password.length > 0 && confirmPassword.length > 0;
@@ -102,8 +80,6 @@ export const GeneralInformation = observer((): ReactElement => {
             setPasswordsMismatch(false);
             usersStore.passwordMismatch = false;
             showSuccess(`Password generated successfully: ${data.password}`);
-        } else {
-            showError(response?.error);
         }
     };
 
@@ -160,29 +136,43 @@ export const GeneralInformation = observer((): ReactElement => {
                     Custom role
                 </div>
             </div>
-            <div className='grid'>
-                <div className='col-12'>
-                    <DashboardRadio
-                        radioArray={roleOptions}
-                        justifyContent='start'
-                        initialValue={(() => {
-                            const roleIndex = roleOptions.findIndex(
-                                (option) =>
-                                    option.roleuid === user?.roleuid ||
-                                    option.title === user?.rolename
-                            );
-                            return roleIndex >= 0 ? roleIndex.toString() : "";
-                        })()}
-                        onChange={(value) => {
-                            const selectedOption = roleOptions[parseInt(value as string)];
-                            changeUserData([
-                                ["rolename", selectedOption.title as string],
-                                ["roleuid", selectedOption.roleuid as string],
-                            ]);
-                        }}
-                    />
+            {isLoading ? (
+                <div className='grid'>
+                    <div className='col-3'>
+                        <Skeleton height='50px' />
+                    </div>
+                    <div className='col-3'>
+                        <Skeleton height='50px' />
+                    </div>
+                    <div className='col-3'>
+                        <Skeleton height='50px' />
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <div className='grid'>
+                    <div className='col-12'>
+                        <DashboardRadio
+                            radioArray={roleOptions}
+                            justifyContent='start'
+                            initialValue={(() => {
+                                const roleIndex = roleOptions.findIndex(
+                                    (option) =>
+                                        option.roleuid === user?.roleuid ||
+                                        option.title === user?.rolename
+                                );
+                                return roleIndex >= 0 ? roleIndex.toString() : "";
+                            })()}
+                            onChange={(value) => {
+                                const selectedOption = roleOptions[parseInt(value as string)];
+                                changeUserData([
+                                    ["rolename", selectedOption.title as string],
+                                    ["roleuid", selectedOption.roleuid as string],
+                                ]);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
             <Splitter title='Contact & Login Information' className='my-4' />
             <div className='grid'>
                 <div className='col-4'>

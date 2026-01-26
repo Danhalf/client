@@ -38,6 +38,7 @@ export class UsersStore {
     public rootStore: RootStore;
     private _user: Partial<UserData> = initialUserData;
     private _userRoles: UserRole[] = [] as UserRole[];
+    private _availableRoles: UserRole[] = [];
     private _currentRole: UserRole | null = null;
     private _password: string = "";
     private _passwordMismatch: boolean = false;
@@ -49,6 +50,10 @@ export class UsersStore {
 
     public get userRoles() {
         return this._userRoles;
+    }
+
+    public get availableRoles() {
+        return this._availableRoles;
     }
 
     public get password() {
@@ -137,6 +142,22 @@ export class UsersStore {
             })) as UserRole[];
         } else {
             this._userRoles = [] as UserRole[];
+        }
+    };
+
+    public loadAvailableRoles = async (useruid: string) => {
+        this._isLoading = true;
+        try {
+            const response = await getUserRoles(useruid);
+            if (response && Array.isArray(response)) {
+                this._availableRoles = (response as UserRole[]).slice(0, 4);
+            } else {
+                this._availableRoles = [];
+            }
+        } catch (error) {
+            this._availableRoles = [];
+        } finally {
+            this._isLoading = false;
         }
     };
 
