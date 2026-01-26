@@ -5,7 +5,7 @@ import { TabView, TabPanel } from "primereact/tabview";
 import { Button } from "primereact/button";
 import { observer } from "mobx-react-lite";
 import { CREATE_ID, USERS_PAGE } from "common/constants/links";
-import { GeneralInformation, ROLE_OPTIONS } from "./components/GeneralInformation";
+import { GeneralInformation, SALES_PERSON_ROLE } from "./components/GeneralInformation";
 import { SalesPersonInformation } from "./components/SalesPersonInformation";
 import { useStore } from "store/hooks";
 import { useToastMessage } from "common/hooks";
@@ -58,8 +58,9 @@ export const UsersForm = observer((): ReactElement => {
             },
         ];
 
-        const salesPersonRole = ROLE_OPTIONS.find((option) => option.name === "Salesman");
-        if (user?.rolename === salesPersonRole?.title) {
+        const isSalesPerson = user?.rolename === SALES_PERSON_ROLE.displayTitle;
+
+        if (isSalesPerson) {
             baseTabs.push({
                 settingName: "Sales Person Information",
                 route: "sales-person-information",

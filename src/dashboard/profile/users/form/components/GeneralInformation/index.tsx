@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -7,8 +7,8 @@ import { DashboardRadio, EmailInput, PhoneInput } from "dashboard/common/form/in
 import { RadioButtonProps } from "primereact/radiobutton";
 import { Button } from "primereact/button";
 import { useStore } from "store/hooks";
-import { generateNewPassword } from "http/services/users";
-import { GenerateNewPasswordResponse } from "common/models/users";
+import { generateNewPassword, getUserRoles } from "http/services/users";
+import { GenerateNewPasswordResponse, UserRole } from "common/models/users";
 import { useToastMessage } from "common/hooks";
 import { PasswordInput } from "dashboard/common/form/inputs/password";
 import InfoIcon from "assets/images/info-icon.svg";
@@ -16,23 +16,18 @@ import { SETTINGS_PAGE } from "common/constants/links";
 
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. Without this information, two-factor authentication cannot be set up for the user in the future. If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
 
-export const ROLE_OPTIONS: RadioButtonProps[] = [
-    {
-        name: "Owner",
-        title: "Owner (Admin)",
-        value: 0,
-    },
-    {
-        name: "Manager",
-        title: "Manager",
-        value: 1,
-    },
-    {
-        name: "Salesman",
-        title: "Sales Person",
-        value: 2,
-    },
+interface RoleOption extends RadioButtonProps {
+    roleuid: string;
+    apiRoleName: string;
+}
+
+export const ROLE_MAPPING = [
+    { keyword: "owner", displayTitle: "Owner (Admin)", displayName: "Owner" },
+    { keyword: "manager", displayTitle: "Manager", displayName: "Manager" },
+    { keyword: "sales", displayTitle: "Sales Person", displayName: "Salesman" },
 ];
+
+export const SALES_PERSON_ROLE = ROLE_MAPPING[2];
 
 export const GeneralInformation = observer((): ReactElement => {
     const navigate = useNavigate();
@@ -43,9 +38,47 @@ export const GeneralInformation = observer((): ReactElement => {
     const { showError, showSuccess } = useToastMessage();
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
+    const [roleOptions, setRoleOptions] = useState<RoleOption[]>([]);
 
     const hasEmail = !!user?.email1;
     const hasPhone = !!user?.phone1;
+
+    useEffect(() => {
+        const loadRoles = async () => {
+            const ERROR_MESSAGE = "Failed to load roles";
+            if (!authUser) return;
+            try {
+                const response = await getUserRoles(authUser.useruid);
+                if (response && Array.isArray(response)) {
+                    const apiRoles = (response as UserRole[]).slice(0, 4);
+                    const mappedRoles: RoleOption[] = [];
+
+                    ROLE_MAPPING.forEach((mapping, index) => {
+                        const apiRole = apiRoles.find((role) =>
+                            role.rolename.toLowerCase().includes(mapping.keyword)
+                        );
+                        if (apiRole) {
+                            mappedRoles.push({
+                                name: mapping.displayName,
+                                title: mapping.displayTitle,
+                                value: index,
+                                roleuid: apiRole.roleuid,
+                                apiRoleName: apiRole.rolename,
+                            });
+                        }
+                    });
+
+                    setRoleOptions(mappedRoles);
+                } else {
+                    showError(ERROR_MESSAGE);
+                }
+            } catch (error) {
+                showError(ERROR_MESSAGE);
+            }
+        };
+
+        loadRoles();
+    }, [authUser]);
 
     const handlePasswordsBlur = () => {
         const bothFilled = password.length > 0 && confirmPassword.length > 0;
@@ -130,17 +163,22 @@ export const GeneralInformation = observer((): ReactElement => {
             <div className='grid'>
                 <div className='col-12'>
                     <DashboardRadio
-                        radioArray={ROLE_OPTIONS}
+                        radioArray={roleOptions}
                         justifyContent='start'
                         initialValue={(() => {
-                            const roleIndex = ROLE_OPTIONS.findIndex(
-                                (option) => option.title === user?.rolename
+                            const roleIndex = roleOptions.findIndex(
+                                (option) =>
+                                    option.roleuid === user?.roleuid ||
+                                    option.title === user?.rolename
                             );
                             return roleIndex >= 0 ? roleIndex.toString() : "";
                         })()}
                         onChange={(value) => {
-                            const selectedOption = ROLE_OPTIONS[parseInt(value as string)];
-                            changeUserData("rolename", selectedOption.title);
+                            const selectedOption = roleOptions[parseInt(value as string)];
+                            changeUserData([
+                                ["rolename", selectedOption.title as string],
+                                ["roleuid", selectedOption.roleuid as string],
+                            ]);
                         }}
                     />
                 </div>

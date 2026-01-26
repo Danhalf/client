@@ -16,11 +16,22 @@ const initialUserData: Partial<UserData> = {
     firstName: "",
     lastName: "",
     loginName: "",
+    loginname: "",
+    loginpassword: "",
     rolename: "",
     roleuid: "",
     email1: "",
+    email: "",
     phone1: "",
+    phone: "",
     middleName: "",
+    enabled: 1,
+    dealer_id: "",
+    streetAddress: "",
+    city: "",
+    state: "",
+    ZIP: "",
+    salespersonLicense: "",
 };
 
 export class UsersStore {
@@ -223,10 +234,28 @@ export class UsersStore {
     );
 
     public createUser = async () => {
-        const response = await createUser(this.rootStore.userStore.authUser?.useruid || "", {
-            ...this._user,
-            password: this._password,
-        } as Partial<UserData>);
+        const userData = {
+            loginname: this._user.loginName || "",
+            loginpassword: this._password,
+            enabled: this._user.enabled || 1,
+            dealer_id: this.rootStore.userStore.authUser?.useruid || "",
+            roleuid: this._user.roleuid || "",
+            firstName: this._user.firstName || "",
+            lastName: this._user.lastName || "",
+            middleName: this._user.middleName || "",
+            phone: this._user.phone1 || "",
+            email: this._user.email1 || "",
+            streetAddress: this._user.streetAddress || "",
+            city: this._user.city || "",
+            state: this._user.state || "",
+            ZIP: this._user.ZIP || "",
+            salespersonLicense: this._user.salespersonLicense || "",
+        };
+
+        const response = await createUser(
+            this.rootStore.userStore.authUser?.useruid || "",
+            userData as any
+        );
         if (response && response.status === Status.ERROR) {
             return {
                 status: Status.ERROR,
@@ -248,7 +277,9 @@ export class UsersStore {
             !!this._user.firstName &&
             !!this._user.lastName &&
             !!this._user.loginName &&
+            !!this._user.roleuid &&
             (hasValidPhone || hasEmail) &&
+            !!this._password &&
             !this._passwordMismatch
         );
     }
