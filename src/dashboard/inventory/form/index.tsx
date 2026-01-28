@@ -111,7 +111,7 @@ export const InventoryForm = observer(() => {
     const searchParams = new URLSearchParams(location.search);
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
     const { showError, showSuccess } = useToastMessage();
-    const { inventory: inventoryPermissions } = usePermissions();
+    const { inventoryPermissions } = usePermissions();
 
     const [isInventoryWebExported, setIsInventoryWebExported] = useState(false);
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);

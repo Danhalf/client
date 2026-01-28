@@ -45,7 +45,7 @@ export const usePermissions = () => {
         return otherPermissions.length === 0;
     };
 
-    const inventory = {
+    const inventoryPermissions = {
         canView: (): boolean => hasPermission("uaViewInventory"),
 
         canCreate: (): boolean => hasPermission("uaAddInventory"),
@@ -85,6 +85,6 @@ export const usePermissions = () => {
         hasAnyPermission,
         hasAllPermissions,
         isSalespersonOnly,
-        inventory,
+        inventoryPermissions,
     };
 };

@@ -13,17 +13,17 @@ export const InventoryProtectedRoute = ({
     requireCreate,
     requireEdit,
 }: InventoryProtectedRouteProps): ReactElement => {
-    const { inventory } = usePermissions();
+    const { inventoryPermissions } = usePermissions();
 
-    if (!inventory.canView()) {
+    if (!inventoryPermissions.canView()) {
         return <Navigate to='/dashboard' replace />;
     }
 
-    if (requireCreate && !inventory.canCreate()) {
+    if (requireCreate && !inventoryPermissions.canCreate()) {
         return <Navigate to='/dashboard/inventory' replace />;
     }
 
-    if (requireEdit && !inventory.canOpenDetails()) {
+    if (requireEdit && !inventoryPermissions.canOpenDetails()) {
         return <Navigate to='/dashboard/inventory' replace />;
     }
 

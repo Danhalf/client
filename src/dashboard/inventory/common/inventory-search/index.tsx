@@ -30,7 +30,7 @@ export const InventorySearch = ({
     originalPath,
     ...props
 }: InventorySearchProps) => {
-    const { inventory: inventoryPermissions } = usePermissions();
+    const { inventoryPermissions } = usePermissions();
     const [user, setUser] = useState<AuthUser | null>(null);
     const [options, setOptions] = useState<Inventory[]>([]);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);

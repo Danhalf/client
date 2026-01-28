@@ -56,7 +56,7 @@ export default function Inventories({
 }: InventoriesProps): ReactElement {
     const userStore = useStore().userStore;
     const { authUser } = userStore;
-    const { inventory: inventoryPermissions } = usePermissions();
+    const { inventoryPermissions } = usePermissions();
     const [inventories, setInventories] = useState<Inventory[]>([]);
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [globalSearch, setGlobalSearch] = useState<string>("");
