@@ -558,7 +558,10 @@ export const InventoryForm = observer(() => {
                                             icon='pi pi-times'
                                             className='p-button gap-2 inventory__delete-nav w-full'
                                             severity='danger'
-                                            onClick={() => setStepActiveIndex(deleteActiveIndex)}
+                                            onClick={() =>
+                                                inventoryPermissions.canDelete() &&
+                                                setStepActiveIndex(deleteActiveIndex)
+                                            }
                                         >
                                             Delete inventory
                                         </Button>
