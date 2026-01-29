@@ -86,6 +86,8 @@ export const usePermissions = () => {
         canEditPayments: (): boolean => hasPermission("uaEditPayments"),
 
         canDeletePayments: (): boolean => hasPermission("uaDeletePayments"),
+
+        canEditLeaseHerePayHere: (): boolean => hasPermission("uaAddCreditsAndFees"),
     };
 
     return {
