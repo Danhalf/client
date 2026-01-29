@@ -78,6 +78,14 @@ export const usePermissions = () => {
         canOpenDetails: (): boolean => {
             return hasPermission("uaViewInventory") && hasPermission("uaEditInventory");
         },
+
+        canEditExpenses: (): boolean => hasPermission("uaEditExpenses"),
+
+        canAddExpenses: (): boolean => hasPermission("uaAddExpenses"),
+
+        canEditPayments: (): boolean => hasPermission("uaEditPayments"),
+
+        canDeletePayments: (): boolean => hasPermission("uaDeletePayments"),
     };
 
     return {
