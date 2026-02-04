@@ -130,11 +130,24 @@ export const getShortInventoryList = async (useruid: string) => {
     });
 };
 
-export const setInventory = async (inventoryUid: string, inventoryData: Partial<Inventory>) => {
+export const updateInventory = async (
+    inventoryuid: string,
+    inventoryData: Partial<Inventory>
+): Promise<InventorySetResponse | BaseResponseError | undefined> => {
     return new ApiRequest().post<InventorySetResponse>({
-        url: `inventory/${inventoryUid || 0}/set`,
+        url: `inventory/${inventoryuid}/set`,
         data: inventoryData,
-        defaultError: "Error on set inventory",
+        defaultError: "Error while updating inventory",
+    });
+};
+
+export const createInventory = async (
+    inventoryData: Partial<Inventory>
+): Promise<InventorySetResponse | BaseResponseError | undefined> => {
+    return new ApiRequest().post<InventorySetResponse>({
+        url: `inventory/0/set`,
+        data: inventoryData,
+        defaultError: "Error while creating inventory",
     });
 };
 
