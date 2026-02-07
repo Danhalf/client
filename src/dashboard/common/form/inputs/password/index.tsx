@@ -2,6 +2,7 @@ import { Password, PasswordProps } from "primereact/password";
 import { PASSWORD_REGEX, LATIN_PASSWORD_DISALLOWED_REGEX } from "common/constants/regex";
 import "./index.css";
 import { useId, useMemo } from "react";
+import { TruncatedText } from "dashboard/common/display";
 
 interface PasswordInputProps extends PasswordProps {
     label?: string;
@@ -87,7 +88,11 @@ export const PasswordInput = ({
             <label htmlFor={id} className='float-label'>
                 {label}
             </label>
-            {!!error && <div className='p-error pt-2'>{errorMessage}</div>}
+            {!!error && (
+                <div className='p-error pt-2'>
+                    <TruncatedText text={errorMessage} withTooltip={true} width='full' />
+                </div>
+            )}
         </span>
     );
 };

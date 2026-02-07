@@ -5,13 +5,17 @@
 .password-field-container {
     position: relative;
     .p-error {
-        display: inline-flex;
+        position: absolute;
+        display: block;
         bottom: -6px;
         left: 0;
         padding-left: 2px;
         padding-right: 2px;
         background-color: var(--admss-app-white);
         font-size: 12px;
+        width: calc(100% - 4px);
+        max-width: calc(100% - 4px);
+        z-index: 1;
     }
 }
 
