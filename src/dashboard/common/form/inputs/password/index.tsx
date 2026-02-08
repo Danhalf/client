@@ -26,11 +26,11 @@ export const PasswordInput = ({
     ...props
 }: PasswordInputProps) => {
     const id = useId();
-    const hasValidLength = PASSWORD_REGEX.LENGTH_REGEX.test(password || "");
-    const hasLowercase = PASSWORD_REGEX.LOWERCASE_REGEX.test(password || "");
-    const hasUppercase = PASSWORD_REGEX.UPPERCASE_REGEX.test(password || "");
-    const hasNumber = PASSWORD_REGEX.NUMBER_REGEX.test(password || "");
-    const hasSpecial = PASSWORD_REGEX.SPECIAL_CHAR_REGEX.test(password || "");
+    const hasValidLength = new RegExp(PASSWORD_REGEX.LENGTH_REGEX).test(password || "");
+    const hasLowercase = new RegExp(PASSWORD_REGEX.LOWERCASE_REGEX).test(password || "");
+    const hasUppercase = new RegExp(PASSWORD_REGEX.UPPERCASE_REGEX).test(password || "");
+    const hasNumber = new RegExp(PASSWORD_REGEX.NUMBER_REGEX).test(password || "");
+    const hasSpecial = new RegExp(PASSWORD_REGEX.SPECIAL_CHAR_REGEX).test(password || "");
 
     const isPasswordCorrect = useMemo(() => {
         if (skipValidation) return true;

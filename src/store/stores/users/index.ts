@@ -42,6 +42,7 @@ export class UsersStore {
     private _currentRole: UserRole | null = null;
     private _password: string = "";
     private _passwordMismatch: boolean = false;
+    private _loginError: boolean = false;
     protected _isLoading = false;
 
     public get user() {
@@ -66,6 +67,10 @@ export class UsersStore {
 
     public get currentRole() {
         return this._currentRole;
+    }
+
+    public get loginError() {
+        return this._loginError;
     }
 
     public constructor(rootStore: RootStore) {
@@ -289,6 +294,9 @@ export class UsersStore {
     public currentUserClear = action(() => {
         this._user = initialUserData;
         this._userRoles = [] as UserRole[];
+        this._password = "";
+        this._passwordMismatch = false;
+        this._loginError = false;
     });
 
     public get isFormValid(): boolean {
@@ -302,7 +310,8 @@ export class UsersStore {
             !!this._user.roleuid &&
             (hasValidPhone || hasEmail) &&
             !!this._password &&
-            !this._passwordMismatch
+            !this._passwordMismatch &&
+            !this._loginError
         );
     }
 
@@ -312,6 +321,10 @@ export class UsersStore {
 
     public set passwordMismatch(mismatch: boolean) {
         this._passwordMismatch = mismatch;
+    }
+
+    public set loginError(error: boolean) {
+        this._loginError = error;
     }
 
     public set currentRole(role: UserRole | null) {
