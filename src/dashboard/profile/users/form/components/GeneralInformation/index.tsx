@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, useEffect } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { InputText } from "primereact/inputtext";
@@ -44,6 +44,15 @@ export const GeneralInformation = observer((): ReactElement | null => {
 
     const hasEmail = !!user?.email1;
     const hasPhone = !!user?.phone1;
+    const isEditMode = !!user?.useruid;
+
+    useEffect(() => {
+        if (!password) {
+            setConfirmPassword("");
+            setPasswordsMismatch(false);
+            setLoginError("");
+        }
+    }, [password]);
 
     const roleOptions: RoleOption[] = ROLE_MAPPING.map((mapping, index) => {
         const apiRole = availableRoles.find((role) =>
@@ -102,7 +111,6 @@ export const GeneralInformation = observer((): ReactElement | null => {
         if (value.length > LOGIN_MAX_LENGTH) {
             return `Login must not exceed ${LOGIN_MAX_LENGTH} characters`;
         }
-
         return "";
     };
 
@@ -238,6 +246,7 @@ export const GeneralInformation = observer((): ReactElement | null => {
             <div className='grid'>
                 <div className='col-4'>
                     <PasswordInput
+                        label={`Password ${!isEditMode ? "(required)" : ""}`}
                         password={password}
                         setPassword={(password) => (usersStore.password = password)}
                         error={passwordsMismatch}
@@ -246,7 +255,7 @@ export const GeneralInformation = observer((): ReactElement | null => {
                 </div>
                 <div className='col-4'>
                     <PasswordInput
-                        label='Verify Password (required)'
+                        label={`Verify Password ${!isEditMode ? "(required)" : ""}`}
                         password={confirmPassword}
                         setPassword={setConfirmPassword}
                         error={passwordsMismatch}

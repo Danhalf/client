@@ -302,6 +302,10 @@ export class UsersStore {
     public get isFormValid(): boolean {
         const hasValidPhone = PHONE_NUMBER_REGEX.test(this._user.phone1 || "");
         const hasEmail = !!this._user.email1;
+        const isEditMode = !!this._user.useruid;
+        const isPasswordValid = isEditMode
+            ? !this._passwordMismatch
+            : !!this._password && !this._passwordMismatch;
 
         return (
             !!this._user.firstName &&
@@ -309,8 +313,7 @@ export class UsersStore {
             !!this._user.loginName &&
             !!this._user.roleuid &&
             (hasValidPhone || hasEmail) &&
-            !!this._password &&
-            !this._passwordMismatch &&
+            isPasswordValid &&
             !this._loginError
         );
     }

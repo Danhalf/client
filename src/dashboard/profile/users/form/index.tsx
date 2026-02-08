@@ -54,7 +54,10 @@ export const UsersForm = observer((): ReactElement => {
     }, [authUser]);
 
     useEffect(() => {
-        if (!id || id === CREATE_ID) return;
+        if (!id || id === CREATE_ID) {
+            currentUserClear();
+            return;
+        }
         handleGetCurrentUser(id);
         getCurrentUserRoles(id);
         return () => {
@@ -105,6 +108,7 @@ export const UsersForm = observer((): ReactElement => {
                 showError(response?.error);
             } else {
                 showSuccess("User created successfully");
+                currentUserClear();
                 navigate(USERS_PAGE.MAIN);
             }
         }
