@@ -1,4 +1,4 @@
-import { SubUser, UserData, UserRole, UserRolePayload } from "common/models/users";
+import { SubUser, UserData, UserRole, UserRolePayload, SalespersonInfo } from "common/models/users";
 import { BaseResponseError, Status } from "common/models/base-response";
 import {
     createUser,
@@ -6,6 +6,9 @@ import {
     getRoleInfo,
     getUserData,
     getUserRoles,
+    getSalespersonInfo,
+    updateSalespersonInfo,
+    setUserData,
 } from "http/services/users";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
@@ -34,6 +37,26 @@ const initialUserData: Partial<UserData> = {
     salespersonLicense: "",
 };
 
+const initialSalespersonInfo: Partial<SalespersonInfo> = {
+    Commission: 0,
+    CommissionType: 0,
+    VehicleProfit: 0,
+    OverallIncome: 0,
+    Acquisition: 0,
+    Reserve: 0,
+    FinanceIncome: 0,
+    MiscCost: 0,
+    MiscProfit: 0,
+    AccessoryProfit: 0,
+    GPUProfit: 0,
+    CreditLifeProfit: 0,
+    GAPProfit: 0,
+    DPProfit: 0,
+    VehiclePack: 0,
+    Devices: 0,
+    InterestRate: 0,
+};
+
 export class UsersStore {
     public rootStore: RootStore;
     private _user: Partial<UserData> = initialUserData;
@@ -43,6 +66,7 @@ export class UsersStore {
     private _password: string = "";
     private _passwordMismatch: boolean = false;
     private _loginError: boolean = false;
+    private _salespersonInfo: Partial<SalespersonInfo> = initialSalespersonInfo;
     protected _isLoading = false;
 
     public get user() {
@@ -71,6 +95,10 @@ export class UsersStore {
 
     public get loginError() {
         return this._loginError;
+    }
+
+    public get salespersonInfo() {
+        return this._salespersonInfo;
     }
 
     public constructor(rootStore: RootStore) {
@@ -289,7 +317,124 @@ export class UsersStore {
                 error: response?.error,
             };
         }
+
+        if (response && "useruid" in response && response.useruid) {
+            const salespersonResponse = await this.updateSalespersonInfo(
+                response.useruid as string
+            );
+            if (
+                salespersonResponse &&
+                "status" in salespersonResponse &&
+                salespersonResponse.status === Status.ERROR
+            ) {
+                console.warn("Failed to save salesperson info:", salespersonResponse.error);
+            }
+        }
+
+        return response;
     };
+
+    public updateUser = async (useruid: string) => {
+        const userData: Partial<UserData> = {
+            loginname: this._user.loginName || this._user.loginname || "",
+            enabled: this._user.enabled || 1,
+            roleuid: this._user.roleuid || "",
+            firstName: this._user.firstName || "",
+            lastName: this._user.lastName || "",
+            middleName: this._user.middleName || "",
+            phone: this._user.phone1 || this._user.phone || "",
+            email: this._user.email1 || this._user.email || "",
+            streetAddress: this._user.streetAddress || "",
+            city: this._user.city || "",
+            state: this._user.state || "",
+            ZIP: this._user.ZIP || "",
+            salespersonLicense: this._user.salespersonLicense || "",
+        };
+
+        if (this._password) {
+            userData.loginpassword = this._password;
+        }
+
+        try {
+            const response = await setUserData(useruid, userData);
+            if (response && response.status === Status.ERROR) {
+                return {
+                    status: Status.ERROR,
+                    error: response?.error,
+                };
+            }
+
+            const salespersonResponse = await this.updateSalespersonInfo(useruid);
+            if (
+                salespersonResponse &&
+                "status" in salespersonResponse &&
+                salespersonResponse.status === Status.ERROR
+            ) {
+                return salespersonResponse;
+            }
+
+            return response;
+        } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            };
+        }
+    };
+
+    public getSalespersonInfo = async (useruid: string) => {
+        try {
+            const response = await getSalespersonInfo(useruid);
+            if (response && "status" in response && response.status === Status.ERROR) {
+                return {
+                    status: Status.ERROR,
+                    error: (response as BaseResponseError).error,
+                };
+            } else {
+                this._salespersonInfo = response as SalespersonInfo;
+            }
+        } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            };
+        }
+    };
+
+    public updateSalespersonInfo = async (useruid: string) => {
+        try {
+            const response = await updateSalespersonInfo(useruid, this._salespersonInfo);
+            if (response && "status" in response && response.status === Status.ERROR) {
+                return {
+                    status: Status.ERROR,
+                    error: (response as BaseResponseError).error,
+                };
+            }
+            return response;
+        } catch (error) {
+            return {
+                status: Status.ERROR,
+                error,
+            };
+        }
+    };
+
+    public changeSalespersonInfo = action(
+        <K extends keyof SalespersonInfo>(
+            keyOrEntries: K | [K, SalespersonInfo[K]][],
+            value?: SalespersonInfo[K]
+        ) => {
+            if (Array.isArray(keyOrEntries)) {
+                keyOrEntries.forEach(([key, val]) => {
+                    this._salespersonInfo[key] = val;
+                });
+            } else {
+                if (value !== undefined) {
+                    this._salespersonInfo[keyOrEntries] = value;
+                }
+            }
+        }
+    );
 
     public currentUserClear = action(() => {
         this._user = initialUserData;
@@ -297,6 +442,7 @@ export class UsersStore {
         this._password = "";
         this._passwordMismatch = false;
         this._loginError = false;
+        this._salespersonInfo = initialSalespersonInfo;
     });
 
     public get isFormValid(): boolean {

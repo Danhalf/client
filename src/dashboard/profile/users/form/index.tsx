@@ -30,6 +30,7 @@ export const UsersForm = observer((): ReactElement => {
         currentUserClear,
         isFormValid,
         createUser,
+        updateUser,
         loadAvailableRoles,
     } = usersStore;
     const handleGetCurrentUser = async (useruid: string) => {
@@ -106,12 +107,23 @@ export const UsersForm = observer((): ReactElement => {
             const response = await createUser();
             if (response && response.error) {
                 showError(response?.error);
-            } else {
-                showSuccess("User created successfully");
-                currentUserClear();
-                navigate(USERS_PAGE.MAIN);
+                return;
             }
+            showSuccess("User created successfully");
+            currentUserClear();
+            navigate(USERS_PAGE.MAIN);
+            return;
         }
+
+        if (!id) return;
+
+        const response = await updateUser(id);
+        if (response && response.error) {
+            showError(response?.error as string);
+            return;
+        }
+        showSuccess("User updated successfully");
+        navigate(USERS_PAGE.MAIN);
     };
 
     return (
