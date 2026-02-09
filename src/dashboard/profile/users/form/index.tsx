@@ -29,6 +29,7 @@ export const UsersForm = observer((): ReactElement => {
         getCurrentUserRoles,
         currentUserClear,
         isFormValid,
+        isUserChanged,
         createUser,
         updateUser,
         loadAvailableRoles,
@@ -117,6 +118,11 @@ export const UsersForm = observer((): ReactElement => {
 
         if (!id) return;
 
+        if (!usersStore.user.roleuid || !usersStore.user.roleuid.trim()) {
+            showError("Role not selected");
+            return;
+        }
+
         const response = await updateUser(id);
         if (response && response.error) {
             showError(response?.error as string);
@@ -166,9 +172,17 @@ export const UsersForm = observer((): ReactElement => {
                     </Button>
                     <Button
                         className='uppercase px-6 form__button'
-                        severity={isFormValid ? "success" : "secondary"}
+                        severity={
+                            id === CREATE_ID
+                                ? isFormValid
+                                    ? "success"
+                                    : "secondary"
+                                : isUserChanged
+                                  ? "success"
+                                  : "secondary"
+                        }
                         type='submit'
-                        disabled={!isFormValid}
+                        disabled={id === CREATE_ID ? !isFormValid : !isUserChanged}
                         onClick={handleSaveClick}
                     >
                         {id === CREATE_ID ? "Create" : "Update"}

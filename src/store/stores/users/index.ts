@@ -67,6 +67,7 @@ export class UsersStore {
     private _passwordMismatch: boolean = false;
     private _loginError: boolean = false;
     private _salespersonInfo: Partial<SalespersonInfo> = initialSalespersonInfo;
+    private _isUserChanged: boolean = false;
     protected _isLoading = false;
 
     public get user() {
@@ -99,6 +100,10 @@ export class UsersStore {
 
     public get salespersonInfo() {
         return this._salespersonInfo;
+    }
+
+    public get isUserChanged() {
+        return this._isUserChanged;
     }
 
     public constructor(rootStore: RootStore) {
@@ -155,6 +160,7 @@ export class UsersStore {
                 return;
             } else {
                 this._user = response as SubUser;
+                this._isUserChanged = false;
             }
         } catch (error) {
             return {
@@ -275,6 +281,7 @@ export class UsersStore {
 
     public changeUserData = action(
         <K extends keyof UserData>(keyOrEntries: K | [K, UserData[K]][], value?: UserData[K]) => {
+            this._isUserChanged = true;
             if (Array.isArray(keyOrEntries)) {
                 keyOrEntries.forEach(([key, val]) => {
                     this._user[key] = val;
@@ -424,6 +431,7 @@ export class UsersStore {
             keyOrEntries: K | [K, SalespersonInfo[K]][],
             value?: SalespersonInfo[K]
         ) => {
+            this._isUserChanged = true;
             if (Array.isArray(keyOrEntries)) {
                 keyOrEntries.forEach(([key, val]) => {
                     this._salespersonInfo[key] = val;
@@ -443,6 +451,7 @@ export class UsersStore {
         this._passwordMismatch = false;
         this._loginError = false;
         this._salespersonInfo = initialSalespersonInfo;
+        this._isUserChanged = false;
     });
 
     public get isFormValid(): boolean {
@@ -466,6 +475,7 @@ export class UsersStore {
 
     public set password(password: string) {
         this._password = password;
+        this._isUserChanged = true;
     }
 
     public set passwordMismatch(mismatch: boolean) {
