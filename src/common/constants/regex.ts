@@ -24,8 +24,3 @@ export const PASSWORD_REGEX = {
     NUMBER_REGEX,
     SPECIAL_CHAR_REGEX,
 };
-
-export const LOGIN_VALID_REGEX = new RegExp(
-    `^[^\\p{Emoji}\\p{Emoji_Presentation}\\p{Extended_Pictographic}\\s]{${LOGIN_MIN_LENGTH},${LOGIN_MAX_LENGTH}}$`,
-    "u"
-);
