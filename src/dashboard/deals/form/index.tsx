@@ -27,7 +27,7 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { DeleteDealForm } from "dashboard/deals/form/delete-form";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { useFormExitConfirmation } from "common/hooks";
+import { useFormExitConfirmation, usePermissions } from "common/hooks";
 import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 import { DEALS_PAGE } from "common/constants/links";
 
@@ -228,6 +228,7 @@ export const DealsForm = observer(() => {
     const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
     const [confirmDeleteVisible, setConfirmDeleteVisible] = useState<boolean>(false);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
+    const { dealPermissions } = usePermissions();
 
     const { handleExitClick, ConfirmModalComponent } = useFormExitConfirmation({
         isFormChanged,
@@ -308,13 +309,20 @@ export const DealsForm = observer(() => {
         setAccordionSteps(sections.map((item) => item.startIndex));
         const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
         setItemsMenuCount(itemsMenuCount);
-        setPrintActiveIndex(itemsMenuCount + 1);
-        setDeleteActiveIndex(itemsMenuCount + 2);
+
+        let currentIndex = itemsMenuCount + 1;
+        if (id && dealPermissions.canPrintForms()) {
+            setPrintActiveIndex(currentIndex);
+            currentIndex++;
+        }
+        if (id && dealPermissions.canDelete()) {
+            setDeleteActiveIndex(currentIndex);
+        }
 
         return () => {
             sections.forEach((section) => section.clearCount());
         };
-    }, [dealType]);
+    }, [dealType, id, dealPermissions]);
 
     useEffect(() => {
         if (stepActiveIndex === printActiveIndex) {
@@ -491,7 +499,7 @@ export const DealsForm = observer(() => {
                                             </AccordionTab>
                                         ))}
                                     </Accordion>
-                                    {id && (
+                                    {id && dealPermissions.canPrintForms() && (
                                         <Button
                                             icon='icon adms-print'
                                             className={`p-button gap-2 deal__print-nav ${
@@ -503,7 +511,7 @@ export const DealsForm = observer(() => {
                                             Print forms
                                         </Button>
                                     )}
-                                    {id && (
+                                    {id && dealPermissions.canDelete() && (
                                         <Button
                                             icon='pi pi-times'
                                             className='p-button gap-2 deal__delete-nav w-full'
@@ -589,20 +597,24 @@ export const DealsForm = observer(() => {
                                                         </div>
                                                     ))
                                                 )}
-                                                {stepActiveIndex === printActiveIndex && (
-                                                    <div className='deal-form'>
-                                                        <div className='deal-form__title uppercase'>
-                                                            Print forms
+                                                {id &&
+                                                    dealPermissions.canPrintForms() &&
+                                                    stepActiveIndex === printActiveIndex && (
+                                                        <div className='deal-form'>
+                                                            <div className='deal-form__title uppercase'>
+                                                                Print forms
+                                                            </div>
+                                                            <PrintDealForms />
                                                         </div>
-                                                        <PrintDealForms />
-                                                    </div>
-                                                )}{" "}
-                                                {stepActiveIndex === deleteActiveIndex && (
-                                                    <DeleteDealForm
-                                                        isDeleteConfirm={isDeleteConfirm}
-                                                        attemptedSubmit={attemptedSubmit}
-                                                    />
-                                                )}
+                                                    )}{" "}
+                                                {id &&
+                                                    dealPermissions.canDelete() &&
+                                                    stepActiveIndex === deleteActiveIndex && (
+                                                        <DeleteDealForm
+                                                            isDeleteConfirm={isDeleteConfirm}
+                                                            attemptedSubmit={attemptedSubmit}
+                                                        />
+                                                    )}
                                             </Form>
                                         </Formik>
                                     </div>
@@ -635,7 +647,9 @@ export const DealsForm = observer(() => {
                                     }
                                     disabled={stepActiveIndex >= itemsMenuCount}
                                     severity={
-                                        stepActiveIndex === deleteActiveIndex ||
+                                        (id &&
+                                            dealPermissions.canDelete() &&
+                                            stepActiveIndex === deleteActiveIndex) ||
                                         stepActiveIndex >= itemsMenuCount
                                             ? "secondary"
                                             : "success"
@@ -645,7 +659,9 @@ export const DealsForm = observer(() => {
                                 >
                                     Next
                                 </Button>
-                                {stepActiveIndex === deleteActiveIndex ? (
+                                {id &&
+                                dealPermissions.canDelete() &&
+                                stepActiveIndex === deleteActiveIndex ? (
                                     <Button
                                         onClick={() =>
                                             deleteReason.length
