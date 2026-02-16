@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { ReactElement, ReactNode } from "react";
 import { usePermissions } from "common/hooks";
-import { DEALS_PAGE } from "common/constants/links";
+import { DASHBOARD_PAGE, DEALS_PAGE } from "common/constants/links";
 
 interface DealsProtectedRouteProps {
     children: ReactNode;
@@ -19,7 +19,7 @@ export const DealsProtectedRoute = ({
     const { dealPermissions } = usePermissions();
 
     if (!dealPermissions.canView()) {
-        return <Navigate to='/dashboard' replace />;
+        return <Navigate to={DASHBOARD_PAGE} replace />;
     }
 
     if (requireCreate && !dealPermissions.canCreate()) {
