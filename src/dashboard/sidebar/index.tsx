@@ -16,11 +16,12 @@ import {
     SETTINGS_PAGE,
 } from "common/constants/links";
 import { typeGuards } from "common/utils";
+import { usePermissions } from "common/hooks/usePermissions";
 
 export const Sidebar = observer((): ReactElement => {
     const store = useStore().userStore;
+    const { inventoryPermissions, contactPermissions, salesPermissions } = usePermissions();
     const { authUser, settings } = store;
-    const [isSalesPerson, setIsSalesPerson] = useState(true);
     const [isInitialRender, setIsInitialRender] = useState(true);
 
     useEffect(() => {
@@ -37,17 +38,6 @@ export const Sidebar = observer((): ReactElement => {
     const handleMouseLeave = () => {
         settings.isSidebarCollapsed = true;
     };
-
-    useEffect(() => {
-        if (authUser && Object.keys(authUser.permissions).length) {
-            const { permissions } = authUser;
-            const { uaSalesPerson, ...otherPermissions } = permissions;
-            if (Object.values(otherPermissions).some((permission) => permission === 1)) {
-                return setIsSalesPerson(false);
-            }
-            if (!!uaSalesPerson) setIsSalesPerson(true);
-        }
-    }, [authUser, authUser?.permissions]);
 
     const renderNavItem = (
         to: string,
@@ -89,17 +79,21 @@ export const Sidebar = observer((): ReactElement => {
         >
             <ul className='sidebar-nav'>
                 {renderNavItem(DASHBOARD_PAGE, "home", "Home")}
-                {renderNavItem(INVENTORY_PAGE.MAIN, "inventory", "Inventory")}
-                {isSalesPerson || (
-                    <>
-                        {renderNavItem(CONTACTS_PAGE.MAIN, "contacts", "Contacts")}
-                        {renderNavItem(DEALS_PAGE.MAIN, "deals", "Deals")}
-                        {renderNavItem(ACCOUNTS_PAGE.MAIN, "accounts", "Accounts")}
-                        {renderNavItem(REPORTS_PAGE.MAIN, "reports", "Reports")}
-                        {renderNavItem(TASKS_PAGE.MAIN, "tasks", "Tasks")}
-                        {renderNavItem(EXPORT_WEB_PAGE.MAIN, "export-web", "Export to WEB")}
-                    </>
-                )}
+                {inventoryPermissions.canSeeInMenu() &&
+                    renderNavItem(INVENTORY_PAGE.MAIN, "inventory", "Inventory")}
+                {salesPermissions.canShowContacts() &&
+                    contactPermissions.canSeeInMenu() &&
+                    renderNavItem(CONTACTS_PAGE.MAIN, "contacts", "Contacts")}
+                {salesPermissions.canShowDeals() &&
+                    renderNavItem(DEALS_PAGE.MAIN, "deals", "Deals")}
+                {salesPermissions.canShowAccounts() &&
+                    renderNavItem(ACCOUNTS_PAGE.MAIN, "accounts", "Accounts")}
+                {salesPermissions.canShowReports() &&
+                    renderNavItem(REPORTS_PAGE.MAIN, "reports", "Reports")}
+                {salesPermissions.canShowTasks() &&
+                    renderNavItem(TASKS_PAGE.MAIN, "tasks", "Tasks")}
+                {salesPermissions.canShowExportWeb() &&
+                    renderNavItem(EXPORT_WEB_PAGE.MAIN, "export-web", "Export to WEB")}
                 {renderNavItem(
                     SETTINGS_PAGE.MAIN,
                     <i className='sidebar-nav__icon adms-settings' />,

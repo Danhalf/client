@@ -14,7 +14,14 @@ import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { getExtendedData } from "http/services/auth-user.service";
-import { CONTACT_SUPPORT, HELP_PAGE, SETTINGS_PAGE, USERS_PAGE, USER_PROFILE_PAGE } from "common/constants/links";
+import {
+    CONTACT_SUPPORT,
+    HELP_PAGE,
+    HOME_PAGE,
+    SETTINGS_PAGE,
+    USERS_PAGE,
+    USER_PROFILE_PAGE,
+} from "common/constants/links";
 
 export const Header = observer((): ReactElement => {
     const store = useStore().userStore;
@@ -45,7 +52,7 @@ export const Header = observer((): ReactElement => {
         }
     }, [authUser?.useruid]);
 
-    const signOut = ({ useruid }: AuthUser) => {
+    const signOut = async ({ useruid, token }: AuthUser) => {
         const currentPath = window.location.pathname + window.location.search;
         const routeData: LastRouteData = {
             path: currentPath,
@@ -54,9 +61,8 @@ export const Header = observer((): ReactElement => {
         };
         localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
         localStorageClear(LS_APP_USER);
-        logout(useruid).finally(() => {
-            navigate("/");
-        });
+        await logout(useruid, token);
+        navigate(HOME_PAGE, { replace: true });
     };
 
     const removeSupportHistoryParam = () => {

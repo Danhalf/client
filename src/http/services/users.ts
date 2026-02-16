@@ -1,6 +1,12 @@
 import { BaseResponseError } from "common/models/base-response";
 import { QueryParams } from "common/models/query-params";
-import { UserData, UserRole, UserRolePayload } from "common/models/users";
+import {
+    CheckPasswordResponse,
+    UserData,
+    UserRole,
+    UserRolePayload,
+    SalespersonInfo,
+} from "common/models/users";
 import { ApiRequest } from "http/index";
 
 export const getUsersList = async (useruid: string, params?: QueryParams) => {
@@ -108,9 +114,9 @@ export const getUserData = async (useruid: string) => {
     });
 };
 
-export const createUser = async (useruid: string, userData: Partial<UserData>) => {
+export const createUser = async (dealer_id: string, userData: Partial<UserData>) => {
     return new ApiRequest().post({
-        url: `user/${useruid}/user`,
+        url: `user/${dealer_id}/user`,
         data: userData,
         defaultError: "Error while creating user",
     });
@@ -142,5 +148,28 @@ export const createOrUpdateRole = async (roleuid: string, roleData: UserRolePayl
         url: `user/${roleuid || 0}/role`,
         data: roleData,
         defaultError: "Error while creating or updating role",
+    });
+};
+
+export const checkPassword = async (useruid: string, password: string) => {
+    return new ApiRequest().post<CheckPasswordResponse>({
+        url: `user/${useruid}/checkpassword`,
+        data: { password },
+        defaultError: "Password is incorrect",
+    });
+};
+
+export const getSalespersonInfo = async (useruid: string) => {
+    return new ApiRequest().get<SalespersonInfo | BaseResponseError>({
+        url: `user/${useruid}/salespersoninfo`,
+        defaultError: "Error while getting salesperson info",
+    });
+};
+
+export const updateSalespersonInfo = async (useruid: string, data: Partial<SalespersonInfo>) => {
+    return new ApiRequest().post<SalespersonInfo | BaseResponseError>({
+        url: `user/${useruid}/salespersoninfo`,
+        data,
+        defaultError: "Error while updating salesperson info",
     });
 };

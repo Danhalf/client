@@ -3,9 +3,9 @@ import { ReactElement } from "react";
 import { observer } from "mobx-react-lite";
 import { TabView, TabPanel } from "primereact/tabview";
 import { useNavigate, useLocation } from "react-router-dom";
-import { AdditionalInformation } from "dashboard/profile/users/form/components/SalesPersonInformation/tabs/AdditionalInformation";
-import { TypicalOptions } from "dashboard/profile/users/form/components/SalesPersonInformation/tabs/TypicalOptions";
-import { BackendOptions } from "dashboard/profile/users/form/components/SalesPersonInformation/tabs/BackendOptions";
+import { AdditionalInformation } from "dashboard/profile/users/form/components/AdditionalSettings/tabs/AdditionalInformation";
+import { TypicalOptions } from "dashboard/profile/users/form/components/AdditionalSettings/tabs/TypicalOptions";
+import { BackendOptions } from "dashboard/profile/users/form/components/AdditionalSettings/tabs/BackendOptions";
 
 const tabs = [
     { header: "Additional Information", component: <AdditionalInformation /> },
@@ -13,7 +13,7 @@ const tabs = [
     { header: "Back-End Options", component: <BackendOptions /> },
 ];
 
-export const SalesPersonInformation = observer((): ReactElement => {
+export const AdditionalSettings = observer((): ReactElement => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -32,12 +32,10 @@ export const SalesPersonInformation = observer((): ReactElement => {
     const activeTabIndex = tabParam ? parseInt(tabParam, 10) : 0;
 
     return (
-        <div className='user-form sales-person-information'>
-            <h3 className='sales-person-information__title user-form__title'>
-                Sales Person Information
-            </h3>
+        <div className='user-form additional-settings'>
+            <h3 className='additional-settings__title user-form__title'>Additional Settings</h3>
             <TabView
-                className='sales-person-information__tabs'
+                className='additional-settings__tabs'
                 activeIndex={activeTabIndex}
                 onTabChange={handleTabChange}
             >

@@ -7,15 +7,15 @@ import { RecentMessages } from "dashboard/home/recent-messages";
 import { LatestUpdates } from "dashboard/home/latest-updates";
 import "./index.css";
 import { getAlerts, setAlert } from "http/services/tasks.service";
-import { useNotification, useToastMessage } from "common/hooks";
+import { useNotification, usePermissions, useToastMessage } from "common/hooks";
 import { Alert } from "common/models/tasks";
 
 const ALERT_SHOWN_KEY = "alert_shown";
 
 export const Home = (): ReactElement => {
     const store = useStore().userStore;
+    const { inventoryPermissions, contactPermissions, salesPermissions } = usePermissions();
     const { authUser } = store;
-    const [isSalesPerson, setIsSalesPerson] = useState(true);
     const [date] = useState<Date | null>(null);
     const { showNotification } = useNotification();
     const { showError } = useToastMessage();
@@ -33,13 +33,6 @@ export const Home = (): ReactElement => {
                 setPendingAlerts(alerts);
             }
         }
-
-        const { permissions } = authUser;
-        const { uaSalesPerson, ...otherPermissions } = permissions;
-        if (Object.values(otherPermissions).some((permission) => permission === 1)) {
-            return setIsSalesPerson(false);
-        }
-        if (!!uaSalesPerson) setIsSalesPerson(true);
     }, [authUser]);
 
     const showNextAlert = useCallback(
@@ -91,36 +84,44 @@ export const Home = (): ReactElement => {
                         <h2 className='card-header__title uppercase m-0'>Common tasks</h2>
                     </div>
                     <div className='card-content common-tasks-menu flex flex-wrap lg:justify-content-between md:justify-content-center gap-6'>
-                        {isSalesPerson || (
-                            <>
+                        {salesPermissions.canShowContacts() &&
+                            contactPermissions.canSeeInMenu() && (
+                                <>
+                                    {contactPermissions.canCreate() && (
+                                        <Link
+                                            to='contacts/create'
+                                            className='common-tasks-menu__item new-contact cursor-pointer'
+                                        >
+                                            <div className='common-tasks-menu__icon new-contact'></div>
+                                            New Contact
+                                        </Link>
+                                    )}
+                                    <Link
+                                        to='contacts'
+                                        className='common-tasks-menu__item cursor-pointer'
+                                    >
+                                        <div className='common-tasks-menu__icon browse-all-contacts'></div>
+                                        Browse <br /> all contacts
+                                    </Link>
+                                </>
+                            )}
+                        {inventoryPermissions.canSeeInMenu() &&
+                            inventoryPermissions.canCreate() && (
                                 <Link
-                                    to='contacts/create'
-                                    className='common-tasks-menu__item new-contact cursor-pointer'
-                                >
-                                    <div className='common-tasks-menu__icon new-contact'></div>
-                                    New Contact
-                                </Link>
-                                <Link
-                                    to='contacts'
+                                    to='inventory/create'
                                     className='common-tasks-menu__item cursor-pointer'
                                 >
-                                    <div className='common-tasks-menu__icon browse-all-contacts'></div>
-                                    Browse <br /> all contacts
+                                    <div className='common-tasks-menu__icon new-inventory'></div>
+                                    New inventory
                                 </Link>
-                            </>
+                            )}
+                        {inventoryPermissions.canSeeInMenu() && (
+                            <Link to='inventory' className='common-tasks-menu__item cursor-pointer'>
+                                <div className='common-tasks-menu__icon browser-all-inventory'></div>
+                                Browse <br /> all inventory
+                            </Link>
                         )}
-                        <Link
-                            to='inventory/create'
-                            className='common-tasks-menu__item cursor-pointer'
-                        >
-                            <div className='common-tasks-menu__icon new-inventory'></div>
-                            New inventory
-                        </Link>
-                        <Link to='inventory' className='common-tasks-menu__item cursor-pointer'>
-                            <div className='common-tasks-menu__icon browser-all-inventory'></div>
-                            Browse <br /> all inventory
-                        </Link>
-                        {isSalesPerson || (
+                        {salesPermissions.canShowDeals() && (
                             <>
                                 <Link
                                     to='deals/create'

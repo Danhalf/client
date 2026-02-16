@@ -17,6 +17,8 @@ import { InventoryForm } from "dashboard/inventory/form";
 import { SignIn } from "sign/sign-in";
 import { TwoFactorAuth } from "sign/two-factor-auth";
 import ProtectedRoute from "http/routes/ProtectedRoute";
+import { InventoryProtectedRoute } from "http/routes/InventoryProtectedRoute";
+import { ContactsProtectedRoute } from "http/routes/ContactsProtectedRoute";
 import { GeneralSettings } from "dashboard/profile/generalSettings";
 import { Reports } from "dashboard/reports";
 import { ExportToWeb } from "dashboard/export-web";
@@ -79,22 +81,66 @@ const AppRouter = (): ReactElement => {
                                 </ProtectedRoute>
                             ),
                             children: [
-                                { path: "", element: <Inventory /> },
-                                { path: "create", element: <InventoryForm /> },
-                                { path: ":id", element: <InventoryForm /> },
+                                {
+                                    path: "",
+                                    element: (
+                                        <InventoryProtectedRoute>
+                                            <Inventory />
+                                        </InventoryProtectedRoute>
+                                    ),
+                                },
+                                {
+                                    path: "create",
+                                    element: (
+                                        <InventoryProtectedRoute requireCreate>
+                                            <InventoryForm />
+                                        </InventoryProtectedRoute>
+                                    ),
+                                },
+                                {
+                                    path: ":id",
+                                    element: (
+                                        <InventoryProtectedRoute requireEdit>
+                                            <InventoryForm />
+                                        </InventoryProtectedRoute>
+                                    ),
+                                },
                             ],
                         },
                         {
                             path: "contacts",
                             element: (
                                 <ProtectedRoute notAllowed={["salesPerson"]}>
-                                    <Outlet />
+                                    <ContactsProtectedRoute>
+                                        <Outlet />
+                                    </ContactsProtectedRoute>
                                 </ProtectedRoute>
                             ),
                             children: [
-                                { path: "", element: <Contacts /> },
-                                { path: "create", element: <ContactForm /> },
-                                { path: ":id", element: <ContactForm /> },
+                                {
+                                    path: "",
+                                    element: (
+                                        <ContactsProtectedRoute>
+                                            <Contacts />
+                                        </ContactsProtectedRoute>
+                                    ),
+                                },
+                                {
+                                    path: "create",
+                                    element: (
+                                        <ContactsProtectedRoute requireCreate>
+                                            <ContactForm />
+                                        </ContactsProtectedRoute>
+                                    ),
+                                },
+                                {
+                                    path: ":id",
+                                    element: (
+                                        <ContactsProtectedRoute requireEdit>
+                                            <ContactForm />
+                                        </ContactsProtectedRoute>
+                                    ),
+                                },
                             ],
                         },
                         {

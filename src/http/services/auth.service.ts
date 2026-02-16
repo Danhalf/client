@@ -42,17 +42,15 @@ export const auth = async ({
     });
 };
 
-export const logout = async (useruid: string) => {
+export const logout = async (useruid: string, token: string) => {
     return new ApiRequest().post({
         url: `user/${useruid}/logout`,
+        config: {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        },
         defaultError: "Logout failed",
-    });
-};
-
-export const checkToken = async (token: string) => {
-    return new ApiRequest().get({
-        url: `sites/${token}/checktoken`,
-        defaultError: "Token validation failed",
     });
 };
 

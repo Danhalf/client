@@ -70,19 +70,26 @@ export interface UserData extends BaseResponseError {
     created: string;
     email1: string;
     email2: string;
+    email: string;
+    enabled: 0 | 1;
+    dealer_id: string;
     firstName: string;
     index: number;
     middleName: string;
     lastName: string;
     locations: any;
     loginName: string;
+    loginname: string;
+    loginpassword: string;
     messager1: string;
     messager2: string;
     parentuid: string;
     phone1: string;
     phone2: string;
+    phone: string;
     rolename: string;
     roleuid: string;
+    salespersonLicense: string;
     state: string;
     streetAddress: string;
     updated: string;
@@ -110,4 +117,29 @@ export interface UserRole {
 export interface UserRolePayload {
     rolename: string;
     permissions: Record<PermissionKey, 0 | 1>;
+}
+
+export interface CheckPasswordResponse extends BaseResponseError {
+    valid: boolean;
+    message: string;
+}
+
+export interface SalespersonInfo extends BaseResponseError {
+    Commission: number;
+    CommissionType: number;
+    VehicleProfit: number;
+    OverallIncome: number;
+    Acquisition: number;
+    Reserve: number;
+    FinanceIncome: number;
+    MiscCost: number;
+    MiscProfit: number;
+    AccessoryProfit: number;
+    GPUProfit: number;
+    CreditLifeProfit: number;
+    GAPProfit: number;
+    DPProfit: number;
+    VehiclePack: number;
+    Devices: number;
+    InterestRate: number;
 }

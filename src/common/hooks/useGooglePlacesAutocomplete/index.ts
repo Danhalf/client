@@ -1,5 +1,12 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
-import { useMapsLibrary, useApiIsLoaded } from "@vis.gl/react-google-maps";
+import {
+    useMapsLibrary,
+    useApiIsLoaded,
+    useApiLoadingStatus,
+    APILoadingStatus,
+} from "@vis.gl/react-google-maps";
+
+const MIN_QUERY_LENGTH = 3;
 
 export interface AddressSuggestion {
     description: string;
@@ -24,23 +31,24 @@ export const useGooglePlacesAutocomplete = () => {
     const places = useMapsLibrary("places");
     const autocompleteSuggestionAvailableRef = useRef<boolean>(false);
     const newApiFailedRef = useRef<boolean>(false);
+    const apiLoadingStatus: APILoadingStatus = useApiLoadingStatus();
 
     useEffect(() => {
-        if (
-            typeof window !== "undefined" &&
-            window.google &&
-            window.google.maps &&
-            window.google.maps.importLibrary
-        ) {
-            window.google.maps
-                .importLibrary("places")
-                .then((placesLibrary: any) => {
-                    if (placesLibrary.AutocompleteSuggestion) {
-                        autocompleteSuggestionAvailableRef.current = true;
-                    }
-                })
-                .catch(() => {});
-        }
+        const loadPlacesLibrary = async () => {
+            if (
+                typeof window !== "undefined" &&
+                window.google &&
+                window.google.maps &&
+                window.google.maps.importLibrary
+            ) {
+                const placesLibrary: any = await window.google.maps.importLibrary("places");
+                if (placesLibrary.AutocompleteSuggestion) {
+                    autocompleteSuggestionAvailableRef.current = true;
+                }
+            }
+        };
+
+        loadPlacesLibrary();
     }, [isApiLoaded]);
 
     const isReady = useMemo(() => {
@@ -58,9 +66,17 @@ export const useGooglePlacesAutocomplete = () => {
     const completeMethod = useCallback(async (event: { query: string }) => {
         const query = event.query?.trim() || "";
 
-        if (query.length < 3) {
+        if (query.length < MIN_QUERY_LENGTH) {
             setSuggestions([]);
             return;
+        }
+
+        if (
+            apiLoadingStatus === APILoadingStatus.LOADING ||
+            apiLoadingStatus === APILoadingStatus.NOT_LOADED ||
+            apiLoadingStatus === APILoadingStatus.AUTH_FAILURE
+        ) {
+            console.warn(`Google Maps API status: ${apiLoadingStatus}`);
         }
 
         const shouldTryNewAPI =
@@ -84,6 +100,7 @@ export const useGooglePlacesAutocomplete = () => {
                     input: query,
                     includedRegionCodes: ["us"],
                     includedPrimaryTypes: ["street_address"],
+                    languageCode: "en",
                 };
 
                 const response = await AutocompleteSuggestion.fetchAutocompleteSuggestions(request);
@@ -150,6 +167,7 @@ export const useGooglePlacesAutocomplete = () => {
                         input: query,
                         types: ["address"],
                         componentRestrictions: { country: "us" },
+                        language: "en",
                     },
                     (predictions, status) => {
                         if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
@@ -195,6 +213,7 @@ export const useGooglePlacesAutocomplete = () => {
                     {
                         placeId: placeId,
                         fields: ["address_components", "formatted_address"],
+                        language: "en",
                     },
                     (place, status) => {
                         if (status === google.maps.places.PlacesServiceStatus.OK && place) {

@@ -1,4 +1,4 @@
-.sales-person-information__tabs .p-tabview-nav {
+.additional-settings__tabs .p-tabview-nav {
     flex-direction: row;
     flex: 0 0;
     width: auto;
@@ -11,18 +11,18 @@
     margin-bottom: 10px;
 }
 
-.sales-person-information__tabs .p-tabview-panels {
+.additional-settings__tabs .p-tabview-panels {
     flex: 1;
     padding: 0;
 }
 
-.sales-person-information__tabs .p-tabview-nav-container a.p-tabview-nav-link {
+.additional-settings__tabs .p-tabview-nav-container a.p-tabview-nav-link {
     color: var(--admss-app-primary);
     font-weight: 700;
     border: none;
 }
 
-.sales-person-information__tabs
+.additional-settings__tabs
     .p-tabview-nav-container
     a.p-tabview-nav-link[aria-selected="true"] {
     color: var(--admss-app-main-blue);
