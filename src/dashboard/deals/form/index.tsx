@@ -216,15 +216,15 @@ export const DealsForm = observer(() => {
     } = store;
 
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
-    const [printActiveIndex, setPrintActiveIndex] = useState<number>(0);
+    const [printActiveIndex, setPrintActiveIndex] = useState<number>(-1);
     const stepsRef = useRef<HTMLDivElement>(null);
+    const accordionStepsRef = useRef<number[]>([0]);
     const navigate = useNavigate();
     const [dealsSections, setDealsSections] = useState<DealsSection[]>([]);
-    const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const formikRef = useRef<FormikProps<Partial<Deal> & Partial<DealExtData>>>(null);
     const [errorSections, setErrorSections] = useState<string[]>([]);
-    const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
+    const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(-1);
     const [isDeleteConfirm, setIsDeleteConfirm] = useState<boolean>(false);
     const [confirmDeleteVisible, setConfirmDeleteVisible] = useState<boolean>(false);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
@@ -235,21 +235,6 @@ export const DealsForm = observer(() => {
         onConfirmExit: () => navigate(DEALS_PAGE.MAIN),
         className: "deal-confirm-dialog",
     });
-
-    useEffect(() => {
-        accordionSteps.forEach((step, index) => {
-            if (stepActiveIndex >= step) store.accordionActiveIndex = [index];
-        });
-        if (stepsRef.current) {
-            const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
-            if (activeStep) {
-                activeStep.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
-            }
-        }
-    }, [stepActiveIndex, stepsRef.current]);
 
     useEffect(() => {
         if (stepActiveIndex === printActiveIndex && id) {
@@ -306,35 +291,56 @@ export const DealsForm = observer(() => {
 
         const sections = dealsSections.map((sectionData) => new DealsSection(sectionData));
         setDealsSections(sections);
-        setAccordionSteps(sections.map((item) => item.startIndex));
+        const newAccordionSteps = sections.map((item) => item.startIndex);
+        accordionStepsRef.current = newAccordionSteps;
         const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
         setItemsMenuCount(itemsMenuCount);
 
+        const canPrint = dealPermissions.canPrintForms();
+        const canDelete = dealPermissions.canDelete();
+
         let currentIndex = itemsMenuCount + 1;
-        if (id && dealPermissions.canPrintForms()) {
+        if (id && canPrint) {
             setPrintActiveIndex(currentIndex);
             currentIndex++;
         }
-        if (id && dealPermissions.canDelete()) {
+        if (id && canDelete) {
             setDeleteActiveIndex(currentIndex);
         }
 
         return () => {
             sections.forEach((section) => section.clearCount());
         };
-    }, [dealType, id, dealPermissions]);
+    }, [dealType, id]);
 
     useEffect(() => {
         if (stepActiveIndex === printActiveIndex) {
             store.accordionActiveIndex = [];
         } else {
-            accordionSteps.forEach((step, index) => {
+            let activeIndex = 0;
+            accordionStepsRef.current.forEach((step, index) => {
                 if (stepActiveIndex >= step) {
-                    store.accordionActiveIndex = [index];
+                    activeIndex = index;
                 }
             });
+            if (
+                !Array.isArray(store.accordionActiveIndex) ||
+                !store.accordionActiveIndex.includes(activeIndex)
+            ) {
+                store.accordionActiveIndex = [activeIndex];
+            }
         }
-    }, [stepActiveIndex, printActiveIndex, accordionSteps]);
+
+        if (stepsRef.current) {
+            const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
+            if (activeStep) {
+                activeStep.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+            }
+        }
+    }, [stepActiveIndex, printActiveIndex]);
 
     const handleActivePrintForms = () => {
         navigate(getUrl(printActiveIndex));
@@ -449,7 +455,12 @@ export const DealsForm = observer(() => {
                                     <Accordion
                                         activeIndex={accordionActiveIndex}
                                         onTabChange={(e) => {
-                                            store.accordionActiveIndex = e.index;
+                                            const newIndex = Array.isArray(e.index)
+                                                ? e.index
+                                                : [e.index];
+                                            if (newIndex.length > 0) {
+                                                store.accordionActiveIndex = e.index;
+                                            }
                                         }}
                                         className='deal__accordion'
                                         multiple
