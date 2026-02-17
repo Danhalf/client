@@ -76,9 +76,11 @@ export const EditAccessDialog = ({
     onHide,
     reportuid,
 }: EditAccessDialogProps): ReactElement => {
-    const userStore = useStore().userStore;
+    const store = useStore();
+    const userStore = store.userStore;
+    const reportStore = store.reportStore;
     const { authUser } = userStore;
-    const { showError, showSuccess, showWarning } = useToastMessage();
+    const { showError, showSuccess } = useToastMessage();
     const [accessList, setAccessList] = useState<ReportAccess[]>([]);
     const [selectedRole, setSelectedRole] = useState<(ROLE | ACCESS)[]>([]);
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -104,6 +106,15 @@ export const EditAccessDialog = ({
             }
         });
     };
+
+    useEffect(() => {
+        const isNewReport = !reportuid || reportuid === "0";
+
+        if (isNewReport && reportStore.reportACL.length > 0) {
+            setAccessList(reportStore.reportACL);
+            setIsButtonDisabled(false);
+        }
+    }, []);
 
     useEffect(() => {
         let qry: string = search;
@@ -240,7 +251,8 @@ export const EditAccessDialog = ({
         const isNewReport = !reportuid || reportuid === "0";
 
         if (isNewReport) {
-            showWarning("Please save the report first before setting access permissions.");
+            reportStore.reportACL = accessList;
+            reportStore.isReportChanged = true;
             onHide();
             return;
         }
