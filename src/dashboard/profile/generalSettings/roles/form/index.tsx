@@ -72,6 +72,19 @@ export const UsersRolesForm = observer((): ReactElement => {
     } = usersStore;
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const formikRef = useRef<FormikProps<RoleFormValues>>(null);
+    const initialRolenameRef = useRef<string>("");
+    const initialRoleIdRef = useRef<string>("");
+
+    useEffect(() => {
+        if (!id || id === CREATE_ID) return;
+        if (currentRole?.roleuid !== id) {
+            initialRoleIdRef.current = "";
+            return;
+        }
+        if (initialRoleIdRef.current === id) return;
+        initialRolenameRef.current = currentRole?.rolename ?? "";
+        initialRoleIdRef.current = id;
+    }, [id, currentRole?.roleuid, currentRole?.rolename]);
 
     const debouncedCheckRoleName = useMemo(
         () =>
@@ -81,7 +94,7 @@ export const UsersRolesForm = observer((): ReactElement => {
                     resolve(true);
                     return;
                 }
-                if (id !== CREATE_ID && trimmed === (currentRole?.rolename || "")) {
+                if (id !== CREATE_ID && trimmed === initialRolenameRef.current) {
                     resolve(true);
                     return;
                 }
@@ -97,7 +110,7 @@ export const UsersRolesForm = observer((): ReactElement => {
                     resolve(true);
                 }
             }, DEBOUNCE_TIME),
-        [authUser?.useruid, id, currentRole?.rolename, currentRole?.roleuid]
+        [authUser?.useruid, id, currentRole?.roleuid]
     );
 
     const roleFormSchema = useMemo(
@@ -219,7 +232,11 @@ export const UsersRolesForm = observer((): ReactElement => {
                                                             ? "p-invalid"
                                                             : ""
                                                     }`}
-                                                    errorMessage={ERROR_MESSAGES.ROLE_NAME_INPUT}
+                                                    errorMessage={
+                                                        errors.rolename
+                                                            ? ERROR_MESSAGES.ROLE_NAME_INPUT
+                                                            : undefined
+                                                    }
                                                 />
                                             </div>
                                             <label className='role-main__select-all'>
