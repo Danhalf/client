@@ -192,16 +192,12 @@ export const ReportColumnSelect = observer((): ReactElement => {
                         <div className='data-set__control'>
                             <ComboBox
                                 className='data-set__dropdown'
+                                panelClassName='capitalize'
                                 options={availableDatasets}
                                 value={dataSet}
                                 emptyMessage='-'
                                 disabled={!!report.isdefault}
                                 onChange={(e) => setDataSet(e.value)}
-                                pt={{
-                                    wrapper: {
-                                        className: "capitalize",
-                                    },
-                                }}
                                 label='Data Set'
                             />
                         </div>
