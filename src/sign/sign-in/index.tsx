@@ -1,4 +1,4 @@
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { PasswordInput } from "dashboard/common/form/inputs/password";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
@@ -8,7 +8,7 @@ import "../index.css";
 import { auth, check2FA } from "http/services/auth.service";
 import { useEffect } from "react";
 import { APP_TYPE, APP_VERSION, createApiDashboardInstance } from "http/index";
-import { BaseResponseError, Status } from "common/models/base-response";
+import { Status } from "common/models/base-response";
 import { useStore } from "store/hooks";
 import { TwoFactorAuthStep } from "store/stores/user";
 import { useToastMessage } from "common/hooks";
@@ -23,6 +23,7 @@ import {
     TwoFactorCheckResponse,
 } from "common/models/user";
 import { observer } from "mobx-react-lite";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 export interface LoginForm {
     username: string;
@@ -121,11 +122,11 @@ export const SignIn = observer(() => {
             let errors: any = {};
 
             if (!data.username.trim()) {
-                errors.username = "Username is required.";
+                errors.username = ERROR_MESSAGES.USERNAME_REQUIRED;
             }
 
             if (!data.password.trim()) {
-                errors.password = "Password is required.";
+                errors.password = ERROR_MESSAGES.PASSWORD_REQUIRED;
             }
 
             return errors;
@@ -134,7 +135,12 @@ export const SignIn = observer(() => {
             try {
                 const response = await auth(formik.values);
                 if (!response) {
-                    showError("Authentication failed");
+                    formik.setTouched({ username: true, password: true }, false);
+                    formik.setErrors({
+                        username: ERROR_MESSAGES.INCORRECT_USERNAME,
+                        password: ERROR_MESSAGES.INCORRECT_PASSWORD,
+                    });
+                    showError(ERROR_MESSAGES.AUTHENTICATION_FAILED);
                     return;
                 }
                 if (response.status === Status.OK && "token" in response && response.token) {
@@ -172,9 +178,23 @@ export const SignIn = observer(() => {
                     navigate("/2fa", { state: formik.values });
                     return;
                 }
-                showError((response as BaseResponseError)?.error || String(response));
+                const serverError =
+                    typeof response === "object" && response !== null && "error" in response
+                        ? (response as { error?: string }).error
+                        : String(response);
+                formik.setTouched({ username: true, password: true }, false);
+                formik.setErrors({
+                    username: ERROR_MESSAGES.INCORRECT_USERNAME,
+                    password: ERROR_MESSAGES.INCORRECT_PASSWORD,
+                });
+                showError(serverError || ERROR_MESSAGES.AUTHENTICATION_FAILED);
             } catch (error) {
-                const errorMessage = "An unexpected error occurred during login";
+                formik.setTouched({ username: true, password: true }, false);
+                formik.setErrors({
+                    username: ERROR_MESSAGES.INCORRECT_USERNAME,
+                    password: ERROR_MESSAGES.INCORRECT_PASSWORD,
+                });
+                const errorMessage = ERROR_MESSAGES.UNEXPECTED_ERROR;
                 showError(error instanceof Error ? error.message : errorMessage);
             }
         },
@@ -198,25 +218,20 @@ export const SignIn = observer(() => {
                         <div className='sign-in__input space pt-2 pb-2'>
                             <span className='w-full p-float-label p-input-icon-right'>
                                 <i className='adms-username-my-profile sign__icon' />
-                                <InputText
+                                <TextInput
+                                    name='username'
+                                    label='Username'
                                     placeholder='Username'
-                                    className={`sign__input ${
-                                        formik.touched.username && formik.errors.username
-                                            ? "p-invalid"
-                                            : ""
-                                    }`}
-                                    id='username'
+                                    className='sign__input'
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     value={formik.values.username}
+                                    error={Boolean(
+                                        formik.touched.username && formik.errors.username
+                                    )}
+                                    errorMessage={formik.errors.username}
                                 />
-                                <label htmlFor='username'>Username</label>
                             </span>
-                            {formik.touched.username && formik.errors.username ? (
-                                <small className='p-error error-space'>
-                                    {formik.errors.username}
-                                </small>
-                            ) : null}
                         </div>
 
                         <div className='sign-in__input space pt-2 pb-2'>

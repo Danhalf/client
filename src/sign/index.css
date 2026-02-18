@@ -34,39 +34,8 @@
     font-size: 1.1rem;
 }
 
-.sign__input {
-    width: 100%;
-    border-color: var(--admss-app-light-grey);
-    color: var(--admss-app-primary);
-}
-
-.sign-in__password {
-    position: relative;
-}
-
-.sign-in__password .sign__icon {
-    position: absolute;
-    right: 0.75em;
-    display: inline-flex;
-    align-items: center;
-}
-
-.sign-in__password .sign__icon.adms-show,
-.sign-in__password .sign__icon.adms-hide {
-    cursor: pointer;
-}
-
-.sign-in__password {
-    display: flex;
-    align-items: center;
-}
-
 .sign-in__input.space {
     margin-bottom: 1rem;
-}
-
-.sign__icon {
-    color: var(--admss-app-light-grey) !important;
 }
 
 .sign-controls {
@@ -113,15 +82,4 @@
     .sign-in {
         width: 545px;
     }
-}
-.sign-in__input {
-    position: relative;
-}
-
-.sign-in__input small {
-    position: absolute;
-    bottom: -1rem; 
-    left: 0;
-    font-size: 0.75rem;
-    color: #dc3545; 
 }
