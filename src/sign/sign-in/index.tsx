@@ -1,13 +1,14 @@
 import { InputText } from "primereact/inputtext";
+import { PasswordInput } from "dashboard/common/form/inputs/password";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Link, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import "../index.css";
 import { auth, check2FA } from "http/services/auth.service";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { APP_TYPE, APP_VERSION, createApiDashboardInstance } from "http/index";
-import { Status } from "common/models/base-response";
+import { BaseResponseError, Status } from "common/models/base-response";
 import { useStore } from "store/hooks";
 import { TwoFactorAuthStep } from "store/stores/user";
 import { useToastMessage } from "common/hooks";
@@ -16,7 +17,11 @@ import { LS_LAST_ROUTE, LastRouteData, LS_APP_USER } from "common/constants/loca
 import { ROUTE_RESTORE_TIMEOUT_HOURS } from "common/settings";
 import { convertTimeToMilliseconds } from "common/helpers";
 import { getKeyValue } from "services/local-storage.service";
-import { TwoFactorCheckResponse } from "common/models/user";
+import {
+    getTfaSessionUid,
+    isAuthResponseTfaRequired,
+    TwoFactorCheckResponse,
+} from "common/models/user";
 import { observer } from "mobx-react-lite";
 
 export interface LoginForm {
@@ -75,7 +80,6 @@ export const SignIn = observer(() => {
     const navigate = useNavigate();
     const userStore = useStore().userStore;
     const { showError } = useToastMessage();
-    const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
     useEffect(() => {
         const storedUser = getKeyValue(LS_APP_USER);
@@ -128,35 +132,12 @@ export const SignIn = observer(() => {
         },
         onSubmit: async () => {
             try {
-                const checkResponse = (await check2FA({
-                    user: formik.values.username,
-                    deviceuid: userStore.deviceUID,
-                })) as TwoFactorCheckResponse;
-
-                if (
-                    checkResponse &&
-                    ("required" in checkResponse || "tfa_required" in checkResponse) &&
-                    (checkResponse.required || checkResponse.tfa_required)
-                ) {
-                    userStore.twoFactorAuth.reset();
-                    userStore.twoFactorAuth.currentStep = TwoFactorAuthStep.INTRODUCTION;
-                    if (checkResponse.tfa_method) {
-                        userStore.twoFactorAuth.selectedMethod = checkResponse.tfa_method;
-                    }
-                    navigate("/2fa", { state: formik.values });
-                    return;
-                }
-
                 const response = await auth(formik.values);
                 if (!response) {
                     showError("Authentication failed");
                     return;
                 }
-                if (response.status === Status.OK && "token" in response) {
-                    if (!response.token) {
-                        await Promise.reject(new Error("Invalid credentials"));
-                        return;
-                    }
+                if (response.status === Status.OK && "token" in response && response.token) {
                     try {
                         userStore.storedUser = response;
                         createApiDashboardInstance(navigate);
@@ -172,9 +153,26 @@ export const SignIn = observer(() => {
                         showError(String(error));
                         return;
                     }
-                } else {
-                    showError(response?.error || String(response));
+                    return;
                 }
+                if (isAuthResponseTfaRequired(response)) {
+                    const checkResponse = (await check2FA({
+                        user: formik.values.username,
+                        deviceuid: userStore.deviceUID,
+                    })) as TwoFactorCheckResponse;
+                    userStore.twoFactorAuth.reset();
+                    const sessionUid = getTfaSessionUid(response);
+                    if (sessionUid) {
+                        userStore.twoFactorAuth.twoFactorSessionUID = sessionUid;
+                    }
+                    userStore.twoFactorAuth.currentStep = TwoFactorAuthStep.INTRODUCTION;
+                    if (checkResponse?.tfa_method) {
+                        userStore.twoFactorAuth.selectedMethod = checkResponse.tfa_method;
+                    }
+                    navigate("/2fa", { state: formik.values });
+                    return;
+                }
+                showError((response as BaseResponseError)?.error || String(response));
             } catch (error) {
                 const errorMessage = "An unexpected error occurred during login";
                 showError(error instanceof Error ? error.message : errorMessage);
@@ -222,33 +220,16 @@ export const SignIn = observer(() => {
                         </div>
 
                         <div className='sign-in__input space pt-2 pb-2'>
-                            <span className='w-full p-float-label sign-in__password'>
-                                <i
-                                    className={`icon ${
-                                        formik.values.password
-                                            ? passwordVisible
-                                                ? "icon adms-hide"
-                                                : "icon adms-show"
-                                            : "icon adms-password"
-                                    } sign__icon`}
-                                    onClick={() => setPasswordVisible((prev) => !prev)}
-                                />
-
-                                <InputText
-                                    placeholder='Password'
-                                    className={`sign__input ${formik.touched.password && formik.errors.password ? "p-invalid" : ""}`}
-                                    id='password'
-                                    type={!passwordVisible ? "password" : "text"}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    value={formik.values.password}
-                                />
-
-                                <label htmlFor='password'>Password</label>
-                            </span>
-                            {formik.touched.password && formik.errors.password ? (
-                                <small className='p-error'>{formik.errors.password}</small>
-                            ) : null}
+                            <PasswordInput
+                                label='Password'
+                                password={formik.values.password}
+                                setPassword={(value) => formik.setFieldValue("password", value)}
+                                onBlur={formik.handleBlur("password")}
+                                feedback={false}
+                                skipValidation={true}
+                                error={Boolean(formik.touched.password && formik.errors.password)}
+                                errorMessage={formik.errors.password}
+                            />
                         </div>
 
                         <div className='flex justify-content-between user-help'>
