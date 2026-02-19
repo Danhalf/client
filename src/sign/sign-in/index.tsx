@@ -215,7 +215,7 @@ export const SignIn = observer(() => {
                 <div className='sign-in-wrapper'>
                     <h1 className='sign__title'>Sign In</h1>
                     <form onSubmit={formik.handleSubmit}>
-                        <div className='sign-in__input space pt-2 pb-2'>
+                        <div className='sign-in__input space pt-2 pb-1'>
                             <span className='w-full p-float-label p-input-icon-right'>
                                 <i className='adms-username-my-profile sign__icon' />
                                 <TextInput
@@ -234,7 +234,7 @@ export const SignIn = observer(() => {
                             </span>
                         </div>
 
-                        <div className='sign-in__input space pt-2 pb-2'>
+                        <div className='sign-in__input space pt-2'>
                             <PasswordInput
                                 label='Password'
                                 password={formik.values.password}
@@ -267,9 +267,14 @@ export const SignIn = observer(() => {
                         <div className='text-center'>
                             <Button
                                 label='Sign in'
-                                severity='success'
+                                severity={
+                                    !!(formik.errors.username || formik.errors.password)
+                                        ? "secondary"
+                                        : "success"
+                                }
                                 type='submit'
                                 className='sign__button font-bold'
+                                disabled={!!(formik.errors.username || formik.errors.password)}
                             />
                         </div>
                     </form>

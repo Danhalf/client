@@ -563,6 +563,7 @@ export const TextInput = ({
             <InputText
                 ref={ref}
                 id={uniqueId}
+                name={name}
                 className={inputClassName}
                 style={{ height: `${props.height || 50}px` }}
                 tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
