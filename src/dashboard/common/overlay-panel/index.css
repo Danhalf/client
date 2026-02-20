@@ -1,26 +1,6 @@
 .info-panel {
     position: relative;
 }
-.info-panel__button {
-    border-radius: 50%;
-    border: none;
-    background: var(--admss-app-medium-blue);
-    width: 38px;
-    height: 38px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    .icon {
-        color: var(--admss-app-medium-blue);
-        transition: all 0.4s ease-in-out;
-    }
-}
-
-.info-panel__button--pulse {
-    width: 42px;
-    height: 42px;
-    animation: pulse 3s infinite;
-}
 
 @keyframes pulse {
     0% {
@@ -56,6 +36,12 @@
     align-items: center;
     transition: background-color 0.4s;
     cursor: pointer;
+    animation: pulse 3s infinite;
+    border: none;
+    .icon {
+        color: var(--admss-app-medium-blue);
+        transition: all 0.4s ease-in-out;
+    }
 }
 
 .info-panel__button.p-button:hover,
@@ -70,6 +56,8 @@
     color: #fff;
     line-height: 1;
     font-size: 16px;
+    padding-top: 2px;
+    padding-left: 2px;
 }
 
 .info-panel__icon-wrapper:hover {
