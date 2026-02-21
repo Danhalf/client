@@ -36,17 +36,22 @@
     align-items: center;
     transition: background-color 0.4s;
     cursor: pointer;
-    animation: pulse 3s infinite;
     border: none;
+    &:enabled:focus {
+        box-shadow: none;
+    }
     .icon {
         color: var(--admss-app-medium-blue);
         transition: all 0.4s ease-in-out;
     }
 }
 
+.info-panel__button--pulse {
+    animation: pulse 3s infinite;
+}
+
 .info-panel__button.p-button:hover,
-.info-panel__button.p-button:active,
-.info-panel__button.p-button:focus {
+.info-panel__button.p-button:active {
     box-shadow: none;
     border: none;
     background-color: var(--admss-app-main-blue);
