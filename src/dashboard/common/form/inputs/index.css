@@ -241,6 +241,16 @@
     border-radius: 5px 0 0 5px;
 }
 
+.search-input__wrapper.p-float-label:has(.p-inputwrapper-filled) .search-input__label,
+.search-input__wrapper.p-float-label:has(.p-inputwrapper-focus) .search-input__label {
+    top: 0;
+    left: 4px;
+    color: var(--admss-app-medium-grey);
+    margin-top: -16px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
 .search-input__icon {
     height: 100%;
     padding-top: 4px;
