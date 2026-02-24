@@ -190,10 +190,10 @@ export const DealGeneralSale = observer((): ReactElement => {
                         store.dealType = e.value;
                         changeDeal({ key: "dealtype", value: e.value });
                     }}
-                    className={`w-full deal-sale__dropdown ${errors.dealtype && "p-invalid"}`}
+                    className='w-full deal-sale__dropdown'
+                    error={!!errors.dealtype}
+                    errorMessage={errors.dealtype as string}
                 />
-
-                <small className='p-error'>{errors.dealtype}</small>
             </div>
             <div className='col-3 relative'>
                 <ComboBox
@@ -207,10 +207,11 @@ export const DealGeneralSale = observer((): ReactElement => {
                     }}
                     options={dealStatusesList}
                     required
-                    className={`w-full deal-sale__dropdown ${errors.dealstatus && "p-invalid"}`}
+                    className='w-full deal-sale__dropdown'
                     label='Sale status (required)'
+                    error={!!errors.dealstatus}
+                    errorMessage={errors.dealstatus as string}
                 />
-                <small className='p-error'>{errors.dealstatus}</small>
             </div>
             <div className='col-3 relative'>
                 <ComboBox
@@ -225,9 +226,10 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDeal({ key: "saletype", value: e.value });
                     }}
                     label='Sale type (required)'
-                    className={`w-full deal-sale__dropdown ${errors.saletype && "p-invalid"}`}
+                    className='w-full deal-sale__dropdown'
+                    error={!!errors.saletype}
+                    errorMessage={errors.saletype as string}
                 />
-                <small className='p-error'>{errors.saletype}</small>
             </div>
             <div className='col-3 relative'>
                 <DateInput
@@ -271,10 +273,11 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDeal({ key: "inventorystatus", value: e.value });
                     }}
                     required
-                    className={`w-full deal-sale__dropdown ${errors.inventorystatus && "p-invalid"}`}
+                    className='w-full deal-sale__dropdown'
                     label='New or Used (req.)'
+                    error={!!errors.inventorystatus}
+                    errorMessage={errors.inventorystatus as string}
                 />
-                <small className='p-error'>{errors.inventorystatus}</small>
             </div>
 
             <div className='col-12 text-line'>
@@ -322,10 +325,11 @@ export const DealGeneralSale = observer((): ReactElement => {
                         changeDealExtData({ key: "HowFoundOut", value: e.value });
                     }}
                     editable
-                    className={`w-full deal-sale__dropdown ${errors.HowFoundOut && "p-invalid"}`}
+                    className='w-full deal-sale__dropdown'
                     label='How did you hear about us? (required)'
+                    error={!!errors.HowFoundOut}
+                    errorMessage={errors.HowFoundOut as string}
                 />
-                <small className='p-error'>{errors.HowFoundOut}</small>
             </div>
             <div className='col-3 relative'>
                 <TextInput

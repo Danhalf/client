@@ -273,13 +273,11 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     editable
                     valueTemplate={selectedAutoMakesTemplate}
                     itemTemplate={autoMakesOptionTemplate}
-                    className={`deal-trade__dropdown w-full ${
-                        errors.Trade2_Make ? "p-invalid" : ""
-                    }`}
+                    className='deal-trade__dropdown w-full'
                     label='Make (required)'
+                    error={!!errors.Trade2_Make}
+                    errorMessage={errors.Trade2_Make as string}
                 />
-
-                <small className='p-error'>{errors.Trade2_Make || ""}</small>
             </div>
 
             <div className='col-6 relative'>
@@ -290,10 +288,11 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                     editable
                     options={automakesModelList}
                     onChange={({ value }) => handleModelChange(value)}
-                    className={`deal-trade__dropdown w-full ${errors.Trade2_Model ? "p-invalid" : ""}`}
+                    className='deal-trade__dropdown w-full'
                     label='Model (required)'
+                    error={!!errors.Trade2_Model}
+                    errorMessage={errors.Trade2_Model as string}
                 />
-                <small className='p-error'>{errors.Trade2_Model}</small>
             </div>
             <div className='col-3 relative'>
                 <NumberInput

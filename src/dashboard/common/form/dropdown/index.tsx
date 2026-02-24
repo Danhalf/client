@@ -7,6 +7,8 @@ import { useId } from "react";
 interface CustomDropdownProps extends DropdownProps {
     filterThreshold?: number;
     label?: string;
+    error?: boolean;
+    errorMessage?: string;
 }
 
 export const ComboBox = ({
@@ -14,10 +16,13 @@ export const ComboBox = ({
     filter,
     filterThreshold = DEFAULT_FILTER_THRESHOLD,
     label,
+    error,
+    errorMessage,
     ...props
 }: CustomDropdownProps) => {
     const shouldEnableFilter = options && options.length > filterThreshold;
     const uniqueId = useId();
+    const showError = error || !!errorMessage;
 
     const dropdownListItem = (option: unknown) => {
         const optionLabel = props?.optionLabel;
@@ -35,7 +40,7 @@ export const ComboBox = ({
             {...props}
             id={props.id || uniqueId}
             showClear={!props.required && props.value}
-            className={`${props.className} combo-box`}
+            className={`${props.className} combo-box ${showError ? "p-invalid" : ""}`}
             options={options}
             filter={filter ?? shouldEnableFilter}
             itemTemplate={dropdownListItem}
@@ -47,14 +52,30 @@ export const ComboBox = ({
         />
     );
 
-    return label ? (
-        <span className='p-float-label'>
+    const content = label ? (
+        <span
+            className={`p-float-label combo-box__wrapper relative ${showError ? "p-invalid" : ""}`}
+        >
             {dropdown}
             <label htmlFor={uniqueId} className='float-label'>
                 {label}
             </label>
+            {showError && errorMessage && (
+                <div className='p-error'>
+                    <small>{errorMessage}</small>
+                </div>
+            )}
         </span>
     ) : (
-        dropdown
+        <span className={`combo-box__wrapper relative ${showError ? "p-invalid" : ""}`}>
+            {dropdown}
+            {showError && errorMessage && (
+                <div className='p-error'>
+                    <small>{errorMessage}</small>
+                </div>
+            )}
+        </span>
     );
+
+    return content;
 };

@@ -400,10 +400,11 @@ export const VehicleGeneral = observer((): ReactElement => {
                     required
                     className={`w-full vehicle-general__dropdown ${
                         inventory.locationuid === "" && "p-inputwrapper-filled"
-                    } ${errors.locationuid ? "p-invalid" : ""}`}
+                    }`}
                     label='Location name (required)'
+                    error={!!errors.locationuid}
+                    errorMessage={errors.locationuid}
                 />
-                <small className='p-error'>{errors.locationuid}</small>
             </div>
             <div className='col-3 relative'>
                 <ComboBox
@@ -415,12 +416,11 @@ export const VehicleGeneral = observer((): ReactElement => {
                     onChange={handleGroupClassChange}
                     onFocus={() => setIsGroupClassFocused(true)}
                     onBlur={() => setIsGroupClassFocused(false)}
-                    className={`w-full vehicle-general__dropdown ${
-                        errors.GroupClassName ? "p-invalid" : ""
-                    }`}
+                    className='w-full vehicle-general__dropdown'
                     label={`Inventory group (${!inventory.GroupClassName && !isGroupClassFocused ? "req." : "required"})`}
+                    error={!!errors.GroupClassName}
+                    errorMessage={errors.GroupClassName}
                 />
-                <small className='p-error'>{errors.GroupClassName}</small>
             </div>
 
             <div className='col-12'>
@@ -580,13 +580,12 @@ export const VehicleGeneral = observer((): ReactElement => {
                         setFieldValue("Model", model);
                         changeInventory({ key: "Model", value: model });
                     }}
-                    className={`vehicle-general__dropdown w-full ${
-                        errors.Model ? "p-invalid" : ""
-                    }`}
+                    className='vehicle-general__dropdown w-full'
                     itemTemplate={(option) => handleDeleteInventoryRecord(option, true)}
                     label='Model (required)'
+                    error={!!errors.Model}
+                    errorMessage={errors.Model}
                 />
-                <small className='p-error'>{errors.Model}</small>
             </div>
             <div className='col-3'>
                 <TextInput
