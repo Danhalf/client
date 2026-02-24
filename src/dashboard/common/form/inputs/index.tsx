@@ -5,7 +5,7 @@ import "./index.css";
 import { InputNumber, InputNumberProps, InputNumberValueChangeEvent } from "primereact/inputnumber";
 import { Checkbox, CheckboxChangeEvent, CheckboxProps } from "primereact/checkbox";
 import { Calendar, CalendarProps } from "primereact/calendar";
-import { Dropdown, DropdownProps } from "primereact/dropdown";
+import { DropdownProps } from "primereact/dropdown";
 import { InputText, InputTextProps } from "primereact/inputtext";
 import { STATES_LIST } from "common/constants/states";
 import { Button } from "primereact/button";
@@ -372,6 +372,8 @@ export const BorderedCheckbox = ({
 interface SearchInputProps extends DropdownProps {
     onInputChange?: (value: string) => void;
     onIconClick?: () => void;
+    error?: boolean;
+    errorMessage?: string;
 }
 
 export const SearchInput = ({
@@ -379,9 +381,12 @@ export const SearchInput = ({
     title,
     onInputChange,
     onIconClick,
+    error,
+    errorMessage,
     ...props
 }: SearchInputProps): ReactElement => {
     const dropdownRef: LegacyRef<any> = useRef(null);
+    const showError = error || !!errorMessage;
 
     const handleOnInputChange = ({ target }: any) => {
         const { value } = target as DropdownProps;
@@ -394,39 +399,49 @@ export const SearchInput = ({
     };
 
     return (
-        <div
-            key={props.name}
-            style={{
-                height,
-            }}
-            className='flex align-items-center search-input'
+        <span
+            className={`combo-box__wrapper relative ${showError ? "p-invalid" : ""}`}
+            style={{ display: "block" }}
         >
-            <span className='p-float-label search-input__wrapper'>
-                <Dropdown
-                    ref={dropdownRef}
-                    filter={props.options && props.options?.length > DEFAULT_FILTER_THRESHOLD}
-                    autoFocus={false}
-                    onInput={handleOnInputChange}
-                    optionLabel='name'
-                    editable
-                    placeholder={title}
-                    {...props}
-                    pt={{
-                        trigger: {
-                            className: "hidden",
-                        },
-                    }}
-                />
-                <label className='float-label search-input__label'>{title}</label>
-            </span>
-            <button
-                className='search-input__icon input-icon input-icon-right'
-                onClick={onIconClick}
-                type='button'
+            <div
+                key={props.name}
+                style={{
+                    height,
+                }}
+                className='flex align-items-center search-input'
             >
-                <i className='icon adms-table-search' />
-            </button>
-        </div>
+                <span className='p-float-label search-input__wrapper'>
+                    <ComboBox
+                        ref={dropdownRef}
+                        filter={props.options && props.options?.length > DEFAULT_FILTER_THRESHOLD}
+                        autoFocus={false}
+                        onInput={handleOnInputChange}
+                        optionLabel='name'
+                        editable
+                        placeholder={title}
+                        {...props}
+                        pt={{
+                            trigger: {
+                                className: "hidden",
+                            },
+                        }}
+                    />
+                    <label className='float-label search-input__label'>{title}</label>
+                </span>
+                <button
+                    className='search-input__icon input-icon input-icon-right'
+                    onClick={onIconClick}
+                    type='button'
+                >
+                    <i className='icon adms-table-search' />
+                </button>
+            </div>
+            {showError && errorMessage && (
+                <div className='p-error'>
+                    <small>{errorMessage}</small>
+                </div>
+            )}
+        </span>
     );
 };
 

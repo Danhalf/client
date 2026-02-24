@@ -25,6 +25,11 @@
     position: relative;
 }
 
+.p-float-label > .combo-box__wrapper {
+    display: block;
+    width: 100%;
+}
+
 .combo-box__wrapper .p-error {
     --line-height: 8px;
     position: absolute;

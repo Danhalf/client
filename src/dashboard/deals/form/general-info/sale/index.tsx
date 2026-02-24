@@ -154,27 +154,26 @@ export const DealGeneralSale = observer((): ReactElement => {
                     value={values?.contactinfo}
                     getFullInfo={handleGetCompanyInfo}
                     name='Buyer Name (required)'
-                    className={`${errors.contactinfo && "p-invalid"}`}
+                    className={errors.contactinfo ? "p-invalid" : ""}
+                    error={!!errors.contactinfo}
+                    errorMessage={errors.contactinfo as string}
                 />
-                <small className='p-error'>{errors.contactinfo}</small>
             </div>
             <div className='col-6 relative'>
-                <span className='p-float-label'>
-                    <InventorySearch
-                        {...getFieldProps("inventoryinfo")}
-                        className={`${errors.inventoryinfo && "p-invalid"}`}
-                        onChange={({ target: { value } }) => {
-                            setFieldValue("inventoryinfo", value);
-                            changeDeal({ key: "inventoryinfo", value });
-                        }}
-                        originalPath={currentPath}
-                        value={values?.inventoryinfo}
-                        getFullInfo={handleGetInventoryInfo}
-                        name='Vehicle (required)'
-                    />
-                    <label className='float-label'></label>
-                </span>
-                <small className='p-error'>{errors.inventoryinfo}</small>
+                <InventorySearch
+                    {...getFieldProps("inventoryinfo")}
+                    className={errors.inventoryinfo ? "p-invalid" : ""}
+                    onChange={({ target: { value } }) => {
+                        setFieldValue("inventoryinfo", value);
+                        changeDeal({ key: "inventoryinfo", value });
+                    }}
+                    originalPath={currentPath}
+                    value={values?.inventoryinfo}
+                    getFullInfo={handleGetInventoryInfo}
+                    name='Vehicle (required)'
+                    error={!!errors.inventoryinfo}
+                    errorMessage={errors.inventoryinfo as string}
+                />
             </div>
             <div className='col-6 relative'>
                 <ComboBox

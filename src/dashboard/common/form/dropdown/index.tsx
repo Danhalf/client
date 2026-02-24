@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
 import { Dropdown, DropdownProps } from "primereact/dropdown";
 import "./index.css";
@@ -11,15 +12,18 @@ interface CustomDropdownProps extends DropdownProps {
     errorMessage?: string;
 }
 
-export const ComboBox = ({
-    options,
-    filter,
-    filterThreshold = DEFAULT_FILTER_THRESHOLD,
-    label,
-    error,
-    errorMessage,
-    ...props
-}: CustomDropdownProps) => {
+export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function ComboBox(
+    {
+        options,
+        filter,
+        filterThreshold = DEFAULT_FILTER_THRESHOLD,
+        label,
+        error,
+        errorMessage,
+        ...props
+    },
+    ref
+) {
     const shouldEnableFilter = options && options.length > filterThreshold;
     const uniqueId = useId();
     const showError = error || !!errorMessage;
@@ -37,6 +41,7 @@ export const ComboBox = ({
 
     const dropdown = (
         <Dropdown
+            ref={ref}
             {...props}
             id={props.id || uniqueId}
             showClear={!props.required && props.value}
@@ -53,17 +58,17 @@ export const ComboBox = ({
     );
 
     const content = label ? (
-        <span
-            className={`p-float-label combo-box__wrapper relative ${showError ? "p-invalid" : ""}`}
-        >
+        <span className={`p-float-label ${showError ? "p-invalid" : ""}`}>
             {dropdown}
             <label htmlFor={uniqueId} className='float-label'>
                 {label}
             </label>
             {showError && errorMessage && (
-                <div className='p-error'>
-                    <small>{errorMessage}</small>
-                </div>
+                <span className='combo-box__wrapper relative'>
+                    <div className='p-error'>
+                        <small>{errorMessage}</small>
+                    </div>
+                </span>
             )}
         </span>
     ) : (
@@ -78,4 +83,4 @@ export const ComboBox = ({
     );
 
     return content;
-};
+});
