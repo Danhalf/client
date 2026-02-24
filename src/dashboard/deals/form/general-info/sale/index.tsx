@@ -233,30 +233,32 @@ export const DealGeneralSale = observer((): ReactElement => {
             <div className='col-3 relative'>
                 <DateInput
                     {...getFieldProps("dateeffective")}
-                    className={`${errors.dateeffective && "p-invalid"}`}
+                    className={errors.dateeffective ? "p-invalid" : ""}
                     name='Sale date (required)'
                     date={parseDateFromServer(values.dateeffective)}
                     emptyDate
+                    error={!!errors.dateeffective}
+                    errorMessage={errors.dateeffective as string}
                     onChange={({ value }) => {
                         setFieldValue("dateeffective", value);
                         changeDeal({ key: "dateeffective", value: Number(value) });
                     }}
                 />
-                <small className='p-error'>{errors.dateeffective}</small>
             </div>
             <div className='col-3 relative'>
                 <DateInput
                     {...getFieldProps("datepurchase")}
-                    className={`${errors.datepurchase && "p-invalid"}`}
+                    className={errors.datepurchase ? "p-invalid" : ""}
                     name='First operated (required)'
                     date={parseDateFromServer(values.datepurchase)}
                     emptyDate
+                    error={!!errors.datepurchase}
+                    errorMessage={errors.datepurchase as string}
                     onChange={({ value }) => {
                         setFieldValue("datepurchase", value);
                         changeDeal({ key: "datepurchase", value: Number(value) });
                     }}
                 />
-                <small className='p-error'>{errors.datepurchase}</small>
             </div>
             <div className='col-3 relative'>
                 <ComboBox

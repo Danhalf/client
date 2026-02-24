@@ -258,9 +258,9 @@ export const DealRetailTradeSecond = observer((): ReactElement => {
                         changeDealExtData({ key: "Trade2_VIN", value });
                     }}
                     onAction={handleVINchange}
-                    className={`${errors.Trade2_VIN ? "p-invalid" : ""}`}
+                    error={!!errors.Trade2_VIN}
+                    errorMessage={errors.Trade2_VIN as string}
                 />
-                <small className='p-error'>{errors.Trade2_VIN || ""}</small>
             </div>
             <div className='col-6 relative'>
                 <ComboBox

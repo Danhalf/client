@@ -21,16 +21,16 @@
     }
 }
 
-.combo-box__wrapper {
+.input-error-wrapper {
     position: relative;
 }
 
-.p-float-label > .combo-box__wrapper {
+.p-float-label > .input-error-wrapper {
     display: block;
     width: 100%;
 }
 
-.combo-box__wrapper .p-error {
+.input-error-wrapper .p-error {
     --line-height: 8px;
     position: absolute;
     display: inline-block;
@@ -40,11 +40,11 @@
     bottom: -6px;
 }
 
-.combo-box__wrapper .p-error small {
+.input-error-wrapper .p-error small {
     font-size: 12px;
 }
 
-.combo-box__wrapper .p-error::before {
+.input-error-wrapper .p-error::before {
     content: "";
     z-index: -1;
     position: absolute;
@@ -56,7 +56,7 @@
 }
 
 @media (max-width: 1780px) {
-    .combo-box__wrapper .p-error {
+    .input-error-wrapper .p-error {
         max-width: calc(100% - 20px);
     }
 }

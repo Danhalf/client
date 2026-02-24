@@ -129,6 +129,8 @@ interface StateDropdownProps extends DropdownProps {
 interface DateInputProps extends CalendarProps {
     checked?: boolean;
     onCheckboxChange?: (e: CheckboxChangeEvent) => void;
+    error?: boolean;
+    errorMessage?: string;
 }
 
 export const DashboardRadio = ({
@@ -400,7 +402,7 @@ export const SearchInput = ({
 
     return (
         <span
-            className={`combo-box__wrapper relative ${showError ? "p-invalid" : ""}`}
+            className={`input-error-wrapper relative ${showError ? "p-invalid" : ""}`}
             style={{ display: "block" }}
         >
             <div
@@ -458,8 +460,11 @@ export const DateInput = ({
     floatLabel = true,
     checked = false,
     onClearAction,
+    error,
+    errorMessage,
     ...props
 }: DateInputProps): ReactElement => {
+    const showError = error || !!errorMessage;
     const [innerDate, setInnerDate] = useState<Date | null>(null);
     const [isChecked, setIsChecked] = useState<boolean>(checked);
     const uniqueId = useId();
@@ -499,70 +504,80 @@ export const DateInput = ({
     };
 
     const content = (
-        <div
-            key={name}
-            className={`flex align-items-center justify-content-between date-item relative ${
-                innerDate ? "date-item--filled" : "date-item--empty"
-            }`}
+        <span
+            className={`date-input__wrapper relative ${showError ? "p-invalid" : ""}`}
+            style={{ display: "block" }}
         >
-            {((!checkbox && floatLabel) ||
-                (checkbox && !isChecked && floatLabel) ||
-                (checkbox && checkboxWithLabel && isChecked)) && (
-                <label
-                    htmlFor={uniqueId}
-                    className={`date-item__label ${innerDate ? "" : "date-item__label--empty"} label-top ${checkbox && !isChecked ? "ml-5" : ""}`}
-                >
-                    {name}
-                </label>
-            )}
-            <div className='date-item__input w-full flex relative'>
-                {checkbox && (
-                    <Checkbox
-                        className='date-item__checkbox'
-                        checked={isChecked}
-                        onChange={(e) => {
-                            onCheckboxChange?.(e);
-                            setIsChecked(!isChecked);
-                            if (!isChecked) {
-                                setInnerDate(new Date());
-                            } else {
-                                setInnerDate(null);
-                            }
+            <div
+                key={name}
+                className={`flex align-items-center justify-content-between date-item relative ${
+                    innerDate ? "date-item--filled" : "date-item--empty"
+                }`}
+            >
+                {((!checkbox && floatLabel) ||
+                    (checkbox && !isChecked && floatLabel) ||
+                    (checkbox && checkboxWithLabel && isChecked)) && (
+                    <label
+                        htmlFor={uniqueId}
+                        className={`date-item__label ${innerDate ? "" : "date-item__label--empty"} label-top ${checkbox && !isChecked ? "ml-5" : ""}`}
+                    >
+                        {name}
+                    </label>
+                )}
+                <div className='date-item__input w-full flex relative'>
+                    {checkbox && (
+                        <Checkbox
+                            className='date-item__checkbox'
+                            checked={isChecked}
+                            onChange={(e) => {
+                                onCheckboxChange?.(e);
+                                setIsChecked(!isChecked);
+                                if (!isChecked) {
+                                    setInnerDate(new Date());
+                                } else {
+                                    setInnerDate(null);
+                                }
+                            }}
+                        />
+                    )}
+                    <Calendar
+                        ref={calendarRef}
+                        inputId={uniqueId}
+                        placeholder={floatLabel ? undefined : name}
+                        value={checkbox && !isChecked ? null : innerDate}
+                        disabled={checkbox && !isChecked}
+                        className={`w-full date-item__calendar ${checkbox && "date-item__calendar--checkbox"}`}
+                        onChange={(e) => handleDateChange(e.value as Date | null)}
+                        {...props}
+                    />
+                    {innerDate && clearButton && (
+                        <Button
+                            type='button'
+                            className='date-item__clear-button'
+                            icon='pi pi-times'
+                            onClick={handleClearDate}
+                            text
+                            tooltip='Clear date'
+                            tooltipOptions={{ position: "top" }}
+                        />
+                    )}
+                    <div
+                        className='date-item__icon input-icon input-icon-right'
+                        style={{
+                            cursor: props.disabled ? "default" : "pointer",
                         }}
-                    />
-                )}
-                <Calendar
-                    ref={calendarRef}
-                    inputId={uniqueId}
-                    placeholder={floatLabel ? undefined : name}
-                    value={checkbox && !isChecked ? null : innerDate}
-                    disabled={checkbox && !isChecked}
-                    className={`w-full date-item__calendar ${checkbox && "date-item__calendar--checkbox"}`}
-                    onChange={(e) => handleDateChange(e.value as Date | null)}
-                    {...props}
-                />
-                {innerDate && clearButton && (
-                    <Button
-                        type='button'
-                        className='date-item__clear-button'
-                        icon='pi pi-times'
-                        onClick={handleClearDate}
-                        text
-                        tooltip='Clear date'
-                        tooltipOptions={{ position: "top" }}
-                    />
-                )}
-                <div
-                    className='date-item__icon input-icon input-icon-right'
-                    style={{
-                        cursor: props.disabled ? "default" : "pointer",
-                    }}
-                    onClick={props.disabled ? undefined : openCalendar}
-                >
-                    <i className='adms-calendar' />
+                        onClick={props.disabled ? undefined : openCalendar}
+                    >
+                        <i className='adms-calendar' />
+                    </div>
                 </div>
             </div>
-        </div>
+            {showError && errorMessage && (
+                <div className='p-error'>
+                    <small>{errorMessage}</small>
+                </div>
+            )}
+        </span>
     );
 
     return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;

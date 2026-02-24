@@ -64,7 +64,7 @@ export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function Combo
                 {label}
             </label>
             {showError && errorMessage && (
-                <span className='combo-box__wrapper relative'>
+                <span className='input-error-wrapper relative'>
                     <div className='p-error'>
                         <small>{errorMessage}</small>
                     </div>
@@ -72,7 +72,7 @@ export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function Combo
             )}
         </span>
     ) : (
-        <span className={`combo-box__wrapper relative ${showError ? "p-invalid" : ""}`}>
+        <span className={`input-error-wrapper relative ${showError ? "p-invalid" : ""}`}>
             {dropdown}
             {showError && errorMessage && (
                 <div className='p-error'>

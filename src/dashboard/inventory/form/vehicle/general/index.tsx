@@ -479,9 +479,10 @@ export const VehicleGeneral = observer((): ReactElement => {
                             }}
                             onAction={handleVINchange}
                             disabled={inventory.GroupClassName === "equipment"}
-                            className={`w-full ${errors.VIN ? "p-invalid" : ""}`}
+                            className='w-full'
+                            error={!!errors.VIN}
+                            errorMessage={errors.VIN as string}
                         />
-                        <small className='p-error'>{errors.VIN}</small>
                     </div>
                 </>
             )}
@@ -511,7 +512,11 @@ export const VehicleGeneral = observer((): ReactElement => {
                 />
             </div>
             <div className='col-6 relative'>
-                <span className='p-float-label'>
+                <span
+                    className={`p-float-label input-error-wrapper relative ${
+                        errors.Make ? "p-invalid" : ""
+                    }`}
+                >
                     <AutoComplete
                         {...getFieldProps("Make")}
                         value={values.Make}
@@ -550,9 +555,12 @@ export const VehicleGeneral = observer((): ReactElement => {
                         panelClassName='vehicle-general__panel'
                     />
                     <label className='float-label'>Make (required)</label>
+                    {errors.Make && (
+                        <div className='p-error'>
+                            <small>{errors.Make}</small>
+                        </div>
+                    )}
                 </span>
-
-                <small className='p-error'>{errors.Make}</small>
             </div>
 
             <div className='col-6 relative'>
@@ -599,8 +607,8 @@ export const VehicleGeneral = observer((): ReactElement => {
             </div>
             <div className='col-3 relative'>
                 <NumberInput
+                    name='Year'
                     label='Year (required)'
-                    {...getFieldProps("Year")}
                     className='vehicle-general__text-input w-full'
                     useGrouping={false}
                     value={parseInt(values.Year) || null}
@@ -618,8 +626,8 @@ export const VehicleGeneral = observer((): ReactElement => {
 
             <div className='col-3 relative'>
                 <NumberInput
+                    name='mileage'
                     label='Mileage'
-                    {...getFieldProps("mileage")}
                     className='vehicle-general__text-input w-full'
                     value={parseMileage(inventory?.mileage || "0")}
                     useGrouping={false}
