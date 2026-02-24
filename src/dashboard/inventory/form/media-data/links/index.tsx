@@ -3,7 +3,7 @@ import { ChangeEvent, ReactElement, useEffect, useState, useRef, useId } from "r
 import { observer } from "mobx-react-lite";
 import { Button } from "primereact/button";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import { CATEGORIES } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
@@ -377,7 +377,9 @@ export const LinksMedia = observer((): ReactElement => {
                     value={uploadFileLinks?.contenttype || 0}
                     onChange={handleCategorySelect}
                 />
-                <InputText
+                <TextInput
+                    name='comment'
+                    label='Comment'
                     className='media-input__text'
                     placeholder='Comment'
                     value={uploadFileLinks?.notes || ""}

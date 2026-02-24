@@ -45,12 +45,16 @@ interface CurrencyInputProps extends InputNumberProps {
     labelPosition?: LabelPosition;
     coloredEmptyValue?: boolean;
     wrapperClassName?: string;
+    error?: boolean;
+    errorMessage?: string;
 }
 
 interface PercentInputProps extends InputNumberProps {
     labelPosition?: LabelPosition;
     floatLabel?: boolean;
     emptyValue?: boolean;
+    error?: boolean;
+    errorMessage?: string;
 }
 
 type Push<N extends number, T extends any[]> = ((...args: T) => void) extends (
@@ -90,11 +94,23 @@ interface TextInputProps extends InputTextProps {
     label?: string;
 }
 
+interface NumberInputProps extends InputNumberProps {
+    colWidth?: Range<1, 13>;
+    ref?: React.RefObject<InputNumber>;
+    wrapperClassName?: string;
+    infoText?: string;
+    error?: boolean;
+    errorMessage?: string;
+    label?: string;
+}
+
 interface PhoneInputProps extends Omit<InputMaskProps, "onChange" | "onBlur"> {
     colWidth?: Range<1, 13>;
     onChange?: (e: any) => void;
     onBlur?: (e: any) => void;
     withValidationMessage?: boolean;
+    error?: boolean;
+    errorMessage?: string;
 }
 
 interface EmailInputProps extends Omit<InputTextProps, "onChange" | "onBlur"> {
@@ -102,6 +118,8 @@ interface EmailInputProps extends Omit<InputTextProps, "onChange" | "onBlur"> {
     onChange?: (e: any) => void;
     onBlur?: (e: any) => void;
     withValidationMessage?: boolean;
+    error?: boolean;
+    errorMessage?: string;
 }
 
 interface StateDropdownProps extends DropdownProps {
@@ -178,12 +196,15 @@ export const CurrencyInput = ({
     currencyIcon = CURRENCY_OPTIONS.DOLLAR,
     coloredEmptyValue = false,
     wrapperClassName,
+    error = false,
+    errorMessage,
     ...props
 }: CurrencyInputProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<InputNumber>(null);
     const uniqueId = useId();
     const shouldClearOnInput = useRef(false);
+    const showError = error || !!errorMessage;
 
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
         const input = inputRef.current?.getInput() as HTMLInputElement | undefined;
@@ -230,7 +251,7 @@ export const CurrencyInput = ({
     return (
         <div
             key={name}
-            className={`flex align-items-center justify-content-between currency-item relative ${wrapperClassName || ""}`}
+            className={`flex align-items-center justify-content-between currency-item relative text-input ${showError ? "p-invalid" : ""} ${wrapperClassName || ""}`}
             ref={containerRef}
         >
             <label
@@ -258,13 +279,18 @@ export const CurrencyInput = ({
                     min={0}
                     locale='en-US'
                     value={value === null ? null : value || 0}
-                    inputClassName={`${coloredEmptyValue && !value ? "currency-item__input--empty" : ""}`}
+                    inputClassName={`${coloredEmptyValue && !value ? "currency-item__input--empty" : ""} ${showError ? "p-invalid" : ""}`}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     onKeyDown={handleKeyDown}
                     {...props}
                 />
             </div>
+            {showError && errorMessage && (
+                <div className='p-error'>
+                    <small>{errorMessage}</small>
+                </div>
+            )}
         </div>
     );
 };
@@ -275,13 +301,16 @@ export const PercentInput = ({
     labelPosition = "left",
     emptyValue = false,
     floatLabel = false,
+    error = false,
+    errorMessage,
     ...props
 }: PercentInputProps): ReactElement => {
     const uniqueId = useId();
+    const showError = error || !!errorMessage;
     return (
         <div
             key={name}
-            className='flex align-items-center justify-content-between percent-item relative'
+            className={`flex align-items-center justify-content-between percent-item relative text-input ${showError ? "p-invalid" : ""}`}
         >
             <label
                 htmlFor={uniqueId}
@@ -295,7 +324,7 @@ export const PercentInput = ({
                     minFractionDigits={2}
                     inputId={uniqueId}
                     name={name}
-                    inputClassName={`${props.value ? "percent-item__input--filled" : "percent-item__input--empty"}`}
+                    inputClassName={`${props.value ? "percent-item__input--filled" : "percent-item__input--empty"} ${showError ? "p-invalid" : ""}`}
                     {...props}
                     value={props.value ? props.value : 0}
                     pt={{
@@ -306,6 +335,11 @@ export const PercentInput = ({
                 />
                 <div className='percent-item__icon input-icon input-icon-right'>%</div>
             </div>
+            {showError && errorMessage && (
+                <div className='p-error'>
+                    <small>{errorMessage}</small>
+                </div>
+            )}
         </div>
     );
 };
@@ -610,6 +644,57 @@ export const TextInput = ({
     return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
 };
 
+export const NumberInput = ({
+    name,
+    colWidth,
+    ref,
+    wrapperClassName,
+    infoText,
+    error = false,
+    errorMessage,
+    label,
+    className: propsClassName,
+    ...props
+}: NumberInputProps): ReactElement => {
+    const uniqueId = useId();
+    const showError = error || !!errorMessage;
+    const inputClassName = [`w-full`, propsClassName, showError ? "p-invalid" : ""]
+        .filter(Boolean)
+        .join(" ");
+
+    const content = (
+        <span
+            className={`p-float-label number-input ${showError ? "p-invalid" : ""} relative ${wrapperClassName || ""}`}
+        >
+            <InputNumber
+                ref={ref}
+                inputId={uniqueId}
+                name={name}
+                inputClassName={inputClassName}
+                style={{ height: `${(props as { height?: number }).height || 50}px` }}
+                tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
+                aria-describedby={infoText ? `${uniqueId}-info` : undefined}
+                {...props}
+            />
+            {infoText && (
+                <small className='input-help' id={`${uniqueId}-info`}>
+                    {infoText}
+                </small>
+            )}
+            <label htmlFor={uniqueId} className='float-label'>
+                {label ?? name}
+            </label>
+            {showError && errorMessage && (
+                <div className='p-error'>
+                    <small>{errorMessage}</small>
+                </div>
+            )}
+        </span>
+    );
+
+    return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
+};
+
 export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps): ReactElement => {
     const content = (
         <ComboBox
@@ -633,11 +718,14 @@ export const PhoneInput = ({
     onChange,
     onBlur,
     withValidationMessage = false,
+    error: errorProp = false,
+    errorMessage: errorMessageProp,
     ...props
 }: PhoneInputProps): ReactElement => {
     const inputRef = useRef(null);
     const [error, setError] = useState<string>("");
     const uniqueId = useId();
+    const showError = errorProp || !!errorMessageProp || (withValidationMessage && !!error);
 
     const handleCursorPosition = () => {
         const input = inputRef.current as unknown as HTMLInputElement | null;
@@ -665,13 +753,16 @@ export const PhoneInput = ({
         if (isBlur && onBlur) onBlur(e);
     };
 
+    const messageToShow = errorMessageProp ?? (withValidationMessage ? error : undefined);
     const content = (
-        <span className='p-float-label relative phone-input'>
+        <span
+            className={`p-float-label relative phone-input text-input ${showError ? "p-invalid" : ""}`}
+        >
             <InputMask
                 type='tel'
                 ref={inputRef}
                 mask='999-999-9999'
-                className={`w-full phone-input__input ${error ? "p-invalid" : ""}`}
+                className={`w-full phone-input__input ${showError ? "p-invalid" : ""}`}
                 style={{ height: `${props.height || 50}px` }}
                 onClick={handleCursorPosition}
                 id={uniqueId}
@@ -685,7 +776,11 @@ export const PhoneInput = ({
             <label htmlFor={uniqueId} className='float-label'>
                 {name}
             </label>
-            {withValidationMessage && error && <div className='p-error pt-2'>{error}</div>}
+            {showError && messageToShow && (
+                <div className='p-error'>
+                    <small>{messageToShow}</small>
+                </div>
+            )}
         </span>
     );
 
@@ -698,11 +793,14 @@ export const EmailInput = ({
     onChange,
     onBlur,
     withValidationMessage = false,
+    error: errorProp = false,
+    errorMessage: errorMessageProp,
     ...props
 }: EmailInputProps): ReactElement => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [error, setError] = useState<string>("");
     const uniqueId = useId();
+    const showError = errorProp || !!errorMessageProp || (withValidationMessage && !!error);
 
     const validateAndHandle = (e: React.ChangeEvent<HTMLInputElement>, isBlur = false) => {
         const { value } = e.target;
@@ -717,12 +815,15 @@ export const EmailInput = ({
         if (isBlur && onBlur) onBlur(e);
     };
 
+    const messageToShow = errorMessageProp ?? (withValidationMessage ? error : undefined);
     const content = (
-        <span className='p-float-label relative email-input'>
+        <span
+            className={`p-float-label relative email-input text-input ${showError ? "p-invalid" : ""}`}
+        >
             <InputText
                 type='email'
                 ref={inputRef}
-                className={`w-full email-input__input ${error ? "p-invalid" : ""}`}
+                className={`w-full email-input__input ${showError ? "p-invalid" : ""}`}
                 style={{ height: `${props.height || 50}px` }}
                 id={uniqueId}
                 tooltipOptions={{ showOnDisabled: true, style: { maxWidth: "490px" } }}
@@ -733,7 +834,11 @@ export const EmailInput = ({
             <label htmlFor={uniqueId} className='float-label'>
                 {name}
             </label>
-            {withValidationMessage && error && <div className='p-error pt-2'>{error}</div>}
+            {showError && messageToShow && (
+                <div className='p-error'>
+                    <small>{messageToShow}</small>
+                </div>
+            )}
         </span>
     );
 

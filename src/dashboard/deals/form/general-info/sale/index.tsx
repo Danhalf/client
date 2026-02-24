@@ -2,7 +2,7 @@ import { observer } from "mobx-react-lite";
 import { ReactElement, useEffect, useState } from "react";
 import "./index.css";
 import { DateInput } from "dashboard/common/form/inputs";
-import { InputText } from "primereact/inputtext";
+import { TextInput } from "dashboard/common/form/inputs";
 import { useStore } from "store/hooks";
 import {
     getDealInventoryStatuses,
@@ -293,20 +293,18 @@ export const DealGeneralSale = observer((): ReactElement => {
                 />
             </div>
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        {...getFieldProps("accountInfo")}
-                        className='w-full deal-sale__text-input'
-                        disabled={!!id}
-                        value={deal.accountInfo || ""}
-                        onChange={({ target: { value } }) => {
-                            if (id) return;
-                            setFieldValue("accountInfo", value);
-                            changeDeal({ key: "accountInfo", value });
-                        }}
-                    />
-                    <label className='float-label'>Account number</label>
-                </span>
+                <TextInput
+                    label='Account number'
+                    {...getFieldProps("accountInfo")}
+                    className='w-full deal-sale__text-input'
+                    disabled={!!id}
+                    value={deal.accountInfo || ""}
+                    onChange={({ target: { value } }) => {
+                        if (id) return;
+                        setFieldValue("accountInfo", value);
+                        changeDeal({ key: "accountInfo", value });
+                    }}
+                />
             </div>
 
             <hr className='col-12 form-line' />
@@ -330,19 +328,18 @@ export const DealGeneralSale = observer((): ReactElement => {
                 <small className='p-error'>{errors.HowFoundOut}</small>
             </div>
             <div className='col-3 relative'>
-                <span className='p-float-label'>
-                    <InputText
-                        {...getFieldProps("SaleID")}
-                        className={`deal-sale__text-input w-full ${errors.SaleID && "p-invalid"}`}
-                        value={values.SaleID}
-                        onChange={(e) => {
-                            setFieldValue("SaleID", e.target.value);
-                            changeDealExtData({ key: "SaleID", value: e.target.value });
-                        }}
-                    />
-                    <label className='float-label'>ROS SaleID (required)</label>
-                </span>
-                <small className='p-error'>{errors.SaleID}</small>
+                <TextInput
+                    label='ROS SaleID (required)'
+                    {...getFieldProps("SaleID")}
+                    className='deal-sale__text-input w-full'
+                    value={values.SaleID}
+                    error={!!errors.SaleID}
+                    errorMessage={errors.SaleID}
+                    onChange={(e) => {
+                        setFieldValue("SaleID", e.target.value);
+                        changeDealExtData({ key: "SaleID", value: e.target.value });
+                    }}
+                />
             </div>
         </section>
     );

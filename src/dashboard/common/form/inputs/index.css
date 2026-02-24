@@ -302,7 +302,8 @@
     }
 }
 
-.text-input {
+.text-input,
+.number-input {
     position: relative;
 
     .p-error {
@@ -330,5 +331,19 @@
             height: var(--line-height);
             background-color: var(--admss-app-white);
         }
+    }
+}
+
+.currency-item.text-input,
+.percent-item.text-input {
+    flex-wrap: wrap;
+
+    .p-error {
+        position: relative;
+        flex-basis: 100%;
+        width: 100%;
+        bottom: auto;
+        left: 0;
+        max-width: none;
     }
 }
