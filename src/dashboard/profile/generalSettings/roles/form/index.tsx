@@ -4,6 +4,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { ReactElement, useMemo, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "primereact/button";
+import { Checkbox } from "primereact/checkbox";
 import { RolesContacts } from "dashboard/profile/generalSettings/roles/form/contacts";
 import { RolesDeals } from "dashboard/profile/generalSettings/roles/form/deals";
 import { RolesInventory } from "dashboard/profile/generalSettings/roles/form/inventory";
@@ -69,6 +70,7 @@ export const UsersRolesForm = observer((): ReactElement => {
         saveCurrentRole,
         createNewRole,
         togglePermissionsGroup,
+        allPermissionsChecked,
     } = usersStore;
     const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
     const formikRef = useRef<FormikProps<RoleFormValues>>(null);
@@ -241,12 +243,14 @@ export const UsersRolesForm = observer((): ReactElement => {
                                                     }
                                                 />
                                             </div>
-                                            <label className='role-main__select-all'>
-                                                <input
-                                                    type='checkbox'
+                                            <label className='role-main__select-all cursor-pointer'>
+                                                <Checkbox
+                                                    key={allPermissionsChecked ? "all" : "none"}
+                                                    checked={allPermissionsChecked}
                                                     onChange={() => togglePermissionsGroup()}
+                                                    className='role-main__select-all-checkbox mr-2'
                                                 />
-                                                <span>Select All</span>
+                                                Select All
                                             </label>
                                         </div>
                                         <TabView
