@@ -233,9 +233,11 @@ export const UsersRolesForm = observer((): ReactElement => {
                                                             : ""
                                                     }`}
                                                     errorMessage={
-                                                        errors.rolename
-                                                            ? ERROR_MESSAGES.ROLE_NAME_INPUT
-                                                            : undefined
+                                                        touched.rolename && !values.rolename.length
+                                                            ? ERROR_MESSAGES.REQUIRED
+                                                            : errors.rolename
+                                                              ? ERROR_MESSAGES.ROLE_NAME_INPUT
+                                                              : undefined
                                                     }
                                                 />
                                             </div>
