@@ -132,6 +132,11 @@ export const UsersRoles = observer((): ReactElement => {
                     className='roles-table'
                     rowClassName={() => "hover:text-primary cursor-pointer roles-table-row"}
                     tableStyle={{ tableLayout: "fixed", width: "100%" }}
+                    pt={{
+                        wrapper: {
+                            className: "thin-scrollbar",
+                        },
+                    }}
                 >
                     <Column
                         bodyStyle={{ textAlign: "center" }}
