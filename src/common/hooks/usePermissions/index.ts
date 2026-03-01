@@ -173,6 +173,22 @@ export const usePermissions = () => {
         },
     };
 
+    const accountPermissions = {
+        canView: (): boolean => hasPermission("uaViewAccounts"),
+
+        canEdit: (): boolean => hasPermission("uaEditAccounts"),
+
+        canDelete: (): boolean => hasPermission("uaDeleteAccounts"),
+
+        canSeeInMenu: (): boolean => hasPermission("uaViewAccounts"),
+
+        canOpenDetails: (): boolean => hasPermission("uaViewAccounts"),
+
+        canEditPayments: (): boolean => hasPermission("uaEditPayments"),
+
+        canBackPayments: (): boolean => hasPermission("uaAllowBackDatingPayments"),
+    };
+
     const salesPermissions = {
         canShowContacts: (): boolean => {
             return !isSalesperson();
@@ -211,6 +227,7 @@ export const usePermissions = () => {
         inventoryPermissions,
         contactPermissions,
         dealPermissions,
+        accountPermissions,
         salesPermissions,
     };
 };
