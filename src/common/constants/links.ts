@@ -69,11 +69,14 @@ interface AccountsPage {
     EDIT(id: string): string;
     NOTES(id: string): string;
     PROMISE_TO_PAY(id: string): string;
+    TAKE_PAYMENT_TAB: string;
+    TAKE_PAYMENT(id: string): string;
 }
 export const ACCOUNTS_PAGE: Readonly<AccountsPage> = {
     MAIN: `${DASHBOARD_PAGE}/accounts`,
     NOTES_TAB: `?${TAB_ID}=notes`,
     PROMISE_TO_PAY_TAB: `?${TAB_ID}=promise-to-pay`,
+    TAKE_PAYMENT_TAB: `?${TAB_ID}=take-payment`,
     CREATE() {
         return `${this.MAIN}${CREATE_PATH}`;
     },
@@ -85,6 +88,9 @@ export const ACCOUNTS_PAGE: Readonly<AccountsPage> = {
     },
     PROMISE_TO_PAY(id: string) {
         return `${this.EDIT(id)}${this.PROMISE_TO_PAY_TAB}`;
+    },
+    TAKE_PAYMENT(id: string) {
+        return `${this.EDIT(id)}${this.TAKE_PAYMENT_TAB}`;
     },
 };
 

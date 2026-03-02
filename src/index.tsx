@@ -202,7 +202,14 @@ const AppRouter = (): ReactElement => {
                                 { path: "", element: <Accounts /> },
                                 { path: "create", element: <AccountsForm /> },
                                 { path: ":id", element: <AccountsForm /> },
-                                { path: ":id/take-payment", element: <AccountTakePayment /> },
+                                {
+                                    path: ":id/take-payment",
+                                    element: (
+                                        <AccountsProtectedRoute requireEditPayments>
+                                            <AccountTakePayment />
+                                        </AccountsProtectedRoute>
+                                    ),
+                                },
                             ],
                         },
                         {
