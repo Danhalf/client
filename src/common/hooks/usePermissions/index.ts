@@ -187,6 +187,8 @@ export const usePermissions = () => {
         canEditPayments: (): boolean => hasPermission("uaEditPayments"),
 
         canBackPayments: (): boolean => hasPermission("uaAllowBackDatingPayments"),
+
+        canEditPartialPayments: (): boolean => hasPermission("uaAllowPartialPayments"),
     };
 
     const salesPermissions = {
