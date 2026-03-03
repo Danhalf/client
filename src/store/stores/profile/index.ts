@@ -36,6 +36,16 @@ export class ProfileStore {
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
+
+        const authUser = this.rootStore.userStore.authUser;
+
+        if (authUser) {
+            this._profile = {
+                ...this._profile,
+                companyname: authUser.companyname || "",
+                locationname: authUser.locationname || "",
+            };
+        }
     }
 
     public get profile() {
