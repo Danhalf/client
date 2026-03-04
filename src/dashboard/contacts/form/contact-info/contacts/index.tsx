@@ -90,38 +90,30 @@ export const ContactsSocialInfo = observer((): ReactElement => {
                 </div>
             )}
 
-            <div className='col-6 relative'>
+            <PhoneInput
+                name='Phone Number'
+                colWidth={6}
+                onBlur={handleBlur}
+                value={contact.phone1 ?? ""}
+                onChange={async ({ target: { value } }) => {
+                    await setFieldValue("phone1", value);
+                    changeContact("phone1", value);
+                    setFieldTouched("phone1", true, true);
+                }}
+            />
+            {anotherPhone ? (
                 <PhoneInput
                     name='Phone Number'
-                    className={`contacts-social__text-input w-full ${
-                        errors.phone1 ? "p-invalid" : ""
-                    }`}
+                    colWidth={6}
                     onBlur={handleBlur}
-                    value={contact.phone1 ?? ""}
+                    value={contact.phone2 ?? ""}
                     onChange={async ({ target: { value } }) => {
-                        await setFieldValue("phone1", value);
-                        changeContact("phone1", value);
-                        setFieldTouched("phone1", true, true);
+                        if (!value?.length) setAnotherPhone(false);
+                        await setFieldValue("phone2", value);
+                        changeContact("phone2", value);
+                        setFieldTouched("phone2", true, true);
                     }}
                 />
-            </div>
-            {anotherPhone ? (
-                <div className='col-6 relative'>
-                    <PhoneInput
-                        name='Phone Number'
-                        className={`contacts-social__text-input w-full ${
-                            errors.phone2 ? "p-invalid" : ""
-                        }`}
-                        onBlur={handleBlur}
-                        value={contact.phone2 ?? ""}
-                        onChange={async ({ target: { value } }) => {
-                            if (!value?.length) setAnotherPhone(false);
-                            await setFieldValue("phone2", value);
-                            changeContact("phone2", value);
-                            setFieldTouched("phone2", true, true);
-                        }}
-                    />
-                </div>
             ) : (
                 <div className='col-6'>
                     <Button

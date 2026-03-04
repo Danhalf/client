@@ -750,7 +750,7 @@ export const PhoneInput = ({
     colWidth,
     onChange,
     onBlur,
-    withValidationMessage = false,
+    withValidationMessage = true,
     error: errorProp = false,
     errorMessage: errorMessageProp,
     ...props

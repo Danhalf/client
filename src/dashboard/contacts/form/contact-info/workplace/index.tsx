@@ -8,7 +8,7 @@ import { EmailInput, PhoneInput, TextInput } from "dashboard/common/form/inputs"
 export const ContactsWorkplace = observer((): ReactElement => {
     const store = useStore().contactStore;
     const { contactExtData, changeContactExtData } = store;
-    const { values, errors, touched, setFieldValue, setFieldTouched, handleBlur } =
+    const { values, errors, setFieldValue, setFieldTouched, handleBlur } =
         useFormikContext<ContactExtData>();
     return (
         <div className='grid contacts-workplace row-gap-2'>
@@ -48,20 +48,19 @@ export const ContactsWorkplace = observer((): ReactElement => {
                 }}
             />
 
-            <div className='col-6 relative'>
-                <PhoneInput
-                    name='Phone Number'
-                    onBlur={handleBlur}
-                    value={contactExtData.Buyer_Emp_Phone || ""}
-                    onChange={async ({ target: { value } }) => {
-                        await setFieldValue("Buyer_Emp_Phone", value);
-                        changeContactExtData("Buyer_Emp_Phone", value);
-                        setFieldTouched("Buyer_Emp_Phone", true, true);
-                    }}
-                    error={!!errors.Buyer_Emp_Phone}
-                    errorMessage={errors.Buyer_Emp_Phone}
-                />
-            </div>
+            <PhoneInput
+                name='Phone Number'
+                colWidth={6}
+                onBlur={handleBlur}
+                value={contactExtData.Buyer_Emp_Phone || ""}
+                onChange={async ({ target: { value } }) => {
+                    await setFieldValue("Buyer_Emp_Phone", value);
+                    changeContactExtData("Buyer_Emp_Phone", value);
+                    setFieldTouched("Buyer_Emp_Phone", true, true);
+                }}
+                error={!!errors.Buyer_Emp_Phone}
+                errorMessage={errors.Buyer_Emp_Phone}
+            />
         </div>
     );
 });
