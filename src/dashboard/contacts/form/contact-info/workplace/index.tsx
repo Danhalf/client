@@ -51,16 +51,15 @@ export const ContactsWorkplace = observer((): ReactElement => {
             <div className='col-6 relative'>
                 <PhoneInput
                     name='Phone Number'
-                    className={`contacts-workplace__text-input w-full ${
-                        errors.Buyer_Emp_Phone && touched.Buyer_Emp_Phone ? "p-invalid" : ""
-                    }`}
                     onBlur={handleBlur}
-                    value={contactExtData.Buyer_Emp_Phone}
+                    value={contactExtData.Buyer_Emp_Phone || ""}
                     onChange={async ({ target: { value } }) => {
                         await setFieldValue("Buyer_Emp_Phone", value);
                         changeContactExtData("Buyer_Emp_Phone", value);
                         setFieldTouched("Buyer_Emp_Phone", true, true);
                     }}
+                    error={!!errors.Buyer_Emp_Phone}
+                    errorMessage={errors.Buyer_Emp_Phone}
                 />
             </div>
         </div>
