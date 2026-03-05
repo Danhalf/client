@@ -256,6 +256,13 @@ export const setInventoryPaymentBack = async (
     });
 };
 
+export const deleteInventoryPaymentPack = async (paymentPackId: string) => {
+    return new ApiRequest().post<BaseResponseError>({
+        url: `inventory/${paymentPackId}/deletepaymentpack`,
+        defaultError: "Error on delete payment",
+    });
+};
+
 export const deleteInventoryMake = async (itemuid: string) => {
     return new ApiRequest().post<BaseResponseError>({
         url: `inventory/${itemuid}/deletemake`,

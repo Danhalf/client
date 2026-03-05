@@ -7,11 +7,16 @@ import { DataTable, DataTableRowClickEvent } from "primereact/datatable";
 import { Column, ColumnProps } from "primereact/column";
 import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
-import { getInventoryPaymentBack, setInventoryPaymentBack } from "http/services/inventory-service";
+import {
+    deleteInventoryPaymentPack,
+    getInventoryPaymentBack,
+    setInventoryPaymentBack,
+} from "http/services/inventory-service";
 import { InventoryPaymentBack } from "common/models/inventory";
 import { Status } from "common/models/base-response";
-import { useToast } from "dashboard/common/toast";
 import { usePermissions } from "common/hooks/usePermissions";
+import { ConfirmModal } from "dashboard/common/dialog/confirm";
+import { useToastMessage } from "common/hooks";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof InventoryPaymentBack;
@@ -39,7 +44,9 @@ export const PurchasePayments = observer((): ReactElement => {
     const [salesTaxPaid, setSalesTaxPaid] = useState<0 | 1>(0);
     const [description, setDescription] = useState<string>("");
     const [expandedRows, setExpandedRows] = useState<Record<string, any>[]>([]);
-    const toast = useToast();
+    const [confirmActive, setConfirmActive] = useState(false);
+    const [paymentToDelete, setPaymentToDelete] = useState<InventoryPaymentBack | null>(null);
+    const { showError, showSuccess } = useToastMessage();
 
     const fetchInventoryPaymentBack = async () => {
         if (!id) return;
@@ -77,11 +84,7 @@ export const PurchasePayments = observer((): ReactElement => {
             setDescription("");
             setExpandedRows([]);
         } else {
-            toast?.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: response?.error,
-            });
+            showError(response?.error || "Error while saving payment");
         }
     };
 
@@ -102,17 +105,41 @@ export const PurchasePayments = observer((): ReactElement => {
         setExpandedRows([...expandedRows, data]);
     };
 
-    const deleteTemplate = () => {
-        return (
-            <Button
-                type='button'
-                icon='icon adms-trash-can'
-                tooltip='Delete'
-                tooltipOptions={{ showDelay: 300 }}
-                className='purchase-payments__delete-button p-button-text'
-            />
-        );
+    const handleEditPayment = (row: InventoryPaymentBack) => {
+        if (!canEditPayments()) return;
+        setPacksForVehicle(Number(row.payPack) || 0);
+        setDefaultExpenses(parseBoolean(row.payDefaultExpAdded) ? 1 : 0);
+        setPaid(parseBoolean(row.payPaid) ? 1 : 0);
+        setSalesTaxPaid(parseBoolean(row.paySalesTaxPaid) ? 1 : 0);
+        setDescription(String(row.payRemarks ?? ""));
     };
+
+    const handleDeletePayment = async () => {
+        if (!paymentToDelete?.id) return;
+        const response = await deleteInventoryPaymentPack(paymentToDelete.id);
+        if (response?.error) {
+            showError(response?.error || "Error while deleting payment");
+        } else {
+            await fetchInventoryPaymentBack();
+            setConfirmActive(false);
+            setPaymentToDelete(null);
+            showSuccess("Payment has been deleted.");
+        }
+    };
+
+    const deleteTemplate = (payment: InventoryPaymentBack) => (
+        <Button
+            type='button'
+            icon='icon adms-trash-can'
+            tooltip='Delete'
+            tooltipOptions={{ showDelay: 300 }}
+            className='purchase-payments__delete-button p-button-text'
+            onClick={() => {
+                setPaymentToDelete(payment);
+                setConfirmActive(true);
+            }}
+        />
+    );
 
     return (
         <>
@@ -206,6 +233,7 @@ export const PurchasePayments = observer((): ReactElement => {
                                                 tooltip='Edit'
                                                 tooltipOptions={{ showDelay: 300 }}
                                                 className='purchase-payments__table-button p-button-text'
+                                                onClick={() => handleEditPayment(options)}
                                             />
                                         )}
                                         <Button
@@ -292,6 +320,19 @@ export const PurchasePayments = observer((): ReactElement => {
                     </DataTable>
                 </div>
             </div>
+            <ConfirmModal
+                visible={confirmActive}
+                bodyMessage='Do you really want to delete this payment? This process cannot be undone.'
+                confirmAction={handleDeletePayment}
+                draggable={false}
+                rejectLabel='Cancel'
+                acceptLabel='Delete'
+                className='expenses-confirm-dialog'
+                onHide={() => {
+                    setConfirmActive(false);
+                    setPaymentToDelete(null);
+                }}
+            />
         </>
     );
 });
