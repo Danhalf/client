@@ -18,6 +18,45 @@
     color: var(--admss-app-medium-grey);
 }
 
+.purchase-payments__table.p-datatable {
+    --datatable-header-height: 45px;
+    margin-top: 50px;
+
+    .p-datatable-thead {
+        height: var(--datatable-header-height);
+    }
+
+    ::-webkit-scrollbar {
+        background: linear-gradient(
+            to bottom,
+            var(--admss-app-light-blue) var(--datatable-header-height),
+            transparent var(--datatable-header-height)
+        );
+    }
+
+    ::-webkit-scrollbar-track {
+        margin-top: var(--datatable-header-height);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--admss-app-medium-blue);
+        border-radius: 5px;
+    }
+
+    .p-datatable-wrapper {
+        overflow-x: auto;
+        padding-left: 6px;
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+    }
+
+    .p-column-header-content {
+        justify-content: center;
+    }
+}
+
 .total-sum {
     margin-left: auto;
     margin-top: 10px;
@@ -54,4 +93,35 @@
     border-radius: 50%;
     border: none;
     background: transparent;
+}
+
+.purchase-payments__table .expanded-row {
+    display: flex;
+    gap: 10px;
+    padding-left: 82px;
+}
+
+.purchase-payments__table .expanded-row__label {
+    font-weight: 700;
+    flex: 0;
+}
+
+.table-button-active .p-button-icon {
+    color: var(--admss-app-primary);
+    transform: rotate(180deg);
+}
+
+.inventory-form .p-datatable .p-datatable-tbody {
+    .purchase-payments__table-controls {
+        padding: 0 10px;
+        height: 40px;
+
+        .purchase-payments__table-controls-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 10px;
+        }
+    }
 }

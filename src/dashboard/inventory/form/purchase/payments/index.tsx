@@ -10,7 +10,6 @@ import { useParams } from "react-router-dom";
 import { getInventoryPaymentBack, setInventoryPaymentBack } from "http/services/inventory-service";
 import { InventoryPaymentBack } from "common/models/inventory";
 import { Status } from "common/models/base-response";
-import { Checkbox } from "primereact/checkbox";
 import { useToast } from "dashboard/common/toast";
 import { usePermissions } from "common/hooks/usePermissions";
 
@@ -20,6 +19,14 @@ interface TableColumnProps extends ColumnProps {
 }
 
 type TableColumnsList = Pick<TableColumnProps, "header" | "field" | "body">;
+
+const parseBoolean = (value: unknown): boolean => {
+    if (typeof value === "boolean") return value;
+    const n = Number(value);
+    if (!Number.isNaN(n)) return n !== 0;
+    if (typeof value === "string") return value.toLowerCase() === "true";
+    return false;
+};
 
 export const PurchasePayments = observer((): ReactElement => {
     const { id } = useParams();
@@ -35,17 +42,10 @@ export const PurchasePayments = observer((): ReactElement => {
     const toast = useToast();
 
     const fetchInventoryPaymentBack = async () => {
-        if (id) {
-            const response = await getInventoryPaymentBack(id);
-            if (response) {
-                const expenses = response as InventoryPaymentBack;
-                setExpensesList([expenses]);
-                setPacksForVehicle(expenses.payPack);
-                setDefaultExpenses(expenses.payDefaultExpAdded);
-                setPaid(expenses.payPaid);
-                setSalesTaxPaid(expenses.paySalesTaxPaid);
-                setDescription(expenses.payRemarks);
-            }
+        if (!id) return;
+        const response = await getInventoryPaymentBack(id);
+        if (Array.isArray(response)) {
+            setExpensesList(response);
         }
     };
 
@@ -55,27 +55,9 @@ export const PurchasePayments = observer((): ReactElement => {
 
     const renderColumnsData: TableColumnsList[] = [
         { field: "payPack", header: "Pack for this Vehicle" },
-        {
-            field: "payDefaultExpAdded",
-            header: "Default Expenses",
-            body: (rowData: InventoryPaymentBack) => (
-                <Checkbox checked={!!rowData.payDefaultExpAdded} readOnly />
-            ),
-        },
-        {
-            field: "payPaid",
-            header: "Paid",
-            body: (rowData: InventoryPaymentBack) => (
-                <Checkbox checked={!!rowData.payPaid} readOnly />
-            ),
-        },
-        {
-            field: "paySalesTaxPaid",
-            header: "Sales Tax Paid",
-            body: (rowData: InventoryPaymentBack) => (
-                <Checkbox checked={!!rowData.paySalesTaxPaid} readOnly />
-            ),
-        },
+        { field: "payDefaultExpAdded", header: "Default Expenses" },
+        { field: "payPaid", header: "Paid" },
+        { field: "paySalesTaxPaid", header: "Sales Tax Paid" },
     ];
 
     const handleSavePayment = async () => {
@@ -87,7 +69,13 @@ export const PurchasePayments = observer((): ReactElement => {
             payRemarks: description,
         });
         if (response?.status === Status.OK) {
-            fetchInventoryPaymentBack();
+            await fetchInventoryPaymentBack();
+            setPacksForVehicle(0);
+            setDefaultExpenses(0);
+            setPaid(0);
+            setSalesTaxPaid(0);
+            setDescription("");
+            setExpandedRows([]);
         } else {
             toast?.current?.show({
                 severity: "error",
@@ -104,6 +92,14 @@ export const PurchasePayments = observer((): ReactElement => {
                 <div className='expanded-row__text'>{data.payRemarks}</div>
             </div>
         );
+    };
+
+    const handleRowExpansionClick = (data: InventoryPaymentBack) => {
+        if (expandedRows.includes(data)) {
+            setExpandedRows(expandedRows.filter((item) => item !== data));
+            return;
+        }
+        setExpandedRows([...expandedRows, data]);
     };
 
     const deleteTemplate = () => {
@@ -178,12 +174,21 @@ export const PurchasePayments = observer((): ReactElement => {
                         showGridlines
                         className='mt-6 purchase-payments__table'
                         value={expensesList}
-                        emptyMessage='No expenses yet.'
+                        emptyMessage='No payments yet.'
                         reorderableColumns
                         resizableColumns
                         rowExpansionTemplate={rowExpansionTemplate}
                         expandedRows={expandedRows}
                         onRowToggle={(e: DataTableRowClickEvent) => setExpandedRows([e.data])}
+                        scrollable
+                        pt={{
+                            wrapper: {
+                                className: "thin-scrollbar",
+                                style: {
+                                    height: "205px",
+                                },
+                            },
+                        }}
                     >
                         <Column
                             bodyStyle={{ textAlign: "center" }}
@@ -206,11 +211,17 @@ export const PurchasePayments = observer((): ReactElement => {
                                         <Button
                                             type='button'
                                             icon='adms-arrow-bottom'
+                                            tooltip={
+                                                isRowExpanded
+                                                    ? "Hide description"
+                                                    : "Show description"
+                                            }
                                             tooltipOptions={{ showDelay: 300 }}
                                             disabled={!options?.payRemarks}
                                             className={`purchase-payments__table-button p-button-text ${
                                                 isRowExpanded && "table-button-active"
                                             }`}
+                                            onClick={() => handleRowExpansionClick(options)}
                                         />
                                     </div>
                                 );
@@ -224,20 +235,46 @@ export const PurchasePayments = observer((): ReactElement => {
                                 },
                             }}
                         />
-                        {renderColumnsData.map(({ field, header, body }) => (
-                            <Column
-                                field={field}
-                                header={header}
-                                key={field}
-                                headerClassName='cursor-move'
-                                body={body}
-                                pt={{
-                                    headerContent: {
-                                        className: "justify-content-start",
-                                    },
-                                }}
-                            />
-                        ))}
+                        {renderColumnsData.map(({ field, header }) =>
+                            field === "payPack" ? (
+                                <Column
+                                    field={field}
+                                    header={header}
+                                    key={field}
+                                    headerClassName='cursor-move'
+                                    className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                    body={(options) => (
+                                        <>{`$ ${Number(options[field] || 0).toFixed(2)}`}</>
+                                    )}
+                                />
+                            ) : field === "payDefaultExpAdded" ? (
+                                <Column
+                                    field={field}
+                                    header={header}
+                                    key={field}
+                                    headerClassName='cursor-move'
+                                    className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                    body={(options) => (
+                                        <>
+                                            {parseBoolean(options[field])
+                                                ? "Data from database"
+                                                : ""}
+                                        </>
+                                    )}
+                                />
+                            ) : (
+                                <Column
+                                    field={field}
+                                    header={header}
+                                    key={field}
+                                    headerClassName='cursor-move'
+                                    className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                    body={(options) => (
+                                        <>{parseBoolean(options[field]) ? "Yes" : "No"}</>
+                                    )}
+                                />
+                            )
+                        )}
                         {canDeletePayments() && (
                             <Column
                                 body={deleteTemplate}
@@ -253,10 +290,6 @@ export const PurchasePayments = observer((): ReactElement => {
                             />
                         )}
                     </DataTable>
-                </div>
-                <div className='total-sum'>
-                    <span className='total-sum__label'>Total expenses:</span>
-                    <span className='total-sum__value'> $ 0.00</span>
                 </div>
             </div>
         </>

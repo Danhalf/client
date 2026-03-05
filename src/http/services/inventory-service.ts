@@ -110,7 +110,7 @@ export const getInventoryGroupOptions = async (groupuid: string) => {
 };
 
 export const getInventoryPaymentBack = async (inventoryuid: string) => {
-    return new ApiRequest().get<InventoryPaymentBack>({
+    return new ApiRequest().get<InventoryPaymentBack[]>({
         url: `inventory/${inventoryuid}/paymentpack`,
         defaultError: "Error on get inventory expense",
     });
