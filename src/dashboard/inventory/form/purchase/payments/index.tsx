@@ -212,7 +212,7 @@ export const PurchasePayments = observer((): ReactElement => {
                             wrapper: {
                                 className: "thin-scrollbar",
                                 style: {
-                                    height: "205px",
+                                    height: "245px",
                                 },
                             },
                         }}
@@ -246,7 +246,10 @@ export const PurchasePayments = observer((): ReactElement => {
                                             }
                                             tooltipOptions={{ showDelay: 300 }}
                                             disabled={!options?.payRemarks}
-                                            className={`purchase-payments__table-button p-button-text ${
+                                            severity={
+                                                !options?.payRemarks ? "secondary" : "success"
+                                            }
+                                            className={`purchase-payments__table-button edit-button p-button-text ${
                                                 isRowExpanded && "table-button-active"
                                             }`}
                                             onClick={() => handleRowExpansionClick(options)}
@@ -304,18 +307,7 @@ export const PurchasePayments = observer((): ReactElement => {
                             )
                         )}
                         {canDeletePayments() && (
-                            <Column
-                                body={deleteTemplate}
-                                frozen
-                                alignFrozen='right'
-                                pt={{
-                                    root: {
-                                        style: {
-                                            width: "20px",
-                                        },
-                                    },
-                                }}
-                            />
+                            <Column body={deleteTemplate} frozen alignFrozen='right' />
                         )}
                     </DataTable>
                 </div>

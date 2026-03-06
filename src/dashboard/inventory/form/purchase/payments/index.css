@@ -19,7 +19,7 @@
 }
 
 .purchase-payments__table.p-datatable {
-    --datatable-header-height: 45px;
+    --datatable-header-height: 44px;
     margin-top: 50px;
 
     .p-datatable-thead {
@@ -53,34 +53,58 @@
     }
 
     .p-column-header-content {
-        justify-content: center;
+        justify-content: flex-start;
     }
 }
 
-.total-sum {
-    margin-left: auto;
-    margin-top: 10px;
-    font-size: 18px;
-}
-
-.total-sum__label {
-    color: var(--admss-app-main-blue);
-    font-weight: 700;
-}
-
-.total-sum__value {
-    margin: 0 10px;
-    font-weight: 600;
-}
-
 .purchase-payments__table-button {
-    &.p-button {
+    &.p-button.p-button-icon-only {
+        width: 24px;
+        height: 24px;
+        font-size: 18px;
+        border-radius: 50%;
+        border: none;
+        background: transparent;
+        transition: color 0.3s ease-in-out;
+
+        .p-button-icon {
+            transition:
+                transform 0.3s ease-in-out,
+                color 0.3s ease-in-out;
+            transform-origin: center;
+        }
+
+        &.edit-button {
+            color: var(--admss-app-blue-text);
+        }
+
+        &:disabled {
+            color: var(--admss-app-light-grey);
+        }
         &:enabled:hover {
+            color: var(--admss-app-medium-grey);
             background: transparent;
         }
         &:enabled:focus {
             box-shadow: none;
         }
+    }
+}
+
+.inventory-form .p-datatable {
+    .p-datatable-thead > tr > th {
+        border-left: 1px solid var(--admss-app-medium-blue);
+    }
+    .p-datatable-thead > tr > th:last-child {
+        border-left: none;
+    }
+    tr td:has(.purchase-payments__table-controls-container) + td {
+        border-left: none;
+    }
+    tr td:has(.purchase-payments__delete-button) {
+        border-left: none;
+        width: 20px;
+        padding: 0;
     }
 }
 
@@ -93,6 +117,13 @@
     border-radius: 50%;
     border: none;
     background: transparent;
+
+    &:enabled:hover {
+        color: var(--admss-app-medium-grey);
+        background: transparent;
+        box-shadow: none;
+        border: none;
+    }
 }
 
 .purchase-payments__table .expanded-row {
