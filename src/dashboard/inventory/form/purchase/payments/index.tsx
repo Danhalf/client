@@ -18,6 +18,18 @@ import { usePermissions } from "common/hooks/usePermissions";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
 import { useToastMessage } from "common/hooks";
 
+const TOAST_MESSAGES = {
+    SUCCESS: {
+        SAVE: "Payment is successfully saved!",
+        UPDATE: "Payment is successfully updated!",
+        DELETE: "Payment has been deleted.",
+    },
+    ERROR: {
+        SAVE: "Error while saving payment",
+        DELETE: "Error while deleting payment",
+    },
+};
+
 interface TableColumnProps extends ColumnProps {
     field: keyof InventoryPaymentBack;
     body?: (rowData: InventoryPaymentBack) => ReactElement;
@@ -46,6 +58,7 @@ export const PurchasePayments = observer((): ReactElement => {
     const [expandedRows, setExpandedRows] = useState<Record<string, any>[]>([]);
     const [confirmActive, setConfirmActive] = useState(false);
     const [paymentToDelete, setPaymentToDelete] = useState<InventoryPaymentBack | null>(null);
+    const [editingPayment, setEditingPayment] = useState<InventoryPaymentBack | null>(null);
     const { showError, showSuccess } = useToastMessage();
 
     const fetchInventoryPaymentBack = async () => {
@@ -77,14 +90,18 @@ export const PurchasePayments = observer((): ReactElement => {
         });
         if (response?.status === Status.OK) {
             await fetchInventoryPaymentBack();
+            showSuccess(
+                editingPayment ? TOAST_MESSAGES.SUCCESS.UPDATE : TOAST_MESSAGES.SUCCESS.SAVE
+            );
             setPacksForVehicle(0);
             setDefaultExpenses(0);
             setPaid(0);
             setSalesTaxPaid(0);
             setDescription("");
             setExpandedRows([]);
+            setEditingPayment(null);
         } else {
-            showError(response?.error || "Error while saving payment");
+            showError(response?.error || TOAST_MESSAGES.ERROR.SAVE);
         }
     };
 
@@ -107,6 +124,7 @@ export const PurchasePayments = observer((): ReactElement => {
 
     const handleEditPayment = (row: InventoryPaymentBack) => {
         if (!canEditPayments()) return;
+        setEditingPayment(row);
         setPacksForVehicle(Number(row.payPack) || 0);
         setDefaultExpenses(parseBoolean(row.payDefaultExpAdded) ? 1 : 0);
         setPaid(parseBoolean(row.payPaid) ? 1 : 0);
@@ -114,16 +132,39 @@ export const PurchasePayments = observer((): ReactElement => {
         setDescription(String(row.payRemarks ?? ""));
     };
 
+    const hasFormChanges =
+        !editingPayment ||
+        Number(editingPayment.payPack) !== packsForVehicle ||
+        (parseBoolean(editingPayment.payDefaultExpAdded) ? 1 : 0) !== defaultExpenses ||
+        (parseBoolean(editingPayment.payPaid) ? 1 : 0) !== paid ||
+        (parseBoolean(editingPayment.paySalesTaxPaid) ? 1 : 0) !== salesTaxPaid ||
+        String(editingPayment.payRemarks ?? "") !== description;
+
+    const isFormEmpty =
+        !packsForVehicle && !defaultExpenses && !paid && !salesTaxPaid && !description.trim();
+
+    const isSaveDisabled =
+        (!!editingPayment && !hasFormChanges) || (!editingPayment && isFormEmpty);
+
+    const handleCancelEdit = () => {
+        setEditingPayment(null);
+        setPacksForVehicle(0);
+        setDefaultExpenses(0);
+        setPaid(0);
+        setSalesTaxPaid(0);
+        setDescription("");
+    };
+
     const handleDeletePayment = async () => {
         if (!paymentToDelete?.id) return;
         const response = await deleteInventoryPaymentPack(paymentToDelete.id);
         if (response?.error) {
-            showError(response?.error || "Error while deleting payment");
+            showError(response?.error || TOAST_MESSAGES.ERROR.DELETE);
         } else {
             await fetchInventoryPaymentBack();
             setConfirmActive(false);
             setPaymentToDelete(null);
-            showSuccess("Payment has been deleted.");
+            showSuccess(TOAST_MESSAGES.SUCCESS.DELETE);
         }
     };
 
@@ -187,13 +228,25 @@ export const PurchasePayments = observer((): ReactElement => {
                     </span>
                 </div>
 
-                <Button
-                    className='purchase-payments__button'
-                    type='button'
-                    onClick={handleSavePayment}
-                >
-                    Save
-                </Button>
+                <div className='purchase-payments__actions'>
+                    {editingPayment && (
+                        <Button
+                            type='button'
+                            label='Cancel'
+                            className='purchase-payments__button p-button-outlined'
+                            onClick={handleCancelEdit}
+                        />
+                    )}
+                    <Button
+                        className='purchase-payments__button'
+                        type='button'
+                        onClick={handleSavePayment}
+                        disabled={isSaveDisabled}
+                        severity={isSaveDisabled ? "secondary" : "success"}
+                    >
+                        {editingPayment ? "Update" : "Save"}
+                    </Button>
+                </div>
             </div>
             <div className='grid'>
                 <div className='col-12'>
