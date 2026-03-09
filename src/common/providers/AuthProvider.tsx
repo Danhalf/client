@@ -10,13 +10,21 @@ import {
     useRef,
 } from "react";
 import { AuthUser } from "common/models/user";
-import { getKeyValue } from "services/local-storage.service";
+import { getKeyValue, localStorageClear } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { typeGuards } from "common/utils";
 import { SessionExpiryModal } from "dashboard/common/session-expiry-modal";
+import {
+    registerAuthProviderUpdate,
+    refreshAccessTokenIfNeeded,
+    setRefreshApi,
+} from "http/token-refresh";
+import { RefreshTokenResponse } from "common/models/user";
+import { refreshAccessToken } from "http/services/auth.service";
 
 const MS_IN_SECOND = 1000;
 const REFRESH_MARGIN_SECONDS = 60;
+const SESSION_EXPIRY_MODAL_DELAY_MS = 30 * MS_IN_SECOND;
 
 interface AuthTokensState {
     accessToken: string | null;
@@ -182,39 +190,91 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         setSecondsLeft(0);
         clearRefreshTimer();
         clearCountdownInterval();
+        localStorageClear(LS_APP_USER);
     }, []);
 
-    const scheduleRefresh = useCallback((expiresInSec: number) => {
-        if (!typeGuards.isNumber(expiresInSec) || expiresInSec <= 0) {
-            return;
-        }
+    const scheduleRefresh = useCallback(
+        (expiresInSec: number) => {
+            if (!typeGuards.isNumber(expiresInSec) || expiresInSec <= 0) {
+                return;
+            }
 
-        const now = Date.now();
-        const totalMs = expiresInSec * MS_IN_SECOND;
-        const marginMs = REFRESH_MARGIN_SECONDS * MS_IN_SECOND;
-        const delayMs = Math.max(totalMs - marginMs, 0);
+            const now = Date.now();
+            const totalMs = expiresInSec * MS_IN_SECOND;
+            const marginMs = REFRESH_MARGIN_SECONDS * MS_IN_SECOND;
+            const delayMs = Math.min(
+                Math.max(totalMs - marginMs, 0),
+                SESSION_EXPIRY_MODAL_DELAY_MS
+            );
 
-        setTokens((prev) => ({
-            ...prev,
-            expiresAt: now + totalMs,
-        }));
+            setTokens((prev) => ({
+                ...prev,
+                expiresAt: now + totalMs,
+            }));
 
-        clearRefreshTimer();
+            clearRefreshTimer();
 
-        if (delayMs === 0) {
-            const initialSeconds = Math.min(expiresInSec, REFRESH_MARGIN_SECONDS);
-            startExpiryCountdown(initialSeconds);
-            return;
-        }
+            if (delayMs === 0) {
+                const initialSeconds = Math.min(expiresInSec, REFRESH_MARGIN_SECONDS);
+                startExpiryCountdown(initialSeconds);
+                return;
+            }
 
-        refreshTimerId.current = window.setTimeout(() => {
-            startExpiryCountdown(REFRESH_MARGIN_SECONDS);
-        }, delayMs);
-    }, [startExpiryCountdown]);
+            refreshTimerId.current = window.setTimeout(() => {
+                startExpiryCountdown(REFRESH_MARGIN_SECONDS);
+            }, delayMs);
+        },
+        [startExpiryCountdown]
+    );
 
     const forceRefresh = useCallback(async () => {
-        return;
+        const success = await refreshAccessTokenIfNeeded();
+        if (!success) {
+            logout();
+        }
+    }, [logout]);
+
+    const applyRefreshedTokens = useCallback(
+        (data: RefreshTokenResponse) => {
+            const now = Date.now();
+            setTokens({
+                accessToken: data.token,
+                refreshToken: data.refresh_token,
+                sessionUid: data.sessionuid,
+                userUid: data.useruid,
+                expiresAt: now + data.expires_in * MS_IN_SECOND,
+                refreshExpiresAt: now + data.refresh_token_expires_in * MS_IN_SECOND,
+            });
+            setAuthUser((prev) =>
+                prev
+                    ? {
+                          ...prev,
+                          token: data.token,
+                          refresh_token: data.refresh_token,
+                          refresh_token_expires_in: data.refresh_token_expires_in,
+                          expires_in: data.expires_in,
+                          sessionuid: data.sessionuid,
+                      }
+                    : null
+            );
+            scheduleRefresh(data.expires_in);
+            setIsSessionExpiring(false);
+            setSecondsLeft(0);
+            clearCountdownInterval();
+            clearRefreshTimer();
+        },
+        [scheduleRefresh]
+    );
+
+    useEffect(() => {
+        setRefreshApi(refreshAccessToken);
+        return () => setRefreshApi(null);
     }, []);
+
+    useEffect(() => {
+        registerAuthProviderUpdate(applyRefreshedTokens);
+        return () => registerAuthProviderUpdate(null);
+    }, [applyRefreshedTokens]);
 
     const setSessionExpiring = useCallback((expiring: boolean, value?: number) => {
         setIsSessionExpiring(expiring);
