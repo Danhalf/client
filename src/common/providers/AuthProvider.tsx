@@ -7,13 +7,16 @@ import {
     useMemo,
     useState,
     useEffect,
+    useRef,
 } from "react";
 import { AuthUser } from "common/models/user";
 import { getKeyValue } from "services/local-storage.service";
 import { LS_APP_USER } from "common/constants/localStorage";
 import { typeGuards } from "common/utils";
+import { SessionExpiryModal } from "dashboard/common/session-expiry-modal";
 
 const MS_IN_SECOND = 1000;
+const REFRESH_MARGIN_SECONDS = 60;
 
 interface AuthTokensState {
     accessToken: string | null;
@@ -89,10 +92,57 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
     const [isSessionExpiring, setIsSessionExpiring] = useState(false);
     const [secondsLeft, setSecondsLeft] = useState(0);
 
+    const refreshTimerId = useRef<number | null>(null);
+    const countdownIntervalId = useRef<number | null>(null);
+
+    const clearRefreshTimer = () => {
+        if (refreshTimerId.current !== null) {
+            window.clearTimeout(refreshTimerId.current);
+            refreshTimerId.current = null;
+        }
+    };
+
+    const clearCountdownInterval = () => {
+        if (countdownIntervalId.current !== null) {
+            window.clearInterval(countdownIntervalId.current);
+            countdownIntervalId.current = null;
+        }
+    };
+
+    const startExpiryCountdown = useCallback((initialSeconds: number) => {
+        const safeInitialSeconds = initialSeconds > 0 ? initialSeconds : 0;
+        setIsSessionExpiring(true);
+        setSecondsLeft(safeInitialSeconds);
+
+        clearCountdownInterval();
+
+        if (safeInitialSeconds === 0) {
+            return;
+        }
+
+        countdownIntervalId.current = window.setInterval(() => {
+            setSecondsLeft((prev) => {
+                if (prev <= 1) {
+                    window.clearInterval(countdownIntervalId.current ?? undefined);
+                    countdownIntervalId.current = null;
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, MS_IN_SECOND);
+    }, []);
+
     useEffect(() => {
         const { user, tokens: nextTokens } = createInitialStateFromStoredUser();
         setAuthUser(user);
         setTokens(nextTokens);
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            clearRefreshTimer();
+            clearCountdownInterval();
+        };
     }, []);
 
     const login = useCallback((user: AuthUser) => {
@@ -112,6 +162,10 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         });
         setIsSessionExpiring(false);
         setSecondsLeft(0);
+
+        if (typeGuards.isNumber(user.expires_in)) {
+            scheduleRefresh(user.expires_in);
+        }
     }, []);
 
     const logout = useCallback(() => {
@@ -126,15 +180,37 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         });
         setIsSessionExpiring(false);
         setSecondsLeft(0);
+        clearRefreshTimer();
+        clearCountdownInterval();
     }, []);
 
     const scheduleRefresh = useCallback((expiresInSec: number) => {
+        if (!typeGuards.isNumber(expiresInSec) || expiresInSec <= 0) {
+            return;
+        }
+
         const now = Date.now();
+        const totalMs = expiresInSec * MS_IN_SECOND;
+        const marginMs = REFRESH_MARGIN_SECONDS * MS_IN_SECOND;
+        const delayMs = Math.max(totalMs - marginMs, 0);
+
         setTokens((prev) => ({
             ...prev,
-            expiresAt: now + expiresInSec * MS_IN_SECOND,
+            expiresAt: now + totalMs,
         }));
-    }, []);
+
+        clearRefreshTimer();
+
+        if (delayMs === 0) {
+            const initialSeconds = Math.min(expiresInSec, REFRESH_MARGIN_SECONDS);
+            startExpiryCountdown(initialSeconds);
+            return;
+        }
+
+        refreshTimerId.current = window.setTimeout(() => {
+            startExpiryCountdown(REFRESH_MARGIN_SECONDS);
+        }, delayMs);
+    }, [startExpiryCountdown]);
 
     const forceRefresh = useCallback(async () => {
         return;
@@ -177,7 +253,19 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         ]
     );
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    return (
+        <AuthContext.Provider value={value}>
+            <>
+                {children}
+                <SessionExpiryModal
+                    visible={isSessionExpiring}
+                    secondsLeft={secondsLeft}
+                    onContinue={forceRefresh}
+                    onLogout={logout}
+                />
+            </>
+        </AuthContext.Provider>
+    );
 };
 
 export const useAuth = (): AuthContextValue => {
