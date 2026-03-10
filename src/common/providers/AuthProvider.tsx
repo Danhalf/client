@@ -23,10 +23,10 @@ import { RefreshTokenResponse } from "common/models/user";
 import { refreshAccessToken, logout as apiLogout } from "http/services/auth.service";
 import { LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
 import { HOME_PAGE } from "common/constants/links";
+import { INACTIVITY_TIMEOUT_SECONDS } from "common/settings";
+import { MS_IN_SECOND, SECONDS_IN_MINUTE } from "common/constants/time";
 
-const MS_IN_SECOND = 1000;
-const REFRESH_MARGIN_SECONDS = 60;
-const SESSION_EXPIRY_MODAL_DELAY_MS = 30 * MS_IN_SECOND;
+const REFRESH_MARGIN_SECONDS = SECONDS_IN_MINUTE;
 
 interface AuthTokensState {
     accessToken: string | null;
@@ -104,6 +104,8 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
 
     const refreshTimerId = useRef<number | null>(null);
     const countdownIntervalId = useRef<number | null>(null);
+    const inactivityTimerId = useRef<number | null>(null);
+    const lastActivityAtRef = useRef<number | null>(null);
 
     const clearRefreshTimer = () => {
         if (refreshTimerId.current !== null) {
@@ -117,6 +119,48 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
             window.clearInterval(countdownIntervalId.current);
             countdownIntervalId.current = null;
         }
+    };
+
+    const startExpiryCountdown = (initialSeconds: number) => {
+        const safeInitialSeconds = initialSeconds > 0 ? initialSeconds : 0;
+        setIsSessionExpiring(true);
+        setSecondsLeft(safeInitialSeconds);
+
+        clearCountdownInterval();
+
+        if (safeInitialSeconds === 0) {
+            return;
+        }
+
+        countdownIntervalId.current = window.setInterval(() => {
+            setSecondsLeft((prev) => {
+                if (prev <= 1) {
+                    window.clearInterval(countdownIntervalId.current ?? undefined);
+                    countdownIntervalId.current = null;
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, MS_IN_SECOND);
+    };
+
+    const resetInactivityTimer = () => {
+        if (!authUser) {
+            return;
+        }
+
+        lastActivityAtRef.current = Date.now();
+
+        if (inactivityTimerId.current !== null) {
+            window.clearTimeout(inactivityTimerId.current);
+        }
+
+        inactivityTimerId.current = window.setTimeout(() => {
+            if (!authUser) {
+                return;
+            }
+            startExpiryCountdown(REFRESH_MARGIN_SECONDS);
+        }, INACTIVITY_TIMEOUT_SECONDS * MS_IN_SECOND);
     };
 
     const login = useCallback((user: AuthUser) => {
@@ -179,29 +223,6 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         window.location.replace(HOME_PAGE);
     }, [authUser, tokens.accessToken, logout]);
 
-    const startExpiryCountdown = useCallback((initialSeconds: number) => {
-        const safeInitialSeconds = initialSeconds > 0 ? initialSeconds : 0;
-        setIsSessionExpiring(true);
-        setSecondsLeft(safeInitialSeconds);
-
-        clearCountdownInterval();
-
-        if (safeInitialSeconds === 0) {
-            return;
-        }
-
-        countdownIntervalId.current = window.setInterval(() => {
-            setSecondsLeft((prev) => {
-                if (prev <= 1) {
-                    window.clearInterval(countdownIntervalId.current ?? undefined);
-                    countdownIntervalId.current = null;
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, MS_IN_SECOND);
-    }, []);
-
     useEffect(() => {
         const { user, tokens: nextTokens } = createInitialStateFromStoredUser();
         setAuthUser(user);
@@ -212,6 +233,10 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         return () => {
             clearRefreshTimer();
             clearCountdownInterval();
+            if (inactivityTimerId.current !== null) {
+                window.clearTimeout(inactivityTimerId.current);
+                inactivityTimerId.current = null;
+            }
         };
     }, []);
 
@@ -221,6 +246,69 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         }
     }, [isSessionExpiring, secondsLeft, performSignOut]);
 
+    useEffect(() => {
+        if (!tokens.expiresAt) {
+            return;
+        }
+
+        const remainingMs = tokens.expiresAt - Date.now();
+        const remainingSec = Math.floor(remainingMs / MS_IN_SECOND);
+
+        if (remainingSec <= 0) {
+            (async () => {
+                const success = await refreshAccessTokenIfNeeded();
+                if (!success) {
+                    logout();
+                    window.location.replace(HOME_PAGE);
+                }
+            })();
+            return;
+        }
+
+        scheduleRefresh(remainingSec);
+    }, [tokens.expiresAt]);
+
+    useEffect(() => {
+        if (!authUser) {
+            if (inactivityTimerId.current !== null) {
+                window.clearTimeout(inactivityTimerId.current);
+                inactivityTimerId.current = null;
+            }
+            lastActivityAtRef.current = null;
+            return;
+        }
+
+        const handleActivity = () => {
+            resetInactivityTimer();
+        };
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                handleActivity();
+            }
+        };
+
+        const activityEvents: Array<keyof WindowEventMap> = ["click", "keydown", "touchstart"];
+
+        activityEvents.forEach((eventName) => {
+            window.addEventListener(eventName, handleActivity);
+        });
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        resetInactivityTimer();
+
+        return () => {
+            activityEvents.forEach((eventName) => {
+                window.removeEventListener(eventName, handleActivity);
+            });
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+            if (inactivityTimerId.current !== null) {
+                window.clearTimeout(inactivityTimerId.current);
+                inactivityTimerId.current = null;
+            }
+        };
+    }, [authUser]);
+
     const scheduleRefresh = useCallback(
         (expiresInSec: number) => {
             if (!typeGuards.isNumber(expiresInSec) || expiresInSec <= 0) {
@@ -229,11 +317,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
 
             const now = Date.now();
             const totalMs = expiresInSec * MS_IN_SECOND;
-            const marginMs = REFRESH_MARGIN_SECONDS * MS_IN_SECOND;
-            const delayMs = Math.min(
-                Math.max(totalMs - marginMs, 0),
-                SESSION_EXPIRY_MODAL_DELAY_MS
-            );
+            const refreshInMs = Math.max((expiresInSec - REFRESH_MARGIN_SECONDS) * MS_IN_SECOND, 0);
 
             setTokens((prev) => ({
                 ...prev,
@@ -242,17 +326,15 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
 
             clearRefreshTimer();
 
-            if (delayMs === 0) {
-                const initialSeconds = Math.min(expiresInSec, REFRESH_MARGIN_SECONDS);
-                startExpiryCountdown(initialSeconds);
-                return;
-            }
-
-            refreshTimerId.current = window.setTimeout(() => {
-                startExpiryCountdown(REFRESH_MARGIN_SECONDS);
-            }, delayMs);
+            refreshTimerId.current = window.setTimeout(async () => {
+                const success = await refreshAccessTokenIfNeeded();
+                if (!success) {
+                    logout();
+                    window.location.replace(HOME_PAGE);
+                }
+            }, refreshInMs);
         },
-        [startExpiryCountdown]
+        [logout]
     );
 
     const forceRefresh = useCallback(async () => {
