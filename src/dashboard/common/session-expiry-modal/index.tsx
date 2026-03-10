@@ -12,6 +12,9 @@ const SESSION_EXPIRY = {
     SIGN_OUT: "Sign out now",
 };
 
+const SESSION_WARNING_THRESHOLD_SECONDS = 30;
+const SESSION_DANGER_THRESHOLD_SECONDS = 10;
+
 interface SessionExpiryModalProps {
     visible: boolean;
     secondsLeft: number;
@@ -30,6 +33,24 @@ export const SessionExpiryModal = ({
         .padStart(2, "0");
     const seconds = (secondsLeft % SECONDS_IN_MINUTE).toString().padStart(2, "0");
 
+    const timerClassName = `session-expiry-modal__timer${
+        secondsLeft < SESSION_DANGER_THRESHOLD_SECONDS ? " session-expiry-modal__timer--danger" : ""
+    }${
+        secondsLeft < SESSION_WARNING_THRESHOLD_SECONDS &&
+        secondsLeft >= SESSION_DANGER_THRESHOLD_SECONDS
+            ? " session-expiry-modal__timer--warning"
+            : ""
+    }`;
+
+    const dialogHeader = () => {
+        return (
+            <div className='session-expiry-modal__header'>
+                <i className='icon adms-warning' />
+                <span>Your session is about to expire</span>
+            </div>
+        );
+    };
+
     return (
         <Dialog
             visible={visible}
@@ -37,11 +58,11 @@ export const SessionExpiryModal = ({
             className='session-expiry-modal'
             closable={false}
             draggable={false}
-            header='Your session is about to expire'
+            header={dialogHeader()}
         >
             <div className='session-expiry-modal__content'>
                 <p className='session-expiry-modal__description'>{SESSION_EXPIRY.MESSAGE}</p>
-                <div className='session-expiry-modal__timer'>
+                <div className={timerClassName}>
                     <span className='session-expiry-modal__timer-value'>
                         {minutes}:{seconds}
                     </span>
