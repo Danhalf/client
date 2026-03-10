@@ -29,9 +29,10 @@
 .session-expiry-modal__description {
     margin: 0;
     text-align: left;
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 18px;
+    line-height: 20px;
     color: var(--admss-app-text-muted);
+    font-family: Open Sans;
 }
 
 .session-expiry-modal__timer {
@@ -41,22 +42,24 @@
     justify-content: center;
     padding: 24px;
     border-radius: 8px;
-    background-color: var(--admss-app-lightest-blue-violet);
+    background-color: var(--admss-app-focus-blue);
+    color: var(--admss-app-main-blue);
     border: 1px dashed var(--admss-app-medium-light-blue);
 }
 
 .session-expiry-modal__timer-value {
     font-weight: 700;
-    font-size: 32px;
-    line-height: 1.2;
-    color: var(--admss-app-blue-text);
+    font-size: 48px;
+    line-height: 48px;
+    font-family: Arial, Helvetica, sans-serif;
+    letter-spacing: 0;
+    text-align: center;
 }
 
 .session-expiry-modal__timer-label {
     margin-top: 4px;
-    font-size: 11px;
+    font-size: 12px;
     text-transform: uppercase;
-    color: var(--admss-app-medium-grey);
 }
 
 .session-expiry-modal__actions {
@@ -73,12 +76,31 @@
 }
 
 .session-expiry-modal__button--primary.p-button {
-    background-color: var(--admss-app-blue, #2563eb);
-    border-color: var(--admss-app-blue, #2563eb);
+    background-color: var(--admss-app-main-blue);
+    border-color: var(--admss-app-main-blue);
+    &:enabled:hover,
+    &:enabled:focus {
+        box-shadow: none;
+        background-color: var(--admss-app-warning-blue);
+        border-color: var(--admss-app-warning-blue);
+        color: var(--admss-app-white);
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
 }
 
 .session-expiry-modal__button--secondary.p-button {
     background-color: var(--admss-app-white);
-    color: var(--admss-app-warning-blue);
-    border-color: var(--admss-app-lightest-grey);
+    color: var(--admss-app-main-blue);
+    border-color: var(--admss-app-main-blue);
+    &:enabled:hover,
+    &:enabled:focus {
+        box-shadow: none;
+        background-color: var(--admss-app-white);
+        border-color: var(--admss-app-warning-blue);
+        color: var(--admss-app-warning-blue);
+        outline: none;
+        box-shadow: none;
+    }
 }
