@@ -20,7 +20,9 @@ import {
     setRefreshApi,
 } from "http/token-refresh";
 import { RefreshTokenResponse } from "common/models/user";
-import { refreshAccessToken } from "http/services/auth.service";
+import { refreshAccessToken, logout as apiLogout } from "http/services/auth.service";
+import { LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
+import { HOME_PAGE } from "common/constants/links";
 
 const MS_IN_SECOND = 1000;
 const REFRESH_MARGIN_SECONDS = 60;
@@ -117,42 +119,6 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         }
     };
 
-    const startExpiryCountdown = useCallback((initialSeconds: number) => {
-        const safeInitialSeconds = initialSeconds > 0 ? initialSeconds : 0;
-        setIsSessionExpiring(true);
-        setSecondsLeft(safeInitialSeconds);
-
-        clearCountdownInterval();
-
-        if (safeInitialSeconds === 0) {
-            return;
-        }
-
-        countdownIntervalId.current = window.setInterval(() => {
-            setSecondsLeft((prev) => {
-                if (prev <= 1) {
-                    window.clearInterval(countdownIntervalId.current ?? undefined);
-                    countdownIntervalId.current = null;
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, MS_IN_SECOND);
-    }, []);
-
-    useEffect(() => {
-        const { user, tokens: nextTokens } = createInitialStateFromStoredUser();
-        setAuthUser(user);
-        setTokens(nextTokens);
-    }, []);
-
-    useEffect(() => {
-        return () => {
-            clearRefreshTimer();
-            clearCountdownInterval();
-        };
-    }, []);
-
     const login = useCallback((user: AuthUser) => {
         const now = Date.now();
         setAuthUser(user);
@@ -192,6 +158,68 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
         clearCountdownInterval();
         localStorageClear(LS_APP_USER);
     }, []);
+
+    const performSignOut = useCallback(async () => {
+        const currentPath = window.location.pathname + window.location.search;
+
+        if (authUser) {
+            const routeData: LastRouteData = {
+                path: currentPath,
+                timestamp: Date.now(),
+                useruid: authUser.useruid,
+            };
+            localStorage.setItem(LS_LAST_ROUTE, JSON.stringify(routeData));
+        }
+
+        if (authUser && tokens.accessToken) {
+            await apiLogout(authUser.useruid, tokens.accessToken);
+        }
+
+        logout();
+        window.location.replace(HOME_PAGE);
+    }, [authUser, tokens.accessToken, logout]);
+
+    const startExpiryCountdown = useCallback((initialSeconds: number) => {
+        const safeInitialSeconds = initialSeconds > 0 ? initialSeconds : 0;
+        setIsSessionExpiring(true);
+        setSecondsLeft(safeInitialSeconds);
+
+        clearCountdownInterval();
+
+        if (safeInitialSeconds === 0) {
+            return;
+        }
+
+        countdownIntervalId.current = window.setInterval(() => {
+            setSecondsLeft((prev) => {
+                if (prev <= 1) {
+                    window.clearInterval(countdownIntervalId.current ?? undefined);
+                    countdownIntervalId.current = null;
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, MS_IN_SECOND);
+    }, []);
+
+    useEffect(() => {
+        const { user, tokens: nextTokens } = createInitialStateFromStoredUser();
+        setAuthUser(user);
+        setTokens(nextTokens);
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            clearRefreshTimer();
+            clearCountdownInterval();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (isSessionExpiring && secondsLeft === 0) {
+            void performSignOut();
+        }
+    }, [isSessionExpiring, secondsLeft, performSignOut]);
 
     const scheduleRefresh = useCallback(
         (expiresInSec: number) => {
@@ -321,7 +349,7 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
                     visible={isSessionExpiring}
                     secondsLeft={secondsLeft}
                     onContinue={forceRefresh}
-                    onLogout={logout}
+                    onLogout={performSignOut}
                 />
             </>
         </AuthContext.Provider>
