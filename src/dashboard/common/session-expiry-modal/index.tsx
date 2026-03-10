@@ -2,6 +2,7 @@ import { ReactElement } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import "./index.css";
+import { SECONDS_IN_MINUTE } from "common/constants/time";
 
 const SESSION_EXPIRY = {
     MESSAGE:
@@ -24,10 +25,10 @@ export const SessionExpiryModal = ({
     onContinue,
     onLogout,
 }: SessionExpiryModalProps): ReactElement => {
-    const minutes = Math.floor(secondsLeft / 60)
+    const minutes = Math.floor(secondsLeft / SECONDS_IN_MINUTE)
         .toString()
         .padStart(2, "0");
-    const seconds = (secondsLeft % 60).toString().padStart(2, "0");
+    const seconds = (secondsLeft % SECONDS_IN_MINUTE).toString().padStart(2, "0");
 
     return (
         <Dialog
