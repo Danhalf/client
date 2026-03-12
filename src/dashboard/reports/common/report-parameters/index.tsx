@@ -117,15 +117,13 @@ export const ReportParameters = ({
                     emptyDate
                     onChange={({ value }) => setStartDate(Number(value))}
                 />
-                {report.AskForStartAndEndDates && (
-                    <DateInput
-                        name='End Date'
-                        colWidth={3}
-                        date={endDate}
-                        emptyDate
-                        onChange={({ value }) => setEndDate(Number(value))}
-                    />
-                )}
+                <DateInput
+                    name='End Date'
+                    colWidth={3}
+                    date={endDate}
+                    emptyDate
+                    onChange={({ value }) => setEndDate(Number(value))}
+                />
                 <div className='col-12 flex justify-content-end gap-3'>
                     <Button
                         className='edit-collection__button'
