@@ -18,10 +18,8 @@ export const ProfileAvatar = observer(
         const { profileStore } = useStore();
 
         useEffect(() => {
-            if (profileStore.logo) {
-                setAvatarImage(profileStore.logo);
-            }
-        }, [profileStore.logo]);
+            setAvatarImage(profileStore.displayedLogo || null);
+        }, [profileStore.displayedLogo]);
 
         const handleChooseClick = (e: React.MouseEvent) => {
             if (!editable) return;
@@ -38,7 +36,9 @@ export const ProfileAvatar = observer(
 
             const reader = new FileReader();
             reader.onloadend = () => {
-                setAvatarImage(reader.result as string);
+                const dataUrl = reader.result as string;
+                setAvatarImage(dataUrl);
+                profileStore.setLogoPreview(dataUrl);
             };
             reader.readAsDataURL(file);
             profileStore.setLogoFile(file);
