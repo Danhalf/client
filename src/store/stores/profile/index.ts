@@ -5,7 +5,7 @@ import { updateUserProfile, changePassword, checkPassword, getUserData } from "h
 import { UserData, CheckPasswordResponse } from "common/models/users";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { typeGuards } from "common/utils";
-import { uploadUserLogo } from "http/services/media.service";
+import { getUserLogo, uploadUserLogo } from "http/services/media.service";
 
 export interface ExtendedProfile extends Partial<AuthUser> {
     address: string;
@@ -29,6 +29,8 @@ export class ProfileStore {
     public rootStore: RootStore;
     private _profile: ExtendedProfile = initialProfile;
     private _isProfileChanged: boolean = false;
+    private _logo: string | null = null;
+    private _logoPreview: string | null = null;
     private _logoFile: File | null = null;
     private _currentPassword: string = "";
     private _newPassword: string = "";
@@ -53,6 +55,10 @@ export class ProfileStore {
 
     public get profile() {
         return this._profile;
+    }
+
+    public get displayedLogo() {
+        return this._logoPreview || this._logo;
     }
 
     public changeProfile = <K extends keyof ExtendedProfile>(key: K, value: ExtendedProfile[K]) => {
@@ -81,8 +87,11 @@ export class ProfileStore {
         }
     }
 
-    public markProfileSaved() {
-        this._isProfileChanged = false;
+    public setLogoPreview(logoPreview: string | null) {
+        this._logoPreview = logoPreview;
+        if (logoPreview) {
+            this._isProfileChanged = true;
+        }
     }
 
     public get currentPassword() {
@@ -143,6 +152,17 @@ export class ProfileStore {
         this.resetCurrentPasswordError();
         this._isValidatingPassword = false;
     }
+
+    public loadLogo = async (useruid: string) => {
+        try {
+            const logo = await getUserLogo(useruid);
+            this._logo = logo || null;
+            this._logoPreview = null;
+        } catch {
+            this._logo = null;
+            this._logoPreview = null;
+        }
+    };
 
     public loadProfile = async () => {
         const authUser = this.rootStore.userStore.authUser;
@@ -215,16 +235,19 @@ export class ProfileStore {
             }
 
             if (this._logoFile) {
-                const logoResponse = (await uploadUserLogo(
-                    authUser.useruid,
-                    this._logoFile
-                )) as BaseResponseError | undefined;
+                const logoResponse = (await uploadUserLogo(authUser.useruid, this._logoFile)) as
+                    | BaseResponseError
+                    | undefined;
 
                 if (logoResponse && logoResponse.status === Status.ERROR) {
                     return logoResponse;
                 }
 
                 this._logoFile = null;
+                if (this._logoPreview) {
+                    this._logo = this._logoPreview;
+                    this._logoPreview = null;
+                }
             }
 
             this._isProfileChanged = false;
