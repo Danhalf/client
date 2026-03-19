@@ -33,6 +33,10 @@ export const FirstLoginPasswordModal = ({
         return newPassword !== confirmPassword && confirmPassword.length > 0;
     }, [newPassword, confirmPassword]);
 
+    const isButtonDisabled = useMemo(() => {
+        return isSaving || !newPassword || !confirmPassword || passwordsMismatch;
+    }, [isSaving, newPassword, confirmPassword, passwordsMismatch]);
+
     const handleSave = async () => {
         if (isSaving) return;
 
@@ -121,7 +125,8 @@ export const FirstLoginPasswordModal = ({
                         onClick={() => {
                             void handleSave();
                         }}
-                        disabled={isSaving || !newPassword || !confirmPassword || passwordsMismatch}
+                        disabled={isButtonDisabled}
+                        severity={isButtonDisabled ? "secondary" : "success"}
                     />
                 </div>
             </div>
