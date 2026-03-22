@@ -76,7 +76,7 @@ export function MediaUploadFields({
     onSave,
     canSave,
     isLoading,
-    comboClassName = "media-input__dropdown w-full",
+    comboClassName = "media-input__dropdown",
 }: MediaUploadFieldsProps): ReactElement {
     return (
         <div className='col-12 mt-4 media-input'>
