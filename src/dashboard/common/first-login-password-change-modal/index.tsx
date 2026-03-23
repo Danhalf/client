@@ -55,7 +55,7 @@ export const FirstLoginPasswordModal = ({
     ]);
 
     const handleSave = async () => {
-        if (isSaving) return;
+        if (isSaving || !isNewPasswordValid || !isConfirmPasswordValid) return;
 
         if (!newPassword || !confirmPassword) {
             showError(ERROR_MESSAGES.PASSWORD_REQUIRED);
@@ -64,11 +64,6 @@ export const FirstLoginPasswordModal = ({
 
         if (passwordsMismatch) {
             showError(ERROR_MESSAGES.PASSWORD_MISMATCH);
-            return;
-        }
-
-        if (!isNewPasswordValid || !isConfirmPasswordValid) {
-            showError("Password does not meet the required rules.");
             return;
         }
 
