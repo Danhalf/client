@@ -10,14 +10,11 @@ import {
     updateSalespersonInfo,
     updateUserProfile,
     changePassword,
-    checkLogin,
 } from "http/services/users";
 import { action, makeAutoObservable } from "mobx";
 import { RootStore } from "store";
 import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 import { PERMISSION_KEYS, PermissionKey } from "common/constants/permissions";
-import { ERROR_MESSAGES } from "common/constants/error-messages";
-import { typeGuards } from "common/utils";
 
 const initialUserData: Partial<UserData> = {
     firstName: "",
@@ -320,22 +317,6 @@ export class UsersStore {
             this.rootStore.userStore.authUser?.dealer_id ||
             this.rootStore.userStore.authUser?.useruid ||
             "0";
-
-        const authUseruid = this.rootStore.userStore.authUser?.useruid || "";
-        const loginToCheck = (this._user.loginName || "").trim();
-        if (authUseruid && loginToCheck) {
-            try {
-                const check = await checkLogin(loginToCheck);
-                const exists = !!(check && "exists" in check && check.exists);
-                if (exists) {
-                    this._loginError = true;
-                    return { status: Status.ERROR, error: "Login name must be unique" };
-                }
-            } catch {
-                return { status: Status.ERROR, error: ERROR_MESSAGES.UNEXPECTED_ERROR };
-            }
-        }
-
         const userData = {
             loginname: this._user.loginName || "",
             loginpassword: this._password,
@@ -379,35 +360,6 @@ export class UsersStore {
     };
 
     public updateUser = async (useruid: string) => {
-        const authUseruid = this.rootStore.userStore.authUser?.useruid || "";
-        const loginToCheck = (this._user.loginName || this._user.loginname || "").trim();
-        const initialLogin = (this._user.loginname || "").trim();
-        if (authUseruid && loginToCheck) {
-            if (initialLogin && loginToCheck === initialLogin) {
-                return {
-                    status: Status.ERROR,
-                    error: "Login name must be unique",
-                } as BaseResponseError;
-            } else {
-                try {
-                    const check = await checkLogin(loginToCheck);
-                    if (check && typeGuards.isExist(check)) {
-                        return { status: Status.ERROR, error: (check as BaseResponseError).error };
-                    }
-                } catch {
-                    return {
-                        status: Status.ERROR,
-                        error: ERROR_MESSAGES.UNEXPECTED_ERROR,
-                    } as BaseResponseError;
-                }
-            }
-        } else {
-            return {
-                status: Status.ERROR,
-                error: "User is not authenticated",
-            } as BaseResponseError;
-        }
-
         const userData: Partial<UserData> = {
             loginname: this._user.loginName || this._user.loginname || "",
             enabled: this._user.enabled || 1,

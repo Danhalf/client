@@ -7,6 +7,7 @@ import {
     UserRolePayload,
     SalespersonInfo,
     ChangePasswordPayload,
+    CheckLoginResponse,
 } from "common/models/users";
 import { ApiRequest } from "http/index";
 
@@ -177,7 +178,7 @@ export const checkRoleName = async (useruid: string, rolename: string, roleuid?:
 };
 
 export const checkLogin = async (login: string) => {
-    return new ApiRequest().post<{ login: string; exists: boolean } | BaseResponseError>({
+    return new ApiRequest().post<CheckLoginResponse>({
         url: `user/check-login`,
         data: { login },
         defaultError: "Error while checking login name",

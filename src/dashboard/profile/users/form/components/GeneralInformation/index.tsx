@@ -19,7 +19,6 @@ import { debounce } from "common/helpers";
 import { DEBOUNCE_TIME } from "common/settings";
 import { typeGuards } from "common/utils";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
-import { BaseResponseError } from "common/models/base-response";
 
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. Without this information, two-factor authentication cannot be set up for the user in the future. If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
 
@@ -45,7 +44,7 @@ export const GeneralInformation = observer((): ReactElement | null => {
     const { showSuccess } = useToastMessage();
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
-    const [loginError, setLoginError] = useState<string>("");
+    const [loginError, setLoginError] = useState<string | null>(null);
     const initialLoginRef = useRef<string>("");
     const initialUseruidRef = useRef<string>("");
     const hasEmail = !!user?.email1;
@@ -63,7 +62,7 @@ export const GeneralInformation = observer((): ReactElement | null => {
         if (!password) {
             setConfirmPassword("");
             setPasswordsMismatch(false);
-            setLoginError("");
+            setLoginError(null);
         }
     }, [password]);
 
@@ -116,15 +115,15 @@ export const GeneralInformation = observer((): ReactElement | null => {
         navigate(SETTINGS_PAGE.ROLES_CREATE());
     };
 
-    const validateLoginLength = (value: string): string => {
-        if (!value) return "";
+    const validateLoginLength = (value: string): string | null => {
+        if (!value) return null;
         if (value.length < LOGIN_MIN_LENGTH) {
             return `Login must be at least ${LOGIN_MIN_LENGTH} characters`;
         }
         if (value.length > LOGIN_MAX_LENGTH) {
             return `Login must not exceed ${LOGIN_MAX_LENGTH} characters`;
         }
-        return "";
+        return null;
     };
 
     const handleLoginChange = (value: string) => {
@@ -138,8 +137,12 @@ export const GeneralInformation = observer((): ReactElement | null => {
             debounce(async (value: string) => {
                 const trimmed = value.trim();
 
-                if (!trimmed || !authUser?.useruid) {
-                    setLoginError("");
+                if (
+                    !trimmed ||
+                    !authUser?.useruid ||
+                    (isEditMode && trimmed === initialLoginRef.current)
+                ) {
+                    setLoginError(null);
                     usersStore.loginError = false;
                     return;
                 }
@@ -151,23 +154,14 @@ export const GeneralInformation = observer((): ReactElement | null => {
                     return;
                 }
 
-                if (isEditMode && trimmed === initialLoginRef.current) {
-                    setLoginError("");
-                    usersStore.loginError = false;
-                    return;
-                }
-
-                try {
-                    const res = await checkLogin(trimmed);
-                    if (res && typeGuards.isExist(res)) {
-                        setLoginError(
-                            (res as BaseResponseError).error || ERROR_MESSAGES.UNEXPECTED_ERROR
-                        );
-                        usersStore.loginError = true;
-                        return;
-                    }
-                } catch {
-                    setLoginError(ERROR_MESSAGES.UNEXPECTED_ERROR);
+                const res = await checkLogin(trimmed);
+                if (
+                    res &&
+                    typeGuards.isExist(res) &&
+                    typeGuards.hasProperty(res, "exists") &&
+                    res.exists
+                ) {
+                    setLoginError(res.message || ERROR_MESSAGES.LOGIN_NAME_UNIQUE);
                     usersStore.loginError = true;
                 }
             }, DEBOUNCE_TIME),
@@ -268,7 +262,7 @@ export const GeneralInformation = observer((): ReactElement | null => {
                         className='w-full general-information__login'
                         value={user?.loginName || ""}
                         error={!!loginError}
-                        errorMessage={loginError}
+                        errorMessage={loginError || null}
                         onChange={(e) => handleLoginChange(e.target.value)}
                         onBlur={handleLoginBlur}
                     />
