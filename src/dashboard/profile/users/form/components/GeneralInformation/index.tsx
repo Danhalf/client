@@ -17,8 +17,8 @@ import { SETTINGS_PAGE } from "common/constants/links";
 import { LOGIN_MIN_LENGTH, LOGIN_MAX_LENGTH, LOGIN_VALID_REGEX } from "common/constants/regex";
 import { debounce } from "common/helpers";
 import { DEBOUNCE_TIME } from "common/settings";
-import { typeGuards } from "common/utils";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { typeGuards } from "common/utils";
 
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. Without this information, two-factor authentication cannot be set up for the user in the future. If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
 
@@ -53,9 +53,15 @@ export const GeneralInformation = observer((): ReactElement | null => {
 
     useEffect(() => {
         if (!user?.useruid) return;
-        if (initialUseruidRef.current === user.useruid) return;
-        initialUseruidRef.current = user.useruid;
-        initialLoginRef.current = (user.loginName || "").trim();
+        if (initialUseruidRef.current !== user.useruid) {
+            initialUseruidRef.current = user.useruid;
+            initialLoginRef.current = (user.loginName || "").trim();
+            return;
+        }
+        const name = (user.loginName || "").trim();
+        if (initialLoginRef.current === "" && name !== "") {
+            initialLoginRef.current = name;
+        }
     }, [user?.useruid, user?.loginName]);
 
     useEffect(() => {
@@ -136,12 +142,12 @@ export const GeneralInformation = observer((): ReactElement | null => {
         () =>
             debounce(async (value: string) => {
                 const trimmed = value.trim();
-
-                if (
-                    !trimmed ||
-                    !authUser?.useruid ||
-                    (isEditMode && trimmed === initialLoginRef.current)
-                ) {
+                if (!trimmed || !authUser?.useruid) {
+                    setLoginError(null);
+                    usersStore.loginError = false;
+                    return;
+                }
+                if (!!user?.useruid && trimmed === initialLoginRef.current) {
                     setLoginError(null);
                     usersStore.loginError = false;
                     return;
@@ -155,17 +161,17 @@ export const GeneralInformation = observer((): ReactElement | null => {
                 }
 
                 const res = await checkLogin(trimmed);
-                if (
-                    res &&
-                    typeGuards.isExist(res) &&
-                    typeGuards.hasProperty(res, "exists") &&
-                    res.exists
-                ) {
-                    setLoginError(res.message || ERROR_MESSAGES.LOGIN_NAME_UNIQUE);
-                    usersStore.loginError = true;
+                if (res && typeGuards.hasProperty(res, "exists")) {
+                    if (res.exists) {
+                        setLoginError(res.message || ERROR_MESSAGES.LOGIN_NAME_UNIQUE);
+                        usersStore.loginError = true;
+                    } else {
+                        setLoginError(null);
+                        usersStore.loginError = false;
+                    }
                 }
             }, DEBOUNCE_TIME),
-        [authUser?.useruid, isEditMode]
+        [authUser?.useruid, user?.useruid]
     );
 
     const handleLoginBlur = () => {

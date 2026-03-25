@@ -238,9 +238,7 @@ export const AudioMedia = observer((): ReactElement => {
                 accept='audio/*'
                 maxFileSize={limitations.maxSize * 1000000}
                 onUpload={onTemplateUpload}
-                headerTemplate={
-                    limitations.maxUpload > totalCount ? chooseTemplate : <div></div>
-                }
+                headerTemplate={limitations.maxUpload > totalCount ? chooseTemplate : <div></div>}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate("audio files")}
                 onSelect={onTemplateSelect}
