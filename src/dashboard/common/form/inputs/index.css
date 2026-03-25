@@ -343,7 +343,7 @@
             left: 0;
             width: 100%;
             height: var(--line-height);
-            background-color: var(--admss-app-white-blue);
+            background-color: var(--admss-app-white);
         }
     }
 }
