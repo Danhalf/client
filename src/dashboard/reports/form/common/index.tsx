@@ -108,7 +108,7 @@ export const ReportSelect = ({
                 onDragStart={() => setIsDragging(true)}
                 onDragStop={handleDragStop}
             >
-                {values.map((value, index) => (
+                {values.map((value) => (
                     <div
                         className={`report-select__item ${isSelected(value) ? "selected" : ""}`}
                         key={value.data}
