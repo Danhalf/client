@@ -302,9 +302,7 @@ export const VideoMedia = observer((): ReactElement => {
                 accept='video/*'
                 maxFileSize={limitations.maxSize * 1000000}
                 onUpload={onTemplateUpload}
-                headerTemplate={
-                    limitations.maxUpload > totalCount ? chooseTemplate : <div></div>
-                }
+                headerTemplate={limitations.maxUpload > totalCount ? chooseTemplate : <div></div>}
                 itemTemplate={itemTemplate}
                 emptyTemplate={emptyTemplate("video files")}
                 onSelect={onTemplateSelect}
