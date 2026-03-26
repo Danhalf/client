@@ -280,6 +280,12 @@
     margin: 0;
 }
 
+.report-select__list .react-grid-item.react-grid-placeholder {
+    background-color: var(--admss-app-medium-light-blue);
+    border: 1px solid var(--admss-app-medium-blue);
+    opacity: 1;
+}
+
 .report-control__checkbox {
     display: flex;
     align-items: center;
