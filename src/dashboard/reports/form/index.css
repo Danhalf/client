@@ -274,6 +274,7 @@
     height: var(--select-area-height);
     max-height: var(--select-area-height);
     overflow-y: scroll;
+    overflow-x: hidden;
     list-style: none;
     padding: 0;
     margin: 0;
