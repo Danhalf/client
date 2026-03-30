@@ -121,6 +121,16 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
+.video-modal__video--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    min-width: 280px;
+    color: var(--admss-app-white);
+    background: rgba(var(--admss-app-white), 0.08);
+}
+
 .video-modal__close {
     position: absolute;
     top: -40px;
