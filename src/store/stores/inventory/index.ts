@@ -614,16 +614,20 @@ export class InventoryStore {
                                     } else {
                                         let itemSrc = URL.createObjectURL(file);
                                         if (mediaType === MediaType.mtVideo) {
-                                            const previewSrc = await getInventoryMediaPreview(
-                                                uploadMediaResponse.itemuid
-                                            );
+                                            const previewId =
+                                                uploadMediaResponse.mediauid ??
+                                                uploadMediaResponse.itemuid;
+                                            const previewSrc =
+                                                await getInventoryMediaPreview(previewId);
                                             URL.revokeObjectURL(itemSrc);
                                             itemSrc = previewSrc || "";
                                         }
                                         const savedItem: MediaItem = {
                                             src: itemSrc,
                                             itemuid: uploadMediaResponse.itemuid,
-                                            mediauid: uploadMediaResponse.itemuid,
+                                            mediauid:
+                                                uploadMediaResponse.mediauid ??
+                                                uploadMediaResponse.itemuid,
                                             info: {
                                                 contenttype: (
                                                     currentMt.get(mediaType) as UploadMediaItem
@@ -837,7 +841,7 @@ export class InventoryStore {
                     if (mediauid && itemuid) {
                         const responseSrc =
                             mediaType === MediaType.mtVideo
-                                ? await getInventoryMediaPreview(itemuid)
+                                ? await getInventoryMediaPreview(mediauid)
                                 : await getInventoryMediaItem(mediauid);
                         if (responseSrc) {
                             result[index] = {
