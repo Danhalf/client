@@ -24,6 +24,16 @@ export const getInventoryMediaItemList = async (
     return undefined;
 };
 
+const blobResponseToDataUrl = async (blob: Blob): Promise<string> => {
+    return new Promise<string>((resolve) => {
+        const reader = new window.FileReader();
+        reader.addEventListener("load", (event) => {
+            resolve(event.target?.result as string);
+        });
+        reader.readAsDataURL(blob);
+    });
+};
+
 export const getInventoryMediaItem = async (mediaID: string): Promise<string | undefined> => {
     const response = await new ApiRequest().get<Blob | BaseResponseError>({
         url: `media/${mediaID}/media`,
@@ -36,16 +46,22 @@ export const getInventoryMediaItem = async (mediaID: string): Promise<string | u
     }
 
     const blob = response as Blob;
+    return blobResponseToDataUrl(blob);
+};
 
-    const dataUrl = await new Promise<string>((resolve) => {
-        const reader = new window.FileReader();
-        reader.addEventListener("load", (event) => {
-            resolve(event.target?.result as string);
-        });
-        reader.readAsDataURL(blob);
+export const getInventoryMediaPreview = async (mediaID: string): Promise<string | undefined> => {
+    const response = await new ApiRequest().get<Blob | BaseResponseError>({
+        url: `media/${mediaID}/preview`,
+        config: { responseType: "blob" },
+        defaultError: "Error while getting media preview",
     });
 
-    return dataUrl;
+    if (!response || "status" in (response as BaseResponseError)) {
+        return undefined;
+    }
+
+    const blob = response as Blob;
+    return blobResponseToDataUrl(blob);
 };
 
 export const getInventoryMediaInfo = async (
