@@ -2,11 +2,11 @@ import { ReactElement, useState, useEffect, useMemo, useRef } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
 import { TextInput } from "dashboard/common/form/inputs";
-import { Skeleton } from "primereact/skeleton";
 import { Splitter } from "dashboard/common/display";
-import { DashboardRadio, EmailInput, PhoneInput } from "dashboard/common/form/inputs";
-import { RadioButtonProps } from "primereact/radiobutton";
+import { EmailInput, PhoneInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
+import { DropdownChangeEvent } from "primereact/dropdown";
+import { ComboBox } from "dashboard/common/form/dropdown";
 import { useStore } from "store/hooks";
 import { checkLogin, generateNewPassword } from "http/services/users";
 import { GenerateNewPasswordResponse } from "common/models/users";
@@ -22,25 +22,25 @@ import { typeGuards } from "common/utils";
 
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. Without this information, two-factor authentication cannot be set up for the user in the future. If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
 
-interface RoleOption extends RadioButtonProps {
+interface RoleSelectOption {
     roleuid: string;
-    apiRoleName: string;
+    label: string;
 }
 
-export const ROLE_MAPPING = [
-    { keyword: "owner", displayTitle: "Owner (Admin)", displayName: "Owner" },
-    { keyword: "manager", displayTitle: "Manager", displayName: "Manager" },
-    { keyword: "sales", displayTitle: "Sales Person", displayName: "Salesman" },
-];
+interface RoleGroup {
+    name: string;
+    options: RoleSelectOption[];
+}
 
-export const SALES_PERSON_ROLE = ROLE_MAPPING[2];
+const GROUP_DEFAULT = "Default Roles";
+const GROUP_CUSTOM = "Custom Roles";
 
 export const GeneralInformation = observer((): ReactElement | null => {
     const navigate = useNavigate();
     const usersStore = useStore().usersStore;
     const authUserStore = useStore().userStore;
     const { authUser } = authUserStore;
-    const { user, changeUserData, password, availableRoles, isLoading } = usersStore;
+    const { user, changeUserData, password, availableRoles } = usersStore;
     const { showSuccess } = useToastMessage();
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [passwordsMismatch, setPasswordsMismatch] = useState<boolean>(false);
@@ -50,6 +50,39 @@ export const GeneralInformation = observer((): ReactElement | null => {
     const hasEmail = !!user?.email1;
     const hasPhone = !!user?.phone1;
     const isEditMode = !!user?.useruid;
+
+    const roleSelectGroups = useMemo((): RoleGroup[] => {
+        const rolesWithUid = availableRoles.filter((role) => role.roleuid);
+        const compareOptionsByLabel = (first: RoleSelectOption, second: RoleSelectOption) =>
+            first.label.localeCompare(second.label);
+
+        const defaultOptions: RoleSelectOption[] = rolesWithUid
+            .filter((role) => role.isDefault === 1)
+            .map((role) => ({
+                roleuid: role.roleuid,
+                label: role.rolename || role.name,
+            }))
+            .sort(compareOptionsByLabel);
+
+        const customOptions: RoleSelectOption[] = rolesWithUid
+            .filter((role) => role.isDefault !== 1)
+            .map((role) => ({
+                roleuid: role.roleuid,
+                label: role.rolename || role.name,
+            }))
+            .sort(compareOptionsByLabel);
+
+        const groups: RoleGroup[] = [];
+        if (defaultOptions.length) {
+            groups.push({ name: GROUP_DEFAULT, options: defaultOptions });
+        }
+        if (customOptions.length) {
+            groups.push({ name: GROUP_CUSTOM, options: customOptions });
+        }
+        return groups;
+    }, [availableRoles]);
+
+    const dropdownSelectedRoleUid = user?.roleuid?.trim() || null;
 
     useEffect(() => {
         if (!user?.useruid) return;
@@ -71,21 +104,6 @@ export const GeneralInformation = observer((): ReactElement | null => {
             setLoginError(null);
         }
     }, [password]);
-
-    const roleOptions: RoleOption[] = ROLE_MAPPING.map((mapping, index) => {
-        const apiRole = availableRoles.find((role) =>
-            role.rolename.toLowerCase().includes(mapping.keyword)
-        );
-        return apiRole
-            ? {
-                  name: mapping.displayName,
-                  title: mapping.displayTitle,
-                  value: index,
-                  roleuid: apiRole.roleuid,
-                  apiRoleName: apiRole.rolename,
-              }
-            : null;
-    }).filter(Boolean) as RoleOption[];
 
     const handlePasswordsBlur = () => {
         const bothFilled = password.length > 0 && confirmPassword.length > 0;
@@ -181,6 +199,16 @@ export const GeneralInformation = observer((): ReactElement | null => {
         debouncedCheckLoginName(trimmedValue);
     };
 
+    const handleRoleChange = (event: DropdownChangeEvent) => {
+        const chosenRoleUid = (event.value as string) ?? "";
+        const matchedRole = availableRoles.find((role) => role.roleuid === chosenRoleUid);
+        const roleDisplayName = matchedRole ? matchedRole.rolename || matchedRole.name : "";
+        changeUserData([
+            ["roleuid", chosenRoleUid],
+            ["rolename", roleDisplayName],
+        ]);
+    };
+
     return (
         <div className='user-form general-information'>
             <h3 className='general-information__title user-form__title'>General Information</h3>
@@ -222,43 +250,25 @@ export const GeneralInformation = observer((): ReactElement | null => {
                     Custom role
                 </div>
             </div>
-            {isLoading ? (
-                <div className='grid'>
-                    <div className='col-3'>
-                        <Skeleton height='50px' />
-                    </div>
-                    <div className='col-3'>
-                        <Skeleton height='50px' />
-                    </div>
-                    <div className='col-3'>
-                        <Skeleton height='50px' />
-                    </div>
+            <div className='grid'>
+                <div className='col-4'>
+                    <ComboBox
+                        label='Role (required)'
+                        value={dropdownSelectedRoleUid}
+                        options={roleSelectGroups}
+                        optionGroupLabel='name'
+                        optionGroupChildren='options'
+                        optionLabel='label'
+                        optionValue='roleuid'
+                        onChange={handleRoleChange}
+                        placeholder='Role (required)'
+                        filter
+                        filterBy='label'
+                        filterPlaceholder='Search'
+                        className='w-full general-information__role-dropdown'
+                    />
                 </div>
-            ) : (
-                <div className='grid'>
-                    <div className='col-12'>
-                        <DashboardRadio
-                            radioArray={roleOptions}
-                            justifyContent='start'
-                            initialValue={(() => {
-                                const roleIndex = roleOptions.findIndex(
-                                    (option) =>
-                                        option.roleuid === user?.roleuid ||
-                                        option.title === user?.rolename
-                                );
-                                return roleIndex >= 0 ? roleIndex.toString() : "";
-                            })()}
-                            onChange={(value) => {
-                                const selectedOption = roleOptions[parseInt(value as string)];
-                                changeUserData([
-                                    ["rolename", selectedOption.title as string],
-                                    ["roleuid", selectedOption.roleuid as string],
-                                ]);
-                            }}
-                        />
-                    </div>
-                </div>
-            )}
+            </div>
             <Splitter title='Contact & Login Information' className='my-4' />
             <div className='grid'>
                 <div className='col-4'>
