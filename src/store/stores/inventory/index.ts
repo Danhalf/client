@@ -40,7 +40,6 @@ import {
     uploadInventoryMedia,
     setMediaItemData,
     getInventoryMediaItem,
-    getInventoryMediaPreview,
     deleteMediaImage,
 } from "http/services/media.service";
 import { makeAutoObservable, action } from "mobx";
@@ -612,22 +611,10 @@ export class InventoryStore {
                                         const { error } = mediaDataResponse as BaseResponseError;
                                         this._formErrorMessage = error || "Failed to upload file";
                                     } else {
-                                        let itemSrc = URL.createObjectURL(file);
-                                        if (mediaType === MediaType.mtVideo) {
-                                            const previewId =
-                                                uploadMediaResponse.mediauid ??
-                                                uploadMediaResponse.itemuid;
-                                            const previewSrc =
-                                                await getInventoryMediaPreview(previewId);
-                                            URL.revokeObjectURL(itemSrc);
-                                            itemSrc = previewSrc || "";
-                                        }
                                         const savedItem: MediaItem = {
-                                            src: itemSrc,
+                                            src: URL.createObjectURL(file),
                                             itemuid: uploadMediaResponse.itemuid,
-                                            mediauid:
-                                                uploadMediaResponse.mediauid ??
-                                                uploadMediaResponse.itemuid,
+                                            mediauid: uploadMediaResponse.itemuid,
                                             info: {
                                                 contenttype: (
                                                     currentMt.get(mediaType) as UploadMediaItem
@@ -839,10 +826,7 @@ export class InventoryStore {
             await Promise.all(
                 inventoryMediaID.map(async ({ mediauid, itemuid }, index: number) => {
                     if (mediauid && itemuid) {
-                        const responseSrc =
-                            mediaType === MediaType.mtVideo
-                                ? await getInventoryMediaPreview(mediauid)
-                                : await getInventoryMediaItem(mediauid);
+                        const responseSrc = await getInventoryMediaItem(mediauid);
                         if (responseSrc) {
                             result[index] = {
                                 info: result[index].info,

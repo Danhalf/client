@@ -18,7 +18,7 @@ import { CATEGORIES, UPLOAD_TEXT } from "common/constants/media-categories";
 import { Loader } from "dashboard/common/loader";
 import { emptyTemplate } from "dashboard/common/form/upload";
 import { ConfirmModal } from "dashboard/common/dialog/confirm";
-import { getInventoryMediaItem } from "http/services/media.service";
+import { generateVideoThumbnailFromFirstSeconds } from "common/utils/video-thumbnail";
 import {
     createMediaChooseTemplate,
     MediaUploadFields,
@@ -96,8 +96,10 @@ export const VideoMedia = observer((): ReactElement => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [videoPlayerVisible, setVideoPlayerVisible] = useState<boolean>(false);
     const [activeVideoSrc, setActiveVideoSrc] = useState<string>("");
-    const [videoPlaybackLoading, setVideoPlaybackLoading] = useState(false);
     const [itemuid, setItemuid] = useState<string>("");
+    const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
+    const [loadingThumbnails, setLoadingThumbnails] = useState<Set<string>>(new Set());
+    const generatingThumbnailsRef = useRef<Set<string>>(new Set());
 
     const uniqueVideos = useMemo(() => {
         const videosSet = new Set();
@@ -123,6 +125,52 @@ export const VideoMedia = observer((): ReactElement => {
             setVideoChecked(newCheckedState);
         }
     }, [uniqueVideos.length, videoChecked.length]);
+
+    useEffect(() => {
+        const generateThumbnails = async () => {
+            for (const video of uniqueVideos) {
+                if (!video.itemuid || !video.src) continue;
+
+                setThumbnails((prev) => {
+                    if (prev[video.itemuid]) {
+                        generatingThumbnailsRef.current.delete(video.itemuid);
+                        return prev;
+                    }
+                    return prev;
+                });
+
+                if (generatingThumbnailsRef.current.has(video.itemuid)) continue;
+
+                generatingThumbnailsRef.current.add(video.itemuid);
+                setLoadingThumbnails((prev) => new Set(prev).add(video.itemuid));
+
+                try {
+                    const thumbnail = await generateVideoThumbnailFromFirstSeconds(video.src, 5);
+                    if (thumbnail) {
+                        setThumbnails((prev) => {
+                            if (prev[video.itemuid]) return prev;
+                            return {
+                                ...prev,
+                                [video.itemuid]: thumbnail,
+                            };
+                        });
+                    }
+                } catch (error) {
+                } finally {
+                    generatingThumbnailsRef.current.delete(video.itemuid);
+                    setLoadingThumbnails((prev) => {
+                        const newSet = new Set(prev);
+                        newSet.delete(video.itemuid);
+                        return newSet;
+                    });
+                }
+            }
+        };
+
+        if (uniqueVideos.length > 0) {
+            generateThumbnails();
+        }
+    }, [uniqueVideos]);
 
     const handleCategorySelect = (e: DropdownChangeEvent) => {
         store.uploadFileVideos = {
@@ -197,25 +245,14 @@ export const VideoMedia = observer((): ReactElement => {
         setModalVisible(true);
     };
 
-    const handleVideoPlayerOpen = async (videoItemuid: string | undefined) => {
-        if (!videoItemuid) return;
+    const handleVideoPlayerOpen = (src: string) => {
+        setActiveVideoSrc(src);
         setVideoPlayerVisible(true);
-        setActiveVideoSrc("");
-        setVideoPlaybackLoading(true);
-        try {
-            const playbackSrc = await getInventoryMediaItem(videoItemuid);
-            if (playbackSrc) {
-                setActiveVideoSrc(playbackSrc);
-            }
-        } finally {
-            setVideoPlaybackLoading(false);
-        }
     };
 
     const handleVideoPlayerClose = () => {
         setVideoPlayerVisible(false);
         setActiveVideoSrc("");
-        setVideoPlaybackLoading(false);
     };
 
     const handleDeleteVideo = (mediauid: string) => {
@@ -315,17 +352,17 @@ export const VideoMedia = observer((): ReactElement => {
                                         className='media-uploaded__checkbox'
                                     />
                                 )}
-                                {!src ? (
+                                {loadingThumbnails.has(itemuid) ? (
                                     <div className='media-video__placeholder'>
                                         <i className='icon adms-play-prev media-video__placeholder-icon' />
                                     </div>
                                 ) : (
                                     <div
                                         className='media-video__clickable'
-                                        onClick={() => handleVideoPlayerOpen(itemuid)}
+                                        onClick={() => handleVideoPlayerOpen(src)}
                                     >
                                         <Image
-                                            src={src}
+                                            src={thumbnails[itemuid] || src}
                                             alt='inventory-item'
                                             width='75'
                                             height='75'
@@ -407,23 +444,10 @@ export const VideoMedia = observer((): ReactElement => {
                         >
                             <i className='pi pi-times' />
                         </button>
-                        {videoPlaybackLoading ? (
-                            <Loader />
-                        ) : activeVideoSrc ? (
-                            <video
-                                className='video-modal__video'
-                                controls
-                                autoPlay
-                                key={activeVideoSrc}
-                            >
-                                <source src={activeVideoSrc} type='video/mp4' />
-                                Your browser does not support the video tag.
-                            </video>
-                        ) : (
-                            <div className='video-modal__video video-modal__video--empty'>
-                                Unable to load video.
-                            </div>
-                        )}
+                        <video className='video-modal__video' controls autoPlay>
+                            <source src={activeVideoSrc} type='video/mp4' />
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
                 </div>
             )}

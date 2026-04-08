@@ -184,7 +184,6 @@ export interface InventoryWebInfo {
 
 export interface InventorySetResponse extends BaseResponseError {
     itemuid: string;
-    mediauid?: string;
 }
 
 export interface CreateMediaItemRecordResponse extends BaseResponseError {
