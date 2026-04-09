@@ -15,7 +15,7 @@ import { CompanySearch } from "dashboard/contacts/common/company-search";
 import { InventorySearch } from "dashboard/inventory/common/inventory-search";
 import { useFormikContext } from "formik";
 import { PartialDeal } from "dashboard/deals/form";
-import { ContactUser } from "common/models/contact";
+import { ContactTypeNameList, ContactUser } from "common/models/contact";
 import { Inventory } from "common/models/inventory";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ComboBox } from "dashboard/common/form/dropdown";
@@ -141,6 +141,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                         setFieldValue("contactinfo", value);
                         changeDeal({ key: "contactinfo", value });
                     }}
+                    contactCategory={ContactTypeNameList.BUYERS}
                     originalPath={currentPath}
                     value={values?.contactinfo}
                     getFullInfo={handleGetCompanyInfo}
@@ -185,7 +186,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     errorMessage={errors.dealtype as string}
                 />
             </div>
-            <div className='col-3 relative'>
+            <div className='col-6 relative'>
                 <ComboBox
                     {...getFieldProps("dealstatus")}
                     optionLabel='name'
