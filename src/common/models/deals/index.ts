@@ -586,3 +586,17 @@ export interface DealWashout extends BaseResponseError {
     name: string;
     requestuid: string;
 }
+
+export interface DealTypeResponse extends BaseResponse {
+    deal_types: IndexedDealList[];
+}
+export interface DealStatusList extends BaseResponse {
+    deal_status: IndexedDealList[];
+}
+export interface InventoryStatusResponse extends BaseResponse {
+    inventory_status: IndexedDealList[];
+}
+
+export interface TotalDealsList extends BaseResponse {
+    total: number;
+}

@@ -9,7 +9,6 @@ import {
     getDealStatuses,
     getDealTypes,
     getHowToKnowList,
-    getSaleTypes,
 } from "http/services/deals.service";
 import { HowToKnow, IndexedDealList } from "common/models/deals";
 import { CompanySearch } from "dashboard/contacts/common/company-search";
@@ -39,7 +38,6 @@ export const DealGeneralSale = observer((): ReactElement => {
     const { deal, changeDeal, changeDealExtData } = store;
 
     const [dealTypesList, setDealTypesList] = useState<IndexedDealList[]>([]);
-    const [saleTypesList, setSaleTypesList] = useState<IndexedDealList[]>([]);
     const [dealStatusesList, setDealStatusesList] = useState<IndexedDealList[]>([]);
     const [howToKnowList, setHowToKnowList] = useState<Partial<HowToKnow[]>>([]);
     const [inventoryStatusesList, setInventoryStatusesList] = useState<IndexedDealList[]>([]);
@@ -51,13 +49,6 @@ export const DealGeneralSale = observer((): ReactElement => {
                 setDealTypesList(dealTypesRes);
             } else if (!dealTypesRes) {
                 showError("Error while getting deal types");
-            }
-
-            const saleTypesRes = await getSaleTypes();
-            if (saleTypesRes && Array.isArray(saleTypesRes)) {
-                setSaleTypesList(saleTypesRes);
-            } else if (!saleTypesRes) {
-                showError("Error while getting sale types");
             }
 
             const dealStatusesRes = await getDealStatuses();
@@ -212,24 +203,7 @@ export const DealGeneralSale = observer((): ReactElement => {
                     errorMessage={errors.dealstatus as string}
                 />
             </div>
-            <div className='col-3 relative'>
-                <ComboBox
-                    {...getFieldProps("saletype")}
-                    optionLabel='name'
-                    optionValue='id'
-                    required
-                    options={saleTypesList}
-                    value={values.saletype}
-                    onChange={(e) => {
-                        setFieldValue("saletype", e.value);
-                        changeDeal({ key: "saletype", value: e.value });
-                    }}
-                    label='Sale type (required)'
-                    className='w-full deal-sale__dropdown'
-                    error={!!errors.saletype}
-                    errorMessage={errors.saletype as string}
-                />
-            </div>
+
             <div className='col-3 relative'>
                 <DateInput
                     {...getFieldProps("dateeffective")}
