@@ -208,7 +208,6 @@ export const DealRetailTag = observer((): ReactElement => {
                     <InputText
                         className='deal-odometer__text-input w-full'
                         value={TempTagNumber}
-                        disabled={!Title_and_License}
                         onChange={({ target: { value } }: { target: { value: string } }) =>
                             changeDealExtData({ key: "TempTagNumber", value })
                         }
