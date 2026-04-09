@@ -172,14 +172,14 @@ export const DealGeneralSale = observer((): ReactElement => {
                     {...getFieldProps("dealtype")}
                     optionLabel='name'
                     optionValue='id'
-                    required
                     options={dealTypesList}
                     label='Type of Deal (required)'
-                    value={values.dealtype}
+                    value={values.dealtype ?? null}
                     onChange={(e) => {
-                        setFieldValue("dealtype", e.value);
-                        store.dealType = e.value;
-                        changeDeal({ key: "dealtype", value: e.value });
+                        const v = e.value;
+                        setFieldValue("dealtype", v ?? null);
+                        store.dealType = v ?? null;
+                        changeDeal({ key: "dealtype", value: v });
                     }}
                     className='w-full deal-sale__dropdown'
                     error={!!errors.dealtype}
