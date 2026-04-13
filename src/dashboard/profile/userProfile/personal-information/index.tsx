@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, useMemo } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { EmailInput, PhoneInput, StateDropdown, TextInput } from "dashboard/common/form/inputs";
@@ -6,6 +6,7 @@ import { ProfileAvatar } from "dashboard/profile/common/profile-avatar";
 import "./index.css";
 import { Splitter } from "dashboard/common/display";
 import InfoIcon from "assets/images/info-icon.svg";
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. 
 Without this information, two-factor authentication cannot be set up for the user in the future. 
@@ -14,8 +15,17 @@ If both fields are filled in, the user will be able to choose their preferred tw
 export const PersonalInformation = observer((): ReactElement => {
     const profileStore = useStore().profileStore;
     const user = useStore().userStore;
-    const { profile, changeProfile } = profileStore;
+    const { profile, changeProfile, locations, selectedLocationUid, changeCurrentLocation } =
+        profileStore;
     const { authUser } = user;
+    const locationOptions = useMemo(
+        () =>
+            locations.map((location) => ({
+                label: location.locName,
+                value: location.locationuid,
+            })),
+        [locations]
+    );
 
     return (
         <div className='user-profile__content'>
@@ -34,11 +44,30 @@ export const PersonalInformation = observer((): ReactElement => {
                         value={authUser?.companyname || profile?.companyname || ""}
                         disabled
                     />
-                    <TextInput
-                        name='Location (city/state)'
-                        value={profile?.locationname}
-                        onChange={(event) => changeProfile("locationname", event.target.value)}
-                    />
+                    <div className='user-profile-location-select'>
+                        <MultiSelect
+                            optionLabel='label'
+                            optionValue='value'
+                            options={locationOptions}
+                            value={selectedLocationUid ? [selectedLocationUid] : []}
+                            onChange={({ value }: MultiSelectChangeEvent) =>
+                                changeCurrentLocation(value?.[0] || "")
+                            }
+                            placeholder='Dealer Locations'
+                            className='inventory-dropdown inventory-filter user-profile-location-select__input'
+                            display='chip'
+                            selectedItemsLabel='{0} selected'
+                            selectionLimit={1}
+                            maxSelectedLabels={1}
+                            pt={{
+                                header: { className: "inventory-filter__header" },
+                                wrapper: {
+                                    className: "inventory-filter__wrapper",
+                                    style: { maxHeight: "300px", maxWidth: "310px" },
+                                },
+                            }}
+                        />
+                    </div>
                 </div>
                 <div className='col-6 user-profile-personal__avatar'>
                     <ProfileAvatar />

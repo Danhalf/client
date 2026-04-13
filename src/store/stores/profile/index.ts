@@ -1,11 +1,19 @@
 import { makeAutoObservable } from "mobx";
 import { AuthUser } from "common/models/user";
 import { RootStore } from "store";
-import { updateUserProfile, changePassword, checkPassword, getUserData } from "http/services/users";
+import {
+    updateUserProfile,
+    changePassword,
+    checkPassword,
+    getUserData,
+    getUserLocations,
+    setUserLocations,
+} from "http/services/users";
 import { UserData, CheckPasswordResponse } from "common/models/users";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { typeGuards } from "common/utils";
 import { getUserLogo, uploadUserLogo } from "http/services/media.service";
+import { InventoryLocations } from "common/models/inventory";
 
 export interface ExtendedProfile extends Partial<AuthUser> {
     address: string;
@@ -38,6 +46,9 @@ export class ProfileStore {
     private _currentPasswordError: boolean = false;
     private _currentPasswordErrorMessage: string | null = null;
     private _isValidatingPassword: boolean = false;
+    private _currentLocation: Partial<InventoryLocations> | null = null;
+    private _locations: InventoryLocations[] = [];
+    private _selectedLocationUid: string = "";
     public constructor(rootStore: RootStore) {
         makeAutoObservable(this, { rootStore: false });
         this.rootStore = rootStore;
@@ -76,8 +87,39 @@ export class ProfileStore {
         return this._isProfileChanged;
     }
 
+    public get locations() {
+        return this._locations;
+    }
+
+    public get selectedLocationUid() {
+        return this._selectedLocationUid;
+    }
+
     public set profile(profile: ExtendedProfile) {
         this._profile = profile;
+    }
+
+    public changeCurrentLocation(locationuid: string) {
+        const selectedLocation = this._locations.find(
+            (location) => location.locationuid === locationuid
+        );
+        if (!selectedLocation) {
+            return;
+        }
+
+        const hasLocationChanged = this._selectedLocationUid !== locationuid;
+        this._selectedLocationUid = locationuid;
+        this._currentLocation = selectedLocation;
+        this._profile = {
+            ...this._profile,
+            locationname: selectedLocation.locName || "",
+            address: selectedLocation.locStreetAddress || "",
+            state: selectedLocation.locState || "",
+            zipCode: selectedLocation.locZIP || "",
+            phoneNumber: selectedLocation.locPhone1 || "",
+            email: selectedLocation.locEmail1 || "",
+        };
+        this._isProfileChanged = hasLocationChanged;
     }
 
     public setLogoFile(file: File | null) {
@@ -175,23 +217,35 @@ export class ProfileStore {
         }
 
         try {
-            const response = await getUserData(authUser.useruid);
+            const [response, locationsResponse] = await Promise.all([
+                getUserData(authUser.useruid),
+                getUserLocations(authUser.useruid),
+            ]);
 
             if (!response || typeGuards.isExist(response.error)) {
                 return response as BaseResponseError | undefined;
             }
 
             const userData = response as UserData;
+            const userLocations = Array.isArray(locationsResponse) ? locationsResponse : [];
+            const currentLocation =
+                userLocations.find((location) => location.locationuid === authUser.locationuid) ||
+                userLocations[0];
+
+            this._locations = userLocations;
+            this._selectedLocationUid = currentLocation?.locationuid || "";
+            this._currentLocation = currentLocation || null;
 
             this._profile = {
                 ...this._profile,
                 companyname: userData.companyName || authUser.companyname || "",
-                locationname: userData.city || authUser.locationname || "",
-                address: userData.streetAddress || "",
-                state: userData.state || "",
-                zipCode: userData.ZIP || "",
-                phoneNumber: userData.phone || userData.phone1 || "",
-                email: userData.email || userData.email1 || "",
+                locationname:
+                    currentLocation?.locName || userData.city || authUser.locationname || "",
+                address: currentLocation?.locStreetAddress || userData.streetAddress || "",
+                state: currentLocation?.locState || userData.state || "",
+                zipCode: currentLocation?.locZIP || userData.ZIP || "",
+                phoneNumber: currentLocation?.locPhone1 || userData.phone || userData.phone1 || "",
+                email: currentLocation?.locEmail1 || userData.email || userData.email1 || "",
             };
 
             this._isProfileChanged = false;
@@ -221,10 +275,6 @@ export class ProfileStore {
         const userData: Partial<UserData> = {
             phone: convertEmptyValue(this._profile.phoneNumber),
             email: convertEmptyValue(this._profile.email),
-            streetAddress: convertEmptyValue(this._profile.address),
-            city: convertEmptyValue(this._profile.locationname || authUser.locationname),
-            state: convertEmptyValue(this._profile.state),
-            ZIP: convertEmptyValue(this._profile.zipCode),
         };
 
         try {
@@ -232,6 +282,24 @@ export class ProfileStore {
 
             if (response && typeGuards.isExist(response.error)) {
                 return response as BaseResponseError;
+            }
+
+            const locationPayload: Partial<InventoryLocations> = {
+                ...this._currentLocation,
+                useruid: authUser.useruid,
+                locationuid:
+                    this._currentLocation?.locationuid || authUser.locationuid || undefined,
+                locName: convertEmptyValue(this._profile.locationname || authUser.locationname),
+                locStreetAddress: convertEmptyValue(this._profile.address),
+                locState: convertEmptyValue(this._profile.state),
+                locZIP: convertEmptyValue(this._profile.zipCode),
+                locPhone1: convertEmptyValue(this._profile.phoneNumber),
+                locEmail1: convertEmptyValue(this._profile.email),
+            };
+
+            const locationResponse = await setUserLocations(authUser.useruid, [locationPayload]);
+            if (locationResponse && typeGuards.isExist(locationResponse.error)) {
+                return locationResponse as BaseResponseError;
             }
 
             if (this._logoFile) {
