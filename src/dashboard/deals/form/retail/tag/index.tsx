@@ -43,23 +43,38 @@ export const DealRetailTag = observer((): ReactElement => {
         },
         changeDealExtData,
     } = store;
+
+    const clearTitleAndLicenseDependentFields = () => {
+        changeDealExtData({ key: "Plate_Transferred", value: 0 });
+        changeDealExtData({ key: "Exchanged_Plates", value: 0 });
+        changeDealExtData({ key: "Replace_Plate", value: 0 });
+        changeDealExtData({ key: "Transferred_Plate_Number", value: "" });
+        changeDealExtData({ key: "Exchanged_Plate_Number", value: "" });
+        changeDealExtData({ key: "Replaced_Plate_Number", value: "" });
+        changeDealExtData({ key: "Plate_Issue_Date", value: 0 });
+    };
+
     return (
         <div className='grid deal-retail-tag row-gap-2'>
             <div className='col-6'>
                 <DashboardRadio
                     radioArray={tagTopRadio}
+                    clearable
                     onChange={(value) => {
-                        if (value === "0") {
+                        if (value === null) {
+                            changeDealExtData({ key: "Title_Only", value: 0 });
+                            changeDealExtData({ key: "Title_and_License", value: 0 });
+                            clearTitleAndLicenseDependentFields();
+                        } else if (value === "0") {
                             changeDealExtData({ key: "Title_Only", value: 1 });
                             changeDealExtData({ key: "Title_and_License", value: 0 });
+                            clearTitleAndLicenseDependentFields();
                         } else {
                             changeDealExtData({ key: "Title_Only", value: 0 });
                             changeDealExtData({ key: "Title_and_License", value: 1 });
                         }
                     }}
-                    initialValue={
-                        !Title_Only && !Title_and_License ? "0" : Title_Only === 1 ? "0" : "1"
-                    }
+                    initialValue={Title_Only === 1 ? "0" : Title_and_License === 1 ? "1" : null}
                     style={{ width: `${95 / tagTopRadio.length}%` }}
                 />
             </div>
@@ -208,7 +223,6 @@ export const DealRetailTag = observer((): ReactElement => {
                     <InputText
                         className='deal-odometer__text-input w-full'
                         value={TempTagNumber}
-                        disabled={!Title_and_License}
                         onChange={({ target: { value } }: { target: { value: string } }) =>
                             changeDealExtData({ key: "TempTagNumber", value })
                         }
