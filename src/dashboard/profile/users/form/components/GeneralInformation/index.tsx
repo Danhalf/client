@@ -5,8 +5,7 @@ import { TextInput } from "dashboard/common/form/inputs";
 import { Splitter } from "dashboard/common/display";
 import { EmailInput, PhoneInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
-import { DropdownChangeEvent } from "primereact/dropdown";
-import { ComboBox } from "dashboard/common/form/dropdown";
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { useStore } from "store/hooks";
 import { checkLogin, generateNewPassword } from "http/services/users";
 import { GenerateNewPasswordResponse } from "common/models/users";
@@ -82,7 +81,15 @@ export const GeneralInformation = observer((): ReactElement | null => {
         return groups;
     }, [availableRoles]);
 
-    const dropdownSelectedRoleUid = user?.roleuid?.trim() || null;
+    const selectedRoleUids = useMemo(() => {
+        if (user?.roles?.length) {
+            return user.roles.filter((roleuid) => !!roleuid?.trim());
+        }
+        if (user?.roleuid?.trim()) {
+            return [user.roleuid.trim()];
+        }
+        return [];
+    }, [user?.roles, user?.roleuid]);
 
     useEffect(() => {
         if (!user?.useruid) return;
@@ -199,13 +206,13 @@ export const GeneralInformation = observer((): ReactElement | null => {
         debouncedCheckLoginName(trimmedValue);
     };
 
-    const handleRoleChange = (event: DropdownChangeEvent) => {
-        const chosenRoleUid = (event.value as string) ?? "";
-        const matchedRole = availableRoles.find((role) => role.roleuid === chosenRoleUid);
-        const roleDisplayName = matchedRole ? matchedRole.rolename || matchedRole.name : "";
+    const handleRoleChange = (event: MultiSelectChangeEvent) => {
+        const chosenRoleUids = (event.value as string[]) ?? [];
+        const selectedRoles = availableRoles.filter((role) => chosenRoleUids.includes(role.roleuid));
         changeUserData([
-            ["roleuid", chosenRoleUid],
-            ["rolename", roleDisplayName],
+            ["roles", chosenRoleUids],
+            ["roleuid", chosenRoleUids[0] || ""],
+            ["rolename", selectedRoles.map((role) => role.rolename || role.name).join(", ")],
         ]);
     };
 
@@ -252,19 +259,19 @@ export const GeneralInformation = observer((): ReactElement | null => {
             </div>
             <div className='grid'>
                 <div className='col-4'>
-                    <ComboBox
-                        label='Role (required)'
-                        value={dropdownSelectedRoleUid}
+                    <MultiSelect
+                        value={selectedRoleUids}
                         options={roleSelectGroups}
                         optionGroupLabel='name'
                         optionGroupChildren='options'
                         optionLabel='label'
                         optionValue='roleuid'
                         onChange={handleRoleChange}
-                        placeholder='Role (required)'
+                        placeholder='Roles (required)'
                         filter
                         filterBy='label'
                         filterPlaceholder='Search'
+                        display='chip'
                         className='w-full general-information__role-dropdown'
                     />
                 </div>

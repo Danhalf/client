@@ -135,7 +135,7 @@
     opacity: 0.8;
 }
 
-.general-information__role-dropdown .p-dropdown-items-wrapper {
+.general-information__role-dropdown .p-multiselect-items-wrapper {
     max-height: 420px;
 }
 

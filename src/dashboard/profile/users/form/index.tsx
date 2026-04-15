@@ -124,8 +124,8 @@ export const UsersForm = observer((): ReactElement => {
 
         if (!id) return;
 
-        if (!usersStore.user.roleuid || !usersStore.user.roleuid.trim()) {
-            showError("Role not selected");
+        if (!usersStore.user.roles?.length) {
+            showError("At least one role must be selected");
             return;
         }
 

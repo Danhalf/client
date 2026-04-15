@@ -24,6 +24,7 @@ const initialUserData: Partial<UserData> = {
     loginpassword: "",
     rolename: "",
     roleuid: "",
+    roles: [],
     email1: "",
     email: "",
     phone1: "",
@@ -189,8 +190,12 @@ export class UsersStore {
                 ...role,
                 permissions: this.normalizePermissions(role.permissions),
             })) as UserRole[];
+            this._user.roles = this._userRoles
+                .map((role) => role.roleuid)
+                .filter((roleuid) => !!roleuid?.trim());
         } else {
             this._userRoles = [] as UserRole[];
+            this._user.roles = [];
         }
     };
 
@@ -199,7 +204,7 @@ export class UsersStore {
         try {
             const response = await getUserRoles(useruid);
             if (response && Array.isArray(response)) {
-                this._availableRoles = (response as UserRole[]).slice(0, 4);
+                this._availableRoles = response as UserRole[];
             } else {
                 this._availableRoles = [];
             }
@@ -317,12 +322,13 @@ export class UsersStore {
             this.rootStore.userStore.authUser?.dealer_id ||
             this.rootStore.userStore.authUser?.useruid ||
             "0";
+        const roles = (this._user.roles || []).filter((roleuid) => !!roleuid?.trim());
         const userData = {
             loginname: this._user.loginName || "",
             loginpassword: this._password,
             enabled: this._user.enabled || 1,
             dealer_id,
-            roleuid: this._user.roleuid || "",
+            roles,
             firstName: this._user.firstName || "",
             lastName: this._user.lastName || "",
             middleName: this._user.middleName || "",
@@ -360,10 +366,11 @@ export class UsersStore {
     };
 
     public updateUser = async (useruid: string) => {
+        const roles = (this._user.roles || []).filter((roleuid) => !!roleuid?.trim());
         const userData: Partial<UserData> = {
             loginname: this._user.loginName || this._user.loginname || "",
             enabled: this._user.enabled || 1,
-            roleuid: this._user.roleuid || "",
+            roles,
             firstName: this._user.firstName || "",
             lastName: this._user.lastName || "",
             middleName: this._user.middleName || "",
@@ -494,7 +501,7 @@ export class UsersStore {
             !!this._user.firstName &&
             !!this._user.lastName &&
             !!this._user.loginName &&
-            !!this._user.roleuid &&
+            !!this._user.roles?.length &&
             (hasValidPhone || hasEmail) &&
             isPasswordValid &&
             !this._loginError
