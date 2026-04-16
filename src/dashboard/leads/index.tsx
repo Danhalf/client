@@ -590,14 +590,18 @@ export const LeadsDataTable = observer(() => {
         </span>
     );
 
+    const extraSelectedColumnsCount = Math.max(activeColumns.length - 1, 0);
+
     const columnsTemplate = (
-        <span className='p-float-label'>
+        <span className='p-float-label leads__columns-field'>
             <MultiSelect
                 value={activeColumns}
                 options={renderColumnsData}
                 optionLabel='header'
                 className='leads__columns'
                 display='chip'
+                maxSelectedLabels={1}
+                selectedItemsLabel=''
                 panelHeaderTemplate={() => (
                     <LeadsColumnsHeader
                         columns={renderColumnsData}
@@ -623,6 +627,9 @@ export const LeadsDataTable = observer(() => {
                     header: {
                         className: "deals__columns-header",
                     },
+                    label: {
+                        className: "leads__columns-label",
+                    },
                     wrapper: {
                         className: "deals__columns-wrapper",
                         style: {
@@ -632,6 +639,9 @@ export const LeadsDataTable = observer(() => {
                     },
                 }}
             />
+            {extraSelectedColumnsCount > 0 && (
+                <span className='leads__columns-count'>+{extraSelectedColumnsCount}</span>
+            )}
             <label className='float-label'>Columns</label>
         </span>
     );
