@@ -27,6 +27,8 @@ import { LeadsUserSettings } from "common/models/user";
 import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { Checkbox } from "primereact/checkbox";
+import { useNavigate } from "react-router-dom";
+import { DEALS_PAGE } from "common/constants/links";
 
 interface TableColumnProps extends ColumnProps {
     field: keyof Deal;
@@ -283,10 +285,16 @@ export const LeadsDataTable = observer(() => {
     const [advancedSearch, setAdvancedSearch] = useState<Record<string, string | number>>({});
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
     const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
-    const { activeColumns, setActiveColumnsAndSave, serverSettings, saveColumnWidth } =
-        useUserProfileSettings<LeadsUserSettings, LeadsTableColumn>("leads", renderColumnsData);
+    const {
+        activeColumns,
+        setActiveColumnsAndSave,
+        serverSettings,
+        saveColumnWidth,
+        settingsLoaded,
+    } = useUserProfileSettings<LeadsUserSettings, LeadsTableColumn>("leads", renderColumnsData);
     const { showError } = useToastMessage();
     const { createReport } = useCreateReport<Deal>();
+    const navigate = useNavigate();
 
     const hasAdvancedSearch = useMemo(
         () => Object.values(advancedSearch).some((value) => String(value || "").trim().length > 0),
@@ -319,6 +327,13 @@ export const LeadsDataTable = observer(() => {
             type: SEARCH_FIELD_TYPE.DATE_RANGE,
         },
     ];
+
+    useEffect(() => {
+        if (!settingsLoaded) return;
+        if (!serverSettings?.leads && activeColumns.length) {
+            setActiveColumnsAndSave(activeColumns);
+        }
+    }, [settingsLoaded, serverSettings, activeColumns, setActiveColumnsAndSave]);
 
     const handleGetRows = async (params: QueryParams, total?: boolean) => {
         if (!authUser) return;
@@ -636,6 +651,11 @@ export const LeadsDataTable = observer(() => {
                     onClick={() => setDialogVisible(true)}
                 />
                 <ControlButton
+                    variant={BUTTON_VARIANTS.NEW}
+                    tooltip='Add new lead'
+                    onClick={() => navigate(DEALS_PAGE.CREATE())}
+                />
+                <ControlButton
                     variant={BUTTON_VARIANTS.PRINT}
                     tooltip='Print leads list'
                     onClick={() => printTableData(true)}
@@ -682,6 +702,13 @@ export const LeadsDataTable = observer(() => {
                     {activeColumns.map(({ field, header }: LeadsTableColumn, index) => {
                         const savedWidth = serverSettings?.leads?.columnWidth?.[field];
                         const isLastColumn = index === activeColumns.length - 1;
+                        const additionalStyles =
+                            field === "status"
+                                ? {
+                                      maxWidth: "240px",
+                                      width: "240px",
+                                  }
+                                : undefined;
 
                         return (
                             <Column
@@ -715,7 +742,11 @@ export const LeadsDataTable = observer(() => {
                                     const value = String(data[field as keyof Deal] ?? "");
                                     return <TruncatedText text={value} withTooltip />;
                                 }}
-                                pt={getColumnPtStyles({ savedWidth, isLastColumn })}
+                                pt={getColumnPtStyles({
+                                    savedWidth,
+                                    isLastColumn,
+                                    additionalStyles,
+                                })}
                             />
                         );
                     })}
