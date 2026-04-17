@@ -9,6 +9,7 @@ import { ROWS_PER_PAGE } from "common/settings";
 import { Deal, TotalDealsList } from "common/models/deals";
 import { Loader } from "dashboard/common/loader";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import { ChipMultiSelect } from "dashboard/common/form/chip-multiselect";
 import {
     AdvancedSearchDialog,
     SEARCH_FORM_TYPE,
@@ -593,57 +594,49 @@ export const LeadsDataTable = observer(() => {
     const extraSelectedColumnsCount = Math.max(activeColumns.length - 1, 0);
 
     const columnsTemplate = (
-        <span className='p-float-label leads__columns-field'>
-            <MultiSelect
-                value={activeColumns}
-                options={renderColumnsData}
-                optionLabel='header'
-                className='leads__columns'
-                display='chip'
-                maxSelectedLabels={1}
-                selectedItemsLabel=''
-                panelHeaderTemplate={() => (
-                    <LeadsColumnsHeader
-                        columns={renderColumnsData}
-                        activeColumns={activeColumns}
-                        setActiveColumns={setActiveColumnsAndSave}
-                    />
-                )}
-                onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
-                    stopPropagation();
-                    const sortedValue = value.sort((a: LeadsTableColumn, b: LeadsTableColumn) => {
-                        const firstIndex = renderColumnsData.findIndex(
-                            (col) => col.field === a.field
-                        );
-                        const secondIndex = renderColumnsData.findIndex(
-                            (col) => col.field === b.field
-                        );
-                        return firstIndex - secondIndex;
-                    });
-
-                    setActiveColumnsAndSave(sortedValue);
-                }}
-                pt={{
-                    header: {
-                        className: "deals__columns-header",
-                    },
-                    label: {
-                        className: "leads__columns-label",
-                    },
-                    wrapper: {
-                        className: "deals__columns-wrapper",
-                        style: {
-                            width: "230px",
-                            maxHeight: "500px",
-                        },
-                    },
-                }}
-            />
-            {extraSelectedColumnsCount > 0 && (
-                <span className='leads__columns-count'>+{extraSelectedColumnsCount}</span>
+        <ChipMultiSelect
+            floatLabel={false}
+            label='Columns'
+            floatClassName='leads__columns-float'
+            overflowCount={extraSelectedColumnsCount}
+            value={activeColumns}
+            options={renderColumnsData}
+            optionLabel='header'
+            maxSelectedLabels={1}
+            selectedItemsLabel=''
+            panelHeaderTemplate={() => (
+                <LeadsColumnsHeader
+                    columns={renderColumnsData}
+                    activeColumns={activeColumns}
+                    setActiveColumns={setActiveColumnsAndSave}
+                />
             )}
-            <label className='float-label'>Columns</label>
-        </span>
+            onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
+                stopPropagation();
+                const sortedValue = value.sort((a: LeadsTableColumn, b: LeadsTableColumn) => {
+                    const firstIndex = renderColumnsData.findIndex((col) => col.field === a.field);
+                    const secondIndex = renderColumnsData.findIndex((col) => col.field === b.field);
+                    return firstIndex - secondIndex;
+                });
+
+                setActiveColumnsAndSave(sortedValue);
+            }}
+            pt={{
+                header: {
+                    className: "deals__columns-header",
+                },
+                label: {
+                    className: "leads__columns-label",
+                },
+                wrapper: {
+                    className: "deals__columns-wrapper",
+                    style: {
+                        width: "230px",
+                        maxHeight: "500px",
+                    },
+                },
+            }}
+        />
     );
 
     return (
