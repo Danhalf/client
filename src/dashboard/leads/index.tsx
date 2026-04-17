@@ -259,7 +259,7 @@ const LeadsColumnsHeader = ({
                 type='button'
                 className='p-multiselect-close p-link'
                 onClick={(e) => {
-                    setActiveColumns(columns.filter(({ checked }) => checked));
+                    setActiveColumns([]);
                     onCloseClick?.(e);
                 }}
             >
@@ -613,7 +613,8 @@ export const LeadsDataTable = observer(() => {
             )}
             onChange={({ value, stopPropagation }: MultiSelectChangeEvent) => {
                 stopPropagation();
-                const sortedValue = value.sort((a: LeadsTableColumn, b: LeadsTableColumn) => {
+                const nextValue = Array.isArray(value) ? [...value] : [];
+                const sortedValue = nextValue.sort((a: LeadsTableColumn, b: LeadsTableColumn) => {
                     const firstIndex = renderColumnsData.findIndex((col) => col.field === a.field);
                     const secondIndex = renderColumnsData.findIndex((col) => col.field === b.field);
                     return firstIndex - secondIndex;

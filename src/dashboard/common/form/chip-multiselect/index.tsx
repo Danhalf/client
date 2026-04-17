@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MultiSelect, MultiSelectProps } from "primereact/multiselect";
 import "./index.css";
 
@@ -16,9 +17,12 @@ export function ChipMultiSelect({
     floatClassName,
     className,
     display = "chip",
+    showClear,
     value,
     ...rest
 }: ChipMultiSelectProps) {
+    const shellRef = useRef<HTMLSpanElement | null>(null);
+    const [countLeft, setCountLeft] = useState<number | null>(null);
     const showCount = overflowCount != null && overflowCount > 0;
     const hasValue = Array.isArray(value)
         ? value.length > 0
@@ -34,10 +38,53 @@ export function ChipMultiSelect({
         .filter(Boolean)
         .join(" ");
 
+    useEffect(() => {
+        if (!showCount) {
+            setCountLeft(null);
+            return;
+        }
+
+        const updateCountPosition = () => {
+            const shellElement = shellRef.current;
+            if (!shellElement) return;
+
+            const tokenElement = shellElement.querySelector(
+                ".chip-multiselect .p-multiselect-token"
+            ) as HTMLElement | null;
+            if (!tokenElement) {
+                setCountLeft(null);
+                return;
+            }
+
+            const shellRect = shellElement.getBoundingClientRect();
+            const tokenRect = tokenElement.getBoundingClientRect();
+            const nextLeft = Math.max(0, Math.round(tokenRect.right - shellRect.left + 5));
+            setCountLeft((prevLeft) => (prevLeft === nextLeft ? prevLeft : nextLeft));
+        };
+
+        const frameId = window.requestAnimationFrame(updateCountPosition);
+        window.addEventListener("resize", updateCountPosition);
+
+        return () => {
+            window.cancelAnimationFrame(frameId);
+            window.removeEventListener("resize", updateCountPosition);
+        };
+    }, [showCount, value]);
+
     return (
-        <span className={shellClassName}>
-            <MultiSelect {...rest} value={value} display={display} className={msClassName} />
-            {showCount ? <span className='chip-multiselect__count'>+{overflowCount}</span> : null}
+        <span className={shellClassName} ref={shellRef}>
+            <MultiSelect
+                {...rest}
+                value={value}
+                display={display}
+                showClear={showClear ?? true}
+                className={msClassName}
+            />
+            {showCount && countLeft != null ? (
+                <span className='chip-multiselect__count' style={{ left: `${countLeft}px` }}>
+                    +{overflowCount}
+                </span>
+            ) : null}
             {showFloatLabel ? <label className='float-label'>{label}</label> : null}
             {showPlainLabel ? <span className='chip-multiselect__label'>{label}</span> : null}
         </span>

@@ -14,6 +14,7 @@
     background: var(--admss-app-white);
     align-items: center;
     overflow: visible;
+    position: relative;
 }
 
 .chip-multiselect.p-multiselect .p-multiselect-label-container {
@@ -31,17 +32,46 @@
     pointer-events: none;
 }
 
-.chip-multiselect-shell:has(.chip-multiselect__count)
-    .chip-multiselect.p-multiselect
-    .p-multiselect-label-container {
-    padding-right: 40px;
-}
-
 .chip-multiselect .p-multiselect-label {
     display: flex;
     align-items: center;
     gap: 8px;
     overflow: visible;
+}
+
+.chip-multiselect.p-inputwrapper-filled.p-multiselect.p-multiselect-chip .p-multiselect-label {
+    padding: 0.2rem;
+}
+
+.chip-multiselect.p-multiselect .p-multiselect-clear-icon,
+.chip-multiselect.p-multiselect .p-multiselect-trigger-icon {
+    color: var(--admss-app-medium-grey);
+}
+
+.chip-multiselect.p-multiselect .p-multiselect-trigger {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2rem;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chip-multiselect.p-multiselect.p-multiselect-clearable .p-multiselect-clear-icon {
+    right: 2rem;
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+    margin-top: -0.4rem;
+}
+
+.chip-multiselect.p-multiselect:not(.p-disabled) .p-multiselect-clear-icon:hover,
+.chip-multiselect.p-multiselect:not(.p-disabled)
+    .p-multiselect-trigger:hover
+    .p-multiselect-trigger-icon {
+    color: var(--admss-app-darkest-grey);
 }
 
 .chip-multiselect .p-multiselect-token:nth-child(n + 2) {
@@ -107,6 +137,5 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    right: 50px;
     pointer-events: none;
 }
