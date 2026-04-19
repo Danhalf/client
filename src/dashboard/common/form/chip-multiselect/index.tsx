@@ -13,6 +13,7 @@ export type ChipMultiSelectProps = MultiSelectProps & {
 export function ChipMultiSelect({
     overflowCount,
     floatLabel = false,
+    panelHeaderTemplate = null,
     label,
     floatClassName,
     className,
@@ -75,6 +76,7 @@ export function ChipMultiSelect({
         <span className={shellClassName} ref={shellRef}>
             <MultiSelect
                 {...rest}
+                panelHeaderTemplate={!panelHeaderTemplate ? <></> : panelHeaderTemplate}
                 value={value}
                 display={display}
                 showClear={showClear ?? true}

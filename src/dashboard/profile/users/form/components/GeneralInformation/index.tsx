@@ -5,7 +5,8 @@ import { TextInput } from "dashboard/common/form/inputs";
 import { Splitter } from "dashboard/common/display";
 import { EmailInput, PhoneInput } from "dashboard/common/form/inputs";
 import { Button } from "primereact/button";
-import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import { MultiSelectChangeEvent } from "primereact/multiselect";
+import { ChipMultiSelect } from "dashboard/common/form/chip-multiselect";
 import { useStore } from "store/hooks";
 import { checkLogin, generateNewPassword } from "http/services/users";
 import { GenerateNewPasswordResponse } from "common/models/users";
@@ -90,6 +91,8 @@ export const GeneralInformation = observer((): ReactElement | null => {
         }
         return [];
     }, [user?.roles, user?.roleuid]);
+
+    const extraSelectedRolesCount = Math.max(selectedRoleUids.length - 1, 0);
 
     useEffect(() => {
         if (!user?.useruid) return;
@@ -208,7 +211,9 @@ export const GeneralInformation = observer((): ReactElement | null => {
 
     const handleRoleChange = (event: MultiSelectChangeEvent) => {
         const chosenRoleUids = (event.value as string[]) ?? [];
-        const selectedRoles = availableRoles.filter((role) => chosenRoleUids.includes(role.roleuid));
+        const selectedRoles = availableRoles.filter((role) =>
+            chosenRoleUids.includes(role.roleuid)
+        );
         changeUserData([
             ["roles", chosenRoleUids],
             ["roleuid", chosenRoleUids[0] || ""],
@@ -259,7 +264,9 @@ export const GeneralInformation = observer((): ReactElement | null => {
             </div>
             <div className='grid'>
                 <div className='col-4'>
-                    <MultiSelect
+                    <ChipMultiSelect
+                        floatClassName='w-full'
+                        className='w-full general-information__role-dropdown'
                         value={selectedRoleUids}
                         options={roleSelectGroups}
                         optionGroupLabel='name'
@@ -271,8 +278,9 @@ export const GeneralInformation = observer((): ReactElement | null => {
                         filter
                         filterBy='label'
                         filterPlaceholder='Search'
-                        display='chip'
-                        className='w-full general-information__role-dropdown'
+                        maxSelectedLabels={1}
+                        overflowCount={extraSelectedRolesCount > 0 ? extraSelectedRolesCount : null}
+                        showClear
                     />
                 </div>
             </div>

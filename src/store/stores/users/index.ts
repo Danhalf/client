@@ -1,4 +1,4 @@
-import { SubUser, UserData, UserRole, UserRolePayload, SalespersonInfo } from "common/models/users";
+import { UserData, UserRole, UserRolePayload, SalespersonInfo } from "common/models/users";
 import { BaseResponseError, Status } from "common/models/base-response";
 import {
     createUser,
@@ -37,6 +37,17 @@ const initialUserData: Partial<UserData> = {
     state: "",
     ZIP: "",
     salespersonLicense: "",
+};
+
+const normalizeUserRolesFromUserinfo = (userData: UserData): string[] => {
+    const raw = userData.roles;
+    if (Array.isArray(raw) && raw.length) {
+        return raw.map((roleUid) => String(roleUid).trim()).filter(Boolean);
+    }
+    if (userData.roleuid?.trim()) {
+        return [userData.roleuid.trim()];
+    }
+    return [];
 };
 
 const initialSalespersonInfo: Partial<SalespersonInfo> = {
@@ -170,7 +181,11 @@ export class UsersStore {
                 await Promise.reject(response?.error);
                 return;
             } else {
-                this._user = response as SubUser;
+                const data = response as UserData;
+                this._user = {
+                    ...data,
+                    roles: normalizeUserRolesFromUserinfo(data),
+                };
                 this._isUserChanged = false;
             }
         } catch (error) {
@@ -190,12 +205,8 @@ export class UsersStore {
                 ...role,
                 permissions: this.normalizePermissions(role.permissions),
             })) as UserRole[];
-            this._user.roles = this._userRoles
-                .map((role) => role.roleuid)
-                .filter((roleuid) => !!roleuid?.trim());
         } else {
             this._userRoles = [] as UserRole[];
-            this._user.roles = [];
         }
     };
 
