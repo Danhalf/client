@@ -9,7 +9,7 @@ import { MultiSelectChangeEvent } from "primereact/multiselect";
 import { ChipMultiSelect } from "dashboard/common/form/chip-multiselect";
 import { useStore } from "store/hooks";
 import { checkLogin, generateNewPassword } from "http/services/users";
-import { GenerateNewPasswordResponse } from "common/models/users";
+import { GenerateNewPasswordResponse, UserRole } from "common/models/users";
 import { useToastMessage } from "common/hooks";
 import { PasswordInput } from "dashboard/common/form/inputs/password";
 import InfoIcon from "assets/images/info-icon.svg";
@@ -35,6 +35,11 @@ interface RoleGroup {
 const GROUP_DEFAULT = "Default Roles";
 const GROUP_CUSTOM = "Custom Roles";
 
+function optionLabelForRole(role: UserRole): string {
+    const text = (role.rolename || role.name || "").trim();
+    return text.length > 0 ? text : role.roleuid;
+}
+
 export const GeneralInformation = observer((): ReactElement | null => {
     const navigate = useNavigate();
     const usersStore = useStore().usersStore;
@@ -51,26 +56,53 @@ export const GeneralInformation = observer((): ReactElement | null => {
     const hasPhone = !!user?.phone1;
     const isEditMode = !!user?.useruid;
 
+    const selectedRoleUids = useMemo(() => {
+        let raw: string[] = [];
+        if (user?.roles?.length) {
+            raw = user.roles.filter((roleuid) => !!roleuid?.trim());
+        } else if (user?.roleuid?.trim()) {
+            raw = [user.roleuid.trim()];
+        }
+        return [...new Set(raw)];
+    }, [user?.roles, user?.roleuid]);
+
     const roleSelectGroups = useMemo((): RoleGroup[] => {
         const rolesWithUid = availableRoles.filter((role) => role.roleuid);
         const compareOptionsByLabel = (first: RoleSelectOption, second: RoleSelectOption) =>
             first.label.localeCompare(second.label);
 
-        const defaultOptions: RoleSelectOption[] = rolesWithUid
+        let defaultOptions: RoleSelectOption[] = rolesWithUid
             .filter((role) => role.isDefault === 1)
             .map((role) => ({
                 roleuid: role.roleuid,
-                label: role.rolename || role.name,
+                label: optionLabelForRole(role),
             }))
             .sort(compareOptionsByLabel);
 
-        const customOptions: RoleSelectOption[] = rolesWithUid
+        let customOptions: RoleSelectOption[] = rolesWithUid
             .filter((role) => role.isDefault !== 1)
             .map((role) => ({
                 roleuid: role.roleuid,
-                label: role.rolename || role.name,
+                label: optionLabelForRole(role),
             }))
             .sort(compareOptionsByLabel);
+
+        const presentUids = new Set<string>();
+        [...defaultOptions, ...customOptions].forEach((option) => presentUids.add(option.roleuid));
+
+        const orphanOptions: RoleSelectOption[] = selectedRoleUids
+            .filter((roleuid) => !presentUids.has(roleuid))
+            .map((roleuid) => ({ roleuid, label: roleuid }));
+
+        if (orphanOptions.length) {
+            if (defaultOptions.length) {
+                defaultOptions = [...orphanOptions, ...defaultOptions];
+            } else if (customOptions.length) {
+                customOptions = [...orphanOptions, ...customOptions];
+            } else {
+                customOptions = orphanOptions;
+            }
+        }
 
         const groups: RoleGroup[] = [];
         if (defaultOptions.length) {
@@ -80,17 +112,7 @@ export const GeneralInformation = observer((): ReactElement | null => {
             groups.push({ name: GROUP_CUSTOM, options: customOptions });
         }
         return groups;
-    }, [availableRoles]);
-
-    const selectedRoleUids = useMemo(() => {
-        if (user?.roles?.length) {
-            return user.roles.filter((roleuid) => !!roleuid?.trim());
-        }
-        if (user?.roleuid?.trim()) {
-            return [user.roleuid.trim()];
-        }
-        return [];
-    }, [user?.roles, user?.roleuid]);
+    }, [availableRoles, selectedRoleUids]);
 
     const extraSelectedRolesCount = Math.max(selectedRoleUids.length - 1, 0);
 
@@ -273,6 +295,7 @@ export const GeneralInformation = observer((): ReactElement | null => {
                         optionGroupChildren='options'
                         optionLabel='label'
                         optionValue='roleuid'
+                        dataKey='roleuid'
                         onChange={handleRoleChange}
                         placeholder='Roles (required)'
                         filter
