@@ -13,7 +13,6 @@ export const LeadFormSidebar = ({
 }: LeadFormSidebarProps): ReactElement => {
     return (
         <aside className='lead__tabs'>
-            <div className='lead__menu-title uppercase'>Create new lead</div>
             <button
                 type='button'
                 className={`lead__tab ${activeStep === 0 ? "lead__tab--active" : ""}`}

@@ -39,77 +39,78 @@ export const LeadsForm = (): ReactElement => {
     const handleExit = () => navigate(LEADS_PAGE.MAIN);
 
     return (
-        <div className='grid relative'>
+        <div className='grid relative lead'>
             <Tooltip target='.lead-form__convert-wrap[data-pr-tooltip]' showOnDisabled />
-            <Button icon='pi pi-times' className='p-button close-button' onClick={handleExit} />
+            <Button icon='pi pi-times' className='lead__close-button' onClick={handleExit} />
             <div className='col-12'>
-                <div className='card lead'>
-                    <Formik<LeadFormValues>
-                        initialValues={initialValues}
-                        enableReinitialize
-                        validateOnChange={false}
-                        validateOnBlur={false}
-                        validationSchema={validationSchema}
-                        onSubmit={handleSubmit}
-                    >
-                        {({ values, errors, setFieldValue, submitForm, isSubmitting, dirty }) => (
-                            <Form className='card-content lead__card'>
-                                <div className='lead__body'>
-                                    <LeadFormSidebar
-                                        activeStep={activeStep}
-                                        onStepChange={setActiveStep}
-                                        showVehicleStep={Boolean(values.type)}
-                                    />
-                                    <section className='lead__panel card-content__wrapper'>
-                                        {activeStep === CONTACT_STEP ? (
-                                            <ContactInformationStep
-                                                values={values}
-                                                errors={errors}
-                                                setFieldValue={setFieldValue}
-                                            />
-                                        ) : (
-                                            <VehicleInformationStep
-                                                values={values}
-                                                errors={errors}
-                                                setFieldValue={setFieldValue}
-                                            />
-                                        )}
-                                    </section>
-                                </div>
+                <Formik<LeadFormValues>
+                    initialValues={initialValues}
+                    enableReinitialize
+                    validateOnChange={false}
+                    validateOnBlur={false}
+                    validationSchema={validationSchema}
+                    onSubmit={handleSubmit}
+                >
+                    {({ values, errors, setFieldValue, submitForm, isSubmitting, dirty }) => (
+                        <Form className='card lead__card'>
+                            <div className='card-header lead__header'>
+                                <h2 className='lead__title'>Create new lead</h2>
+                            </div>
+                            <div className='lead__body'>
+                                <LeadFormSidebar
+                                    activeStep={activeStep}
+                                    onStepChange={setActiveStep}
+                                    showVehicleStep={Boolean(values.type)}
+                                />
+                                <section className='lead__panel card-content__wrapper'>
+                                    {activeStep === CONTACT_STEP ? (
+                                        <ContactInformationStep
+                                            values={values}
+                                            errors={errors}
+                                            setFieldValue={setFieldValue}
+                                        />
+                                    ) : (
+                                        <VehicleInformationStep
+                                            values={values}
+                                            errors={errors}
+                                            setFieldValue={setFieldValue}
+                                        />
+                                    )}
+                                </section>
+                            </div>
 
-                                <FormNav className='lead__footer'>
-                                    <FormNavButton
-                                        onClick={() => {
-                                            if (activeStep === CONTACT_STEP) {
-                                                handleExit();
-                                                return;
-                                            }
-                                            setActiveStep((prev) => prev - 1);
-                                        }}
-                                        outlined
-                                    >
-                                        Back
-                                    </FormNavButton>
-                                    <FormNavButton
-                                        onClick={() => setActiveStep((prev) => prev + 1)}
-                                        disabled={activeStep >= LAST_STEP || !values.type}
-                                        severity={activeStep >= LAST_STEP ? "secondary" : "success"}
-                                        outlined
-                                    >
-                                        Next
-                                    </FormNavButton>
-                                    <FormNavButton
-                                        onClick={() => submitForm()}
-                                        severity={!dirty || isSubmitting ? "secondary" : "success"}
-                                        disabled={!dirty || isSubmitting}
-                                    >
-                                        Save
-                                    </FormNavButton>
-                                </FormNav>
-                            </Form>
-                        )}
-                    </Formik>
-                </div>
+                            <FormNav className='lead__footer'>
+                                <FormNavButton
+                                    onClick={() => {
+                                        if (activeStep === CONTACT_STEP) {
+                                            handleExit();
+                                            return;
+                                        }
+                                        setActiveStep((prev) => prev - 1);
+                                    }}
+                                    outlined
+                                >
+                                    Back
+                                </FormNavButton>
+                                <FormNavButton
+                                    onClick={() => setActiveStep((prev) => prev + 1)}
+                                    disabled={activeStep >= LAST_STEP || !values.type}
+                                    severity={activeStep >= LAST_STEP ? "secondary" : "success"}
+                                    outlined
+                                >
+                                    Next
+                                </FormNavButton>
+                                <FormNavButton
+                                    onClick={() => submitForm()}
+                                    severity={!dirty || isSubmitting ? "secondary" : "success"}
+                                    disabled={!dirty || isSubmitting}
+                                >
+                                    Save
+                                </FormNavButton>
+                            </FormNav>
+                        </Form>
+                    )}
+                </Formik>
             </div>
         </div>
     );

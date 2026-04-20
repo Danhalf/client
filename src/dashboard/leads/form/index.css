@@ -1,14 +1,62 @@
+.lead {
+    --card-height: calc(var(--admss-app-default-card-height) - 75px);
+    --title-height: 63px;
+    position: relative;
+    padding: 0;
+}
+
 .lead__card {
+    padding: 40px;
+    padding-right: 30px;
+    height: calc(var(--card-height) + var(--title-height));
+    max-height: var(--card-max-height);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    border-radius: 15px;
     margin-bottom: 45px;
-    padding-top: 44px;
+}
+
+.card-header.lead__header {
+    display: flex;
+    padding-top: 0;
+    margin-bottom: 30px;
+}
+
+.lead__title {
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.lead__close-button {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    padding: 20px;
+    right: 40px;
+    top: 40px;
+    border-radius: 50%;
+    color: var(--admss-app-primary);
+    background-color: transparent;
+    border-color: transparent;
+    transition: color 0.3s;
+}
+
+.lead__close-button .p-button-icon {
+    font-size: 22px;
+}
+
+.lead__close-button:hover,
+.lead__close-button:focus {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--admss-app-primary);
 }
 
 .lead__body {
     display: flex;
-    min-height: 705px;
+    flex: 1;
     border-right: 2px solid var(--admss-app-light-blue);
 }
 
@@ -19,12 +67,6 @@
     display: flex;
     flex-direction: column;
     gap: 0;
-}
-
-.lead__menu-title {
-    font-size: 16px;
-    font-weight: 700;
-    margin: 0 18px 10px;
 }
 
 .lead__tab {
@@ -54,20 +96,26 @@
     flex: 1;
     min-height: 566px;
     border-left: 2px solid var(--admss-app-light-blue);
-    padding: 0 0 20px 22px;
+    padding: 0 40px;
+    border-radius: 0;
     overflow: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .lead-form__title {
-    margin-bottom: 40px;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--admss-app-primary);
+    font-family: "Open Sans", sans-serif;
 }
 
 .lead-form__top {
     display: flex;
     align-items: flex-start;
+    padding-bottom: 20px;
     justify-content: space-between;
 }
 
@@ -86,7 +134,6 @@
 
 .lead-form__convert-button:disabled {
     color: var(--admss-app-medium-grey);
-    text-decoration: none;
     pointer-events: none;
 }
 
@@ -107,5 +154,6 @@
 }
 
 .lead__footer {
-    margin-top: 20px;
+    margin-top: auto;
+    padding-right: 30px;
 }
