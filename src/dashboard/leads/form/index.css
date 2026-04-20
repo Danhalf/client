@@ -1,0 +1,111 @@
+.lead__card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 45px;
+    padding-top: 44px;
+}
+
+.lead__body {
+    display: flex;
+    min-height: 705px;
+    border-right: 2px solid var(--admss-app-light-blue);
+}
+
+.lead__tabs {
+    width: var(--admss-app-card-sidebar-width);
+    min-height: 527px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.lead__menu-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 18px 10px;
+}
+
+.lead__tab {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    color: var(--admss-app-primary);
+    height: 50px;
+    padding: 0 18px;
+    border-radius: 5px 0 0 5px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.lead__tab--active {
+    background: var(--admss-app-light-blue);
+}
+
+.lead__tab:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.lead__panel {
+    flex: 1;
+    min-height: 566px;
+    border-left: 2px solid var(--admss-app-light-blue);
+    padding: 0 0 20px 22px;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+
+.lead-form__title {
+    margin-bottom: 40px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.lead-form__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.lead-form__convert-wrap {
+    display: inline-block;
+}
+
+.lead-form__convert-button {
+    border: none;
+    background: transparent;
+    color: var(--admss-app-main-blue);
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.lead-form__convert-button:disabled {
+    color: var(--admss-app-medium-grey);
+    text-decoration: none;
+    pointer-events: none;
+}
+
+.lead .p-dropdown,
+.lead .p-inputtext,
+.lead .p-inputnumber-input,
+.lead .p-inputtextarea {
+    width: 100%;
+}
+
+.lead-textarea-wrap {
+    margin-top: 16px;
+}
+
+.lead-textarea {
+    min-height: 96px;
+    resize: none;
+}
+
+.lead__footer {
+    margin-top: 20px;
+}
