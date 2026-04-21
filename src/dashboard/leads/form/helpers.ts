@@ -6,16 +6,24 @@ import {
     ServiceVisitType,
     ExistingLeadState,
     emptyLeadValues,
-} from "./types";
+} from "dashboard/leads/form/types";
+import { CREATE_ID } from "common/constants/links";
+import { ERROR_MESSAGES } from "common/constants/error-messages";
 
 export const LOCAL_STORAGE_KEY = "lead-form-drafts";
+
+export enum LEAD_TYPE {
+    TRADE_IN = "trade-in",
+    SERVICE = "service",
+}
 
 const mapExistingLeadToForm = (lead?: ExistingLeadState["lead"]): LeadFormValues | null => {
     if (!lead) return null;
     const [firstName = "", ...lastNameParts] = String(lead.contactinfo || "")
         .trim()
         .split(/\s+/);
-    const inferredType: LeadType = Number(lead.dealtype) <= 1 ? "trade-in" : "service";
+    const inferredType: LeadType =
+        Number(lead.dealtype) <= 1 ? LEAD_TYPE.TRADE_IN : LEAD_TYPE.SERVICE;
     return {
         ...emptyLeadValues,
         type: inferredType,
@@ -30,7 +38,7 @@ export const getInitialValues = (
     id?: string,
     stateLead?: ExistingLeadState["lead"]
 ): LeadFormValues => {
-    if (!id || id === "create") return emptyLeadValues;
+    if (!id || id === CREATE_ID) return emptyLeadValues;
     try {
         const value = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (!value) {
@@ -56,7 +64,7 @@ export const saveLeadDraft = (values: LeadFormValues) => {
 };
 
 export const isContactStepValid = (values: LeadFormValues): boolean => {
-    if (values.type !== "trade-in") return false;
+    if (values.type !== LEAD_TYPE.TRADE_IN) return false;
     return Boolean(
         values.type &&
             values.status &&
@@ -70,7 +78,7 @@ export const isContactStepValid = (values: LeadFormValues): boolean => {
 };
 
 export const isVehicleStepValid = (values: LeadFormValues): boolean => {
-    if (values.type !== "trade-in") return false;
+    if (values.type !== LEAD_TYPE.TRADE_IN) return false;
     return Boolean(
         values.vin.trim() &&
             values.make.trim() &&
@@ -84,69 +92,68 @@ export const isVehicleStepValid = (values: LeadFormValues): boolean => {
 
 export const validationSchema = Yup.object({
     id: Yup.string().default(""),
-    type: Yup.mixed<LeadType>().oneOf(["trade-in", "service"]).required("Data is required."),
+    type: Yup.mixed<LeadType>()
+        .oneOf([LEAD_TYPE.TRADE_IN, LEAD_TYPE.SERVICE])
+        .required("Data is required."),
     status: Yup.mixed<LeadStatus>()
         .oneOf(["new", "in-progress", "completed", "rejected"])
-        .required("Data is required."),
-    firstName: Yup.string().trim().required("Data is required."),
-    lastName: Yup.string().trim().required("Data is required."),
+        .required(ERROR_MESSAGES.REQUIRED),
+    firstName: Yup.string().trim().required(ERROR_MESSAGES.REQUIRED),
+    lastName: Yup.string().trim().required(ERROR_MESSAGES.REQUIRED),
     state: Yup.string()
         .trim()
         .when("type", {
-            is: "trade-in",
-            then: (schema) => schema.required("Data is required."),
+            is: LEAD_TYPE.TRADE_IN,
+            then: (schema) => schema.required(ERROR_MESSAGES.REQUIRED),
             otherwise: (schema) => schema.notRequired(),
         }),
     city: Yup.string()
         .trim()
         .when("type", {
-            is: "trade-in",
-            then: (schema) => schema.required("Data is required."),
+            is: LEAD_TYPE.TRADE_IN,
+            then: (schema) => schema.required(ERROR_MESSAGES.REQUIRED),
             otherwise: (schema) => schema.notRequired(),
         }),
-    email: Yup.string()
-        .trim()
-        .email("Please enter a valid email address.")
-        .required("Data is required."),
-    phone: Yup.string().trim().required("Data is required."),
+    email: Yup.string().trim().email(ERROR_MESSAGES.EMAIL).required(ERROR_MESSAGES.REQUIRED),
+    phone: Yup.string().trim().required(ERROR_MESSAGES.REQUIRED),
     message: Yup.string()
         .trim()
         .when("type", {
-            is: "trade-in",
-            then: (schema) => schema.required("Data is required."),
+            is: LEAD_TYPE.TRADE_IN,
+            then: (schema) => schema.required(ERROR_MESSAGES.REQUIRED),
             otherwise: (schema) => schema.notRequired(),
         }),
     preferredDateTime: Yup.string()
         .trim()
         .when("type", {
-            is: "service",
-            then: (schema) => schema.required("Data is required."),
+            is: LEAD_TYPE.SERVICE,
+            then: (schema) => schema.required(ERROR_MESSAGES.REQUIRED),
             otherwise: (schema) => schema.notRequired(),
         }),
     waitOrDropOff: Yup.mixed<ServiceVisitType>().when("type", {
-        is: "service",
-        then: (schema) => schema.oneOf(["wait", "drop-off"]).required("Data is required."),
+        is: LEAD_TYPE.SERVICE,
+        then: (schema) => schema.oneOf(["wait", "drop-off"]).required(ERROR_MESSAGES.REQUIRED),
         otherwise: (schema) => schema.notRequired(),
     }),
-    vin: Yup.string().trim().required("Data is required."),
-    make: Yup.string().trim().required("Data is required."),
-    model: Yup.string().trim().required("Data is required."),
-    year: Yup.string().trim().required("Data is required."),
-    mileage: Yup.string().trim().required("Data is required."),
+    vin: Yup.string().trim().required(ERROR_MESSAGES.REQUIRED),
+    make: Yup.string().trim().required(ERROR_MESSAGES.REQUIRED),
+    model: Yup.string().trim().required(ERROR_MESSAGES.REQUIRED),
+    year: Yup.string().trim().required(ERROR_MESSAGES.REQUIRED),
+    mileage: Yup.string().trim().required(ERROR_MESSAGES.REQUIRED),
     desiredPrice: Yup.number()
         .nullable()
         .when("type", {
-            is: "trade-in",
+            is: LEAD_TYPE.TRADE_IN,
             then: (schema) =>
-                schema.min(0, "Value must be positive.").required("Data is required."),
+                schema.min(0, "Value must be positive.").required(ERROR_MESSAGES.REQUIRED),
             otherwise: (schema) => schema.notRequired(),
         }),
     payoffAmount: Yup.number()
         .nullable()
         .when("type", {
-            is: "trade-in",
+            is: LEAD_TYPE.TRADE_IN,
             then: (schema) =>
-                schema.min(0, "Value must be positive.").required("Data is required."),
+                schema.min(0, "Value must be positive.").required(ERROR_MESSAGES.REQUIRED),
             otherwise: (schema) => schema.notRequired(),
         }),
     vehicleAdditionalInfo: Yup.string().trim().notRequired(),
