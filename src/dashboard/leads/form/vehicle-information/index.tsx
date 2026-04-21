@@ -34,7 +34,7 @@ export const VehicleInformationStep = ({
                 )}
             </div>
 
-            <div className='grid'>
+            <div className='grid lead-row pt-3'>
                 <TextInput
                     name='VIN'
                     value={values.vin}
@@ -53,7 +53,7 @@ export const VehicleInformationStep = ({
                 />
             </div>
 
-            <div className='grid'>
+            <div className='grid lead-row pt-3'>
                 <TextInput
                     name='Model'
                     value={values.model}
@@ -81,7 +81,7 @@ export const VehicleInformationStep = ({
             </div>
 
             {isTradeIn && (
-                <div key='trade-in-row' className='grid'>
+                <div key='trade-in-row' className='grid lead-row pt-3'>
                     <NumberInput
                         key='desiredPrice'
                         name='Desired Price'

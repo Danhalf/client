@@ -18,6 +18,7 @@ import {
 } from "../types";
 import { isContactStepValid } from "dashboard/leads/form/helpers";
 import { ConvertButton } from "dashboard/leads/form/common/convert-button";
+import { Splitter } from "dashboard/common/display";
 
 interface ContactInformationStepProps {
     values: LeadFormValues;
@@ -50,7 +51,7 @@ export const ContactInformationStep = ({
                 )}
             </div>
 
-            <div key='type-status' className='grid'>
+            <div key='type-status' className='grid lead-row pt-3'>
                 <div className='col-4'>
                     <ComboBox
                         label='Type (required)'
@@ -81,11 +82,11 @@ export const ContactInformationStep = ({
 
             {hasType && (
                 <>
-                    <hr key='divider' className='form-line' />
+                    <Splitter className='py-3 mb-3' />
 
                     {isTradeIn ? (
-                        <>
-                            <div key='tradein-row-1' className='grid'>
+                        <div className='lead-row'>
+                            <div key='tradein-row-1' className='grid lead-row pb-3'>
                                 <TextInput
                                     key='firstName'
                                     name='First Name (required)'
@@ -116,7 +117,7 @@ export const ContactInformationStep = ({
                                 </div>
                             </div>
 
-                            <div key='tradein-row-2' className='grid'>
+                            <div key='tradein-row-2' className='grid lead-row'>
                                 <TextInput
                                     key='city'
                                     name='City'
@@ -145,10 +146,10 @@ export const ContactInformationStep = ({
                                     errorMessage={errors.phone}
                                 />
                             </div>
-                        </>
+                        </div>
                     ) : (
-                        <>
-                            <div key='other-row-1' className='grid'>
+                        <div className='lead-row pb-3'>
+                            <div key='other-row-1' className='grid pb-3'>
                                 <TextInput
                                     key='firstName'
                                     name='First Name (required)'
@@ -230,7 +231,7 @@ export const ContactInformationStep = ({
                                     </>
                                 )}
                             </div>
-                        </>
+                        </div>
                     )}
 
                     <div key='message' className='lead-textarea-wrap'>
