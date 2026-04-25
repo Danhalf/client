@@ -143,27 +143,6 @@
             margin-right: 14px;
             font-weight: 600;
         }
-        .task-calendar {
-            display: flex;
-            justify-content: center;
-            max-width: 380px;
-            border-left: 1px solid var(--admss-app-light-blue);
-            .p-datepicker-calendar {
-                thead th,
-                tbody td {
-                    padding: 0px;
-                    width: 45px;
-                }
-
-                thead th > span,
-                tbody td > span {
-                    display: inline-flex;
-                    height: 30px;
-                    width: 30px;
-                    margin: 0px;
-                }
-            }
-        }
     }
     .card-content__footer {
         display: flex;
