@@ -1,9 +1,9 @@
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { TasksWidget } from "dashboard/tasks/widget";
+import { LatestLeads } from "dashboard/leads/widget";
 import { useStore } from "store/hooks";
 import { RecentMessages } from "dashboard/home/recent-messages";
-import { LatestUpdates } from "dashboard/home/latest-updates";
 import "./index.css";
 import { dismissAlert, getAlerts } from "http/services/tasks.service";
 import { useNotification, usePermissions, useToastMessage } from "common/hooks";
@@ -156,7 +156,15 @@ export const Home = (): ReactElement => {
                 </div>
             </div>
             <div className='col-12 xl:col-6'>
-                <LatestUpdates />
+                <div className='card home-page__latest-leads-widget'>
+                    <div className='card-content'>
+                        <div className='grid lg:justify-content-between md:justify-content-center'>
+                            <div className='col-12'>
+                                <LatestLeads />
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div className='col-12 xl:col-5'>
                 <RecentMessages />
