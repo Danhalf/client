@@ -130,6 +130,7 @@
         }
     }
     .home-page__tasks-widget {
+        min-height: 332px;
         .add-task-control.p-button.p-button-icon-only {
             display: inline-flex;
             align-items: center;
@@ -143,6 +144,10 @@
             margin-right: 14px;
             font-weight: 600;
         }
+    }
+
+    .home-page__latest-leads-widget {
+        min-height: 332px;
     }
     .card-content__footer {
         display: flex;

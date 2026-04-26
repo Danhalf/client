@@ -4,12 +4,21 @@
         padding-bottom: 30px;
     }
 
+    .col-12:has(.latest-leads) {
+        padding-bottom: 0px;
+    }
+
     .latest-leads__header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
+        margin-bottom: 30px;
         padding-right: 40px;
+    }
+
+    .latest-leads__header .card-content__title {
+        font-weight: 700;
+        padding-top: 10px;
     }
 
     .latest-leads__content {
@@ -19,15 +28,11 @@
     .latest-leads__table {
         display: flex;
         flex-direction: column;
-        border: 1px solid var(--admss-app-light-grey);
-        border-radius: 3px;
-        overflow: hidden;
     }
 
     .latest-leads__row {
         display: grid;
         grid-template-columns: 1.1fr 2.2fr 1.1fr 1.2fr;
-        min-height: 44px;
         border-bottom: 1px solid var(--admss-app-light-grey);
         align-items: center;
     }
@@ -37,25 +42,31 @@
     }
 
     .latest-leads__row--header {
-        background: #e9edf7;
-        min-height: 36px;
+        background: var(--admss-app-light-blue);
     }
 
     .latest-leads__row--header .latest-leads__cell {
-        font-size: 10px;
+        font-size: 13px;
         line-height: 1;
-        text-transform: uppercase;
+        text-transform: none;
         color: var(--admss-app-main-blue);
         font-weight: 700;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .latest-leads__row:not(.latest-leads__row--header):hover {
+        background: var(--admss-app-light-green);
     }
 
     .latest-leads__cell {
-        padding: 8px 10px;
+        padding: 6px 10px;
         min-width: 0;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        font-size: 16px;
+        font-size: 14px;
         line-height: 1.35;
         font-weight: 400;
         color: var(--admss-app-blue-text);
@@ -70,10 +81,11 @@
         align-items: center;
         justify-content: center;
         border-radius: 999px;
-        padding: 0 8px;
-        height: 20px;
-        font-size: 10px;
+        padding: 0 12px;
+        height: 22px;
+        font-size: 11px;
         font-weight: 700;
+        letter-spacing: 0.3px;
         line-height: 1.1;
         text-transform: uppercase;
         border: 1px solid transparent;
@@ -106,20 +118,31 @@
     }
 
     .latest-leads__empty {
-        padding: 10px;
+        padding: 16px;
         font-size: 14px;
+        text-align: center;
     }
 
     .latest-leads__footer {
-        padding-top: 4px;
+        font-size: 14px;
+        font-weight: 600;
+        height: 32px;
     }
 
     .latest-leads__button.p-button.messages-more {
-        padding-left: 0;
+        padding: 0;
         color: var(--admss-app-main-blue);
+        text-decoration: underline;
+        font-weight: 400;
 
         &:enabled:hover {
             color: var(--admss-app-medium-blue);
+            text-decoration: underline;
+            background: transparent;
+        }
+
+        .p-button-label {
+            font-weight: 400;
         }
     }
 }
