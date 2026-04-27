@@ -1,5 +1,5 @@
-import { ReportsColumn } from "../reports";
-import { BaseResponseError } from "../base-response";
+import { ReportsColumn } from "common/models/reports";
+import { BaseResponseError } from "common/models/base-response";
 
 interface Audit {
     DataNeedsUpdate: 0 | 1;
