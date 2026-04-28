@@ -11,14 +11,16 @@ import {
     TextInput,
 } from "dashboard/common/form/inputs";
 import {
-    LEAD_STATUS_OPTIONS,
-    LEAD_TYPE_OPTIONS,
     LeadFormValues,
-    VISIT_TYPE_OPTIONS,
-} from "../types";
+} from "dashboard/leads/form/types";
 import { isContactStepValid } from "dashboard/leads/form/helpers";
 import { ConvertButton } from "dashboard/leads/form/common/convert-button";
 import { Splitter } from "dashboard/common/display";
+import {
+    LEAD_STATUS_OPTIONS,
+    LEAD_TYPE_OPTIONS,
+    VISIT_TYPE_OPTIONS,
+} from "common/constants/lead-options";
 
 interface ContactInformationStepProps {
     values: LeadFormValues;
@@ -54,7 +56,7 @@ export const ContactInformationStep = ({
             <div key='type-status' className='grid lead-row pt-3'>
                 <div className='col-4'>
                     <ComboBox
-                        label='Type (required)'
+                        label='Lead type (required)'
                         options={LEAD_TYPE_OPTIONS}
                         value={values.type}
                         onChange={(e) => setFieldValue("type", e.value || "")}
