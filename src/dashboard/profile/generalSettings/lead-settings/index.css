@@ -1,7 +1,6 @@
 .settings-lead {
     padding-top: 0;
     padding-left: 0;
-    max-height: 712px;
     overflow: hidden;
 
     .p-tabview-nav-content {
@@ -63,22 +62,24 @@
 }
 
 .settings-lead__new-type.p-button {
-    width: 145px;
-    height: 50px;
-    font-size: 24px;
+    width: 170px;
+    height: 54px;
+    font-size: 22px;
     font-weight: 700;
+    line-height: 1;
 }
 
 .settings-lead__table {
-    border-bottom: 1px solid var(--admss-app-medium-blue);
+    margin-right: 8px;
 }
 
 .settings-lead__header {
-    height: 50px;
+    height: 42px;
     background: var(--admss-app-light-blue);
     display: flex;
     align-items: center;
     font-weight: 600;
+    font-size: 14px;
 }
 
 .settings-lead__body {
@@ -87,10 +88,15 @@
 }
 
 .settings-lead__row {
-    min-height: 45px;
+    min-height: 39px;
     border-bottom: 1px solid var(--admss-app-medium-blue);
     display: flex;
     align-items: center;
+    font-size: 14px;
+}
+
+.settings-lead__row:last-child {
+    border-bottom: none;
 }
 
 .settings-lead__type {
@@ -98,26 +104,39 @@
     align-items: center;
     flex: 1;
     min-width: 0;
+    padding-left: 8px;
+    gap: 8px;
+}
+
+.settings-lead__type--header {
+    padding-left: 14px;
+}
+
+.settings-lead__type-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .settings-lead__actions {
-    width: 90px;
+    width: 96px;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     padding-right: 8px;
 }
 
 .settings-lead__icon-button.p-button {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     color: var(--admss-app-light-grey);
+    padding: 0;
 }
 
 .settings-lead__icon-button.p-button:enabled:hover {
     background: transparent;
-    color: var(--admss-app-darkest-grey);
+    color: var(--admss-app-dark-blue);
 }
 
 .settings-lead__icon-button.p-button:disabled {
@@ -132,7 +151,7 @@
     display: flex;
     align-items: center;
     width: 100%;
-    max-width: 540px;
+    max-width: 560px;
 }
 
 .settings-lead__row-edit-input {
@@ -143,4 +162,10 @@
     height: 35px;
     border-radius: 0 5px 5px 0;
     text-transform: uppercase;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.settings-lead .switch-button {
+    transform: scale(0.9);
 }

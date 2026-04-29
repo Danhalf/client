@@ -5,6 +5,7 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { TextInput } from "dashboard/common/form/inputs";
 import { SwitchButton } from "dashboard/common/button";
 import { LeadServiceType } from "common/models/export-web";
+import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 
 const MAX_TYPE_LENGTH = 109;
 const TABS = [{ header: "Service Types" }];
@@ -102,8 +103,7 @@ export const SettingsLeadSettings = (): ReactElement => {
     };
 
     return (
-        <div className='col-12 settings-lead'>
-            <div className='settings-form__title'>Lead settings</div>
+        <SettingsSection title='Lead settings' className='settings-lead'>
             <TabView
                 className='settings-lead__tabs'
                 activeIndex={activeTab}
@@ -123,7 +123,9 @@ export const SettingsLeadSettings = (): ReactElement => {
                         </div>
                         <div className='settings-lead__table'>
                             <div className='settings-lead__header'>
-                                <div className='settings-lead__type'>Type</div>
+                                <div className='settings-lead__type settings-lead__type--header'>
+                                    Type
+                                </div>
                                 <div className='settings-lead__actions'></div>
                             </div>
                             <div className='settings-lead__body'>
@@ -164,7 +166,9 @@ export const SettingsLeadSettings = (): ReactElement => {
                                                         </Button>
                                                     </div>
                                                 ) : (
-                                                    <span>{item.name}</span>
+                                                    <span className='settings-lead__type-text'>
+                                                        {item.name}
+                                                    </span>
                                                 )}
                                             </div>
                                             <div className='settings-lead__actions'>
@@ -172,7 +176,7 @@ export const SettingsLeadSettings = (): ReactElement => {
                                                     checked={!!item.enabled}
                                                     onChange={() => handleToggle(item.itemuid)}
                                                     tooltip={item.enabled ? "Disable" : "Enable"}
-                                                    tooltipOptions={{ position: "mouse" }}
+                                                    tooltipOptions={{ position: "top" }}
                                                 />
                                                 <Button
                                                     text
@@ -195,6 +199,6 @@ export const SettingsLeadSettings = (): ReactElement => {
                     </TabPanel>
                 ))}
             </TabView>
-        </div>
+        </SettingsSection>
     );
 };
