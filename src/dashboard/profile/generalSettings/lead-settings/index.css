@@ -62,9 +62,12 @@
 }
 
 .settings-lead__new-type.p-button {
-    width: 170px;
-    height: 54px;
-    font-size: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 245px;
+    height: 50px;
+    font-size: 20px;
     font-weight: 700;
     line-height: 1;
 }
@@ -74,7 +77,7 @@
 }
 
 .settings-lead__header {
-    height: 42px;
+    height: 50px;
     background: var(--admss-app-light-blue);
     display: flex;
     align-items: center;
@@ -88,7 +91,7 @@
 }
 
 .settings-lead__row {
-    min-height: 39px;
+    min-height: 50px;
     border-bottom: 1px solid var(--admss-app-medium-blue);
     display: flex;
     align-items: center;
@@ -106,16 +109,27 @@
     min-width: 0;
     padding-left: 8px;
     gap: 8px;
+
+    .settings-lead__icon-button.p-button {
+        padding: 20px;
+        margin-right: 10px;
+    }
 }
 
 .settings-lead__type--header {
-    padding-left: 14px;
+    padding-left: 66px;
+    font-size: 16px;
 }
 
 .settings-lead__type-text {
     white-space: nowrap;
+    &:disabled {
+        opacity: 1;
+        color: var(--admss-app-lightest-grey);
+    }
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 16px;
 }
 
 .settings-lead__actions {
@@ -130,42 +144,49 @@
 .settings-lead__icon-button.p-button {
     width: 22px;
     height: 22px;
-    color: var(--admss-app-light-grey);
     padding: 0;
+    &.settings-lead__delete-button {
+        color: var(--admss-app-light-grey);
+    }
 }
 
 .settings-lead__icon-button.p-button:enabled:hover {
     background: transparent;
-    color: var(--admss-app-dark-blue);
+    color: var(--admss-app-dark-green);
 }
 
 .settings-lead__icon-button.p-button:disabled {
     opacity: 1;
+    color: var(--admss-app-lightest-grey);
 }
 
 .settings-lead__delete-button.p-button:enabled:hover {
-    color: var(--admss-app-darkest-grey);
+    color: var(--admss-app-dark-blue);
 }
 
 .settings-lead__row-edit {
     display: flex;
     align-items: center;
-    width: 100%;
-    max-width: 560px;
+    width: 94%;
+    .text-input {
+        width: 100%;
+    }
 }
 
 .settings-lead__row-edit-input {
     width: 100%;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .settings-lead__row-edit-button.p-button {
-    height: 35px;
+    display: inline-flex;
+    width: 104px;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
     border-radius: 0 5px 5px 0;
     text-transform: uppercase;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 600;
-}
-
-.settings-lead .switch-button {
-    transform: scale(0.9);
 }

@@ -110,7 +110,15 @@ export const SettingsLeadSettings = (): ReactElement => {
                 onTabChange={(e) => setActiveTab(e.index)}
             >
                 {TABS.map((tab) => (
-                    <TabPanel key={tab.header} header={tab.header}>
+                    <TabPanel
+                        key={tab.header}
+                        header={tab.header}
+                        pt={{
+                            header: {
+                                className: "heading-condensed",
+                            },
+                        }}
+                    >
                         <div className='flex justify-content-start mb-4'>
                             <Button
                                 className='settings-form__button settings-lead__new-type'
@@ -152,6 +160,7 @@ export const SettingsLeadSettings = (): ReactElement => {
                                                             value={editedName}
                                                             maxLength={MAX_TYPE_LENGTH}
                                                             infoText={symbolToLimit}
+                                                            height={40}
                                                             className='settings-lead__row-edit-input'
                                                             onChange={(e) =>
                                                                 setEditedName(e.target.value)
@@ -173,6 +182,7 @@ export const SettingsLeadSettings = (): ReactElement => {
                                             </div>
                                             <div className='settings-lead__actions'>
                                                 <SwitchButton
+                                                    small
                                                     checked={!!item.enabled}
                                                     onChange={() => handleToggle(item.itemuid)}
                                                     tooltip={item.enabled ? "Disable" : "Enable"}
@@ -180,11 +190,7 @@ export const SettingsLeadSettings = (): ReactElement => {
                                                 />
                                                 <Button
                                                     text
-                                                    tooltip={
-                                                        item.isDefault
-                                                            ? "Default type cannot be removed"
-                                                            : "Delete type"
-                                                    }
+                                                    tooltip={"Delete"}
                                                     className='settings-lead__icon-button settings-lead__delete-button'
                                                     icon='adms-trash-can'
                                                     disabled={item.isDefault}
