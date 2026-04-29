@@ -26,6 +26,7 @@ interface ContactInformationStepProps {
     values: LeadFormValues;
     errors: FormikErrors<LeadFormValues>;
     setFieldValue: (field: string, value: unknown) => void;
+    clearFieldError: (field: keyof LeadFormValues) => void;
     onConvert?: () => void;
 }
 
@@ -33,6 +34,7 @@ export const ContactInformationStep = ({
     values,
     errors,
     setFieldValue,
+    clearFieldError,
     onConvert,
 }: ContactInformationStepProps): ReactElement => {
     const isTradeIn = values.type === "trade-in";
@@ -60,6 +62,8 @@ export const ContactInformationStep = ({
                         options={LEAD_TYPE_OPTIONS}
                         value={values.type}
                         onChange={(e) => setFieldValue("type", e.value || "")}
+                        onShow={() => clearFieldError("type")}
+                        onFocus={() => clearFieldError("type")}
                         optionLabel='label'
                         optionValue='value'
                         error={Boolean(errors.type)}
@@ -73,6 +77,8 @@ export const ContactInformationStep = ({
                             options={LEAD_STATUS_OPTIONS}
                             value={values.status}
                             onChange={(e) => setFieldValue("status", e.value || "")}
+                            onShow={() => clearFieldError("status")}
+                            onFocus={() => clearFieldError("status")}
                             optionLabel='label'
                             optionValue='value'
                             error={Boolean(errors.status)}
@@ -224,6 +230,8 @@ export const ContactInformationStep = ({
                                                 onChange={(e) =>
                                                     setFieldValue("waitOrDropOff", e.value || "")
                                                 }
+                                                onShow={() => clearFieldError("waitOrDropOff")}
+                                                onFocus={() => clearFieldError("waitOrDropOff")}
                                                 optionLabel='label'
                                                 optionValue='value'
                                                 error={Boolean(errors.waitOrDropOff)}

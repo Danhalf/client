@@ -51,8 +51,32 @@ export const LeadsForm = (): ReactElement => {
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
-                    {({ values, errors, setFieldValue, submitForm, isSubmitting, dirty }) => (
-                        <Form className='card lead__card'>
+                    {({
+                        values,
+                        errors,
+                        setFieldValue,
+                        setFieldError,
+                        setErrors,
+                        setTouched,
+                        submitForm,
+                        isSubmitting,
+                        dirty,
+                    }) => {
+                        const handleFieldValueChange = (field: string, value: unknown) => {
+                            setFieldValue(field, value);
+                            if (field === "type") {
+                                setErrors({});
+                                setTouched({});
+                                return;
+                            }
+
+                            setFieldError(field, undefined);
+                        };
+                        const clearFieldError = (field: keyof LeadFormValues) =>
+                            setFieldError(field, undefined);
+
+                        return (
+                            <Form className='card lead__card'>
                             <div className='card-header lead__header'>
                                 <h2 className='lead__title'>Create new lead</h2>
                             </div>
@@ -67,13 +91,15 @@ export const LeadsForm = (): ReactElement => {
                                         <ContactInformationStep
                                             values={values}
                                             errors={errors}
-                                            setFieldValue={setFieldValue}
+                                            setFieldValue={handleFieldValueChange}
+                                            clearFieldError={clearFieldError}
                                         />
                                     ) : (
                                         <VehicleInformationStep
                                             values={values}
                                             errors={errors}
-                                            setFieldValue={setFieldValue}
+                                            setFieldValue={handleFieldValueChange}
+                                            clearFieldError={clearFieldError}
                                         />
                                     )}
                                 </section>
@@ -108,8 +134,9 @@ export const LeadsForm = (): ReactElement => {
                                     Save
                                 </FormNavButton>
                             </FormNav>
-                        </Form>
-                    )}
+                            </Form>
+                        );
+                    }}
                 </Formik>
             </div>
         </div>

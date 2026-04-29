@@ -9,14 +9,15 @@ import { MakesListData } from "common/models/inventory";
 import { ListData } from "common/models";
 import defaultMakesLogo from "assets/images/default-makes-logo.svg";
 import { SERVICE_TYPE_OPTIONS, WARRANTY_OPTIONS } from "common/constants/lead-options";
-import { LeadFormValues } from "../types";
-import { isVehicleStepValid } from "../helpers";
-import { ConvertButton } from "../common/convert-button";
+import { LeadFormValues } from "dashboard/leads/form/types";
+import { isVehicleStepValid } from "dashboard/leads/form/helpers";
+import { ConvertButton } from "dashboard/leads/form/common/convert-button";
 
 interface VehicleInformationStepProps {
     values: LeadFormValues;
     errors: FormikErrors<LeadFormValues>;
     setFieldValue: (field: string, value: unknown) => void;
+    clearFieldError: (field: keyof LeadFormValues) => void;
     onConvert?: () => void;
 }
 
@@ -24,6 +25,7 @@ export const VehicleInformationStep = ({
     values,
     errors,
     setFieldValue,
+    clearFieldError,
     onConvert,
 }: VehicleInformationStepProps): ReactElement => {
     const isTradeIn = values.type === "trade-in";
@@ -131,6 +133,8 @@ export const VehicleInformationStep = ({
                             value={values.make}
                             options={automakesList}
                             onChange={({ value }) => handleMakeChange(value)}
+                            onShow={() => clearFieldError("make")}
+                            onFocus={() => clearFieldError("make")}
                             valueTemplate={selectedAutoMakesTemplate}
                             itemTemplate={autoMakesOptionTemplate}
                             className='vehicle-general__dropdown w-full'
@@ -161,6 +165,8 @@ export const VehicleInformationStep = ({
                             value={values.model}
                             options={automakesModelList}
                             onChange={({ value }) => handleModelChange(value)}
+                            onShow={() => clearFieldError("model")}
+                            onFocus={() => clearFieldError("model")}
                             className='vehicle-general__dropdown w-full'
                             label='Model'
                             editable
@@ -201,6 +207,8 @@ export const VehicleInformationStep = ({
                             options={WARRANTY_OPTIONS}
                             value={values.warranty}
                             onChange={(e) => setFieldValue("warranty", e.value || "")}
+                            onShow={() => clearFieldError("warranty")}
+                            onFocus={() => clearFieldError("warranty")}
                             optionLabel='label'
                             optionValue='value'
                             error={Boolean(errors.warranty)}
@@ -214,6 +222,8 @@ export const VehicleInformationStep = ({
                             value={values.typeOfService}
                             required
                             onChange={(e) => setFieldValue("typeOfService", e.value || "")}
+                            onShow={() => clearFieldError("typeOfService")}
+                            onFocus={() => clearFieldError("typeOfService")}
                             optionLabel='label'
                             optionValue='value'
                             error={Boolean(errors.typeOfService)}

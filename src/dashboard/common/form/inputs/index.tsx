@@ -574,7 +574,10 @@ export const DateInput = ({
                         value={checkbox && !isChecked ? null : innerDate}
                         disabled={checkbox && !isChecked}
                         className={`w-full date-item__calendar ${checkbox ? "date-item__calendar--checkbox" : ""} ${showError ? "p-invalid" : ""}`}
-                        onChange={(e) => handleDateChange(e.value as Date | null)}
+                        onChange={(e) => {
+                            handleDateChange(e.value as Date | null);
+                            props.onChange?.(e);
+                        }}
                         {...props}
                     />
                     {innerDate && clearButton && (
