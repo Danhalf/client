@@ -1,6 +1,5 @@
 import { LEADS_PAGE } from "common/constants/links";
 import { Deal, TotalDealsList } from "common/models/deals";
-import { getDealsList } from "http/services/deals.service";
 import { Button } from "primereact/button";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -12,8 +11,10 @@ import {
     getLeadTypeLabel,
 } from "dashboard/leads/common";
 import "./index.css";
+import { getDealsList } from "http/services/deals.service";
 
 const DEFAULT_LEADS_SHOW_COUNT = 4;
+const LEADS_EMPTY_MESSAGE = "No leads yet.";
 
 interface LatestLeadsProps {
     leadsShowCount?: number;
@@ -58,15 +59,15 @@ export const LatestLeads = ({
                 <h2 className='card-content__title uppercase m-0'>Latest Leads</h2>
             </div>
             <div className='card-content latest-leads__content'>
-                <div className='latest-leads__table'>
-                    <div className='latest-leads__row latest-leads__row--header'>
-                        <span className='latest-leads__cell'>Type</span>
-                        <span className='latest-leads__cell'>Contact</span>
-                        <span className='latest-leads__cell'>Created</span>
-                        <span className='latest-leads__cell'>Status</span>
-                    </div>
-                    {leads.length ? (
-                        leads.slice(0, leadsShowCount).map((lead) => {
+                {leads.length ? (
+                    <div className='latest-leads__table'>
+                        <div className='latest-leads__row latest-leads__row--header'>
+                            <span className='latest-leads__cell'>Type</span>
+                            <span className='latest-leads__cell'>Contact</span>
+                            <span className='latest-leads__cell'>Created</span>
+                            <span className='latest-leads__cell'>Status</span>
+                        </div>
+                        {leads.slice(0, leadsShowCount).map((lead) => {
                             const { label: statusLabel, tone: statusTone } =
                                 getLeadStatusPresentation(lead);
                             const statusToneClass = statusTone
@@ -74,7 +75,15 @@ export const LatestLeads = ({
                                 : "";
 
                             return (
-                                <div key={lead.itemuid} className='latest-leads__row'>
+                                <div
+                                    key={lead.itemuid}
+                                    className='latest-leads__row'
+                                    onClick={() =>
+                                        navigate(LEADS_PAGE.EDIT(lead.dealuid), {
+                                            state: { lead },
+                                        })
+                                    }
+                                >
                                     <span className='latest-leads__cell'>
                                         {getLeadTypeLabel(lead.dealtype)}
                                     </span>
@@ -95,11 +104,11 @@ export const LatestLeads = ({
                                     </span>
                                 </div>
                             );
-                        })
-                    ) : (
-                        <div className='latest-leads__empty empty-list'>No leads yet.</div>
-                    )}
-                </div>
+                        })}
+                    </div>
+                ) : (
+                    <div className='latest-leads__empty empty-list'>{LEADS_EMPTY_MESSAGE}</div>
+                )}
                 {allLeadsCount > leadsShowCount && (
                     <div className='card-content__footer latest-leads__footer'>
                         <Button
