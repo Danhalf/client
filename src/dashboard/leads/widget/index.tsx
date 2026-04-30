@@ -2,7 +2,7 @@ import { LEADS_PAGE } from "common/constants/links";
 import { Deal, TotalDealsList } from "common/models/deals";
 import { Button } from "primereact/button";
 import { ReactElement, useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useStore } from "store/hooks";
 import {
     formatCreatedDate,
@@ -24,6 +24,7 @@ export const LatestLeads = ({
     leadsShowCount = DEFAULT_LEADS_SHOW_COUNT,
 }: LatestLeadsProps): ReactElement => {
     const { authUser } = useStore().userStore;
+    const location = useLocation();
     const navigate = useNavigate();
     const [leads, setLeads] = useState<Deal[]>([]);
     const [allLeadsCount, setAllLeadsCount] = useState<number>(0);
@@ -80,7 +81,10 @@ export const LatestLeads = ({
                                     className='latest-leads__row'
                                     onClick={() =>
                                         navigate(LEADS_PAGE.EDIT(lead.dealuid), {
-                                            state: { lead },
+                                            state: {
+                                                lead,
+                                                prevPath: `${location.pathname}${location.search}`,
+                                            },
                                         })
                                     }
                                 >

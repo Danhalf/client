@@ -22,6 +22,7 @@ export const LeadsForm = (): ReactElement => {
     const navigate = useNavigate();
     const [activeStep, setActiveStep] = useState<number>(CONTACT_STEP);
     const locationState = location.state as ExistingLeadState | null;
+    const prevPath = locationState?.prevPath;
     const initialValues = useMemo(
         () => getInitialValues(id, locationState?.lead),
         [id, locationState?.lead]
@@ -36,7 +37,14 @@ export const LeadsForm = (): ReactElement => {
         navigate(LEADS_PAGE.MAIN);
     };
 
-    const handleExit = () => navigate(LEADS_PAGE.MAIN);
+    const handleExit = () => {
+        if (prevPath) {
+            navigate(prevPath);
+            return;
+        }
+
+        navigate(LEADS_PAGE.MAIN);
+    };
 
     return (
         <div className='grid relative lead'>
