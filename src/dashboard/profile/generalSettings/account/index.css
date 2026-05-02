@@ -2,3 +2,72 @@
 .settings-account .p-inputnumber-input {
     width: 100%;
 }
+
+.settings-account {
+    padding-top: 0;
+    padding-left: 0;
+
+    .p-tabview-nav {
+        flex-direction: row;
+        flex: 0 0;
+        width: auto;
+        border: none;
+        min-height: auto;
+        border-bottom: 2px solid var(--admss-app-light-grey);
+        text-transform: uppercase;
+        font-weight: 700;
+        gap: 10px;
+    }
+
+    .settings-account__tabs .p-tabview-nav-container {
+        height: 35px;
+        padding-bottom: 40px;
+    }
+
+    .settings-account__tabs .p-tabview-nav {
+        display: flex;
+        height: auto;
+        min-height: auto;
+        flex-direction: row;
+    }
+
+    .settings-account__tabs .p-tabview-panels {
+        padding-top: 20px;
+        padding-left: 0;
+        padding-right: 10px;
+        border: none;
+    }
+
+    .p-tabview-nav-container a.p-tabview-nav-link {
+        color: var(--admss-app-primary);
+        border: none;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+        color: var(--admss-app-main-blue);
+        border-radius: 0;
+        border-bottom: 2px solid var(--admss-app-main-blue);
+    }
+
+    .radio {
+        width: 50%;
+    }
+}
+
+.settings-account__late-fee-row {
+    align-items: flex-start;
+}
+
+.settings-account__grace-period {
+    display: block;
+
+    .p-inputnumber-input {
+        height: 32px;
+    }
+
+    .p-slider {
+        margin-top: -2px;
+    }
+}
