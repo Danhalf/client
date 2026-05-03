@@ -1,12 +1,14 @@
 import { CurrencyInput, DashboardRadio, PercentInput } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
 import { Slider, SliderChangeEvent } from "primereact/slider";
-import { useState, ChangeEvent } from "react";
+import { useState } from "react";
 import "./index.css";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 import { SettingsSection } from "dashboard/profile/generalSettings/common/section";
 import { TabPanel, TabView } from "primereact/tabview";
 import { RadioButtonProps } from "primereact/radiobutton";
+import { observer } from "mobx-react-lite";
+import { useStore } from "store/hooks";
 
 const ACCOUNT_NUMBER_OPTIONS: RadioButtonProps[] = [
     {
@@ -21,11 +23,10 @@ const ACCOUNT_NUMBER_OPTIONS: RadioButtonProps[] = [
     },
 ];
 
-export const SettingsAccount = () => {
-    const [valueDigits, setValueDigits] = useState<number>(2);
-    const [value, setValue] = useState<number>(5);
+export const SettingsAccount = observer(() => {
+    const store = useStore().generalSettingsStore;
+    const { settings, changeSettings } = store;
     const [activeTab, setActiveTab] = useState(0);
-    const [accountNumberType, setAccountNumberType] = useState(0);
 
     return (
         <SettingsSection title='Account Settings' className='settings-account'>
@@ -39,10 +40,10 @@ export const SettingsAccount = () => {
                         <div className='col-12'>
                             <DashboardRadio
                                 radioArray={ACCOUNT_NUMBER_OPTIONS}
-                                initialValue={accountNumberType}
+                                initialValue={settings.accountNumberStrategy ?? 0}
                                 onChange={(v) => {
                                     if (v !== null) {
-                                        setAccountNumberType(Number(v));
+                                        changeSettings("accountNumberStrategy", Number(v));
                                     }
                                 }}
                             />
@@ -52,25 +53,33 @@ export const SettingsAccount = () => {
                         </div>
                         <div className='col-3'>
                             <span className='p-float-label'>
-                                <InputText className='settings-account__input' />
+                                <InputText
+                                    className='settings-account__input'
+                                    value={settings.accountPrefix || ""}
+                                    onChange={(e) =>
+                                        changeSettings("accountPrefix", e.target.value)
+                                    }
+                                />
                                 <label className='float-label'>Prefix</label>
                             </span>
                         </div>
                         <div className='col-3'>
                             <span className='p-float-label'>
                                 <InputNumber
-                                    value={valueDigits}
+                                    value={settings.accountFixedDigits ?? 0}
+                                    min={0}
                                     max={10}
                                     onChange={(e: InputNumberChangeEvent) =>
-                                        setValueDigits(Number(e.value))
+                                        changeSettings("accountFixedDigits", Number(e.value))
                                     }
                                     className='w-full'
                                 />
                                 <Slider
-                                    value={valueDigits}
+                                    value={settings.accountFixedDigits ?? 0}
                                     onChange={(e: SliderChangeEvent) =>
-                                        setValueDigits(Number(e.value))
+                                        changeSettings("accountFixedDigits", Number(e.value))
                                     }
+                                    min={0}
                                     max={10}
                                     className='w-full'
                                 />
@@ -79,19 +88,28 @@ export const SettingsAccount = () => {
                         </div>
                         <div className='col-3'>
                             <span className='p-float-label'>
-                                <InputText className='settings-account__input' />
+                                <InputText
+                                    className='settings-account__input'
+                                    value={settings.accountSuffix || ""}
+                                    onChange={(e) =>
+                                        changeSettings("accountSuffix", e.target.value)
+                                    }
+                                />
                                 <label className='float-label'>Suffix</label>
                             </span>
                         </div>
                         <div className='col-3'>
                             <span className='p-float-label'>
-                                <InputText
-                                    value={"0"}
-                                    onChange={(e: ChangeEvent<HTMLInputElement>) => {}}
-                                    className='settings-account__input'
+                                <InputNumber
+                                    value={settings.accountStartNumber ?? 0}
+                                    min={0}
+                                    onChange={(e: InputNumberChangeEvent) =>
+                                        changeSettings("accountStartNumber", Number(e.value))
+                                    }
+                                    className='w-full'
                                 />
                                 <label className='settings-account__label float-label'>
-                                    Start number (starts from 0 by default)
+                                    Start number
                                 </label>
                             </span>
                         </div>
@@ -100,24 +118,42 @@ export const SettingsAccount = () => {
                 <TabPanel header='Late fee options'>
                     <div className='grid settings-account__late-fee-row'>
                         <div className='col-3'>
-                            <CurrencyInput title='Late fee (min)' labelPosition='top' />
+                            <CurrencyInput
+                                title='Late fee (min)'
+                                labelPosition='top'
+                                value={settings.accountLateFeeMin}
+                                onChange={(e: InputNumberChangeEvent) =>
+                                    changeSettings("accountLateFeeMin", Number(e.value))
+                                }
+                            />
                         </div>
                         <div className='col-3'>
-                            <CurrencyInput title='Late fee (max)' labelPosition='top' />
+                            <CurrencyInput
+                                title='Late fee (max)'
+                                labelPosition='top'
+                                value={settings.accountLateFeeMax}
+                                onChange={(e: InputNumberChangeEvent) =>
+                                    changeSettings("accountLateFeeMax", Number(e.value))
+                                }
+                            />
                         </div>
                         <div className='col-3'>
                             <span className='p-float-label settings-account__grace-period'>
                                 <InputNumber
                                     className='settings-account__input'
+                                    min={0}
                                     max={10}
-                                    value={value}
+                                    value={settings.accountLateFeeGracePeriod ?? 0}
                                     onChange={(e: InputNumberChangeEvent) =>
-                                        setValue(Number(e.value))
+                                        changeSettings("accountLateFeeGracePeriod", Number(e.value))
                                     }
                                 />
                                 <Slider
-                                    value={value}
-                                    onChange={(e: SliderChangeEvent) => setValue(Number(e.value))}
+                                    value={settings.accountLateFeeGracePeriod ?? 0}
+                                    onChange={(e: SliderChangeEvent) =>
+                                        changeSettings("accountLateFeeGracePeriod", Number(e.value))
+                                    }
+                                    min={0}
                                     max={10}
                                     className='w-full'
                                 />
@@ -129,6 +165,10 @@ export const SettingsAccount = () => {
                                 className='settings-account__input'
                                 title='Late fee percentage'
                                 labelPosition='top'
+                                value={settings.accountLateFeePercentage}
+                                onChange={(e: InputNumberChangeEvent) =>
+                                    changeSettings("accountLateFeePercentage", Number(e.value))
+                                }
                             />
                         </div>
                     </div>
@@ -136,4 +176,4 @@ export const SettingsAccount = () => {
             </TabView>
         </SettingsSection>
     );
-};
+});
