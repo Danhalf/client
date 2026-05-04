@@ -1,4 +1,3 @@
-import { CurrencyInput, DashboardRadio, PercentInput } from "dashboard/common/form/inputs";
 import { InputText } from "primereact/inputtext";
 import { Slider, SliderChangeEvent } from "primereact/slider";
 import { useState } from "react";
@@ -9,6 +8,9 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { RadioButtonProps } from "primereact/radiobutton";
 import { observer } from "mobx-react-lite";
 import { useStore } from "store/hooks";
+import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
+import { Splitter } from "dashboard/common/display";
+import { CurrencyInput, DashboardRadio, PercentInput } from "dashboard/common/form/inputs";
 
 const ACCOUNT_NUMBER_OPTIONS: RadioButtonProps[] = [
     {
@@ -22,6 +24,25 @@ const ACCOUNT_NUMBER_OPTIONS: RadioButtonProps[] = [
         value: 1,
     },
 ];
+
+export enum NOTES_HINT_BODY {
+    PANEL_TITLE = "Note it",
+    INTRO = "Account number is generated automatically based on the selected rule.",
+    SEQUENTIAL_BODY = "uses the fields below to generate a number, for example ACC000042-A.",
+    STOCK_BODY = "uses the stock number from the linked inventory vehicle, for example STK-10245.",
+}
+
+const AccountNumberHintContent = () => (
+    <>
+        <p className='py-2'>{NOTES_HINT_BODY.INTRO}</p>
+        <p className='pb-2'>
+            <b>Sequential Number:</b> {NOTES_HINT_BODY.SEQUENTIAL_BODY}
+        </p>
+        <p className='pb-2'>
+            <b>Stock Number:</b> {NOTES_HINT_BODY.STOCK_BODY}
+        </p>
+    </>
+);
 
 export const SettingsAccount = observer(() => {
     const store = useStore().generalSettingsStore;
@@ -37,7 +58,14 @@ export const SettingsAccount = observer(() => {
                 activeIndex={activeTab}
                 onTabChange={(e) => setActiveTab(e.index)}
             >
-                <TabPanel header='Account number'>
+                <TabPanel
+                    header='Account number'
+                    pt={{
+                        header: {
+                            className: "heading-condensed",
+                        },
+                    }}
+                >
                     <div className='grid'>
                         <div className='col-12'>
                             <DashboardRadio
@@ -52,9 +80,19 @@ export const SettingsAccount = observer(() => {
                                 }}
                             />
                         </div>
-                        <div className='col-12 py-0'>
-                            <hr className='form-line' />
-                        </div>
+                        <Splitter
+                            className='col-12 py-3'
+                            children={
+                                <InfoOverlayPanel
+                                    panelTitle={NOTES_HINT_BODY.PANEL_TITLE}
+                                    className='settings-account__info'
+                                    disableHover
+                                    disablePulse
+                                >
+                                    <AccountNumberHintContent />
+                                </InfoOverlayPanel>
+                            }
+                        />
                         <div className='col-3'>
                             <span className='p-float-label'>
                                 <InputText
@@ -124,7 +162,14 @@ export const SettingsAccount = observer(() => {
                         </div>
                     </div>
                 </TabPanel>
-                <TabPanel header='Late fee options'>
+                <TabPanel
+                    pt={{
+                        header: {
+                            className: "heading-condensed",
+                        },
+                    }}
+                    header='Late fee options'
+                >
                     <div className='grid settings-account__late-fee-row'>
                         <div className='col-3'>
                             <CurrencyInput

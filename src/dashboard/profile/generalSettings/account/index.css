@@ -7,6 +7,10 @@
     padding-top: 0;
     padding-left: 0;
 
+    .settings-form__title {
+        height: 48px;
+    }
+
     .p-tabview-nav {
         flex-direction: row;
         flex: 0 0;
@@ -32,7 +36,7 @@
     }
 
     .settings-account__tabs .p-tabview-panels {
-        padding-top: 20px;
+        padding-top: 50px;
         padding-left: 0;
         padding-right: 10px;
         border: none;
@@ -58,4 +62,28 @@
 
 .settings-account__late-fee-row {
     align-items: flex-start;
+}
+
+.settings-account__info .info-panel__button--pulse {
+    animation: none;
+}
+
+.settings-account__info .info-panel__panel {
+    padding: 30px;
+    width: 480px;
+    right: 50px;
+    bottom: -200px;
+}
+
+.settings-account__info .info-panel__body {
+    line-height: 1.5;
+    font-size: 16px;
+}
+
+.settings-account__info .info-panel__body p {
+    margin: 0 0 10px;
+}
+
+.settings-account__info .info-panel__body p:last-child {
+    margin-bottom: 0;
 }
