@@ -59,15 +59,3 @@
 .settings-account__late-fee-row {
     align-items: flex-start;
 }
-
-.settings-account__grace-period {
-    display: block;
-
-    .p-inputnumber-input {
-        height: 32px;
-    }
-
-    .p-slider {
-        margin-top: -2px;
-    }
-}

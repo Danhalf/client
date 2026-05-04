@@ -27,6 +27,8 @@ export const SettingsAccount = observer(() => {
     const store = useStore().generalSettingsStore;
     const { settings, changeSettings } = store;
     const [activeTab, setActiveTab] = useState(0);
+    const accountNumberStrategy = settings.accountNumberStrategy ?? 0;
+    const isStockNumberStrategy = accountNumberStrategy === 1;
 
     return (
         <SettingsSection title='Account Settings' className='settings-account'>
@@ -39,8 +41,10 @@ export const SettingsAccount = observer(() => {
                     <div className='grid'>
                         <div className='col-12'>
                             <DashboardRadio
+                                wrapperClassName='flex-row w-full'
+                                justifyContent='start'
                                 radioArray={ACCOUNT_NUMBER_OPTIONS}
-                                initialValue={settings.accountNumberStrategy ?? 0}
+                                initialValue={accountNumberStrategy}
                                 onChange={(v) => {
                                     if (v !== null) {
                                         changeSettings("accountNumberStrategy", Number(v));
@@ -59,6 +63,7 @@ export const SettingsAccount = observer(() => {
                                     onChange={(e) =>
                                         changeSettings("accountPrefix", e.target.value)
                                     }
+                                    disabled={isStockNumberStrategy}
                                 />
                                 <label className='float-label'>Prefix</label>
                             </span>
@@ -73,6 +78,7 @@ export const SettingsAccount = observer(() => {
                                         changeSettings("accountFixedDigits", Number(e.value))
                                     }
                                     className='w-full'
+                                    disabled={isStockNumberStrategy}
                                 />
                                 <Slider
                                     value={settings.accountFixedDigits ?? 0}
@@ -82,6 +88,7 @@ export const SettingsAccount = observer(() => {
                                     min={0}
                                     max={10}
                                     className='w-full'
+                                    disabled={isStockNumberStrategy}
                                 />
                                 <label className='float-label'>Fixed digits</label>
                             </span>
@@ -94,6 +101,7 @@ export const SettingsAccount = observer(() => {
                                     onChange={(e) =>
                                         changeSettings("accountSuffix", e.target.value)
                                     }
+                                    disabled={isStockNumberStrategy}
                                 />
                                 <label className='float-label'>Suffix</label>
                             </span>
@@ -107,6 +115,7 @@ export const SettingsAccount = observer(() => {
                                         changeSettings("accountStartNumber", Number(e.value))
                                     }
                                     className='w-full'
+                                    disabled={isStockNumberStrategy}
                                 />
                                 <label className='settings-account__label float-label'>
                                     Start number
@@ -138,7 +147,7 @@ export const SettingsAccount = observer(() => {
                             />
                         </div>
                         <div className='col-3'>
-                            <span className='p-float-label settings-account__grace-period'>
+                            <span className='p-float-label'>
                                 <InputNumber
                                     className='settings-account__input'
                                     min={0}
