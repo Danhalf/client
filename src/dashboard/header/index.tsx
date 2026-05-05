@@ -73,48 +73,44 @@ export const Header = observer((): ReactElement => {
         const showUsersMenu = canAccessUsers();
         const hasManageSectionItems = showChangeLocation || showUsersMenu;
 
-        return (
-            [
-                {
-                    label: "My Profile",
-                    command: () => navigate(USER_PROFILE_PAGE.MAIN),
+        return [
+            {
+                label: "My Profile",
+                command: () => navigate(USER_PROFILE_PAGE.MAIN),
+            },
+            showSettingsMenu
+                ? { label: "General Settings", command: () => navigate(SETTINGS_PAGE.MAIN) }
+                : null,
+            { separator: true },
+            showChangeLocation ? { label: "Change Location" } : null,
+            showUsersMenu ? { label: "Users", command: () => navigate(USERS_PAGE.MAIN) } : null,
+            hasManageSectionItems ? { separator: true } : null,
+            {
+                label: "Contact support",
+                command() {
+                    setSupportContact(true);
                 },
-                showSettingsMenu
-                    ? { label: "General Settings", command: () => navigate(SETTINGS_PAGE.MAIN) }
-                    : null,
-                { separator: true },
-                showChangeLocation ? { label: "Change Location" } : null,
-                showUsersMenu
-                    ? { label: "Users", command: () => navigate(USERS_PAGE.MAIN) }
-                    : null,
-                hasManageSectionItems ? { separator: true } : null,
-                {
-                    label: "Contact support",
-                    command() {
-                        setSupportContact(true);
-                    },
+            },
+            {
+                label: "Support history",
+                command() {
+                    setSupportHistory(true);
                 },
-                {
-                    label: "Support history",
-                    command() {
-                        setSupportHistory(true);
-                    },
+            },
+            {
+                label: "Help",
+                command() {
+                    window.open(HELP_PAGE, "_blank");
                 },
-                {
-                    label: "Help",
-                    command() {
-                        window.open(HELP_PAGE, "_blank");
-                    },
+            },
+            { separator: true },
+            {
+                label: "Logout",
+                command() {
+                    authUser && signOut(authUser);
                 },
-                { separator: true },
-                {
-                    label: "Logout",
-                    command() {
-                        authUser && signOut(authUser);
-                    },
-                },
-            ].filter(Boolean) as MenuItem[]
-        );
+            },
+        ].filter(Boolean) as MenuItem[];
     }, [authUser, canAccessSettings, canAccessUsers, showChangeLocation, navigate]);
 
     if (!isSettingsLoaded) {

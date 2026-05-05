@@ -10,9 +10,7 @@ import {
     StateDropdown,
     TextInput,
 } from "dashboard/common/form/inputs";
-import {
-    LeadFormValues,
-} from "dashboard/leads/form/types";
+import { LeadFormValues } from "dashboard/leads/form/types";
 import { isContactStepValid } from "dashboard/leads/form/helpers";
 import { ConvertButton } from "dashboard/leads/form/common/convert-button";
 import { Splitter } from "dashboard/common/display";
