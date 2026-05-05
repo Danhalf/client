@@ -394,6 +394,9 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
                     setSecondsLeft(0);
                     clearCountdownInterval();
                     clearRefreshTimer();
+                    if (isSessionExpiring) {
+                        resetInactivityTimer();
+                    }
                     if (typeGuards.isNumber(stored.expires_in)) {
                         scheduleRefresh(stored.expires_in);
                     }
@@ -466,9 +469,12 @@ export const AuthProvider = ({ children }: AuthProviderProps): ReactElement => {
             setSecondsLeft(0);
             clearCountdownInterval();
             clearRefreshTimer();
+            if (isSessionExpiring) {
+                resetInactivityTimer();
+            }
             broadcastSessionEvent(SESSION_SYNC.SESSION_REFRESHED);
         },
-        [scheduleRefresh]
+        [isSessionExpiring, scheduleRefresh]
     );
 
     useEffect(() => {
