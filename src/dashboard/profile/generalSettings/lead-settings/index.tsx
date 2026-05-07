@@ -139,21 +139,33 @@ export const SettingsLeadSettings = (): ReactElement => {
                             <div className='settings-lead__body'>
                                 {serviceTypes.map((item) => {
                                     const isEditing = editedItemId === item.itemuid;
+                                    const isNewItem = !item.name;
+                                    const trimmedEditedName = editedName.trim();
+                                    const isSaveDisabled =
+                                        !trimmedEditedName ||
+                                        (!isNewItem && trimmedEditedName === item.name);
                                     return (
                                         <div className='settings-lead__row' key={item.itemuid}>
                                             <div className='settings-lead__type'>
-                                                <Button
-                                                    text
-                                                    tooltip={
-                                                        item.isDefault
-                                                            ? "Default type cannot be edited"
-                                                            : "Edit type"
-                                                    }
-                                                    className='settings-lead__icon-button'
-                                                    icon='adms-edit-item'
-                                                    disabled={item.isDefault}
-                                                    onClick={() => handleStartEdit(item)}
-                                                />
+                                                {isNewItem ? (
+                                                    <span
+                                                        className='settings-lead__icon-placeholder'
+                                                        aria-hidden='true'
+                                                    />
+                                                ) : (
+                                                    <Button
+                                                        text
+                                                        tooltip={
+                                                            item.isDefault
+                                                                ? "Default type cannot be edited"
+                                                                : "Edit type"
+                                                        }
+                                                        className='settings-lead__icon-button'
+                                                        icon='adms-edit-item'
+                                                        disabled={item.isDefault}
+                                                        onClick={() => handleStartEdit(item)}
+                                                    />
+                                                )}
                                                 {isEditing ? (
                                                     <div className='settings-lead__row-edit'>
                                                         <TextInput
@@ -169,33 +181,48 @@ export const SettingsLeadSettings = (): ReactElement => {
                                                         <Button
                                                             className='settings-lead__row-edit-button'
                                                             onClick={() => handleSave(item.itemuid)}
-                                                            disabled={!editedName.trim()}
+                                                            disabled={isSaveDisabled}
+                                                            severity={
+                                                                isSaveDisabled
+                                                                    ? "secondary"
+                                                                    : "success"
+                                                            }
                                                         >
                                                             {item.name ? "Update" : "Save"}
                                                         </Button>
                                                     </div>
                                                 ) : (
-                                                    <span className='settings-lead__type-text'>
+                                                    <span
+                                                        className={`settings-lead__type-text ${item.enabled ? "" : "settings-lead__type-text--disabled"}`}
+                                                    >
                                                         {item.name}
                                                     </span>
                                                 )}
                                             </div>
                                             <div className='settings-lead__actions'>
-                                                <SwitchButton
-                                                    small
-                                                    checked={!!item.enabled}
-                                                    onChange={() => handleToggle(item.itemuid)}
-                                                    tooltip={item.enabled ? "Disable" : "Enable"}
-                                                    tooltipOptions={{ position: "top" }}
-                                                />
-                                                <Button
-                                                    text
-                                                    tooltip={"Delete"}
-                                                    className='settings-lead__icon-button settings-lead__delete-button'
-                                                    icon='adms-trash-can'
-                                                    disabled={item.isDefault}
-                                                    onClick={() => handleDelete(item)}
-                                                />
+                                                {!isNewItem && (
+                                                    <>
+                                                        <SwitchButton
+                                                            small
+                                                            checked={!!item.enabled}
+                                                            onChange={() =>
+                                                                handleToggle(item.itemuid)
+                                                            }
+                                                            tooltip={
+                                                                item.enabled ? "Disable" : "Enable"
+                                                            }
+                                                            tooltipOptions={{ position: "top" }}
+                                                        />
+                                                        <Button
+                                                            text
+                                                            tooltip={"Delete"}
+                                                            className='settings-lead__icon-button settings-lead__delete-button'
+                                                            icon='adms-trash-can'
+                                                            disabled={item.isDefault}
+                                                            onClick={() => handleDelete(item)}
+                                                        />
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     );
