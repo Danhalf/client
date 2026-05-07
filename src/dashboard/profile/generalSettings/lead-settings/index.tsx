@@ -1,5 +1,5 @@
 import "./index.css";
-import { ReactElement, useMemo, useState } from "react";
+import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "primereact/button";
 import { TabPanel, TabView } from "primereact/tabview";
 import { TextInput } from "dashboard/common/form/inputs";
@@ -29,11 +29,29 @@ export const SettingsLeadSettings = (): ReactElement => {
     const [serviceTypes, setServiceTypes] = useState<LeadServiceType[]>(buildDefaultRows);
     const [editedItemId, setEditedItemId] = useState<string | null>(null);
     const [editedName, setEditedName] = useState<string>("");
+    const newItemRowRef = useRef<HTMLDivElement>(null);
 
     const symbolToLimit = useMemo(() => {
         const limit = MAX_TYPE_LENGTH - editedName.length;
         return Math.max(limit, 0).toString();
     }, [editedName]);
+
+    const isNewItemEditing = useMemo(
+        () => serviceTypes.some((item) => item.itemuid === editedItemId && !item.name),
+        [editedItemId, serviceTypes]
+    );
+
+    useEffect(() => {
+        if (!isNewItemEditing) {
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            const row = newItemRowRef.current;
+            row?.scrollIntoView({ block: "nearest", inline: "nearest" });
+            row?.querySelector("input")?.focus();
+        });
+    }, [isNewItemEditing]);
 
     const handleStartEdit = (item: LeadServiceType) => {
         if (item.isDefault) {
@@ -145,7 +163,11 @@ export const SettingsLeadSettings = (): ReactElement => {
                                         !trimmedEditedName ||
                                         (!isNewItem && trimmedEditedName === item.name);
                                     return (
-                                        <div className='settings-lead__row' key={item.itemuid}>
+                                        <div
+                                            className='settings-lead__row'
+                                            key={item.itemuid}
+                                            ref={isNewItem ? newItemRowRef : undefined}
+                                        >
                                             <div className='settings-lead__type'>
                                                 {isNewItem ? (
                                                     <span
@@ -169,6 +191,7 @@ export const SettingsLeadSettings = (): ReactElement => {
                                                 {isEditing ? (
                                                     <div className='settings-lead__row-edit'>
                                                         <TextInput
+                                                            autoFocus={isNewItem}
                                                             value={editedName}
                                                             maxLength={MAX_TYPE_LENGTH}
                                                             infoText={symbolToLimit}
