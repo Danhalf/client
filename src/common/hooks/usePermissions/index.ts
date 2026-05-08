@@ -1,31 +1,11 @@
 import { useStore } from "store/hooks";
 import { PermissionKey } from "common/constants/permissions";
 
-const SALESPERSON_ALLOWED_PERMISSIONS: ReadonlyArray<PermissionKey> = [
-    "uaViewInventory",
-    "uaAddInventory",
-    "uaEditInventory",
-    "uaDeleteInventory",
-    "uaViewCostsAndExpenses",
-    "uaAddExpenses",
-    "uaEditExpenses",
-    "uaSalesPerson",
-];
-
 export const usePermissions = () => {
     const { authUser } = useStore().userStore;
 
-    const isSalesperson = (): boolean => {
-        if (!authUser) return false;
-        if (Number(authUser.issalesperson) === 1) return true;
-        return authUser.permissions?.uaSalesPerson === 1;
-    };
-
     const hasPermission = (permissionKey: PermissionKey): boolean => {
         if (!authUser || !authUser.permissions) return false;
-        if (isSalesperson() && !SALESPERSON_ALLOWED_PERMISSIONS.includes(permissionKey)) {
-            return false;
-        }
         return authUser.permissions[permissionKey] === 1;
     };
 
@@ -39,12 +19,26 @@ export const usePermissions = () => {
 
     const isSalespersonOnly = (): boolean => {
         if (!authUser || !authUser.permissions) return false;
-        if (!isSalesperson()) return false;
 
         const permissions = authUser.permissions;
+        const hasSalespersonRole = permissions.uaSalesPerson === 1;
+
+        if (!hasSalespersonRole) return false;
+
+        const inventoryPermissions: PermissionKey[] = [
+            "uaViewInventory",
+            "uaAddInventory",
+            "uaEditInventory",
+            "uaDeleteInventory",
+            "uaViewCostsAndExpenses",
+            "uaAddExpenses",
+            "uaEditExpenses",
+            "uaSalesPerson",
+        ];
+
         const otherPermissions = Object.keys(permissions).filter(
             (key) =>
-                !SALESPERSON_ALLOWED_PERMISSIONS.includes(key as PermissionKey) &&
+                !inventoryPermissions.includes(key as PermissionKey) &&
                 permissions[key as PermissionKey] === 1
         );
 
@@ -52,10 +46,7 @@ export const usePermissions = () => {
     };
 
     const inventoryPermissions = {
-        canView: (): boolean => {
-            if (isSalesperson()) return true;
-            return hasPermission("uaViewInventory");
-        },
+        canView: (): boolean => hasPermission("uaViewInventory"),
 
         canCreate: (): boolean => hasPermission("uaAddInventory"),
 
@@ -64,7 +55,6 @@ export const usePermissions = () => {
         canDelete: (): boolean => hasPermission("uaDeleteInventory"),
 
         canSeeInMenu: (): boolean => {
-            if (isSalesperson()) return true;
             return (
                 hasPermission("uaViewInventory") &&
                 (hasPermission("uaEditInventory") || hasPermission("uaAddInventory"))
@@ -72,7 +62,6 @@ export const usePermissions = () => {
         },
 
         canViewList: (): boolean => {
-            if (isSalesperson()) return true;
             return (
                 hasPermission("uaViewInventory") &&
                 (hasPermission("uaEditInventory") || hasPermission("uaAddInventory"))
@@ -80,7 +69,6 @@ export const usePermissions = () => {
         },
 
         canSelectInInputs: (): boolean => {
-            if (isSalesperson()) return true;
             return (
                 hasPermission("uaViewInventory") &&
                 (hasPermission("uaEditInventory") || hasPermission("uaAddInventory"))
@@ -88,7 +76,6 @@ export const usePermissions = () => {
         },
 
         canOpenDetails: (): boolean => {
-            if (isSalesperson()) return true;
             return hasPermission("uaViewInventory") && hasPermission("uaEditInventory");
         },
 
@@ -101,6 +88,11 @@ export const usePermissions = () => {
         canDeletePayments: (): boolean => hasPermission("uaDeletePayments"),
 
         canEditLeaseHerePayHere: (): boolean => hasPermission("uaAddCreditsAndFees"),
+    };
+
+    const isSalesperson = (): boolean => {
+        if (!authUser || !authUser.permissions) return false;
+        return authUser.permissions.uaSalesPerson === 1;
     };
 
     const contactPermissions = {
@@ -200,36 +192,43 @@ export const usePermissions = () => {
     };
 
     const salesPermissions = {
-        canShowContacts: (): boolean => !isSalesperson(),
+        canShowContacts: (): boolean => {
+            return !isSalesperson();
+        },
 
-        canShowDeals: (): boolean => !isSalesperson(),
+        canShowDeals: (): boolean => {
+            return !isSalesperson();
+        },
 
-        canShowAccounts: (): boolean => !isSalesperson(),
+        canShowAccounts: (): boolean => {
+            return !isSalesperson();
+        },
 
-        canShowReports: (): boolean => !isSalesperson(),
+        canShowReports: (): boolean => {
+            return !isSalesperson();
+        },
 
-        canShowTasks: (): boolean => !isSalesperson(),
+        canShowTasks: (): boolean => {
+            return !isSalesperson();
+        },
 
-        canShowExportWeb: (): boolean => !isSalesperson(),
+        canShowExportWeb: (): boolean => {
+            return !isSalesperson();
+        },
 
-        shouldShowManagerMenu: (): boolean => !isSalesperson(),
+        shouldShowManagerMenu: (): boolean => {
+            return !isSalesperson();
+        },
     };
 
-    const canAccessSettings = (): boolean => {
-        if (isSalesperson()) return false;
-        return hasPermission("uaEditSettings");
-    };
+    const canAccessSettings = (): boolean => hasPermission("uaEditSettings");
 
-    const canAccessUsers = (): boolean => {
-        if (isSalesperson()) return false;
-        return hasPermission("uaCreateUsers");
-    };
+    const canAccessUsers = (): boolean => hasPermission("uaCreateUsers");
 
     return {
         hasPermission,
         hasAnyPermission,
         hasAllPermissions,
-        isSalesperson,
         isSalespersonOnly,
         canAccessSettings,
         canAccessUsers,
