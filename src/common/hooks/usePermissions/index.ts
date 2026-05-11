@@ -1,5 +1,6 @@
 import { useStore } from "store/hooks";
 import { PermissionKey } from "common/constants/permissions";
+import { fromBinary } from "common/helpers";
 
 const SALESPERSON_ALLOWED_PERMISSIONS: ReadonlyArray<PermissionKey> = [
     "uaViewInventory",
@@ -17,8 +18,8 @@ export const usePermissions = () => {
 
     const isSalesperson = (): boolean => {
         if (!authUser) return false;
-        if (Number(authUser.issalesperson) === 1) return true;
-        return authUser.permissions?.uaSalesPerson === 1;
+        if (fromBinary(authUser.issalesperson)) return true;
+        return fromBinary(authUser.permissions?.uaSalesPerson);
     };
 
     const hasPermission = (permissionKey: PermissionKey): boolean => {
@@ -26,7 +27,7 @@ export const usePermissions = () => {
         if (isSalesperson() && !SALESPERSON_ALLOWED_PERMISSIONS.includes(permissionKey)) {
             return false;
         }
-        return authUser.permissions[permissionKey] === 1;
+        return fromBinary(authUser.permissions[permissionKey]);
     };
 
     const hasAnyPermission = (...permissionKeys: PermissionKey[]): boolean => {
@@ -45,7 +46,7 @@ export const usePermissions = () => {
         const otherPermissions = Object.keys(permissions).filter(
             (key) =>
                 !SALESPERSON_ALLOWED_PERMISSIONS.includes(key as PermissionKey) &&
-                permissions[key as PermissionKey] === 1
+                fromBinary(permissions[key as PermissionKey])
         );
 
         return otherPermissions.length === 0;
@@ -59,7 +60,10 @@ export const usePermissions = () => {
 
         canCreate: (): boolean => hasPermission("uaAddInventory"),
 
-        canEdit: (): boolean => hasPermission("uaEditInventory"),
+        canEdit: (): boolean => {
+            if (isSalesperson()) return true;
+            return hasPermission("uaEditInventory");
+        },
 
         canDelete: (): boolean => hasPermission("uaDeleteInventory"),
 
