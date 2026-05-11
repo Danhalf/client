@@ -9,6 +9,7 @@ import {
     CONTACTS_PAGE,
     DASHBOARD_PAGE,
     DEALS_PAGE,
+    LEADS_PAGE,
     EXPORT_WEB_PAGE,
     INVENTORY_PAGE,
     REPORTS_PAGE,
@@ -26,6 +27,7 @@ export const Sidebar = observer((): ReactElement => {
         dealPermissions,
         accountPermissions,
         salesPermissions,
+        canAccessSettings,
     } = usePermissions();
     const { authUser, settings } = store;
     const [isInitialRender, setIsInitialRender] = useState(true);
@@ -93,6 +95,7 @@ export const Sidebar = observer((): ReactElement => {
                 {salesPermissions.canShowDeals() &&
                     dealPermissions.canSeeInMenu() &&
                     renderNavItem(DEALS_PAGE.MAIN, "deals", "Deals")}
+
                 {salesPermissions.canShowAccounts() &&
                     accountPermissions.canSeeInMenu() &&
                     renderNavItem(ACCOUNTS_PAGE.MAIN, "accounts", "Accounts")}
@@ -102,12 +105,16 @@ export const Sidebar = observer((): ReactElement => {
                     renderNavItem(TASKS_PAGE.MAIN, "tasks", "Tasks")}
                 {salesPermissions.canShowExportWeb() &&
                     renderNavItem(EXPORT_WEB_PAGE.MAIN, "export-web", "Export to WEB")}
-                {renderNavItem(
-                    SETTINGS_PAGE.MAIN,
-                    <i className='sidebar-nav__icon adms-settings' />,
-                    "Settings",
-                    "sidebar-nav__item--settings"
-                )}
+                {salesPermissions.canShowDeals() &&
+                    dealPermissions.canSeeInMenu() &&
+                    renderNavItem(LEADS_PAGE.MAIN, "leads", "Leads")}
+                {canAccessSettings() &&
+                    renderNavItem(
+                        SETTINGS_PAGE.MAIN,
+                        <i className='sidebar-nav__icon adms-settings' />,
+                        "Settings",
+                        "sidebar-nav__item--settings"
+                    )}
             </ul>
         </aside>
     );

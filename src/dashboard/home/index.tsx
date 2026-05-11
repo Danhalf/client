@@ -1,12 +1,11 @@
-import { Calendar } from "primereact/calendar";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { TasksWidget } from "dashboard/tasks/widget";
+import { LatestLeads } from "dashboard/leads/widget";
 import { useStore } from "store/hooks";
 import { RecentMessages } from "dashboard/home/recent-messages";
-import { LatestUpdates } from "dashboard/home/latest-updates";
 import "./index.css";
-import { getAlerts, setAlert } from "http/services/tasks.service";
+import { dismissAlert, getAlerts } from "http/services/tasks.service";
 import { useNotification, usePermissions, useToastMessage } from "common/hooks";
 import { Alert } from "common/models/tasks";
 
@@ -17,7 +16,6 @@ export const Home = (): ReactElement => {
     const { inventoryPermissions, contactPermissions, dealPermissions, salesPermissions } =
         usePermissions();
     const { authUser } = store;
-    const [date] = useState<Date | null>(null);
     const { showNotification } = useNotification();
     const { showError } = useToastMessage();
     const [pendingAlerts, setPendingAlerts] = useState<Alert[]>([]);
@@ -38,7 +36,7 @@ export const Home = (): ReactElement => {
 
     const showNextAlert = useCallback(
         async (currentAlert: Alert) => {
-            const result = await setAlert(currentAlert.itemuid);
+            const result = await dismissAlert(currentAlert.itemuid);
 
             if (result?.error) {
                 setPendingAlerts([]);
@@ -146,23 +144,27 @@ export const Home = (): ReactElement => {
                     </div>
                 </div>
             </div>
-            <div className='col-12 lg:col-8 xl:col-7'>
+            <div className='col-12 xl:col-6'>
                 <div className='card home-page__tasks-widget'>
                     <div className='card-content'>
                         <div className='grid lg:justify-content-between md:justify-content-center'>
-                            <div className='col-12 lg:col-6 xl:col-7'>
+                            <div className='col-12'>
                                 <TasksWidget />
-                            </div>
-
-                            <div className='col-12 lg:col-6 xl:col-5 xl:text-right task-calendar p-0'>
-                                <Calendar className='task-calendar__input' value={date} inline />
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='col-12 lg:col-4 xl:col-5'>
-                <LatestUpdates />
+            <div className='col-12 xl:col-6'>
+                <div className='card home-page__latest-leads-widget'>
+                    <div className='card-content'>
+                        <div className='grid lg:justify-content-between md:justify-content-center'>
+                            <div className='col-12'>
+                                <LatestLeads />
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div className='col-12 xl:col-5'>
                 <RecentMessages />

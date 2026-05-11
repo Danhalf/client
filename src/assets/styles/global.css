@@ -1,6 +1,7 @@
 /* App variables */
 :root {
     --admss-app-font: "Open Sans", Arial, Helvetica, sans-serif;
+    --admss-app-font-condensed: "Open Sans Condensed", "Open Sans", Arial, Helvetica, sans-serif;
     --admss-app-font-weight: 400;
     --admss-app-base-font-size: 18px;
 
@@ -84,6 +85,12 @@
     --admss-app-statuses-cancelled: #de0000;
     --admss-app-statuses-outdated: #5f5f5f;
     --admss-app-statuses-deleted: #000000;
+
+    --admss-app-lead-status-new: var(--admss-app-statuses-started);
+    --admss-app-lead-status-in-progress: var(--admss-app-statuses-in-progress);
+    --admss-app-lead-status-completed: var(--admss-app-statuses-completed);
+    --admss-app-lead-status-rejected: var(--admss-app-statuses-cancelled);
+
     --admss-app-default-card-height: 983px;
 }
 
@@ -123,4 +130,11 @@ body {
 .main .container {
     width: calc(var(--admss-app-container-width) - var(--admss-app-aside-collapsed-width));
     max-width: var(--admss-app-container-width-expanded);
+}
+
+.heading-condensed {
+    font-family: var(--admss-app-font-condensed);
+    font-weight: 700;
+    line-height: 100%;
+    letter-spacing: 0;
 }
