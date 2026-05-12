@@ -7,6 +7,9 @@ import "./index.css";
 import { Splitter } from "dashboard/common/display";
 import InfoIcon from "assets/images/info-icon.svg";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import { Button } from "primereact/button";
+import { useToastMessage } from "common/hooks";
+import { typeGuards } from "common/utils";
 
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. 
 Without this information, two-factor authentication cannot be set up for the user in the future. 
@@ -15,17 +18,35 @@ If both fields are filled in, the user will be able to choose their preferred tw
 export const PersonalInformation = observer((): ReactElement => {
     const profileStore = useStore().profileStore;
     const user = useStore().userStore;
-    const { profile, changeProfile, locations, selectedLocationUid, changeCurrentLocation } =
-        profileStore;
+    const {
+        profile,
+        changeProfile,
+        dealerLocations,
+        selectedLocationUids,
+        changeSelectedLocations,
+        hasUnsavedLocationChanges,
+        showLocationsWarning,
+        isLocationsSaving,
+    } = profileStore;
     const { authUser } = user;
+    const { showError, showSuccess } = useToastMessage();
     const locationOptions = useMemo(
         () =>
-            locations.map((location) => ({
+            dealerLocations.map((location) => ({
                 label: location.locName,
                 value: location.locationuid,
             })),
-        [locations]
+        [dealerLocations]
     );
+
+    const handleSaveLocations = async () => {
+        const response = await profileStore.saveLocations();
+        if (response && typeGuards.isExist(response.error)) {
+            showError(response.error as string);
+            return;
+        }
+        showSuccess("Locations saved successfully!");
+    };
 
     return (
         <div className='user-profile__content'>
@@ -45,28 +66,50 @@ export const PersonalInformation = observer((): ReactElement => {
                         disabled
                     />
                     <div className='user-profile-location-select'>
-                        <MultiSelect
-                            optionLabel='label'
-                            optionValue='value'
-                            options={locationOptions}
-                            value={selectedLocationUid ? [selectedLocationUid] : []}
-                            onChange={({ value }: MultiSelectChangeEvent) =>
-                                changeCurrentLocation(value?.[0] || "")
-                            }
-                            placeholder='Dealer Locations'
-                            className='inventory-dropdown inventory-filter user-profile-location-select__input'
-                            display='chip'
-                            selectedItemsLabel='{0} selected'
-                            selectionLimit={1}
-                            maxSelectedLabels={1}
-                            pt={{
-                                header: { className: "inventory-filter__header" },
-                                wrapper: {
-                                    className: "inventory-filter__wrapper",
-                                    style: { maxHeight: "300px", maxWidth: "310px" },
-                                },
-                            }}
-                        />
+                        <div className='user-profile-location-select__row'>
+                            <MultiSelect
+                                optionLabel='label'
+                                panelHeaderTemplate={() => <></>}
+                                optionValue='value'
+                                options={locationOptions}
+                                value={selectedLocationUids}
+                                onChange={({ value }: MultiSelectChangeEvent) =>
+                                    changeSelectedLocations((value as string[]) || [])
+                                }
+                                onHide={() => profileStore.markLocationsBlurred()}
+                                placeholder='Dealer Locations'
+                                className='inventory-dropdown inventory-filter user-profile-location-select__input'
+                                display='chip'
+                                selectedItemsLabel='{0} selected'
+                                showClear={selectedLocationUids.length > 1}
+                                pt={{
+                                    header: { className: "inventory-filter__header" },
+                                    wrapper: {
+                                        className: "inventory-filter__wrapper",
+                                        style: { maxHeight: "300px", maxWidth: "310px" },
+                                    },
+                                }}
+                            />
+                            <Button
+                                type='button'
+                                className='user-profile-location-select__save-button form-nav__button'
+                                disabled={!hasUnsavedLocationChanges || isLocationsSaving}
+                                severity={
+                                    hasUnsavedLocationChanges && !isLocationsSaving
+                                        ? "success"
+                                        : "secondary"
+                                }
+                                loading={isLocationsSaving}
+                                onClick={handleSaveLocations}
+                            >
+                                Save
+                            </Button>
+                        </div>
+                        {showLocationsWarning && hasUnsavedLocationChanges && (
+                            <span className='user-profile-location-select__warning'>
+                                You have unsaved location changes. Click Save to apply them.
+                            </span>
+                        )}
                     </div>
                 </div>
                 <div className='col-6 user-profile-personal__avatar'>

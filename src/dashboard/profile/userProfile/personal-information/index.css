@@ -19,7 +19,14 @@
 .user-profile-location-select {
     display: flex;
     flex-direction: column;
+    gap: 6px;
+}
+
+.user-profile-location-select__row {
+    display: flex;
+    align-items: stretch;
     gap: 8px;
+    width: 100%;
 }
 
 .user-profile-location-select__label {
@@ -29,7 +36,20 @@
 }
 
 .user-profile-location-select__input {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
+}
+
+.user-profile-location-select__save-button {
+    min-width: 96px;
+    justify-content: center;
+}
+
+.user-profile-location-select__warning {
+    color: var(--admss-app-red);
+    font-size: 12px;
+    line-height: 16px;
+    font-style: italic;
 }
 
 .user-profile-personal__avatar {

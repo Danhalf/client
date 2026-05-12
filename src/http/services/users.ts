@@ -157,6 +157,20 @@ export const getUserLocations = async (useruid: string) => {
     return undefined;
 };
 
+export const getDealerLocations = async (dealerId: string, params?: QueryParams) => {
+    const response = await new ApiRequest().get<LocationsListData>({
+        url: `dealer/${dealerId}/locations`,
+        config: { params },
+        defaultError: "Error while getting dealer locations",
+    });
+
+    if (response && "locations" in response) {
+        return response.locations;
+    }
+
+    return undefined;
+};
+
 export const changePassword = async (useruid: string, payload: ChangePasswordPayload) => {
     return new ApiRequest().post({
         url: `user/${useruid}/changepassword`,
