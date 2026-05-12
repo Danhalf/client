@@ -67,32 +67,33 @@ export const PersonalInformation = observer((): ReactElement => {
                     />
                     <div className='user-profile-location-select'>
                         <div className='user-profile-location-select__row'>
-                            <MultiSelect
-                                optionLabel='label'
-                                panelHeaderTemplate={() => <></>}
-                                optionValue='value'
-                                options={locationOptions}
-                                value={selectedLocationUids}
-                                onChange={({ value }: MultiSelectChangeEvent) =>
-                                    changeSelectedLocations((value as string[]) || [])
-                                }
-                                onHide={() => profileStore.markLocationsBlurred()}
-                                placeholder='Dealer Locations'
-                                className='inventory-dropdown inventory-filter user-profile-location-select__input'
-                                display='chip'
-                                selectedItemsLabel='{0} selected'
-                                showClear={selectedLocationUids.length > 1}
-                                pt={{
-                                    header: { className: "inventory-filter__header" },
-                                    wrapper: {
-                                        className: "inventory-filter__wrapper",
-                                        style: { maxHeight: "300px", maxWidth: "310px" },
-                                    },
-                                }}
-                            />
+                            <span className='p-float-label w-full'>
+                                <MultiSelect
+                                    optionLabel='label'
+                                    panelHeaderTemplate={() => <></>}
+                                    optionValue='value'
+                                    options={locationOptions}
+                                    value={selectedLocationUids}
+                                    onChange={({ value }: MultiSelectChangeEvent) =>
+                                        changeSelectedLocations((value as string[]) || [])
+                                    }
+                                    onHide={() => profileStore.markLocationsBlurred()}
+                                    className='inventory-dropdown inventory-filter user-profile-location-select__input'
+                                    display='chip'
+                                    showClear={selectedLocationUids.length > 1}
+                                    pt={{
+                                        header: { className: "inventory-filter__header" },
+                                        wrapper: {
+                                            className: "inventory-filter__wrapper",
+                                            style: { maxHeight: "300px" },
+                                        },
+                                    }}
+                                />
+                                <label htmlFor='ms-selectedLocationsUids'>Dealer Locations</label>
+                            </span>
                             <Button
                                 type='button'
-                                className='user-profile-location-select__save-button form-nav__button'
+                                className='user-profile-location-select__save-button'
                                 disabled={!hasUnsavedLocationChanges || isLocationsSaving}
                                 severity={
                                     hasUnsavedLocationChanges && !isLocationsSaving

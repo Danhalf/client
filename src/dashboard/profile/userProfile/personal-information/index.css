@@ -25,8 +25,21 @@
 .user-profile-location-select__row {
     display: flex;
     align-items: stretch;
-    gap: 8px;
     width: 100%;
+    .p-multiselect {
+        display: flex;
+        align-items: center;
+        &.p-multiselect-chip .p-multiselect-token {
+            height: 25px;
+            background-color: var(--admss-app-primary-main-green);
+            color: var(--admss-app-white);
+            .p-multiselect-token-icon {
+                color: var(--admss-app-white);
+                width: 14px;
+                height: 14px;
+            }
+        }
+    }
 }
 
 .user-profile-location-select__label {
@@ -38,11 +51,20 @@
 .user-profile-location-select__input {
     flex: 1;
     min-width: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .user-profile-location-select__save-button {
-    min-width: 96px;
+    min-width: 104px;
+    height: 50px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 24px;
+    text-transform: uppercase;
     justify-content: center;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 .user-profile-location-select__warning {
@@ -85,4 +107,3 @@
     font-family: "Open Sans", sans-serif;
     font-style: italic;
 }
-
