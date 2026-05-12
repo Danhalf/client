@@ -49,6 +49,7 @@ export class ProfileStore {
     private _isValidatingPassword: boolean = false;
     private _currentLocation: Partial<InventoryLocations> | null = null;
     private _locations: InventoryLocations[] = [];
+    private _selectedLocationUid: string = "";
     private _dealerLocations: InventoryLocations[] = [];
     private _selectedLocationUids: string[] = [];
     private _hasUnsavedLocationChanges: boolean = false;
@@ -96,6 +97,10 @@ export class ProfileStore {
         return this._locations;
     }
 
+    public get selectedLocationUid() {
+        return this._selectedLocationUid;
+    }
+
     public get dealerLocations() {
         return this._dealerLocations;
     }
@@ -118,6 +123,29 @@ export class ProfileStore {
 
     public set profile(profile: ExtendedProfile) {
         this._profile = profile;
+    }
+
+    public changeCurrentLocation(locationuid: string) {
+        const selectedLocation = this._locations.find(
+            (location) => location.locationuid === locationuid
+        );
+        if (!selectedLocation) {
+            return;
+        }
+
+        const hasLocationChanged = this._selectedLocationUid !== locationuid;
+        this._selectedLocationUid = locationuid;
+        this._currentLocation = selectedLocation;
+        this._profile = {
+            ...this._profile,
+            locationname: selectedLocation.locName || "",
+            address: selectedLocation.locStreetAddress || "",
+            state: selectedLocation.locState || "",
+            zipCode: selectedLocation.locZIP || "",
+            phoneNumber: selectedLocation.locPhone1 || "",
+            email: selectedLocation.locEmail1 || "",
+        };
+        this._isProfileChanged = hasLocationChanged;
     }
 
     public changeSelectedLocations = (locationUids: string[]) => {
@@ -272,6 +300,10 @@ export class ProfileStore {
             const dealerLocations = Array.isArray(dealerLocationsResponse)
                 ? dealerLocationsResponse
                 : [];
+            const currentLocation =
+                userLocations.find((location) => location.locationuid === authUser.locationuid) ||
+                userLocations[0];
+
             const dealerLocationUids = new Set(
                 dealerLocations
                     .map((location) => location.locationuid)
@@ -281,18 +313,12 @@ export class ProfileStore {
                 .map((location) => location.locationuid)
                 .filter((uid): uid is string => !!uid)
                 .filter((uid) => dealerLocationUids.has(uid));
-            const currentLocation =
-                dealerLocations.find((location) => location.locationuid === selectedUids[0]) ||
-                userLocations.find(
-                    (location) =>
-                        !!location.locationuid && location.locationuid === authUser.locationuid
-                ) ||
-                null;
 
             this._locations = userLocations;
+            this._selectedLocationUid = currentLocation?.locationuid || "";
+            this._currentLocation = currentLocation || null;
             this._dealerLocations = dealerLocations;
             this._selectedLocationUids = selectedUids;
-            this._currentLocation = currentLocation;
             this._hasUnsavedLocationChanges = false;
             this._showLocationsWarning = false;
 
