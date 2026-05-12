@@ -10,20 +10,10 @@ import {
     setUserLocations,
     getDealerLocations,
 } from "http/services/users";
-import {
-    updateUserProfile,
-    changePassword,
-    checkPassword,
-    getUserData,
-    getUserLocations,
-    setUserLocations,
-    getDealerLocations,
-} from "http/services/users";
 import { UserData, CheckPasswordResponse } from "common/models/users";
 import { BaseResponseError, Status } from "common/models/base-response";
 import { typeGuards } from "common/utils";
 import { getUserLogo, uploadUserLogo } from "http/services/media.service";
-import { InventoryLocations } from "common/models/inventory";
 import { InventoryLocations } from "common/models/inventory";
 
 export interface ExtendedProfile extends Partial<AuthUser> {
@@ -300,13 +290,6 @@ export class ProfileStore {
                     ? getDealerLocations(authUser.dealer_id)
                     : Promise.resolve(undefined),
             ]);
-            const [response, locationsResponse, dealerLocationsResponse] = await Promise.all([
-                getUserData(authUser.useruid),
-                getUserLocations(authUser.useruid),
-                authUser.dealer_id
-                    ? getDealerLocations(authUser.dealer_id)
-                    : Promise.resolve(undefined),
-            ]);
 
             if (!response || typeGuards.isExist(response.error)) {
                 return response as BaseResponseError | undefined;
@@ -342,13 +325,6 @@ export class ProfileStore {
             this._profile = {
                 ...this._profile,
                 companyname: userData.companyName || authUser.companyname || "",
-                locationname:
-                    currentLocation?.locName || userData.city || authUser.locationname || "",
-                address: currentLocation?.locStreetAddress || userData.streetAddress || "",
-                state: currentLocation?.locState || userData.state || "",
-                zipCode: currentLocation?.locZIP || userData.ZIP || "",
-                phoneNumber: currentLocation?.locPhone1 || userData.phone || userData.phone1 || "",
-                email: currentLocation?.locEmail1 || userData.email || userData.email1 || "",
                 locationname:
                     currentLocation?.locName || userData.city || authUser.locationname || "",
                 address: currentLocation?.locStreetAddress || userData.streetAddress || "",
@@ -435,42 +411,6 @@ export class ProfileStore {
                 status: Status.ERROR,
                 error,
             } as BaseResponseError;
-        }
-    };
-
-    public saveLocations = async () => {
-        const authUser = this.rootStore.userStore.authUser;
-        if (!authUser?.useruid) {
-            return {
-                status: Status.ERROR,
-                error: "User is not authenticated",
-            } as BaseResponseError;
-        }
-
-        this._isLocationsSaving = true;
-        try {
-            const selectedLocations: Partial<InventoryLocations>[] = this._dealerLocations
-                .filter((location) => this._selectedLocationUids.includes(location.locationuid))
-                .map((location) => ({
-                    ...location,
-                    useruid: authUser.useruid,
-                }));
-
-            const response = await setUserLocations(authUser.useruid, selectedLocations);
-            if (response && typeGuards.isExist(response.error)) {
-                return response as BaseResponseError;
-            }
-
-            this._hasUnsavedLocationChanges = false;
-            this._showLocationsWarning = false;
-            return response;
-        } catch (error) {
-            return {
-                status: Status.ERROR,
-                error,
-            } as BaseResponseError;
-        } finally {
-            this._isLocationsSaving = false;
         }
     };
 
