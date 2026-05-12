@@ -344,35 +344,6 @@ export class ProfileStore {
                 return response as BaseResponseError;
             }
 
-            const primaryLocationUid = this._currentLocation?.locationuid;
-            const selectedLocations: Partial<InventoryLocations>[] = this._dealerLocations
-                .filter((location) => this._selectedLocationUids.includes(location.locationuid))
-                .map((location) => {
-                    const base: Partial<InventoryLocations> = {
-                        ...location,
-                        useruid: authUser.useruid,
-                    };
-                    if (location.locationuid && location.locationuid === primaryLocationUid) {
-                        return {
-                            ...base,
-                            locName: convertEmptyValue(
-                                this._profile.locationname || authUser.locationname
-                            ),
-                            locStreetAddress: convertEmptyValue(this._profile.address),
-                            locState: convertEmptyValue(this._profile.state),
-                            locZIP: convertEmptyValue(this._profile.zipCode),
-                            locPhone1: convertEmptyValue(this._profile.phoneNumber),
-                            locEmail1: convertEmptyValue(this._profile.email),
-                        };
-                    }
-                    return base;
-                });
-
-            const locationResponse = await setUserLocations(authUser.useruid, selectedLocations);
-            if (locationResponse && typeGuards.isExist(locationResponse.error)) {
-                return locationResponse as BaseResponseError;
-            }
-
             if (this._logoFile) {
                 const logoResponse = (await uploadUserLogo(authUser.useruid, this._logoFile)) as
                     | BaseResponseError
@@ -390,8 +361,6 @@ export class ProfileStore {
             }
 
             this._isProfileChanged = false;
-            this._hasUnsavedLocationChanges = false;
-            this._showLocationsWarning = false;
             return response;
         } catch (error) {
             return {

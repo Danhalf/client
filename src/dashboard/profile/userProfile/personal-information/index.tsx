@@ -1,4 +1,4 @@
-import { ReactElement, useMemo } from "react";
+import { ReactElement, useMemo, useState } from "react";
 import { useStore } from "store/hooks";
 import { observer } from "mobx-react-lite";
 import { EmailInput, PhoneInput, StateDropdown, TextInput } from "dashboard/common/form/inputs";
@@ -14,6 +14,7 @@ import { typeGuards } from "common/utils";
 const INFO_MESSAGE = `At least one contact method is required - phone number or email. 
 Without this information, two-factor authentication cannot be set up for the user in the future. 
 If both fields are filled in, the user will be able to choose their preferred two-factor authentication method.`;
+const LOCATIONS_ERROR_MESSAGE = "You have unsaved location changes. Click Save to apply them.";
 
 export const PersonalInformation = observer((): ReactElement => {
     const profileStore = useStore().profileStore;
@@ -30,6 +31,9 @@ export const PersonalInformation = observer((): ReactElement => {
     } = profileStore;
     const { authUser } = user;
     const { showError, showSuccess } = useToastMessage();
+    const [isLocationsPanelOpen, setIsLocationsPanelOpen] = useState(false);
+    const showLocationError =
+        showLocationsWarning && hasUnsavedLocationChanges && !isLocationsPanelOpen;
     const locationOptions = useMemo(
         () =>
             dealerLocations.map((location) => ({
@@ -67,7 +71,9 @@ export const PersonalInformation = observer((): ReactElement => {
                     />
                     <div className='user-profile-location-select'>
                         <div className='user-profile-location-select__row'>
-                            <span className='p-float-label w-full'>
+                            <span
+                                className={`p-float-label w-full${showLocationError ? " p-invalid" : ""}`}
+                            >
                                 <MultiSelect
                                     optionLabel='label'
                                     panelHeaderTemplate={() => <></>}
@@ -77,7 +83,11 @@ export const PersonalInformation = observer((): ReactElement => {
                                     onChange={({ value }: MultiSelectChangeEvent) =>
                                         changeSelectedLocations((value as string[]) || [])
                                     }
-                                    onHide={() => profileStore.markLocationsBlurred()}
+                                    onShow={() => setIsLocationsPanelOpen(true)}
+                                    onHide={() => {
+                                        setIsLocationsPanelOpen(false);
+                                        profileStore.markLocationsBlurred();
+                                    }}
                                     className='inventory-dropdown inventory-filter user-profile-location-select__input'
                                     display='chip'
                                     showClear={selectedLocationUids.length > 1}
@@ -106,10 +116,10 @@ export const PersonalInformation = observer((): ReactElement => {
                                 Save
                             </Button>
                         </div>
-                        {showLocationsWarning && hasUnsavedLocationChanges && (
-                            <span className='user-profile-location-select__warning'>
-                                You have unsaved location changes. Click Save to apply them.
-                            </span>
+                        {showLocationError && (
+                            <div className='user-profile-location-select__error p-error'>
+                                <small>{LOCATIONS_ERROR_MESSAGE}</small>
+                            </div>
                         )}
                     </div>
                 </div>
