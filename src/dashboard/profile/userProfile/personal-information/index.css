@@ -30,6 +30,16 @@
     .p-multiselect {
         display: flex;
         align-items: center;
+        .p-icon,
+        .p-multiselect-clear-icon {
+            width: 14px;
+            height: 14px;
+            color: var(--admss-app-medium-grey);
+            &.p-multiselect-clear-icon {
+                cursor: pointer;
+                transform: translateY(10%);
+            }
+        }
         &.p-multiselect-chip .p-multiselect-token {
             height: 25px;
             background-color: var(--admss-app-primary-main-green);
