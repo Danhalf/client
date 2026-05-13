@@ -17,7 +17,6 @@ import { ComboBox } from "dashboard/common/form/dropdown";
 export const DealBuyHerePayHere = observer((): ReactElement => {
     const store = useStore().dealStore;
     const {
-        accountNumberPreview,
         deal: { accountInfo, dateeffective },
         dealExtData: {
             Con_Pmt_Freq,
@@ -45,7 +44,7 @@ export const DealBuyHerePayHere = observer((): ReactElement => {
             <div className='col-3'>
                 <span className='p-float-label'>
                     <InputText
-                        value={accountInfo || accountNumberPreview || ""}
+                        value={accountInfo}
                         onChange={({ target: { value } }) =>
                             changeDeal({ key: "accountInfo", value })
                         }
