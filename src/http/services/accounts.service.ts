@@ -28,7 +28,7 @@ export interface TotalAccountList extends BaseResponse {
 }
 
 export const getAccountNumberPreview = async (inventoryuid: string) => {
-    const id = !inventoryuid || String(inventoryuid).trim() === "" ? "0" : String(inventoryuid);
+    const id = !inventoryuid || !String(inventoryuid).trim().length ? "0" : String(inventoryuid);
     return new ApiRequest().get<AccountNumberPreviewResponse | BaseResponseError>({
         url: `accounts/${id}/account-number-preview`,
         defaultError: "Error while getting account number preview",

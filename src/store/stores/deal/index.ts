@@ -251,7 +251,7 @@ export class DealStore {
             return;
         }
         const uid =
-            !inventoryuid || String(inventoryuid).trim() === "" ? "0" : String(inventoryuid);
+            !inventoryuid || !String(inventoryuid).trim().length ? "0" : String(inventoryuid);
         this._debouncedAccountNumberPreview(uid);
     };
 
@@ -358,6 +358,16 @@ export class DealStore {
         ({ key, value }: { key: keyof Deal; value: string | number | null | undefined }) => {
             if (this._deal && key !== "extdata" && key !== "finance") {
                 this._isFormChanged = true;
+
+                if (key === "inventoryinfo" && !this._dealID) {
+                    const cleared =
+                        value === null || value === undefined || String(value).trim().length === 0;
+                    if (cleared) {
+                        delete (this._deal as Record<string, unknown>).inventoryuid;
+                        this.requestAccountNumberPreview(null);
+                    }
+                }
+
                 if (value === null || value === undefined) {
                     delete (this._deal as Record<string, unknown>)[key as string];
                 } else {
