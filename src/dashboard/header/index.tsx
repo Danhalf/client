@@ -117,10 +117,9 @@ export const Header = observer((): ReactElement => {
         return <></>;
     }
 
-    if (menuRight) {
-        return (
-            <header className='header header--collapsed'>
-                <img src={logo} alt='ADMSS' className='header__logo header__logo--collapsed' />
+    return (
+        <header className='header'>
+                <img src={logo} alt='ADMSS' className='header__logo' />
 
                 <div className='header__content'>
                     <div className='header__info'>
@@ -133,7 +132,6 @@ export const Header = observer((): ReactElement => {
                         <Menu model={menuItems} popup ref={menuRight} popupAlignment='right' />
                         <ProfileAvatar
                             className='header__icon'
-                            size={60}
                             editable={false}
                             onClick={(event) => menuRight?.current?.toggle(event)}
                         />
@@ -154,8 +152,6 @@ export const Header = observer((): ReactElement => {
                         />
                     </>
                 )}
-            </header>
-        );
-    }
-    return <></>;
+        </header>
+    );
 });
