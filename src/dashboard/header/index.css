@@ -8,30 +8,27 @@
     border-bottom: 5px solid var(--admss-app-main-blue);
     display: flex;
     align-items: center;
-    padding: 15px 40px;
+    padding: 15px 20px;
     transition:
         height 0.3s ease,
         padding 0.3s ease;
 }
 
-html.app-header-scrolled .header {
-    padding: 15px 20px;
-    padding-right: 40px;
+.app-header-scrolled {
+    .sidebar {
+        padding-top: 26px;
+    }
+    .header {
+        padding-right: 40px;
+    }
 }
 
 .header__logo {
     transition: all 0.3s ease;
-    margin: 0 20px;
-    margin-right: 120px;
-    width: 88px;
-    height: 76px;
-}
-
-html.app-header-scrolled .header__logo {
-    margin: 0;
-    margin-right: 88px;
-    width: 47px;
-    height: 41px;
+    margin: 0 0px;
+    margin-right: 80px;
+    width: 48px;
+    height: 42px;
 }
 
 .header__content {
@@ -53,23 +50,15 @@ html.app-header-scrolled .header__info {
 }
 
 .header__name {
-    font-size: 24px;
+    font-size: 22px;
     line-height: 100%;
     transition: font-size 0.3s ease;
-}
-
-html.app-header-scrolled .header__name {
-    font-size: 18px;
 }
 
 .header__location {
     font-size: 18px;
     line-height: 100%;
     transition: font-size 0.3s ease;
-}
-
-html.app-header-scrolled .header__location {
-    font-size: 14px;
 }
 
 .header-dealer-info {
@@ -97,7 +86,7 @@ html.app-header-scrolled .header__location {
         height 0.3s ease;
 }
 
-html.app-header-scrolled .header .header__icon.profile-avatar {
+.app-header-scrolled .header .header__icon.profile-avatar {
     width: 44px;
     height: 44px;
     --avatar-size: 44px;
