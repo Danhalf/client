@@ -50,7 +50,7 @@ const isErrorResponse = (response: BaseResponseError | undefined): boolean =>
     response?.status === Status.ERROR;
 
 const mapApiItemToSettingType = (item: ContactTypeSetting): ContactSettingsType => ({
-    itemuid: item.id,
+    itemuid: item.id || "",
     typeId: item.type_id,
     sortOrder: item.sort_order,
     name: item.name,
@@ -118,7 +118,12 @@ export const SettingsContactTypes = observer((): ReactElement => {
                 .map(mapApiItemToSettingType)
                 .sort((a, b) => a.sortOrder - b.sortOrder || a.typeId - b.typeId);
 
-            if (!mappedItems.length && initializedDealerRef.current !== dealerId) {
+            const hasUninitializedDefaults = mappedItems.some((item) => !item.itemuid);
+
+            if (
+                (!mappedItems.length || hasUninitializedDefaults) &&
+                initializedDealerRef.current !== dealerId
+            ) {
                 initializedDealerRef.current = dealerId;
                 const initResponse = await initContactTypeSettings(dealerId);
                 if (initResponse && isErrorResponse(initResponse)) {
@@ -245,7 +250,7 @@ export const SettingsContactTypes = observer((): ReactElement => {
     };
 
     const handleDelete = async (item: ContactSettingsType) => {
-        if (item.isDefault || isMutating || isLoading) {
+        if (item.isDefault || !item.itemuid || isMutating || isLoading) {
             return;
         }
 
@@ -268,7 +273,7 @@ export const SettingsContactTypes = observer((): ReactElement => {
     };
 
     const handleToggle = async (item: ContactSettingsType) => {
-        if (isMutating || isLoading) {
+        if (!item.itemuid || isMutating || isLoading) {
             return;
         }
 
