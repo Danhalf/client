@@ -3,7 +3,20 @@ import { Button } from "primereact/button";
 import { TextInput } from "dashboard/common/form/inputs";
 import { SwitchButton } from "dashboard/common/button";
 import { ComboBox } from "dashboard/common/form/dropdown";
-import { ContactTypeNameList } from "common/models/contact";
+import { BaseResponseError, Status } from "common/models/base-response";
+import { ContactTypeSetting } from "common/models/contact";
+import {
+    createContactTypeSetting,
+    deleteContactTypeSetting,
+    getContactTypeSettings,
+    initContactTypeSettings,
+    updateContactTypeSetting,
+} from "http/services/contacts-service";
+import { useStore } from "store/hooks";
+import { useToastMessage } from "common/hooks";
+import { Loader } from "dashboard/common/loader";
+import { observer } from "mobx-react-lite";
+import { CONTACT_TYPE_SETTINGS_MESSAGES } from "common/constants/settings-messages";
 
 const MAX_TYPE_LENGTH = 109;
 
@@ -19,47 +32,50 @@ const CATEGORY_OPTIONS = [
 
 export interface ContactSettingsType {
     itemuid: string;
+    typeId: number;
+    sortOrder: number;
     name: string;
     category: ContactTypeCategory;
     enabled: 0 | 1;
-    isDefault?: boolean;
+    isDefault: boolean;
 }
 
-const DEFAULT_CONTACT_TYPES: Omit<ContactSettingsType, "itemuid">[] = [
-    { name: ContactTypeNameList.BUYERS, category: ContactTypeCategory.INDIVIDUAL, enabled: 1, isDefault: true },
-    { name: ContactTypeNameList.DEALERS, category: ContactTypeCategory.BUSINESS, enabled: 1, isDefault: true },
-    {
-        name: ContactTypeNameList.INSURANCE_COMPANIES,
-        category: ContactTypeCategory.BUSINESS,
-        enabled: 1,
-        isDefault: true,
-    },
-    {
-        name: ContactTypeNameList.INSURANCE_AGENTS,
-        category: ContactTypeCategory.BUSINESS,
-        enabled: 1,
-        isDefault: true,
-    },
-    { name: ContactTypeNameList.VENDORS, category: ContactTypeCategory.BUSINESS, enabled: 1, isDefault: true },
-    { name: ContactTypeNameList.LENDERS, category: ContactTypeCategory.BUSINESS, enabled: 1, isDefault: true },
-    { name: ContactTypeNameList.AUCTIONS, category: ContactTypeCategory.BUSINESS, enabled: 1, isDefault: true },
-    { name: ContactTypeNameList.CONSIGNORS, category: ContactTypeCategory.BUSINESS, enabled: 1, isDefault: true },
-];
+const DEFAULT_NEW_TYPE = {
+    category: ContactTypeCategory.BUSINESS,
+    enabled: 1 as 0 | 1,
+    isDefault: false,
+};
 
-const buildDefaultRows = (): ContactSettingsType[] =>
-    DEFAULT_CONTACT_TYPES.map((item, index) => ({
-        ...item,
-        itemuid: `default-${index + 1}`,
-    }));
+const isErrorResponse = (response: BaseResponseError | undefined): boolean =>
+    response?.status === Status.ERROR;
 
-export const SettingsContactTypes = (): ReactElement => {
-    const [contactTypes, setContactTypes] = useState<ContactSettingsType[]>(buildDefaultRows);
+const mapApiItemToSettingType = (item: ContactTypeSetting): ContactSettingsType => ({
+    itemuid: item.id,
+    typeId: item.type_id,
+    sortOrder: item.sort_order,
+    name: item.name,
+    category: item.require_personal_name
+        ? ContactTypeCategory.INDIVIDUAL
+        : ContactTypeCategory.BUSINESS,
+    enabled: item.enabled ? 1 : 0,
+    isDefault: item.is_default,
+});
+
+export const SettingsContactTypes = observer((): ReactElement => {
+    const { authUser } = useStore().userStore;
+    const { showError, showSuccess } = useToastMessage();
+    const dealerId = authUser?.dealer_id || "0";
+
+    const [contactTypes, setContactTypes] = useState<ContactSettingsType[]>([]);
     const [editedItemId, setEditedItemId] = useState<string | null>(null);
     const [editedName, setEditedName] = useState<string>("");
     const [editedCategory, setEditedCategory] = useState<ContactTypeCategory>(
         ContactTypeCategory.BUSINESS
     );
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isMutating, setIsMutating] = useState<boolean>(false);
     const newItemRowRef = useRef<HTMLDivElement>(null);
+    const initializedDealerRef = useRef<string | null>(null);
 
     const symbolToLimit = useMemo(() => {
         const limit = MAX_TYPE_LENGTH - editedName.length;
@@ -83,7 +99,67 @@ export const SettingsContactTypes = (): ReactElement => {
         });
     }, [isNewItemEditing]);
 
+    const loadContactTypes = async () => {
+        setIsLoading(true);
+
+        const response = await getContactTypeSettings(dealerId);
+        if (response && isErrorResponse(response)) {
+            showError(response.error || CONTACT_TYPE_SETTINGS_MESSAGES.LOAD_ERROR);
+            setIsLoading(false);
+            return;
+        }
+
+        if (
+            response &&
+            "contact_type_settings" in response &&
+            Array.isArray(response.contact_type_settings)
+        ) {
+            const mappedItems = response.contact_type_settings
+                .map(mapApiItemToSettingType)
+                .sort((a, b) => a.sortOrder - b.sortOrder || a.typeId - b.typeId);
+
+            if (!mappedItems.length && initializedDealerRef.current !== dealerId) {
+                initializedDealerRef.current = dealerId;
+                const initResponse = await initContactTypeSettings(dealerId);
+                if (initResponse && isErrorResponse(initResponse)) {
+                    showError(initResponse.error || CONTACT_TYPE_SETTINGS_MESSAGES.INIT_ERROR);
+                    setContactTypes([]);
+                    setIsLoading(false);
+                    return;
+                }
+
+                const refreshedResponse = await getContactTypeSettings(dealerId);
+                if (
+                    refreshedResponse &&
+                    "contact_type_settings" in refreshedResponse &&
+                    Array.isArray(refreshedResponse.contact_type_settings)
+                ) {
+                    setContactTypes(
+                        refreshedResponse.contact_type_settings
+                            .map(mapApiItemToSettingType)
+                            .sort((a, b) => a.sortOrder - b.sortOrder || a.typeId - b.typeId)
+                    );
+                } else {
+                    setContactTypes([]);
+                }
+            } else {
+                setContactTypes(mappedItems);
+            }
+        } else {
+            setContactTypes([]);
+        }
+        setIsLoading(false);
+    };
+
+    useEffect(() => {
+        void loadContactTypes();
+    }, [dealerId]);
+
     const handleStartEdit = (item: ContactSettingsType) => {
+        if (isMutating || isLoading) {
+            return;
+        }
+
         if (item.isDefault) {
             return;
         }
@@ -99,25 +175,56 @@ export const SettingsContactTypes = (): ReactElement => {
         setEditedCategory(item.category);
     };
 
-    const handleSave = (itemuid: string) => {
+    const handleSave = async (itemuid: string) => {
         const trimmedName = editedName.trim();
         if (!trimmedName) {
             return;
         }
 
-        setContactTypes((prev) =>
-            prev.map((item) =>
-                item.itemuid === itemuid
-                    ? { ...item, name: trimmedName, category: editedCategory }
-                    : item
-            )
-        );
+        const item = contactTypes.find((row) => row.itemuid === itemuid);
+        if (!item) {
+            return;
+        }
+
+        const payload = {
+            name: trimmedName,
+            enabled: !!item.enabled,
+            require_business_name: editedCategory === ContactTypeCategory.BUSINESS,
+            require_personal_name: editedCategory === ContactTypeCategory.INDIVIDUAL,
+            sort_order: item.sortOrder,
+        };
+
+        setIsMutating(true);
+
+        if (!item.name) {
+            const response = await createContactTypeSetting(dealerId, payload);
+            if (response && isErrorResponse(response)) {
+                showError(response.error || CONTACT_TYPE_SETTINGS_MESSAGES.CREATE_ERROR);
+                setIsMutating(false);
+                return;
+            }
+
+            showSuccess(CONTACT_TYPE_SETTINGS_MESSAGES.CREATE_SUCCESS);
+        } else {
+            const response = await updateContactTypeSetting(itemuid, payload);
+            if (response && isErrorResponse(response)) {
+                showError(response.error || CONTACT_TYPE_SETTINGS_MESSAGES.UPDATE_ERROR);
+                setIsMutating(false);
+                return;
+            }
+
+            showSuccess(CONTACT_TYPE_SETTINGS_MESSAGES.UPDATE_SUCCESS);
+        }
+
+        await loadContactTypes();
         setEditedItemId(null);
         setEditedName("");
+        setEditedCategory(ContactTypeCategory.BUSINESS);
+        setIsMutating(false);
     };
 
     const handleAddType = () => {
-        if (editedItemId) {
+        if (editedItemId || isMutating || isLoading) {
             return;
         }
 
@@ -126,10 +233,10 @@ export const SettingsContactTypes = (): ReactElement => {
             ...prev,
             {
                 itemuid,
+                typeId: 0,
+                sortOrder: prev.length + 1,
                 name: "",
-                category: ContactTypeCategory.BUSINESS,
-                enabled: 1,
-                isDefault: false,
+                ...DEFAULT_NEW_TYPE,
             },
         ]);
         setEditedItemId(itemuid);
@@ -137,34 +244,67 @@ export const SettingsContactTypes = (): ReactElement => {
         setEditedCategory(ContactTypeCategory.BUSINESS);
     };
 
-    const handleDelete = (item: ContactSettingsType) => {
-        if (item.isDefault) {
+    const handleDelete = async (item: ContactSettingsType) => {
+        if (item.isDefault || isMutating || isLoading) {
             return;
         }
 
-        setContactTypes((prev) => prev.filter((type) => type.itemuid !== item.itemuid));
+        setIsMutating(true);
+        const response = await deleteContactTypeSetting(item.itemuid);
+        if (response && isErrorResponse(response)) {
+            showError(response.error || CONTACT_TYPE_SETTINGS_MESSAGES.DELETE_ERROR);
+            setIsMutating(false);
+            return;
+        }
+
+        showSuccess(CONTACT_TYPE_SETTINGS_MESSAGES.DELETE_SUCCESS);
+        await loadContactTypes();
+
         if (editedItemId === item.itemuid) {
             setEditedItemId(null);
             setEditedName("");
         }
+        setIsMutating(false);
     };
 
-    const handleToggle = (itemuid: string) => {
-        setContactTypes((prev) =>
-            prev.map((item) =>
-                item.itemuid === itemuid ? { ...item, enabled: item.enabled ? 0 : 1 } : item
-            )
+    const handleToggle = async (item: ContactSettingsType) => {
+        if (isMutating || isLoading) {
+            return;
+        }
+
+        setIsMutating(true);
+
+        const response = await updateContactTypeSetting(
+            item.itemuid,
+            item.isDefault
+                ? { enabled: !item.enabled }
+                : {
+                      enabled: !item.enabled,
+                      name: item.name,
+                      require_business_name: item.category === ContactTypeCategory.BUSINESS,
+                      require_personal_name: item.category === ContactTypeCategory.INDIVIDUAL,
+                      sort_order: item.sortOrder,
+                  }
         );
+        if (response && isErrorResponse(response)) {
+            showError(response.error || CONTACT_TYPE_SETTINGS_MESSAGES.UPDATE_ERROR);
+            setIsMutating(false);
+            return;
+        }
+
+        await loadContactTypes();
+        setIsMutating(false);
     };
 
     return (
         <>
-            <div className='flex justify-content-start mb-4'>
+            {isLoading && <Loader overlay />}
+            <div className='flex justify-content-start mb-4 gap-3'>
                 <Button
                     className='settings-form__button settings-contact__new-type'
                     outlined
                     onClick={handleAddType}
-                    disabled={!!editedItemId}
+                    disabled={!!editedItemId || isLoading || isMutating}
                 >
                     Add New Type
                 </Button>
@@ -212,7 +352,7 @@ export const SettingsContactTypes = (): ReactElement => {
                                             }
                                             className='settings-contact__icon-button'
                                             icon='adms-edit-item'
-                                            disabled={item.isDefault}
+                                            disabled={item.isDefault || isMutating || isLoading}
                                             onClick={() => handleStartEdit(item)}
                                         />
                                     )}
@@ -233,12 +373,14 @@ export const SettingsContactTypes = (): ReactElement => {
                                                 optionValue='value'
                                                 value={editedCategory}
                                                 onChange={(e) =>
-                                                    setEditedCategory(e.value as ContactTypeCategory)
+                                                    setEditedCategory(
+                                                        e.value as ContactTypeCategory
+                                                    )
                                                 }
                                             />
                                             <Button
                                                 className='settings-contact__row-edit-button'
-                                                onClick={() => handleSave(item.itemuid)}
+                                                onClick={() => void handleSave(item.itemuid)}
                                                 disabled={isSaveDisabled}
                                                 severity={isSaveDisabled ? "secondary" : "success"}
                                             >
@@ -268,17 +410,18 @@ export const SettingsContactTypes = (): ReactElement => {
                                             <SwitchButton
                                                 small
                                                 checked={!!item.enabled}
-                                                onChange={() => handleToggle(item.itemuid)}
+                                                onChange={() => void handleToggle(item)}
                                                 tooltip={item.enabled ? "Disable" : "Enable"}
                                                 tooltipOptions={{ position: "top" }}
+                                                disabled={isMutating || isLoading}
                                             />
                                             <Button
                                                 text
                                                 tooltip='Delete'
                                                 className='settings-contact__icon-button settings-contact__delete-button'
                                                 icon='adms-trash-can'
-                                                disabled={item.isDefault}
-                                                onClick={() => handleDelete(item)}
+                                                disabled={item.isDefault || isMutating || isLoading}
+                                                onClick={() => void handleDelete(item)}
                                             />
                                         </>
                                     )}
@@ -290,4 +433,4 @@ export const SettingsContactTypes = (): ReactElement => {
             </div>
         </>
     );
-};
+});
