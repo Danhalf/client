@@ -336,7 +336,7 @@ export const SettingsContactTypes = observer((): ReactElement => {
 
                         return (
                             <div
-                                className='settings-contact__row'
+                                className={`settings-contact__row${isEditing ? " settings-contact__row--editing" : ""}`}
                                 key={item.itemuid}
                                 ref={isNewItem ? newItemRowRef : undefined}
                             >
@@ -365,6 +365,7 @@ export const SettingsContactTypes = observer((): ReactElement => {
                                             <TextInput
                                                 autoFocus={isNewItem}
                                                 value={editedName}
+                                                placeholder='Custom contact type'
                                                 maxLength={MAX_TYPE_LENGTH}
                                                 infoText={symbolToLimit}
                                                 height={40}
@@ -372,6 +373,7 @@ export const SettingsContactTypes = observer((): ReactElement => {
                                                 onChange={(e) => setEditedName(e.target.value)}
                                             />
                                             <ComboBox
+                                                className='settings-contact__row-edit-select'
                                                 options={CATEGORY_OPTIONS}
                                                 optionLabel='label'
                                                 optionValue='value'
