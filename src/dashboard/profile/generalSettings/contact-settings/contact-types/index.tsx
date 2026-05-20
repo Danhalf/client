@@ -69,9 +69,7 @@ export const SettingsContactTypes = observer((): ReactElement => {
     const [contactTypes, setContactTypes] = useState<ContactSettingsType[]>([]);
     const [editedItemId, setEditedItemId] = useState<string | null>(null);
     const [editedName, setEditedName] = useState<string>("");
-    const [editedCategory, setEditedCategory] = useState<ContactTypeCategory>(
-        ContactTypeCategory.BUSINESS
-    );
+    const [editedCategory, setEditedCategory] = useState<ContactTypeCategory | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isMutating, setIsMutating] = useState<boolean>(false);
     const newItemRowRef = useRef<HTMLDivElement>(null);
@@ -224,7 +222,7 @@ export const SettingsContactTypes = observer((): ReactElement => {
         await loadContactTypes();
         setEditedItemId(null);
         setEditedName("");
-        setEditedCategory(ContactTypeCategory.BUSINESS);
+        setEditedCategory(null);
         setIsMutating(false);
     };
 
@@ -246,7 +244,7 @@ export const SettingsContactTypes = observer((): ReactElement => {
         ]);
         setEditedItemId(itemuid);
         setEditedName("");
-        setEditedCategory(ContactTypeCategory.BUSINESS);
+        setEditedCategory(null);
     };
 
     const handleDelete = async (item: ContactSettingsType) => {
@@ -331,6 +329,7 @@ export const SettingsContactTypes = observer((): ReactElement => {
                         const trimmedEditedName = editedName.trim();
                         const isSaveDisabled =
                             !trimmedEditedName ||
+                            !editedCategory ||
                             (!isNewItem &&
                                 trimmedEditedName === item.name &&
                                 editedCategory === item.category);
@@ -376,10 +375,13 @@ export const SettingsContactTypes = observer((): ReactElement => {
                                                 options={CATEGORY_OPTIONS}
                                                 optionLabel='label'
                                                 optionValue='value'
+                                                placeholder='Select Category'
+                                                height={40}
                                                 value={editedCategory}
                                                 onChange={(e) =>
                                                     setEditedCategory(
-                                                        e.value as ContactTypeCategory
+                                                        (e.value as ContactTypeCategory | null) ??
+                                                            null
                                                     )
                                                 }
                                             />
