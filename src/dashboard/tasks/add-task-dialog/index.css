@@ -2,15 +2,32 @@
     --admss-app-dialog-button-width: 220px;
     --admss-app-dialog-button-height: 59px;
     width: 660px;
-    height: 872px;
+    max-height: calc(100vh - 48px);
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 
     .p-dialog-header {
         padding-bottom: 18px;
+        flex-shrink: 0;
+    }
+
+    > .p-dialog-content {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
 
     .p-dialog-content-body {
         padding-top: 20px;
         gap: 30px;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 
     .p-error {
@@ -136,6 +153,7 @@
     }
     .task-dialog__footer {
         padding-top: 34px;
+        flex-shrink: 0;
         display: flex;
         gap: 20px;
         justify-content: center;
