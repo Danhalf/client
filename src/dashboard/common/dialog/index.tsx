@@ -31,6 +31,7 @@ export const DashboardDialog = ({
 
     return (
         <Dialog
+            blockScroll
             draggable={false}
             header={header}
             className={`dialog ${className}`}

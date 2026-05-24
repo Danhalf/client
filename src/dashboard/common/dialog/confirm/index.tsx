@@ -47,6 +47,7 @@ export const ConfirmModal = ({
     return (
         <>
             <ConfirmDialog
+                blockScroll
                 header={
                     <div className='confirm-header'>
                         <i

@@ -231,6 +231,7 @@ export const AddTaskDialog = observer(
 
         return (
             <Dialog
+                blockScroll
                 draggable={false}
                 position='top'
                 onHide={onHide}
