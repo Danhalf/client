@@ -1,16 +1,26 @@
-.recent-messages__button.p-button.messages-more {
-    padding: 0;
-    color: var(--admss-app-main-blue);
-    text-decoration: underline;
-
-    .p-button-label {
-        font-weight: 400;
+.home-page {
+    .recent-messages__footer {
+        font-size: 14px;
+        font-weight: 600;
+        height: 32px;
     }
 
-    &:enabled:hover {
-        color: var(--admss-app-medium-blue);
+    .recent-messages__button.p-button.messages-more {
+        padding: 0;
+        color: var(--admss-app-main-blue);
         text-decoration: underline;
-        background: transparent;
+        font-weight: 400;
+        font-size: 14px;
+
+        &:enabled:hover {
+            color: var(--admss-app-medium-blue);
+            text-decoration: underline;
+            background: transparent;
+        }
+
+        .p-button-label {
+            font-weight: 400;
+        }
     }
 }
 

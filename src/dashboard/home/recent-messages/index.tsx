@@ -1,4 +1,4 @@
-import { Status } from "common/models/base-response";
+import { Status, TotalListCount } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
 import { useToast } from "dashboard/common/toast";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
@@ -6,7 +6,7 @@ import { getSupportMessages, SupportHistory } from "http/services/support.servic
 import { Button } from "primereact/button";
 import { Column, ColumnProps } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 import { useStore } from "store/hooks";
 import "./index.css";
 
@@ -30,26 +30,36 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
     const toast = useToast();
     const [dialogActive, setDialogActive] = useState<boolean>(false);
     const [supportHistoryData, setSupportHistoryData] = useState<SupportHistory[]>([]);
+    const [allMessagesCount, setAllMessagesCount] = useState<number>(0);
+
+    const handleGetRecentMessages = useCallback(async () => {
+        if (!authUser) return;
+
+        const [totalCountResponse, messagesResponse] = await Promise.all([
+            getSupportMessages(authUser.useruid, { total: 1 }),
+            getSupportMessages(authUser.useruid, { top: messagesShowCount, type: "desc" }),
+        ]);
+
+        if (totalCountResponse && !Array.isArray(totalCountResponse)) {
+            setAllMessagesCount((totalCountResponse as TotalListCount).total ?? 0);
+        }
+
+        if (Array.isArray(messagesResponse)) {
+            setSupportHistoryData(messagesResponse);
+        } else {
+            messagesResponse?.error &&
+                toast.current?.show({
+                    severity: "error",
+                    summary: Status.ERROR,
+                    detail: messagesResponse.error,
+                    life: TOAST_LIFETIME,
+                });
+        }
+    }, [authUser, messagesShowCount, toast]);
 
     useEffect(() => {
-        if (authUser) {
-            getSupportMessages(authUser.useruid, { top: messagesShowCount, type: "desc" }).then(
-                (response) => {
-                    if (Array.isArray(response)) {
-                        setSupportHistoryData(response);
-                    } else {
-                        response?.error &&
-                            toast.current?.show({
-                                severity: "error",
-                                summary: Status.ERROR,
-                                detail: response.error,
-                                life: TOAST_LIFETIME,
-                            });
-                    }
-                }
-            );
-        }
-    }, [authUser]);
+        handleGetRecentMessages();
+    }, [handleGetRecentMessages]);
 
     return (
         <div className='card h-full'>
@@ -86,11 +96,11 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
                         />
                     ))}
                 </DataTable>
-                {!!supportHistoryData.length && (
-                    <div className='card-content__footer'>
+                {allMessagesCount > messagesShowCount && (
+                    <div className='card-content__footer recent-messages__footer'>
                         <Button
                             onClick={() => setDialogActive(true)}
-                            className='recent-messages__button messages-more'
+                            className='recent-messages__button tasks-widget__button messages-more'
                             text
                         >
                             See more...

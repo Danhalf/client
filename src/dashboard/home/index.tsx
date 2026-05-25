@@ -197,7 +197,7 @@ export const Home = (): ReactElement => {
             <div className='col-12 xl:col-3'>
                 <div className='card'>
                     <div className='card-header'>
-                        <h2 className='uppercase m-0'>Printing</h2>
+                        <h2 className='card-header__title uppercase m-0'>Printing</h2>
                     </div>
                     <div className='card-content'>
                         <ul className='list-none pl-0 printing-menu'>
