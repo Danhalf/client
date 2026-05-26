@@ -125,22 +125,4 @@
         height: 32px;
     }
 
-    .latest-leads__button.p-button.messages-more {
-        padding: 0;
-        color: var(--admss-app-main-blue);
-        font-weight: 600;
-        font-size: 14px;
-        line-height: 100%;
-        text-decoration: underline;
-
-        &:enabled:hover {
-            color: var(--admss-app-medium-blue);
-            text-decoration: underline;
-            background: transparent;
-        }
-
-        .p-button-label {
-            font-weight: 600;
-        }
-    }
 }

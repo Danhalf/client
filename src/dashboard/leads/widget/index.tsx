@@ -122,11 +122,10 @@ export const LatestLeads = ({
                     <div className='card-content__footer latest-leads__footer'>
                         <Button
                             className='latest-leads__button messages-more'
+                            label='See more...'
                             onClick={() => navigate(LEADS_PAGE.MAIN)}
                             text
-                        >
-                            See more...
-                        </Button>
+                        />
                     </div>
                 )}
             </div>

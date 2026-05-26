@@ -150,25 +150,6 @@
             font-weight: 600;
             height: 32px;
         }
-
-        .tasks-widget__button.p-button.messages-more {
-            padding: 0;
-            color: var(--admss-app-main-blue);
-            font-weight: 600;
-            font-size: 14px;
-            line-height: 100%;
-            text-decoration: underline;
-
-            &:enabled:hover {
-                color: var(--admss-app-medium-blue);
-                text-decoration: underline;
-                background: transparent;
-            }
-
-            .p-button-label {
-                font-weight: 600;
-            }
-        }
     }
 
     .home-page__latest-leads-widget {
@@ -178,6 +159,47 @@
         display: flex;
         justify-content: flex-end;
         align-items: center;
+    }
+
+    .messages-more.p-button.p-button-text {
+        padding: 0;
+        min-width: unset;
+        height: auto;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        outline: none;
+        color: var(--admss-app-main-blue);
+        font-size: 14px;
+        line-height: 100%;
+        text-decoration: underline;
+
+        .p-button-label {
+            font-weight: 600;
+            text-shadow: 0 0 0 transparent;
+            transition: text-shadow 0.25s ease;
+        }
+
+        &:enabled:hover,
+        &:enabled:focus,
+        &:enabled:active,
+        &:focus,
+        &:focus-visible {
+            color: var(--admss-app-main-blue);
+            background: transparent;
+            border-color: transparent;
+            box-shadow: none;
+            outline: none;
+            text-decoration: underline;
+        }
+
+        &:enabled:hover .p-button-label,
+        &:enabled:focus .p-button-label,
+        &:enabled:active .p-button-label {
+            text-shadow:
+                0.1px 0 0 currentColor,
+                -0.1px 0 0 currentColor;
+        }
     }
 
     .tasks-widget__title,

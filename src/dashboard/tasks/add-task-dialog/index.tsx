@@ -350,6 +350,7 @@ export const AddTaskDialog = observer(
                         label={`${currentTask ? "Update" : "Save"}`}
                         onClick={handleSaveTaskData}
                         className='task-dialog__save-button'
+                        severity='success'
                         disabled={isSubmitDisabled}
                     />
                 </div>

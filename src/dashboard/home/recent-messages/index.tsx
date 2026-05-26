@@ -106,10 +106,9 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
                         <Button
                             onClick={() => setDialogActive(true)}
                             className='recent-messages__button messages-more'
+                            label='See more...'
                             text
-                        >
-                            See more...
-                        </Button>
+                        />
                     </div>
                 )}
             </div>

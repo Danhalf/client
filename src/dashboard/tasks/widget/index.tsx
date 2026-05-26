@@ -153,11 +153,10 @@ export const TasksWidget = observer(() => {
                 <div className='card-content__footer tasks-widget__footer'>
                     <Button
                         className='tasks-widget__button messages-more'
+                        label='View more...'
                         onClick={() => navigate(TASKS_PAGE.MAIN)}
                         text
-                    >
-                        View more...
-                    </Button>
+                    />
                 </div>
             )}
             <div className='hidden'>

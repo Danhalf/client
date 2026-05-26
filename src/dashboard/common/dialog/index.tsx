@@ -62,6 +62,7 @@ export const DashboardDialog = ({
                                     type='submit'
                                     label={`${footer}`}
                                     disabled={buttonDisabled}
+                                    severity='success'
                                 />
                             )}
                         </div>
