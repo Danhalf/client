@@ -5,7 +5,7 @@ import { MenuItem } from "primereact/menuitem";
 import logo from "assets/images/logo.svg";
 import { AuthUser } from "common/models/user";
 import { logout } from "http/services/auth.service";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LS_LAST_ROUTE, LastRouteData } from "common/constants/localStorage";
 import { useAuth } from "common/providers/AuthProvider";
 import { SupportContactDialog } from "dashboard/profile/supportContact";
@@ -18,6 +18,7 @@ import { usePermissions } from "common/hooks/usePermissions";
 import {
     CONTACT_SUPPORT,
     HELP_PAGE,
+    DASHBOARD_PAGE,
     HOME_PAGE,
     SETTINGS_PAGE,
     USERS_PAGE,
@@ -119,39 +120,41 @@ export const Header = observer((): ReactElement => {
 
     return (
         <header className='header'>
+            <Link to={DASHBOARD_PAGE} className='header__logo-link'>
                 <img src={logo} alt='ADMSS' className='header__logo' />
+            </Link>
 
-                <div className='header__content'>
-                    <div className='header__info'>
-                        <span className='header__name'>{authUser?.loginname}</span>
+            <div className='header__content'>
+                <div className='header__info'>
+                    <span className='header__name'>{authUser?.loginname}</span>
 
-                        <span className='header__location'>{authUser?.locationname}</span>
-                    </div>
-
-                    <div className='header__menu'>
-                        <Menu model={menuItems} popup ref={menuRight} popupAlignment='right' />
-                        <ProfileAvatar
-                            className='header__icon'
-                            editable={false}
-                            onClick={(event) => menuRight?.current?.toggle(event)}
-                        />
-                    </div>
+                    <span className='header__location'>{authUser?.locationname}</span>
                 </div>
-                {authUser && (
-                    <>
-                        <SupportContactDialog
-                            onHide={() => {
-                                setSupportContact(false);
-                                removeSupportHistoryParam();
-                            }}
-                            visible={supportContact}
-                        />
-                        <SupportHistoryDialog
-                            onHide={() => setSupportHistory(false)}
-                            visible={supportHistory}
-                        />
-                    </>
-                )}
+
+                <div className='header__menu'>
+                    <Menu model={menuItems} popup ref={menuRight} popupAlignment='right' />
+                    <ProfileAvatar
+                        className='header__icon'
+                        editable={false}
+                        onClick={(event) => menuRight?.current?.toggle(event)}
+                    />
+                </div>
+            </div>
+            {authUser && (
+                <>
+                    <SupportContactDialog
+                        onHide={() => {
+                            setSupportContact(false);
+                            removeSupportHistoryParam();
+                        }}
+                        visible={supportContact}
+                    />
+                    <SupportHistoryDialog
+                        onHide={() => setSupportHistory(false)}
+                        visible={supportHistory}
+                    />
+                </>
+            )}
         </header>
     );
 });

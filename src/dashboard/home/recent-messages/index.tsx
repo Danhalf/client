@@ -64,7 +64,12 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
     return (
         <div className='card h-full'>
             <div className='card-header'>
-                <h2 className='card-header__title uppercase m-0'>Recent messages</h2>
+                <h2
+                    className='card-header__title uppercase m-0 recent-messages__title'
+                    onClick={() => setDialogActive(true)}
+                >
+                    Recent messages
+                </h2>
             </div>
             <div className='card-content'>
                 <DataTable
@@ -100,7 +105,7 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
                     <div className='card-content__footer recent-messages__footer'>
                         <Button
                             onClick={() => setDialogActive(true)}
-                            className='recent-messages__button tasks-widget__button messages-more'
+                            className='recent-messages__button messages-more'
                             text
                         >
                             See more...

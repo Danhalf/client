@@ -147,10 +147,8 @@ export const Home = (): ReactElement => {
             <div className='col-12 xl:col-6'>
                 <div className='card home-page__tasks-widget'>
                     <div className='card-content'>
-                        <div className='grid lg:justify-content-between md:justify-content-center'>
-                            <div className='col-12'>
-                                <TasksWidget />
-                            </div>
+                        <div className='w-full lg:justify-content-between md:justify-content-center'>
+                            <TasksWidget />
                         </div>
                     </div>
                 </div>
@@ -166,7 +164,7 @@ export const Home = (): ReactElement => {
                     </div>
                 </div>
             </div>
-            <div className='col-12 xl:col-5'>
+            <div className='col-12 xl:col-4'>
                 <RecentMessages />
             </div>
             <div className='col-12 xl:col-4'>
@@ -194,7 +192,7 @@ export const Home = (): ReactElement => {
                     </div>
                 </div>
             </div>
-            <div className='col-12 xl:col-3'>
+            <div className='col-12 xl:col-4'>
                 <div className='card'>
                     <div className='card-header'>
                         <h2 className='card-header__title uppercase m-0'>Printing</h2>

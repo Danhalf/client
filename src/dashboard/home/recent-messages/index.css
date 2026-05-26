@@ -8,9 +8,10 @@
     .recent-messages__button.p-button.messages-more {
         padding: 0;
         color: var(--admss-app-main-blue);
-        text-decoration: underline;
-        font-weight: 400;
+        font-weight: 600;
         font-size: 14px;
+        line-height: 100%;
+        text-decoration: underline;
 
         &:enabled:hover {
             color: var(--admss-app-medium-blue);
@@ -19,7 +20,7 @@
         }
 
         .p-button-label {
-            font-weight: 400;
+            font-weight: 600;
         }
     }
 }

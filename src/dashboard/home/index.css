@@ -144,6 +144,31 @@
             margin-right: 14px;
             font-weight: 600;
         }
+
+        .tasks-widget__footer {
+            font-size: 14px;
+            font-weight: 600;
+            height: 32px;
+        }
+
+        .tasks-widget__button.p-button.messages-more {
+            padding: 0;
+            color: var(--admss-app-main-blue);
+            font-weight: 600;
+            font-size: 14px;
+            line-height: 100%;
+            text-decoration: underline;
+
+            &:enabled:hover {
+                color: var(--admss-app-medium-blue);
+                text-decoration: underline;
+                background: transparent;
+            }
+
+            .p-button-label {
+                font-weight: 600;
+            }
+        }
     }
 
     .home-page__latest-leads-widget {
@@ -153,5 +178,11 @@
         display: flex;
         justify-content: flex-end;
         align-items: center;
+    }
+
+    .tasks-widget__title,
+    .latest-leads__title,
+    .recent-messages__title {
+        cursor: pointer;
     }
 }
