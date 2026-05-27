@@ -1,5 +1,6 @@
 import { Status, TotalListCount } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
+import { TruncatedText } from "dashboard/common/display";
 import { useToast } from "dashboard/common/toast";
 import { SupportHistoryDialog } from "dashboard/profile/supportHistory";
 import { getSupportMessages, SupportHistory } from "http/services/support.service";
@@ -13,6 +14,12 @@ import "./index.css";
 interface TableColumnProps extends ColumnProps {
     field: keyof SupportHistory;
 }
+
+const COLUMN_STYLES: Partial<Record<keyof SupportHistory, React.CSSProperties>> = {
+    username: { width: "28%" },
+    topic: { width: "calc(72% - 105px)" },
+    created: { width: "120px" },
+};
 
 const renderColumnsData: Pick<TableColumnProps, "header" | "field">[] = [
     { field: "username", header: "From" },
@@ -82,22 +89,29 @@ export const RecentMessages = ({ messagesShowCount = 2 }: RecentMessagesProps): 
                             field={field}
                             header={header}
                             key={field}
+                            style={COLUMN_STYLES[field]}
+                            headerClassName={`cursor-default recent-messages__col recent-messages__col--${field}`}
+                            bodyClassName={`recent-messages__col recent-messages__col--${field}`}
                             body={(data: SupportHistory) => {
                                 if (field === "topic") {
                                     return (
-                                        <div
-                                            className='white-space-nowrap 
-                                            overflow-hidden 
-                                            text-overflow-ellipsis 
-                                            max-w-8rem'
-                                        >
-                                            {data[field]}
-                                        </div>
+                                        <TruncatedText
+                                            text={String(data[field] ?? "")}
+                                            withTooltip
+                                            className='recent-messages__theme-cell'
+                                        />
+                                    );
+                                }
+                                if (field === "created") {
+                                    return (
+                                        <TruncatedText
+                                            text={String(data[field] ?? "")}
+                                            withTooltip
+                                        />
                                     );
                                 }
                                 return data[field];
                             }}
-                            headerClassName='cursor-default'
                         />
                     ))}
                 </DataTable>

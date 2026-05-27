@@ -22,6 +22,8 @@
 
     .printing-menu__item {
         margin-bottom: 15px;
+        font-size: 18px;
+        font-weight: 600;
     }
 
     .printing-menu__icon {
@@ -206,5 +208,51 @@
     .latest-leads__title,
     .recent-messages__title {
         cursor: pointer;
+    }
+
+    .home-page__bottom-cards {
+        align-items: stretch;
+    }
+
+    .home-page__bottom-cards > [class*="col-"] {
+        display: flex;
+    }
+
+    .home-page__bottom-cards > [class*="col-"] > .card {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        width: 100%;
+    }
+
+    .home-page__bottom-cards > [class*="col-"] > .card .card-content {
+        flex: 1 1 auto;
+    }
+
+    .home-page__bottom-cards > [class*="col-"] > .card .card-header {
+        padding-top: 0;
+        margin-bottom: 20px;
+    }
+
+    .home-page__bottom-cards > [class*="col-"] > .card .card-header__title {
+        width: auto;
+    }
+
+    .home-page__recent-contact .home-page__recent-contact__content {
+        flex-grow: 0;
+        padding-top: 0;
+        margin-top: 0;
+    }
+
+    .home-page__recent-contact .contact-item:not(:last-child) {
+        margin-bottom: 20px;
+    }
+
+    .home-page__recent-contact .contact-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .home-page__bottom-cards .printing-menu__item:last-child {
+        margin-bottom: 0;
     }
 }
