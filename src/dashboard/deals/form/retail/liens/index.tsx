@@ -12,6 +12,7 @@ import { ContactUser } from "common/models/contact";
 import { ALL_FIELDS } from "common/constants/fields";
 import { DealExtData } from "common/models/deals";
 import "./index.css";
+import { Splitter } from "dashboard/common/display";
 
 type LessorNumber = 1 | 2;
 
@@ -138,6 +139,8 @@ const LessorFields = observer(({ lessorNumber }: LessorFieldsProps): ReactElemen
                 withValidationMessage
             />
 
+            <Splitter className='px-2 py-3 w-full' />
+
             <div className='col-6'>
                 <TextInput
                     name={addressField}
@@ -206,15 +209,14 @@ export const DealRetailLiens = observer((): ReactElement => {
                 </TabPanel>
                 <TabPanel
                     header='Lessor 2'
-                    headerClassName='card-header deal-retail-liens__header uppercase m-0'
+                    headerClassName='card-header deal-retail-liens__header uppercase m-0 heading-condensed'
                 >
                     <LessorFields lessorNumber={2} />
                 </TabPanel>
             </TabView>
 
             <div className='grid deal-retail-liens__shared-fields row-gap-2'>
-                <hr className='form-line' />
-
+                <Splitter className='px-2 py-3  w-full' />
                 <div className='col-3'>
                     <DateInput
                         name='Date of Lien'
