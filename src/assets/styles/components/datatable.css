@@ -47,4 +47,25 @@
         background: var(--admss-app-light-green);
         color: var(--admss-app-primary);
     }
+
+    .p-dropdown {
+        min-width: 4.5rem;
+    }
+
+    .p-dropdown .p-dropdown-panel {
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+body:has(.p-paginator .p-dropdown.p-inputwrapper-focus) .p-dropdown-panel {
+    max-width: 4.5rem;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+body:has(.p-paginator .p-dropdown.p-inputwrapper-focus) .p-dropdown-panel .p-dropdown-item {
+    justify-content: center;
 }
