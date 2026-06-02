@@ -444,23 +444,25 @@ export const ContactsDataTable = ({
                     onClick={() => printTableData()}
                 />
 
-                <ComboBox
-                    value={selectedCategory}
-                    onChange={handleChangeCategory}
-                    options={categories}
-                    optionLabel='name'
-                    editable
-                    disabled={!!contactCategory}
-                    placeholder='Category'
-                    className='category-selector ml-auto'
-                    pt={{
-                        wrapper: {
-                            style: {
-                                maxHeight: "500px",
+                <span className='ml-auto'>
+                    <ComboBox
+                        value={selectedCategory}
+                        onChange={handleChangeCategory}
+                        options={categories}
+                        optionLabel='name'
+                        editable
+                        disabled={!!contactCategory}
+                        placeholder='Category'
+                        className='category-selector'
+                        pt={{
+                            wrapper: {
+                                style: {
+                                    maxHeight: "500px",
+                                },
                             },
-                        },
-                    }}
-                />
+                        }}
+                    />
+                </span>
                 <ColumnSelector<TableColumnsList>
                     selectableColumns={selectableColumns}
                     activeColumns={activeColumns}
