@@ -651,10 +651,46 @@
 
 .p-dropdown .p-dropdown-trigger {
     transition: rotate 0.4s;
+    color: var(--admss-app-medium-grey);
+}
+
+.p-dropdown:not(.p-disabled) .p-dropdown-trigger:hover {
+    color: var(--admss-app-darkest-grey);
+}
+
+.p-dropdown .p-dropdown-clear-icon {
+    color: var(--admss-app-medium-grey);
+}
+
+.p-dropdown:not(.p-disabled) .p-dropdown-clear-icon:hover,
+.p-dropdown:not(.p-disabled) .p-dropdown-clear-icon:focus {
+    color: var(--admss-app-darkest-grey);
 }
 
 .p-dropdown .p-dropdown-trigger[aria-expanded="true"] {
     rotate: 180deg;
+}
+
+.p-multiselect .p-multiselect-trigger,
+.p-multiselect .p-multiselect-clear-icon {
+    color: var(--admss-app-medium-grey);
+}
+
+.p-multiselect:not(.p-disabled) .p-multiselect-trigger:hover,
+.p-multiselect:not(.p-disabled) .p-multiselect-clear-icon:hover {
+    color: var(--admss-app-darkest-grey);
+}
+
+.global-search__icon,
+.p-input-icon-right > .icon.adms-search {
+    color: var(--admss-app-medium-grey);
+}
+
+.global-search:hover .global-search__icon,
+.global-search:has(.p-inputtext:focus) .global-search__icon,
+.p-input-icon-right:hover > .icon.adms-search,
+.p-input-icon-right:has(.p-inputtext:focus) > .icon.adms-search {
+    color: var(--admss-app-darkest-grey);
 }
 
 .text--red {
