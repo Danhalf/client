@@ -41,6 +41,7 @@ import { CONTACTS_PAGE } from "common/constants/links";
 import { TruncatedText } from "dashboard/common/display";
 import { getColumnPtStyles, DataTableWrapper } from "dashboard/common/data-table";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
+import { BUTTON_VARIANTS, ControlButton } from "dashboard/common/button";
 
 interface TableColumnsList extends TableColumn {
     field: keyof ContactUser | "fullName";
@@ -413,7 +414,7 @@ export const ContactsDataTable = ({
                     onChange={(e) => setGlobalSearch(e.target.value)}
                 />
                 <Button
-                    className='contact-top-controls__button m-r-20px'
+                    className='contact-top-controls__button contact-advanced-search-button'
                     label='Advanced search'
                     severity='success'
                     type='button'
@@ -421,25 +422,23 @@ export const ContactsDataTable = ({
                 />
 
                 <Button
-                    className='contact-top-controls__button'
+                    className='contact-top-controls__button new-contact-button'
                     icon='icon adms-add-item'
                     severity={contactPermissions.canCreate() ? "success" : "secondary"}
                     type='button'
                     disabled={!contactPermissions.canCreate()}
                     tooltip='Add new contact'
                     onClick={handleCreateContact}
-                />
-                <Button
-                    severity='success'
-                    type='button'
-                    icon='icon adms-print'
+                >
+                    New
+                </Button>
+                <ControlButton
+                    variant={BUTTON_VARIANTS.PRINT}
                     tooltip='Print contacts form'
                     onClick={() => printTableData(true)}
                 />
-                <Button
-                    severity='success'
-                    type='button'
-                    icon='icon adms-download'
+                <ControlButton
+                    variant={BUTTON_VARIANTS.DOWNLOAD}
                     tooltip='Download contacts form'
                     onClick={() => printTableData()}
                 />

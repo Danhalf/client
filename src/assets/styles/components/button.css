@@ -7,6 +7,14 @@
     width: 50px;
 }
 
+.p-button.contact-advanced-search-button .p-button-label,
+.p-button.datatable-controls__search-button .p-button-label,
+.p-button.inventory-top-controls__search-button .p-button-label,
+.p-button.contact-top-controls__button:not(.p-button-icon-only) .p-button-label,
+.p-button.tasks__search-button .p-button-label {
+    font-weight: 600;
+}
+
 .p-button.p-button-success,
 .p-buttonset.p-button-success > .p-button,
 .p-splitbutton.p-button-success > .p-button,
