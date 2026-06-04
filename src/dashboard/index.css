@@ -308,7 +308,9 @@
 .p-inputtext:enabled:focus + .float-label,
 .p-float-label .p-inputwrapper-filled ~ label,
 .p-float-label .p-inputwrapper-focus ~ label,
-.p-float-label textarea.p-filled ~ label {
+.p-float-label textarea.p-filled ~ label,
+.p-float-label:has(.p-inputwrapper-filled) > .float-label,
+.p-float-label:has(.p-inputwrapper-focus) > .float-label {
     top: 0;
     left: 4px;
     color: var(--admss-app-medium-grey);
@@ -510,6 +512,18 @@
 .vehicle__dropdown-icon {
     height: 30px;
     width: 30px;
+}
+
+.p-dropdown-panel {
+    .p-dropdown-items {
+        padding: 0;
+        .p-dropdown-item {
+            height: 54px;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+        }
+    }
 }
 
 .p-multiselect-panel {
@@ -728,13 +742,6 @@
 
 .p-datepicker:not(.p-datepicker-inline) .p-datepicker-header {
     background: var(--admss-app-white);
-}
-
-.p-dropdown-panel .p-dropdown-items {
-    padding: 0;
-    .p-dropdown-item {
-        padding-left: 0.5rem;
-    }
 }
 
 .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
