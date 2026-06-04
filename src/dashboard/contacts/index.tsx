@@ -428,18 +428,21 @@ export const ContactsDataTable = ({
                     type='button'
                     disabled={!contactPermissions.canCreate()}
                     tooltip='Add new contact'
+                    tooltipOptions={{ className: "tooltip-tail-left" }}
                     onClick={handleCreateContact}
                 >
                     New
                 </Button>
                 <ControlButton
                     variant={BUTTON_VARIANTS.PRINT}
-                    tooltip='Print contacts form'
+                    tooltip='Print'
+                    tooltipOptions={{ className: "tooltip-tail-left" }}
                     onClick={() => printTableData(true)}
                 />
                 <ControlButton
                     variant={BUTTON_VARIANTS.DOWNLOAD}
-                    tooltip='Download contacts form'
+                    tooltip='Download'
+                    tooltipOptions={{ className: "tooltip-tail-left" }}
                     onClick={() => printTableData()}
                 />
 
@@ -548,7 +551,10 @@ export const ContactsDataTable = ({
                                         className='table-edit-button'
                                         icon='adms-edit-item'
                                         tooltip='Edit contact'
-                                        tooltipOptions={{ position: "mouse" }}
+                                        tooltipOptions={{
+                                            position: "right",
+                                            className: "tooltip-tail-left",
+                                        }}
                                         onClick={() =>
                                             contactPermissions.canEdit() &&
                                             navigate(CONTACTS_PAGE.EDIT(contactuid))
@@ -559,7 +565,7 @@ export const ContactsDataTable = ({
                             pt={{
                                 root: {
                                     style: {
-                                        width: "80px",
+                                        width: "60px",
                                     },
                                 },
                             }}

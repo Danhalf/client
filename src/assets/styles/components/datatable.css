@@ -14,6 +14,26 @@
     background: var(--admss-app-light-blue);
 }
 
+.p-datatable .p-sortable-column .p-column-header-content {
+    align-items: center;
+}
+
+.p-datatable .p-sortable-column .p-column-title {
+    line-height: 1;
+}
+
+.p-datatable .p-sortable-column .p-column-header-content > span:has(.p-sortable-column-icon) {
+    display: inline-flex;
+    align-items: center;
+    line-height: 0;
+}
+
+.p-datatable .p-sortable-column .p-sortable-column-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .p-datatable.p-datatable-hoverable-rows
     .p-datatable-tbody
     > tr:not(.p-highlight):not(.p-datatable-emptymessage):hover {
