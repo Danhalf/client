@@ -260,22 +260,6 @@
     padding-bottom: 0;
 }
 
-.new-inventory-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1;
-    flex-direction: column;
-    height: 50px;
-    width: 50px;
-}
-
-.new-inventory-button .icon {
-    font-size: 20px;
-}
-
 .inventory-location {
     width: 200px;
 }
