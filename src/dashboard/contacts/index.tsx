@@ -280,8 +280,6 @@ export const ContactsDataTable = ({
                 ? data[returnedField]
                 : data.companyName || data.businessName || `${data.firstName} ${data.lastName}`;
             onRowClick(value);
-        } else if (contactPermissions.canOpenDetails()) {
-            navigate(data.contactuid);
         }
     };
 
