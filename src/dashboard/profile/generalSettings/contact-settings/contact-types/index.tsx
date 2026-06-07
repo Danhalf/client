@@ -97,13 +97,17 @@ export const SettingsContactTypes = observer((): ReactElement => {
         });
     }, [isNewItemEditing]);
 
-    const loadContactTypes = async () => {
-        setIsLoading(true);
+    const loadContactTypes = async (showLoader = true) => {
+        if (showLoader) {
+            setIsLoading(true);
+        }
 
         const response = await getContactTypeSettings(dealerId);
         if (response && isErrorResponse(response)) {
             showError(response.error || CONTACT_TYPE_SETTINGS_MESSAGES.LOAD_ERROR);
-            setIsLoading(false);
+            if (showLoader) {
+                setIsLoading(false);
+            }
             return;
         }
 
@@ -127,7 +131,9 @@ export const SettingsContactTypes = observer((): ReactElement => {
                 if (initResponse && isErrorResponse(initResponse)) {
                     showError(initResponse.error || CONTACT_TYPE_SETTINGS_MESSAGES.INIT_ERROR);
                     setContactTypes([]);
-                    setIsLoading(false);
+                    if (showLoader) {
+                        setIsLoading(false);
+                    }
                     return;
                 }
 
@@ -151,7 +157,9 @@ export const SettingsContactTypes = observer((): ReactElement => {
         } else {
             setContactTypes([]);
         }
-        setIsLoading(false);
+        if (showLoader) {
+            setIsLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -295,7 +303,7 @@ export const SettingsContactTypes = observer((): ReactElement => {
             return;
         }
 
-        await loadContactTypes();
+        await loadContactTypes(false);
         setIsMutating(false);
     };
 
