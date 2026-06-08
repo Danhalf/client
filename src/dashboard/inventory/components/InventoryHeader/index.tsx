@@ -155,10 +155,30 @@ export default function InventoryHeader({
                     variant={BUTTON_VARIANTS.NEW}
                     tooltip='Add new inventory'
                     onClick={onAddNew}
+                    tooltipOptions={{
+                        position: "right",
+                        className: "tooltip-tail-left",
+                    }}
                 />
             )}
-            <ControlButton variant={BUTTON_VARIANTS.PRINT} withTooltip onClick={onPrint} />
-            <ControlButton variant={BUTTON_VARIANTS.DOWNLOAD} withTooltip onClick={onDownload} />
+            <ControlButton
+                variant={BUTTON_VARIANTS.PRINT}
+                withTooltip
+                tooltipOptions={{
+                    position: "right",
+                    className: "tooltip-tail-left",
+                }}
+                onClick={onPrint}
+            />
+            <ControlButton
+                variant={BUTTON_VARIANTS.DOWNLOAD}
+                withTooltip
+                tooltipOptions={{
+                    position: "right",
+                    className: "tooltip-tail-left",
+                }}
+                onClick={onDownload}
+            />
             <MultiSelect
                 optionValue='value'
                 optionLabel='label'
