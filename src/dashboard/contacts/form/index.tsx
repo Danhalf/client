@@ -1,14 +1,19 @@
-import { Steps } from "primereact/steps";
-import { ReactElement, Suspense, useEffect, useRef, useState } from "react";
-import { Accordion, AccordionTab } from "primereact/accordion";
+import { ReactElement, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "primereact/button";
 import {
     ContactAccordionItems,
-    ContactItem,
     ContactSection,
+    createContactSections,
+    getContactMenuCount,
+    resetFormStepSectionCounters,
 } from "dashboard/contacts/common/step-navigation";
+import { FormStepAccordion, SectionHeaderWithCount } from "dashboard/common/form-stepper";
 import { useNavigate, useParams } from "react-router-dom";
-import { BUYER_ID, generalBuyerInfo, generalCoBuyerInfo } from "./general-info";
+import {
+    BUYER_ID,
+    generalBuyerInfo,
+    generalCoBuyerInfo,
+} from "dashboard/contacts/form/general-info";
 import { ContactInfoData } from "dashboard/contacts/form/contact-info";
 import { useStore } from "store/hooks";
 import { useLocation } from "react-router-dom";
@@ -74,6 +79,101 @@ const tabFields: Partial<Record<ContactAccordionItems, (keyof PartialContact)[]>
     ],
     [ContactAccordionItems.CONTACTS]: ["email1", "email2", "phone1", "phone2"],
     [ContactAccordionItems.COMPANY]: ["Buyer_Emp_Ext", "Buyer_Emp_Phone"],
+};
+
+const buildFormValues = (contact: Contact, contactExtData: ContactExtData): PartialContact =>
+    ({
+        firstName: contact?.firstName || "",
+        middleName: contact?.middleName || "",
+        lastName: contact?.lastName || "",
+        type: contact?.type || null,
+        businessName: contact?.businessName || "",
+        email1: contact?.email1 || "",
+        email2: contact?.email2 || "",
+        phone1: contact?.phone1?.replace(/[^0-9]/g, "") || "",
+        phone2: contact?.phone2?.replace(/[^0-9]/g, "") || "",
+        Buyer_Emp_Ext: contactExtData.Buyer_Emp_Ext || "",
+        Buyer_Emp_Phone: contactExtData.Buyer_Emp_Phone || "",
+        CoBuyer_First_Name: contactExtData.CoBuyer_First_Name || "",
+        CoBuyer_Middle_Name: contactExtData.CoBuyer_Middle_Name || "",
+        CoBuyer_Last_Name: contactExtData.CoBuyer_Last_Name || "",
+        Buyer_SS_Number: contactExtData.Buyer_SS_Number || "",
+        CoBuyer_SS_Number: contactExtData.CoBuyer_SS_Number || "",
+    }) as PartialContact;
+
+const isFieldValueEmpty = (value: PartialContact[keyof PartialContact]): boolean =>
+    value === null || value === undefined || (typeof value === "string" && !value.trim());
+
+const getFieldValidationError = (
+    field: keyof PartialContact,
+    values: PartialContact
+): string | undefined => {
+    if (isFieldValueEmpty(values[field])) {
+        return undefined;
+    }
+
+    try {
+        ContactFormSchema.validateSyncAt(field, values);
+        return undefined;
+    } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+            return error.message;
+        }
+    }
+};
+
+const isTabFilled = (
+    itemLabel: ContactAccordionItems,
+    contact: Contact,
+    contactExtData: ContactExtData,
+    contactType: number,
+    isCoBuyerFieldsFilled: boolean,
+    values: PartialContact
+): boolean => {
+    const tabFieldsForItem = tabFields[itemLabel];
+
+    if (tabFieldsForItem?.some((field) => getFieldValidationError(field, values))) {
+        return false;
+    }
+
+    switch (itemLabel) {
+        case ContactAccordionItems.BUYER: {
+            const type = contact.type;
+            if (!type) return false;
+            if (REQUIRED_COMPANY_TYPE_INDEXES.includes(type)) {
+                return !!contact.businessName?.trim();
+            }
+            return !!(contact.firstName?.trim() && contact.lastName?.trim());
+        }
+        case ContactAccordionItems.CO_BUYER:
+            if (contactType !== BUYER_ID || !isCoBuyerFieldsFilled) return false;
+            return !!(
+                contactExtData.CoBuyer_First_Name?.trim() ||
+                contactExtData.CoBuyer_Last_Name?.trim()
+            );
+        case ContactAccordionItems.CONTACTS:
+            return !!(
+                contact.email1?.trim() ||
+                contact.email2?.trim() ||
+                contact.phone1?.trim() ||
+                contact.phone2?.trim()
+            );
+        case ContactAccordionItems.COMPANY:
+            return !!(
+                contactExtData.Buyer_Emp_Company?.trim() ||
+                contactExtData.Buyer_Emp_Contact?.trim() ||
+                contactExtData.Buyer_Emp_Ext?.trim() ||
+                contactExtData.Buyer_Emp_Phone?.trim()
+            );
+        case ContactAccordionItems.PROSPECTING:
+            return !!(
+                contactExtData.Notes?.trim() ||
+                contactExtData.PROSPECT1_ID?.trim() ||
+                contactExtData.PROSPECT2_ID?.trim()
+            );
+        default:
+            return false;
+    }
 };
 
 export const REQUIRED_COMPANY_TYPE_INDEXES = [2, 3, 4, 5, 6, 7, 8];
@@ -268,11 +368,10 @@ export const ContactForm = observer((): ReactElement => {
     const { showError, showSuccess } = useToastMessage();
 
     const [contactSections, setContactSections] = useState<ContactSection[]>([]);
-    const [accordionSteps, setAccordionSteps] = useState<number[]>([0]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
     const tabParam = searchParams.get(STEP) ? Number(searchParams.get(STEP)) - 1 : 0;
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
-    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([0]);
+    const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([]);
     const store = useStore().contactStore;
     const {
         contact,
@@ -283,6 +382,7 @@ export const ContactForm = observer((): ReactElement => {
         saveContact,
         changeContact,
         isContactChanged,
+        isCoBuyerFieldsFilled,
         memoRoute,
         deleteReason,
         activeTab,
@@ -320,17 +420,16 @@ export const ContactForm = observer((): ReactElement => {
             contactsSections = [...contactsSections, ContactMediaData];
         }
 
-        const sections = contactsSections.map((sectionData) => new ContactSection(sectionData));
+        const sections = createContactSections(contactsSections);
         setContactSections(sections);
-        setAccordionSteps(sections.map((item) => item.startIndex));
-        const itemsMenuCount = sections.reduce((acc, current) => acc + current.getLength(), -1);
+        const itemsMenuCount = getContactMenuCount(sections);
         setItemsMenuCount(itemsMenuCount);
         setDeleteActiveIndex(itemsMenuCount + 1);
 
         return () => {
-            sections.forEach((section) => section.clearCount());
+            resetFormStepSectionCounters();
         };
-    }, [contactType]);
+    }, [contactType, id]);
 
     useEffect(() => {
         if (id) {
@@ -352,6 +451,14 @@ export const ContactForm = observer((): ReactElement => {
         const currentPath = id ? id : "create";
         return `${CONTACTS_PAGE.EDIT(currentPath)}?step=${activeIndex + 1}`;
     };
+
+    const handleStepChange = useCallback(
+        (globalIndex: number) => {
+            setStepActiveIndex(globalIndex);
+            navigate(getUrl(globalIndex));
+        },
+        [id, navigate]
+    );
 
     const handleCloseClick = () => {
         const performNavigation = () => {
@@ -386,21 +493,6 @@ export const ContactForm = observer((): ReactElement => {
             window.removeEventListener("beforeunload", handleBeforeUnload);
         };
     }, [isContactChanged]);
-
-    useEffect(() => {
-        accordionSteps.forEach((step, index) => {
-            stepActiveIndex >= step && setAccordionActiveIndex([index]);
-        });
-        if (stepsRef.current) {
-            const activeStep = stepsRef.current.querySelector("[aria-selected='true']");
-            if (activeStep) {
-                activeStep.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
-            }
-        }
-    }, [stepActiveIndex, stepsRef.current]);
 
     const handleSaveContactForm = () => {
         formikRef.current?.validateForm().then(async (errors) => {
@@ -601,26 +693,29 @@ export const ContactForm = observer((): ReactElement => {
         }
     };
 
-    const stepAccordionHeader = (section: ContactSection) => {
-        const validTabsCount = section.items.reduce((count, item) => {
-            const tabFieldsForItem = tabFields[item.itemLabel];
-
-            const hasErrors = tabFieldsForItem?.some(
-                (fieldName) => formikRef.current?.errors[fieldName]
-            );
-
-            return hasErrors ? count : count + 1;
-        }, 0);
-
-        const totalTabsCount = section.items.length;
+    const renderSectionHeader = (section: ContactSection) => {
+        const formValues = buildFormValues(contact, contactExtData);
+        const filledTabsCount = section.items.reduce(
+            (count, item) =>
+                isTabFilled(
+                    item.itemLabel as ContactAccordionItems,
+                    contact,
+                    contactExtData,
+                    contactType,
+                    isCoBuyerFieldsFilled,
+                    formValues
+                )
+                    ? count + 1
+                    : count,
+            0
+        );
 
         return (
-            <div className='p-0'>
-                {section.label}
-                <span className='ml-2 text--green'>
-                    ({validTabsCount}/{totalTabsCount})
-                </span>
-            </div>
+            <SectionHeaderWithCount
+                label={section.label}
+                filledCount={filledTabsCount}
+                totalCount={section.items.length}
+            />
         );
     };
 
@@ -674,74 +769,40 @@ export const ContactForm = observer((): ReactElement => {
                         </div>
                         <div className='card-content contact__card'>
                             <div className='grid flex-nowrap card-content__wrapper'>
-                                <div className='p-0' ref={stepsRef}>
-                                    <Accordion
-                                        activeIndex={accordionActiveIndex}
-                                        onTabChange={(e) => setAccordionActiveIndex(e.index)}
-                                        multiple
-                                        className='contact__accordion'
-                                    >
-                                        {contactSections.map((section) => (
-                                            <AccordionTab
-                                                key={section.sectionId}
-                                                header={stepAccordionHeader(section)}
+                                <FormStepAccordion
+                                    sections={contactSections}
+                                    stepActiveIndex={stepActiveIndex}
+                                    accordionActiveIndex={accordionActiveIndex}
+                                    onAccordionChange={setAccordionActiveIndex}
+                                    onStepChange={handleStepChange}
+                                    errorSections={errorSections}
+                                    accordionClassName='contact__accordion'
+                                    stepClassName='border-circle contact-step'
+                                    renderSectionHeader={renderSectionHeader}
+                                    navigationRef={stepsRef}
+                                    expandMode='all'
+                                    wrapperClassName='p-0'
+                                    footer={
+                                        id ? (
+                                            <Button
+                                                icon='pi pi-times'
+                                                className='p-button gap-2 inventory__delete-nav w-full'
+                                                severity={
+                                                    contactPermissions.canDelete()
+                                                        ? "danger"
+                                                        : "secondary"
+                                                }
+                                                disabled={!contactPermissions.canDelete()}
+                                                onClick={() =>
+                                                    contactPermissions.canDelete() &&
+                                                    setStepActiveIndex(deleteActiveIndex)
+                                                }
                                             >
-                                                <Steps
-                                                    model={section.items.map(
-                                                        ({ itemLabel, template }, idx) => ({
-                                                            label: itemLabel,
-                                                            template,
-                                                            command: () => {
-                                                                navigate(
-                                                                    getUrl(section.startIndex + idx)
-                                                                );
-                                                            },
-                                                            className: errorSections.length
-                                                                ? errorSections.includes(itemLabel)
-                                                                    ? "section-invalid"
-                                                                    : "section-valid"
-                                                                : "",
-                                                        })
-                                                    )}
-                                                    readOnly={false}
-                                                    activeIndex={
-                                                        stepActiveIndex - section.startIndex
-                                                    }
-                                                    onSelect={(e) =>
-                                                        setStepActiveIndex(
-                                                            e.index + section.startIndex
-                                                        )
-                                                    }
-                                                    className='vertical-step-menu'
-                                                    pt={{
-                                                        menu: { className: "flex-column w-full" },
-                                                        step: {
-                                                            className: "border-circle contact-step",
-                                                        },
-                                                    }}
-                                                />
-                                            </AccordionTab>
-                                        ))}
-                                    </Accordion>
-                                    {id && (
-                                        <Button
-                                            icon='pi pi-times'
-                                            className='p-button gap-2 inventory__delete-nav w-full'
-                                            severity={
-                                                contactPermissions.canDelete()
-                                                    ? "danger"
-                                                    : "secondary"
-                                            }
-                                            disabled={!contactPermissions.canDelete()}
-                                            onClick={() =>
-                                                contactPermissions.canDelete() &&
-                                                setStepActiveIndex(deleteActiveIndex)
-                                            }
-                                        >
-                                            Delete contact
-                                        </Button>
-                                    )}
-                                </div>
+                                                Delete contact
+                                            </Button>
+                                        ) : undefined
+                                    }
+                                />
                                 <div className='w-full flex flex-column p-0'>
                                     <div className='flex flex-grow-1'>
                                         <Formik
@@ -786,7 +847,7 @@ export const ContactForm = observer((): ReactElement => {
                                         >
                                             <Form name='contactForm' className='w-full'>
                                                 {contactSections.map((section) =>
-                                                    section.items.map((item: ContactItem) => {
+                                                    section.items.map((item) => {
                                                         return (
                                                             <div
                                                                 key={item.itemIndex}

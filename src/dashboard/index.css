@@ -805,6 +805,10 @@
     color: var(--admss-app-green);
 }
 
+.text--medium-grey {
+    color: var(--admss-app-medium-grey);
+}
+
 .vertical-step-menu.p-steps .p-steps-item .p-menuitem-link.vertical-nav.p-button {
     border: none;
     background: transparent;
