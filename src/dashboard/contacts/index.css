@@ -62,6 +62,60 @@
     min-height: 705px;
     border-right: 2px solid var(--admss-app-light-blue);
     border-left: 2px solid var(--admss-app-light-blue);
+    overflow: hidden;
+
+    .p-tabview-nav-content {
+        background-color: var(--admss-app-white);
+        height: 60px;
+        z-index: 11;
+    }
+
+    .contact-form__tabs .p-tabview-nav-container {
+        height: 35px;
+        padding-bottom: 40px;
+    }
+
+    .contact-form__tabs .p-tabview-nav {
+        display: flex;
+        height: auto;
+        min-height: auto;
+        flex-direction: row;
+    }
+
+    .p-tabview-nav {
+        flex-direction: row;
+        flex: 0 0;
+        width: auto;
+        border: none;
+        min-height: auto;
+        border-bottom: 1px solid var(--admss-app-light-grey);
+        text-transform: uppercase;
+        font-weight: 700;
+        gap: 10px;
+        margin-bottom: 50px;
+        margin-right: 14px;
+    }
+
+    .p-tabview-panels {
+        flex: 1;
+        padding-top: 40px;
+        padding-left: 0;
+        padding-right: 10px;
+        border: none;
+    }
+
+    .p-tabview-nav-container a.p-tabview-nav-link {
+        color: var(--admss-app-primary);
+        border: none;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
+        color: var(--admss-app-main-blue);
+        border-radius: 0;
+        border-bottom: 2px solid var(--admss-app-main-blue);
+    }
 }
 
 .contact-form__title {
@@ -110,35 +164,6 @@
     border-radius: 0 5px 5px 0;
     border: 1px solid var(--admss-app-light-grey);
     border-left: none;
-}
-
-.contact-form__tabs .p-tabview-nav {
-    flex-direction: row;
-    flex: 0 0;
-    width: auto;
-    border: none;
-    min-height: auto;
-    border-bottom: 2px solid var(--admss-app-light-grey);
-    text-transform: uppercase;
-    font-weight: 700;
-    gap: 10px;
-    margin-bottom: 50px;
-}
-
-.contact-form__tabs .p-tabview-panels {
-    flex: 1;
-    padding: 0;
-}
-
-.contact-form__tabs .p-tabview-nav-container a.p-tabview-nav-link {
-    color: var(--admss-app-primary);
-    border: none;
-}
-
-.contact-form__tabs .p-tabview-nav-container a.p-tabview-nav-link[aria-selected="true"] {
-    color: var(--admss-app-primary);
-    border-radius: 0;
-    border-bottom: 2px solid var(--admss-app-primary);
 }
 
 .contact-confirm-dialog .p-confirm-dialog-reject,

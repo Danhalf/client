@@ -12,6 +12,7 @@ import { useFormikContext } from "formik";
 import { parseCustomDate } from "common/helpers";
 import { SexList } from "common/constants/contract-options";
 import { TOOLTIP_MESSAGE } from "dashboard/contacts/form/general-info/tabs/general";
+import { contactFormTooltipOptions } from "dashboard/contacts/form/common/tooltip";
 import { ERROR_MESSAGES } from "common/constants/error-messages";
 import { Loader } from "dashboard/common/loader";
 import "./index.css";
@@ -194,6 +195,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     label={isScanning ? "Scanning" : "Scan driver license"}
                     className={`general-info__button ${isScanning ? "general-info__button--loading" : ""}`}
                     tooltip='Data received from the DL’s backside will fill in related fields'
+                    tooltipOptions={contactFormTooltipOptions({ position: "top" })}
                     outlined={!isScanning}
                     onClick={handleScanDL}
                     loading={isScanning}
@@ -226,9 +228,10 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                         outlined
                         type='button'
                         className='general-info-overwrite__icon'
-                        tooltipOptions={{
+                        tooltipOptions={contactFormTooltipOptions({
                             className: "overwrite-tooltip",
-                        }}
+                            position: "top",
+                        })}
                     />
                 </div>
             </div>
@@ -240,6 +243,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                 onChange={({ target: { value } }) => handleFieldChange("CoBuyer_First_Name", value)}
                 name={`First Name${shouldShowNameRequired ? " (required)" : ""}`}
                 tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
+                tooltipOptions={contactFormTooltipOptions({ position: "top" })}
                 disabled={shouldDisableNameFields}
                 clearButton
                 error={!!isCoBuyerFirstNameError}
@@ -255,6 +259,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                     handleFieldChange("CoBuyer_Middle_Name", value)
                 }
                 tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
+                tooltipOptions={contactFormTooltipOptions({ position: "top" })}
                 disabled={shouldDisableNameFields}
                 clearButton
                 error={!!errors.CoBuyer_Middle_Name}
@@ -268,6 +273,7 @@ export const ContactsGeneralCoBuyerInfo = observer((): ReactElement => {
                 value={contactExtData.CoBuyer_Last_Name || ""}
                 onChange={({ target: { value } }) => handleFieldChange("CoBuyer_Last_Name", value)}
                 tooltip={shouldDisableNameFields ? TOOLTIP_MESSAGE.PERSON : ""}
+                tooltipOptions={contactFormTooltipOptions({ position: "top" })}
                 disabled={shouldDisableNameFields}
                 clearButton
                 error={!!isCoBuyerLastNameError}

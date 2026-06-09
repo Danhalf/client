@@ -503,6 +503,7 @@
     font-size: 18px;
     text-transform: uppercase;
     font-weight: 700;
+    font-family: var(--admss-app-font-condensed);
 
     &.text-line__title--red {
         color: var(--admss-app-red);
@@ -629,22 +630,6 @@
 
 .p-dropdown-panel.p-component {
     max-width: 250px;
-}
-
-.p-accordion
-    .vertical-step-menu
-    .p-steps-item.section-invalid
-    .p-menuitem-link.vertical-nav
-    .p-steps-number.vertical-nav__icon {
-    border-color: var(--admss-app-red);
-}
-
-.p-accordion
-    .vertical-step-menu
-    .p-steps-item.section-valid
-    .p-menuitem-link.vertical-nav
-    .p-steps-number.vertical-nav__icon {
-    background-color: var(--admss-app-green);
 }
 
 .splitter {
@@ -805,8 +790,8 @@
     color: var(--admss-app-green);
 }
 
-.text--medium-grey {
-    color: var(--admss-app-medium-grey);
+.text--light-grey {
+    color: var(--admss-app-light-grey);
 }
 
 .vertical-step-menu.p-steps .p-steps-item .p-menuitem-link.vertical-nav.p-button {

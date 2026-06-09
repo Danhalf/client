@@ -6,7 +6,11 @@ import {
     getContactMenuCount,
     resetFormStepSectionCounters,
 } from "dashboard/contacts/common/step-navigation";
-import { FormStepAccordion, SectionHeaderWithCount } from "dashboard/common/form-stepper";
+import {
+    FormStepAccordion,
+    FormStepItem,
+    SectionHeaderWithCount,
+} from "dashboard/common/form-stepper";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import {
     BUYER_ID,
@@ -47,7 +51,9 @@ export const ContactForm = observer((): ReactElement => {
 
     const [contactSections, setContactSections] = useState<ContactSection[]>([]);
     const [itemsMenuCount, setItemsMenuCount] = useState(0);
-    const tabParam = searchParams.get(FORM_STEP_PARAM) ? Number(searchParams.get(FORM_STEP_PARAM)) - 1 : 0;
+    const tabParam = searchParams.get(FORM_STEP_PARAM)
+        ? Number(searchParams.get(FORM_STEP_PARAM)) - 1
+        : 0;
     const [stepActiveIndex, setStepActiveIndex] = useState<number>(tabParam);
     const [accordionActiveIndex, setAccordionActiveIndex] = useState<number | number[]>([]);
     const store = useStore().contactStore;
@@ -224,6 +230,32 @@ export const ContactForm = observer((): ReactElement => {
         }
     };
 
+    const resolveStepClassName = (item: FormStepItem, globalIndex: number): string => {
+        const formValues = buildFormValues(contact, contactExtData);
+        const isFilled = isTabFilled(
+            item.itemLabel as ContactAccordionItems,
+            contact,
+            contactExtData,
+            contactType,
+            isCoBuyerFieldsFilled,
+            formValues
+        );
+
+        if (errorSections.includes(item.itemLabel)) {
+            return "section-invalid";
+        }
+
+        if (isFilled) {
+            return "section-valid";
+        }
+
+        if (globalIndex <= stepActiveIndex) {
+            return "section-in-progress";
+        }
+
+        return "";
+    };
+
     const renderSectionHeader = (section: ContactSection) => {
         const formValues = buildFormValues(contact, contactExtData);
         const filledTabsCount = section.items.reduce(
@@ -270,6 +302,7 @@ export const ContactForm = observer((): ReactElement => {
                                     onAccordionChange={setAccordionActiveIndex}
                                     onStepChange={handleStepChange}
                                     errorSections={errorSections}
+                                    resolveStepClassName={resolveStepClassName}
                                     accordionClassName='contact__accordion'
                                     stepClassName='border-circle contact-step'
                                     renderSectionHeader={renderSectionHeader}

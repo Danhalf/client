@@ -16,7 +16,7 @@ export default function ContactFormHeader({ id, contact }: ContactFormHeaderProp
             </h2>
             {id && (
                 <div className='card-header-info'>
-                    <Tooltip target='.tooltip-target' />
+                    <Tooltip target='.tooltip-target' className='tooltip-tail-bottom' />
 
                     {(contact.firstName || contact.lastName) && (
                         <>

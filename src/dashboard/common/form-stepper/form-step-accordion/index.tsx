@@ -1,7 +1,12 @@
+import "dashboard/common/form-stepper/index.css";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Steps } from "primereact/steps";
 import { ReactElement, ReactNode, RefObject, useEffect } from "react";
-import { FormStepAccordionExpandMode, FormStepSection } from "dashboard/common/form-stepper/types";
+import {
+    FormStepAccordionExpandMode,
+    FormStepItem,
+    FormStepSection,
+} from "dashboard/common/form-stepper/types";
 
 const normalizeAccordionIndices = (index: number | number[]): number[] =>
     (Array.isArray(index) ? index : [index]).slice().sort((a, b) => a - b);
@@ -29,6 +34,7 @@ export interface FormStepAccordionProps {
     onAccordionChange: (index: number | number[]) => void;
     onStepChange: (globalIndex: number) => void;
     errorSections?: string[];
+    resolveStepClassName?: (item: FormStepItem, globalIndex: number) => string;
     accordionClassName?: string;
     stepClassName?: string;
     renderSectionHeader?: (section: FormStepSection) => ReactNode;
@@ -47,6 +53,7 @@ export const FormStepAccordion = ({
     onAccordionChange,
     onStepChange,
     errorSections = [],
+    resolveStepClassName,
     accordionClassName = "",
     stepClassName = "border-circle",
     renderSectionHeader,
@@ -128,12 +135,20 @@ export const FormStepAccordion = ({
         onAccordionChange(index);
     };
 
-    const getStepClassName = (itemLabel: string): string => {
+    const getValidationStepClassName = (itemLabel: string): string => {
         if (!errorSections.length) {
             return "";
         }
 
         return errorSections.includes(itemLabel) ? "section-invalid" : "section-valid";
+    };
+
+    const getStepClassName = (item: FormStepItem, globalIndex: number): string => {
+        if (resolveStepClassName) {
+            return resolveStepClassName(item, globalIndex);
+        }
+
+        return getValidationStepClassName(item.itemLabel);
     };
 
     return (
@@ -153,11 +168,11 @@ export const FormStepAccordion = ({
                             readOnly={false}
                             activeIndex={stepActiveIndex - section.startIndex}
                             onSelect={(event) => onStepChange(event.index + section.startIndex)}
-                            model={section.items.map(({ itemLabel, template }, idx) => ({
-                                label: itemLabel,
-                                template,
+                            model={section.items.map((item, idx) => ({
+                                label: item.itemLabel,
+                                template: item.template,
                                 command: () => onStepChange(section.startIndex + idx),
-                                className: getStepClassName(itemLabel),
+                                className: getStepClassName(item, section.startIndex + idx),
                             }))}
                             className='vertical-step-menu'
                             pt={{

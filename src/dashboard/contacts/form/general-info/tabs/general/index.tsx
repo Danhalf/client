@@ -27,6 +27,7 @@ import { parseCustomDate } from "common/helpers";
 import { SexList } from "common/constants/contract-options";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { Loader } from "dashboard/common/loader";
+import { contactFormTooltipOptions } from "dashboard/contacts/form/common/tooltip";
 
 export const enum TOOLTIP_MESSAGE {
     PERSON = "You can input either a person or a business name. If you entered a business name but intended to enter personal details, clear the business name field, and the fields for entering personal data will become active.",
@@ -291,6 +292,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                 label={isScanning ? "Scanning" : "Scan driver license"}
                                 className={`general-info__button ${isScanning ? "general-info__button--loading" : ""}`}
                                 tooltip='Data received from the DL’s backside will fill in related fields'
+                                tooltipOptions={contactFormTooltipOptions({ position: "top" })}
                                 outlined={!isScanning}
                                 onClick={handleScanDL}
                                 loading={isScanning}
@@ -325,9 +327,10 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                     outlined
                                     type='button'
                                     className='general-info-overwrite__icon'
-                                    tooltipOptions={{
+                                    tooltipOptions={contactFormTooltipOptions({
                                         className: "overwrite-tooltip",
-                                    }}
+                                        position: "top",
+                                    })}
                                 />
                             </div>
                         </div>
@@ -350,6 +353,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                           ? TOOLTIP_MESSAGE.PERSON
                                           : ""
                                 }
+                                tooltipOptions={contactFormTooltipOptions({ position: "top" })}
                                 disabled={shouldDisableNameFields}
                                 clearButton
                                 error={!!errors.firstName}
@@ -371,6 +375,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                           ? TOOLTIP_MESSAGE.PERSON
                                           : ""
                                 }
+                                tooltipOptions={contactFormTooltipOptions({ position: "top" })}
                                 disabled={shouldDisableNameFields}
                                 clearButton
                                 error={!!errors.middleName}
@@ -394,6 +399,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                           ? TOOLTIP_MESSAGE.PERSON
                                           : ""
                                 }
+                                tooltipOptions={contactFormTooltipOptions({ position: "top" })}
                                 clearButton
                                 error={!!errors.lastName}
                                 errorMessage={errors.lastName as string}
@@ -412,6 +418,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             }}
                             disabled={!!shouldDisableBusinessName}
                             tooltip={shouldDisableBusinessName ? TOOLTIP_MESSAGE.BUSINESS : ""}
+                            tooltipOptions={contactFormTooltipOptions({ position: "top" })}
                             clearButton
                             error={!!errors.businessName}
                             errorMessage={errors.businessName as string}

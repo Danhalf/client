@@ -3,6 +3,7 @@ import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useParams } from "react-router-dom";
 import { InfoOverlayPanel } from "dashboard/common/overlay-panel";
+import { contactFormTooltipOptions } from "dashboard/contacts/form/common/tooltip";
 import { Button } from "primereact/button";
 import {
     FileUpload,
@@ -150,10 +151,10 @@ export const ContactsDocuments = observer((): ReactElement => {
                     <span className='presentation__label flex flex-column text-left ml-3'>
                         <TruncatedText
                             withTooltip
-                            tooltipOptions={{
+                            tooltipOptions={contactFormTooltipOptions({
                                 position: "top",
                                 content: file.name,
-                            }}
+                            })}
                             className='presentation__label-text'
                             text={file.name}
                         />
