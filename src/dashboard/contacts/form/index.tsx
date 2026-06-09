@@ -403,6 +403,7 @@ export const ContactForm = observer((): ReactElement => {
     const [deleteActiveIndex, setDeleteActiveIndex] = useState<number>(0);
     const [attemptedSubmit, setAttemptedSubmit] = useState<boolean>(false);
     const stepsRef = useRef<HTMLDivElement>(null);
+    const isCreateAccordionInitialized = useRef(false);
 
     useEffect(() => {
         let contactsSections = [ContactInfoData];
@@ -430,6 +431,15 @@ export const ContactForm = observer((): ReactElement => {
             resetFormStepSectionCounters();
         };
     }, [contactType, id]);
+
+    useEffect(() => {
+        if (id || contactSections.length === 0 || isCreateAccordionInitialized.current) {
+            return;
+        }
+
+        setAccordionActiveIndex(contactSections.map((_, index) => index));
+        isCreateAccordionInitialized.current = true;
+    }, [id, contactSections]);
 
     useEffect(() => {
         if (id) {
@@ -780,7 +790,7 @@ export const ContactForm = observer((): ReactElement => {
                                     stepClassName='border-circle contact-step'
                                     renderSectionHeader={renderSectionHeader}
                                     navigationRef={stepsRef}
-                                    expandMode='all'
+                                    expandMode='sync-with-step'
                                     wrapperClassName='p-0'
                                     footer={
                                         id ? (
