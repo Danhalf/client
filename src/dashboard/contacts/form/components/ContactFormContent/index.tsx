@@ -58,11 +58,13 @@ export default function ContactFormContent({
                                             : "hidden"
                                     }`}
                                 >
-                                    <div className='contact-form__title uppercase'>
+                                    <div className='contact-form__title uppercase heading-condensed'>
                                         {item.itemLabel}
                                     </div>
                                     {stepActiveIndex === item.itemIndex && (
-                                        <Suspense fallback={<Loader className='contact-form__loader' />}>
+                                        <Suspense
+                                            fallback={<Loader className='contact-form__loader' />}
+                                        >
                                             {item.component}
                                         </Suspense>
                                     )}
@@ -72,7 +74,10 @@ export default function ContactFormContent({
                     </Form>
                 </Formik>
                 {stepActiveIndex === deleteActiveIndex && canDelete && (
-                    <DeleteForm attemptedSubmit={attemptedSubmit} isDeleteConfirm={isDeleteConfirm} />
+                    <DeleteForm
+                        attemptedSubmit={attemptedSubmit}
+                        isDeleteConfirm={isDeleteConfirm}
+                    />
                 )}
             </div>
         </div>

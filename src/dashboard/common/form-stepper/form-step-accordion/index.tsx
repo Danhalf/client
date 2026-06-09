@@ -67,7 +67,6 @@ export const FormStepAccordion = ({
         if (!areAccordionIndicesEqual(accordionActiveIndex, nextIndices)) {
             onAccordionChange(nextIndices);
         }
-        // accordionActiveIndex is read only to skip redundant updates when sections change
     }, [sections, expandMode, onAccordionChange]);
 
     useEffect(() => {
