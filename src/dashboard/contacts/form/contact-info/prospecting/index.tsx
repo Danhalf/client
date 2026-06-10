@@ -182,7 +182,6 @@ export const ContactsProspecting = observer((): ReactElement => {
             <div className='col-12'>
                 <span className='p-float-label'>
                     <InputTextarea
-                        placeholder='Prospecting Notes'
                         value={contactExtData.Notes}
                         onChange={({ target: { value } }) => changeContactExtData("Notes", value)}
                         className='w-full contacts-prospecting__text-area'
