@@ -1,6 +1,7 @@
-import { ChangeEvent, ReactElement, useRef } from "react";
+import { ChangeEvent, ReactElement, useId, useRef } from "react";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
+import { Tooltip } from "primereact/tooltip";
 import { Loader } from "dashboard/common/loader";
 import { contactFormTooltipOptions } from "dashboard/contacts/form/common/tooltip";
 
@@ -25,6 +26,7 @@ export const ScanDlControls = ({
     className = "col-12 flex gap-4",
 }: ScanDlControlsProps): ReactElement => {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const overwriteHelpTooltipId = useId();
 
     return (
         <div className={className}>
@@ -33,7 +35,7 @@ export const ScanDlControls = ({
                 label={isScanning ? "Scanning" : "Scan driver license"}
                 className={`general-info__button ${isScanning ? "general-info__button--loading" : ""}`}
                 tooltip={SCAN_DL_TOOLTIP}
-                tooltipOptions={contactFormTooltipOptions({ position: "mouse" })}
+                tooltipOptions={contactFormTooltipOptions({ position: "right" })}
                 outlined={!isScanning}
                 onClick={() => fileInputRef.current?.click()}
                 loading={isScanning}
@@ -46,7 +48,7 @@ export const ScanDlControls = ({
                 ref={fileInputRef}
                 onChange={onFileChange}
             />
-            <div className='general-info-overwrite pb-3'>
+            <div className='general-info-overwrite'>
                 <Checkbox
                     checked={allowOverwrite}
                     inputId={checkboxId}
@@ -56,14 +58,17 @@ export const ScanDlControls = ({
                 <label htmlFor={checkboxId} className='general-info-overwrite__label'>
                     Overwrite data
                 </label>
-                <Button
-                    text
-                    tooltip={OVERWRITE_TOOLTIP}
-                    icon='icon adms-help'
-                    outlined
-                    type='button'
-                    className='general-info-overwrite__icon'
-                    tooltipOptions={contactFormTooltipOptions({ position: "right" })}
+                <i
+                    className='icon adms-help general-info-overwrite__icon'
+                    data-tooltip-id={overwriteHelpTooltipId}
+                />
+                <Tooltip
+                    target={`[data-tooltip-id="${overwriteHelpTooltipId}"]`}
+                    content={OVERWRITE_TOOLTIP}
+                    {...contactFormTooltipOptions({
+                        position: "right",
+                        style: { maxWidth: "320px" },
+                    })}
                 />
             </div>
         </div>

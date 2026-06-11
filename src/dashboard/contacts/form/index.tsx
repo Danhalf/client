@@ -313,12 +313,7 @@ export const ContactForm = observer((): ReactElement => {
                                         id ? (
                                             <Button
                                                 icon='pi pi-times'
-                                                className='p-button gap-2 inventory__delete-nav w-full'
-                                                severity={
-                                                    contactPermissions.canDelete()
-                                                        ? "danger"
-                                                        : "secondary"
-                                                }
+                                                className='p-button gap-2 contact__delete-nav w-full'
                                                 disabled={!contactPermissions.canDelete()}
                                                 onClick={() =>
                                                     contactPermissions.canDelete() &&

@@ -19,7 +19,7 @@ const TOOLTIP_POSITION_CONFIG: Record<TooltipPosition, TooltipPositionConfig> = 
         position: "right",
         tailClassName: "tooltip-tail-left",
         my: "left center",
-        at: "right center",
+        at: "center center",
     },
 };
 
