@@ -42,12 +42,3 @@
     margin-top: -16px;
     font-size: 12px;
 }
-
-.overwrite-tooltip .p-tooltip-text {
-    box-shadow: none;
-    background-color: var(--admss-app-white-blue);
-}
-
-.overwrite-tooltip .p-tooltip-text::before {
-    background-color: var(--admss-app-white-blue);
-}

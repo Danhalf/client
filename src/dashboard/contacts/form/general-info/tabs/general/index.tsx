@@ -1,5 +1,5 @@
 import { observer } from "mobx-react-lite";
-import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
+import { ReactElement, useEffect, useMemo, useState } from "react";
 import "./index.css";
 import { useStore } from "store/hooks";
 import { useParams } from "react-router-dom";
@@ -17,8 +17,6 @@ import {
 } from "http/services/contacts-service";
 import { useFormikContext } from "formik";
 import { REQUIRED_COMPANY_TYPE_INDEXES } from "dashboard/contacts/form";
-import { Checkbox } from "primereact/checkbox";
-import { Button } from "primereact/button";
 import { useToast } from "dashboard/common/toast";
 import { Status } from "common/models/base-response";
 import { TOAST_LIFETIME } from "common/settings";
@@ -28,6 +26,7 @@ import { SexList } from "common/constants/contract-options";
 import { ComboBox } from "dashboard/common/form/dropdown";
 import { Loader } from "dashboard/common/loader";
 import { contactFormTooltipOptions } from "dashboard/contacts/form/common/tooltip";
+import { ScanDlControls } from "dashboard/contacts/form/general-info/common/scan-dl-controls";
 
 export const enum TOOLTIP_MESSAGE {
     PERSON = "You can input either a person or a business name. If you entered a business name but intended to enter personal details, clear the business name field, and the fields for entering personal data will become active.",
@@ -47,7 +46,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
     const { contact, contactExtData, contactType, changeContact, changeContactExtData } = store;
     const toast = useToast();
     const [allowOverwrite, setAllowOverwrite] = useState<boolean>(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const { errors, values, validateField, setFieldValue, setFieldTouched, setFieldError } =
         useFormikContext<Contact>();
 
@@ -94,10 +92,6 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
             handleGetTypeList();
         }
     }, [id]);
-
-    const handleScanDL = () => {
-        fileInputRef.current?.click();
-    };
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -233,7 +227,27 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                 !!contact.middleName?.trim() ||
                 !!contact.lastName?.trim())
         );
-    }, [isBusinessNameRequired, contact.firstName, contact.lastName]);
+    }, [isBusinessNameRequired, contact.firstName, contact.lastName, contact.middleName]);
+
+    useEffect(() => {
+        if (!shouldDisableNameFields) {
+            return;
+        }
+
+        (["firstName", "middleName", "lastName"] as const).forEach((field) => {
+            setFieldError(field, undefined);
+            setFieldTouched(field, false, false);
+        });
+    }, [shouldDisableNameFields, setFieldError, setFieldTouched]);
+
+    useEffect(() => {
+        if (!shouldDisableBusinessName) {
+            return;
+        }
+
+        setFieldError("businessName", undefined);
+        setFieldTouched("businessName", false, false);
+    }, [shouldDisableBusinessName, setFieldError, setFieldTouched]);
 
     const handleOfacCheck = () => {
         if (!contact?.firstName || !contact.lastName) {
@@ -286,54 +300,13 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                         </div>
                     </div>
                     {!!contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (
-                        <div className='col-12 flex gap-4'>
-                            <Button
-                                type='button'
-                                label={isScanning ? "Scanning" : "Scan driver license"}
-                                className={`general-info__button ${isScanning ? "general-info__button--loading" : ""}`}
-                                tooltip='Data received from the DL’s backside will fill in related fields'
-                                tooltipOptions={contactFormTooltipOptions({ position: "top" })}
-                                outlined={!isScanning}
-                                onClick={handleScanDL}
-                                loading={isScanning}
-                                loadingIcon={
-                                    <Loader size='small' includeText={false} color='white' />
-                                }
-                            />
-                            <input
-                                type='file'
-                                accept='image/*'
-                                style={{ display: "none" }}
-                                ref={fileInputRef}
-                                onChange={handleFileChange}
-                            />
-                            <div className='general-info-overwrite pb-3'>
-                                <Checkbox
-                                    checked={allowOverwrite}
-                                    inputId='general-info-overwrite'
-                                    className='general-info-overwrite__checkbox'
-                                    onChange={() => setAllowOverwrite(!allowOverwrite)}
-                                />
-                                <label
-                                    htmlFor='general-info-overwrite'
-                                    className='general-info-overwrite__label'
-                                >
-                                    Overwrite data
-                                </label>
-                                <Button
-                                    text
-                                    tooltip='Data received from the DL’s backside will overwrite user-entered data'
-                                    icon='icon adms-help'
-                                    outlined
-                                    type='button'
-                                    className='general-info-overwrite__icon'
-                                    tooltipOptions={contactFormTooltipOptions({
-                                        className: "overwrite-tooltip",
-                                        position: "top",
-                                    })}
-                                />
-                            </div>
-                        </div>
+                        <ScanDlControls
+                            checkboxId='general-info-overwrite'
+                            isScanning={isScanning}
+                            allowOverwrite={allowOverwrite}
+                            onAllowOverwriteChange={setAllowOverwrite}
+                            onFileChange={handleFileChange}
+                        />
                     ) : null}
                     {contactType && !REQUIRED_COMPANY_TYPE_INDEXES.includes(contactType) ? (
                         <>
@@ -353,7 +326,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                           ? TOOLTIP_MESSAGE.PERSON
                                           : ""
                                 }
-                                tooltipOptions={contactFormTooltipOptions({ position: "top" })}
+                                tooltipOptions={contactFormTooltipOptions({ position: "mouse" })}
                                 disabled={shouldDisableNameFields}
                                 clearButton
                                 error={!!errors.firstName}
@@ -375,7 +348,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                           ? TOOLTIP_MESSAGE.PERSON
                                           : ""
                                 }
-                                tooltipOptions={contactFormTooltipOptions({ position: "top" })}
+                                tooltipOptions={contactFormTooltipOptions({ position: "mouse" })}
                                 disabled={shouldDisableNameFields}
                                 clearButton
                                 error={!!errors.middleName}
@@ -399,7 +372,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                                           ? TOOLTIP_MESSAGE.PERSON
                                           : ""
                                 }
-                                tooltipOptions={contactFormTooltipOptions({ position: "top" })}
+                                tooltipOptions={contactFormTooltipOptions({ position: "mouse" })}
                                 clearButton
                                 error={!!errors.lastName}
                                 errorMessage={errors.lastName as string}
@@ -418,7 +391,7 @@ export const ContactsGeneralInfo = observer((): ReactElement => {
                             }}
                             disabled={!!shouldDisableBusinessName}
                             tooltip={shouldDisableBusinessName ? TOOLTIP_MESSAGE.BUSINESS : ""}
-                            tooltipOptions={contactFormTooltipOptions({ position: "top" })}
+                            tooltipOptions={contactFormTooltipOptions({ position: "mouse" })}
                             clearButton
                             error={!!errors.businessName}
                             errorMessage={errors.businessName as string}
