@@ -19,7 +19,7 @@ import { emptyTemplate } from "dashboard/common/form/upload";
 import { useToastMessage } from "common/hooks";
 import { ContactDocumentsLimitations } from "common/models/contact";
 import { Loader } from "dashboard/common/loader";
-import { ContactDocumentTemplate } from "./document-template";
+import { ContactDocumentTemplate } from "dashboard/contacts/form/media-data/documents/document-template";
 import { TruncatedText } from "dashboard/common/display";
 import { UPLOAD_TEXT } from "common/constants/media-categories";
 
@@ -193,7 +193,7 @@ export const ContactsDocuments = observer((): ReactElement => {
                                 <Tag key={format} className='media__upload-tag' value={format} />
                             ))}
                             <div className='media-tooltip'>
-                                <InfoOverlayPanel panelTitle='Limitations:'>
+                                <InfoOverlayPanel panelTitle='Limitations:' disablePulse>
                                     <p>
                                         <b>Supported formats: </b>
                                         {limitations.formats.map((format, index) => (

@@ -96,6 +96,7 @@ export const ContactsProspecting = observer((): ReactElement => {
                 <DateInput
                     date={new Date(contactExtData.created)}
                     emptyDate
+                    hideTodayHighlight
                     name='Contact till'
                     showTime
                     hourFormat='12'
