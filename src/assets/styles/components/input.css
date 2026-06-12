@@ -42,8 +42,8 @@
 
 .p-checkbox .p-checkbox-box.p-highlight,
 .p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
-    background: var(--admss-app-success);
-    border-color: var(--admss-app-success);
+    background: var(--admss-app-primary-main-green);
+    border-color: var(--admss-app-primary-main-green);
 }
 
 .p-error {
