@@ -1,5 +1,5 @@
 import "./index.css";
-import { ReactElement, useCallback, useEffect, useMemo, useState } from "react";
+import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     deleteInventoryMake,
     deleteInventoryModel,
@@ -30,6 +30,9 @@ import { DropdownChangeEvent } from "primereact/dropdown";
 
 const EQUIPMENT = "equipment";
 const DEFAULT_LOCATION = "default";
+
+const sortMakesByName = (list: MakesListData[]): MakesListData[] =>
+    [...list].sort((left, right) => left.name.localeCompare(right.name));
 
 const parseMileage = (mileage: string): number => {
     return parseFloat(mileage.replace(/,/g, ""));
@@ -68,6 +71,7 @@ export const VehicleGeneral = observer((): ReactElement => {
     const [selectedAuditKey, setSelectedAuditKey] = useState<keyof Audit | null>(null);
     const [isGroupClassFocused, setIsGroupClassFocused] = useState<boolean>(false);
     const [activeGroupClassList, setActiveGroupClassList] = useState<UserGroup[]>([]);
+    const makeAutoCompleteRef = useRef<AutoComplete>(null);
 
     const groupClassId = useMemo<string>(() => {
         return (
@@ -518,15 +522,24 @@ export const VehicleGeneral = observer((): ReactElement => {
                     }`}
                 >
                     <AutoComplete
+                        ref={makeAutoCompleteRef}
                         {...getFieldProps("Make")}
                         value={values.Make}
                         suggestions={automakesList}
+                        minLength={0}
                         completeMethod={({ query }) => {
+                            const sortedMakes = sortMakesByName(initialAutoMakesList);
                             setAutomakesList(
-                                initialAutoMakesList.filter((item) =>
-                                    item.name.includes(query.toUpperCase())
-                                )
+                                query
+                                    ? sortedMakes.filter((item) =>
+                                          item.name.includes(query.toUpperCase())
+                                      )
+                                    : sortedMakes
                             );
+                        }}
+                        onFocus={(event) => {
+                            setAutomakesList(sortMakesByName(initialAutoMakesList));
+                            makeAutoCompleteRef.current?.search(event, "", "dropdown");
                         }}
                         dropdown
                         onChange={({ value }) => {
@@ -548,7 +561,6 @@ export const VehicleGeneral = observer((): ReactElement => {
                         }}
                         itemTemplate={(option) => handleDeleteInventoryRecord(option)}
                         selectedItemTemplate={selectedAutoMakesTemplate}
-                        placeholder='Make (required)'
                         className={`vehicle-general__dropdown w-full ${
                             errors.Make ? "p-invalid" : ""
                         }`}
