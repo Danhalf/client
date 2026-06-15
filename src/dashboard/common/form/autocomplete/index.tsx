@@ -1,6 +1,7 @@
 import { AutoComplete, AutoCompleteProps } from "primereact/autocomplete";
 import { Button } from "primereact/button";
 import { FocusEvent, ReactElement, useState, useRef, useEffect } from "react";
+import { FieldLabel } from "dashboard/common/form/field-label";
 import "./index.css";
 
 interface AutoCompleteDropdownProps extends AutoCompleteProps {
@@ -102,7 +103,7 @@ export const AutoCompleteDropdown = ({
                         },
                     }}
                 />
-                <label className='float-label'>{label}</label>
+                <FieldLabel text={label} />
             </span>
             {clearButton && !!value && (
                 <Button

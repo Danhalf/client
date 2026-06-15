@@ -24,6 +24,7 @@ import { Button } from "primereact/button";
 import { AutoComplete } from "primereact/autocomplete";
 import { ListData } from "common/models";
 import { ComboBox } from "dashboard/common/form/dropdown";
+import { FieldLabel } from "dashboard/common/form/field-label";
 import { useToast } from "dashboard/common/toast";
 import { UserGroup } from "common/models/user";
 import { DropdownChangeEvent } from "primereact/dropdown";
@@ -566,7 +567,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                         }`}
                         panelClassName='vehicle-general__panel'
                     />
-                    <label className='float-label'>Make (required)</label>
+                    <FieldLabel text='Make (required)' />
                     {errors.Make && (
                         <div className='p-error'>
                             <small>{errors.Make}</small>

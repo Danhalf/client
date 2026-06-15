@@ -11,7 +11,7 @@ import {
     getInventoryMenuCount,
     resetFormStepSectionCounters,
 } from "dashboard/inventory/common";
-import { FormStepAccordion } from "dashboard/common/form-stepper";
+import { FormStepAccordion, SectionHeaderWithCount } from "dashboard/common/form-stepper";
 import { InventoryPurchaseData } from "dashboard/inventory/form/purchase";
 import { InventoryMediaData } from "dashboard/inventory/form/media-data";
 import { useNavigate, useParams } from "react-router-dom";
@@ -31,6 +31,7 @@ import * as Yup from "yup";
 import {
     InventoryExtData,
     Inventory as InventoryModel,
+    InventoryWebInfo,
     InventoryStockNumber,
 } from "common/models/inventory";
 import { MAX_VIN_LENGTH, MIN_VIN_LENGTH } from "dashboard/common/form/vin-decoder";
@@ -103,6 +104,58 @@ const tabFields: Partial<
     [AccordionItems.TITLE]: ["titleHolderPhone", "titlePrevPhone"],
 };
 
+const WEB_PRICE_FIELDS: (keyof InventoryWebInfo)[] = ["ListPrice", "SpecialPrice"];
+const WEB_DATES_FIELDS: (keyof InventoryWebInfo)[] = ["InStockDate", "LastModifiedDate"];
+const WEB_FUEL_FIELDS: (keyof InventoryWebInfo)[] = ["CityMPG", "HwyMPG"];
+const WEB_EXTRA_FIELDS: (keyof InventoryWebInfo)[] = [
+    "ExtraField1",
+    "ExtraField2",
+    "ExtraField3",
+    "ExtraPrice1",
+    "ExtraPrice2",
+    "ExtraPrice3",
+];
+const WEB_HISTORY_FIELDS: (keyof InventoryWebInfo)[] = ["LastExportDate"];
+
+const isEmptyValue = (value: unknown): boolean => {
+    if (value === null || value === undefined) {
+        return true;
+    }
+
+    if (typeof value === "string") {
+        const trimmedValue = value.trim();
+        return !trimmedValue || trimmedValue === "0";
+    }
+
+    if (typeof value === "number") {
+        return value <= 0;
+    }
+
+    return false;
+};
+
+const hasAnyFilledField = (
+    source: Record<string, unknown> | undefined,
+    fields: string[]
+): boolean => {
+    if (!source) {
+        return false;
+    }
+
+    return fields.some((field) => !isEmptyValue(source[field]));
+};
+
+const hasAllFilledFields = (
+    source: Record<string, unknown> | undefined,
+    fields: string[]
+): boolean => {
+    if (!source) {
+        return false;
+    }
+
+    return fields.every((field) => !isEmptyValue(source[field]));
+};
+
 const MIN_YEAR = 1970;
 const MAX_YEAR = new Date().getFullYear();
 
@@ -140,6 +193,14 @@ export const InventoryForm = observer(() => {
         tabLength,
         inventory,
         inventoryExtData,
+        inventoryOptions,
+        inventoryAudit,
+        inventoryExportWeb,
+        images,
+        videos,
+        audios,
+        documents,
+        links,
         isFormChanged,
         isErasingNeeded,
         currentLocation,
@@ -419,6 +480,194 @@ export const InventoryForm = observer(() => {
         });
     };
 
+    const isInventoryTabFilled = (itemLabel: AccordionItems | string): boolean => {
+        if (!itemLabel) {
+            return false;
+        }
+
+        switch (itemLabel) {
+            case AccordionItems.GENERAL: {
+                const requiredFields = tabFields[
+                    AccordionItems.GENERAL
+                ] as (keyof PartialInventory)[];
+                return hasAllFilledFields(
+                    inventory as unknown as Record<string, unknown>,
+                    requiredFields
+                );
+            }
+            case AccordionItems.DESCRIPTION: {
+                const requiredFields = tabFields[
+                    AccordionItems.DESCRIPTION
+                ] as (keyof PartialInventory)[];
+                return hasAllFilledFields(
+                    inventory as unknown as Record<string, unknown>,
+                    requiredFields
+                );
+            }
+            case AccordionItems.PURCHASES:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "purPurchasedFrom",
+                    "purPurchaseAmount",
+                    "purPurchaseDate",
+                    "purPurchaseBuyerName",
+                    "purPurchaseEmail",
+                    "purPurchasePhone",
+                    "purPurchaseAddress",
+                    "purPurchaseCity",
+                    "purPurchaseZipCode",
+                ]);
+            case AccordionItems.PAYMENTS:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "payAskingPrice",
+                    "payCashPrice",
+                    "payDownPayment",
+                    "payPayment",
+                    "payTerm",
+                    "payAPR",
+                    "payAmtFin",
+                    "payRemarks",
+                ]);
+            case AccordionItems.EXPENSES:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "payExpenses",
+                    "payDefaultExpAdded",
+                ]);
+            case AccordionItems.TITLE:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "titleNumber",
+                    "titleState",
+                    "titleStatus",
+                    "titleReceivedDate",
+                    "titleHolderName",
+                    "titleHolderPhone",
+                    "titlePrevName",
+                    "titlePrevPhone",
+                ]);
+            case AccordionItems.FLOORPLAN:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "fpFloorplanCompany",
+                    "fpRemainBal",
+                    "fpReduxAmt",
+                    "fpReductionDate",
+                    "fpIsFloorplanned",
+                ]);
+            case AccordionItems.CONSIGN:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "csIsConsigned",
+                    "csName",
+                    "csOwnerAskingPrice",
+                    "csReserveAmt",
+                    "csDate",
+                    "csReturnDate",
+                    "csNotes",
+                ]);
+            case AccordionItems.OPTIONS:
+                return inventoryOptions.length > 0;
+            case AccordionItems.CHECKS:
+                return Object.values(inventoryAudit || {}).some((value) => !isEmptyValue(value));
+            case AccordionItems.KEYS:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "keyNumber",
+                    "keysHasRemote",
+                    "keysMissing",
+                    "keysDuplicate",
+                ]);
+            case AccordionItems.DISCLOSURES:
+                return hasAnyFilledField(inventoryExtData as unknown as Record<string, unknown>, [
+                    "damSalvage",
+                    "damFlood",
+                    "damTheft",
+                    "damReconstructed",
+                    "damODOMInExcess",
+                    "damODOMNotActual",
+                    "bgWarranty",
+                    "bgAsIs",
+                ]);
+            case AccordionItems.OTHER:
+                return hasAnyFilledField(inventory as unknown as Record<string, unknown>, [
+                    "Trim",
+                    "Engine",
+                    "Transmission",
+                    "ExteriorColor",
+                    "InteriorColor",
+                    "mileage",
+                    "Notes",
+                ]);
+            case AccordionItems.IMAGES:
+                return images.length > 0;
+            case AccordionItems.VIDEO:
+                return videos.length > 0;
+            case AccordionItems.AUDIO:
+                return audios.length > 0;
+            case AccordionItems.DOCUMENTS:
+                return documents.length > 0;
+            case AccordionItems.LINKS:
+                return links.length > 0;
+            case AccordionItems.WATERMARKING:
+                return false;
+            case AccordionItems.PRICE:
+                return hasAnyFilledField(
+                    inventoryExportWeb as unknown as Record<string, unknown>,
+                    WEB_PRICE_FIELDS
+                );
+            case AccordionItems.DATES:
+                return hasAnyFilledField(
+                    inventoryExportWeb as unknown as Record<string, unknown>,
+                    WEB_DATES_FIELDS
+                );
+            case AccordionItems.FUEL:
+                return hasAnyFilledField(
+                    inventoryExportWeb as unknown as Record<string, unknown>,
+                    WEB_FUEL_FIELDS
+                );
+            case AccordionItems.EXTRA:
+                return hasAnyFilledField(
+                    inventoryExportWeb as unknown as Record<string, unknown>,
+                    WEB_EXTRA_FIELDS
+                );
+            case AccordionItems.HISTORY:
+                return hasAnyFilledField(
+                    inventoryExportWeb as unknown as Record<string, unknown>,
+                    WEB_HISTORY_FIELDS
+                );
+            default:
+                return false;
+        }
+    };
+
+    const resolveStepClassName = (item: InventoryItem, globalIndex: number): string => {
+        const isFilled = isInventoryTabFilled(item.itemLabel);
+
+        if (errorSections.includes(item.itemLabel)) {
+            return "section-invalid";
+        }
+
+        if (isFilled) {
+            return "section-valid";
+        }
+
+        if (globalIndex <= stepActiveIndex) {
+            return "section-in-progress";
+        }
+
+        return "";
+    };
+
+    const renderSectionHeader = (section: InventorySection) => {
+        const filledTabsCount = section.items.reduce(
+            (count, item) => (isInventoryTabFilled(item.itemLabel) ? count + 1 : count),
+            0
+        );
+
+        return (
+            <SectionHeaderWithCount
+                label={section.label}
+                filledCount={filledTabsCount}
+                totalCount={section.items.length}
+            />
+        );
+    };
+
     const navigateAndClear = () => {
         if (memoRoute) {
             navigate(memoRoute);
@@ -495,8 +744,10 @@ export const InventoryForm = observer(() => {
                                     onAccordionChange={setAccordionActiveIndex}
                                     onStepChange={handleStepChange}
                                     errorSections={errorSections}
+                                    resolveStepClassName={resolveStepClassName}
                                     accordionClassName='inventory__accordion'
                                     stepClassName='border-circle inventory-step'
+                                    renderSectionHeader={renderSectionHeader}
                                     navigationRef={stepsRef}
                                     expandMode='sync-with-step'
                                     wrapperClassName='inventory__navigation'

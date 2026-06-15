@@ -7,6 +7,7 @@ import { Status } from "common/models/base-response";
 import { useToast } from "dashboard/common/toast";
 import { TOAST_LIFETIME } from "common/settings";
 import { Loader } from "dashboard/common/loader";
+import { FieldLabel } from "dashboard/common/form/field-label";
 
 interface VINDecoderProps extends InputTextProps {
     onAction: (vin: VehicleDecodeInfo) => void;
@@ -101,7 +102,7 @@ export const VINDecoder = ({
                 >
                     Decode
                 </Button>
-                <label className='float-label'>VIN (required)</label>
+                <FieldLabel text='VIN (required)' />
             </span>
             {showError && errorMessage && (
                 <div className='p-error'>

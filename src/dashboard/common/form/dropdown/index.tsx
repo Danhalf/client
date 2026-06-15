@@ -1,8 +1,18 @@
-import { CSSProperties, FocusEvent, forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from "react";
+import {
+    CSSProperties,
+    FocusEvent,
+    forwardRef,
+    useCallback,
+    useImperativeHandle,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { DEFAULT_FILTER_THRESHOLD } from "common/settings";
 import { Dropdown, DropdownChangeEvent, DropdownProps } from "primereact/dropdown";
 import "./index.css";
 import { TruncatedText } from "dashboard/common/display";
+import { FieldLabel } from "dashboard/common/form/field-label";
 import { useId } from "react";
 
 interface CustomDropdownProps extends DropdownProps {
@@ -71,7 +81,9 @@ export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function Combo
             return options;
         }
 
-        return [...options].sort((left, right) => getOptionText(left).localeCompare(getOptionText(right)));
+        return [...options].sort((left, right) =>
+            getOptionText(left).localeCompare(getOptionText(right))
+        );
     }, [editable, getOptionText, openOnFocus, options]);
 
     const displayOptions = useMemo(() => {
@@ -84,7 +96,9 @@ export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function Combo
             return sortedOptions;
         }
 
-        return sortedOptions?.filter((option) => getOptionText(option).toLowerCase().includes(query));
+        return sortedOptions?.filter((option) =>
+            getOptionText(option).toLowerCase().includes(query)
+        );
     }, [editable, getOptionText, isFiltering, openOnFocus, sortedOptions, value]);
 
     const showDropdown = useCallback(() => {
@@ -172,9 +186,7 @@ export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function Combo
             style={heightStyle}
         >
             {dropdown}
-            <label htmlFor={uniqueId} className='float-label'>
-                {label}
-            </label>
+            <FieldLabel text={label} htmlFor={uniqueId} />
             {showError && errorMessage && (
                 <span className='input-error-wrapper relative'>
                     <div className='p-error'>
