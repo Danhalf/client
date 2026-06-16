@@ -43,6 +43,15 @@
     flex-direction: column;
     justify-content: space-between;
     margin-bottom: 45px;
+    --form-nav-padding-right: 40px;
+}
+
+.inventory__card .form-nav {
+    width: calc(100% - var(--inventory-navigate-width));
+    margin-left: var(--inventory-navigate-width);
+    margin-right: 0;
+    padding-right: var(--form-nav-padding-right);
+    box-sizing: border-box;
 }
 
 .inventory-content__wrapper {

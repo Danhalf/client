@@ -286,7 +286,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         <label className='float-label'>Notes</label>
                     </span>
                 </div>
-                <div className='purchase-expenses-controls'>
+                <div className='col-12 purchase-expenses-controls'>
                     {currentEditExpense?.itemuid && (
                         <Button
                             className='purchase-expenses-controls__button'
@@ -309,8 +309,6 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         </Button>
                     )}
                 </div>
-            </div>
-            <div className='grid'>
                 <div className='col-12'>
                     <DataTable
                         className='purchase-expenses__table'
@@ -415,7 +413,7 @@ export const PurchaseExpenses = observer((): ReactElement => {
                         />
                     </DataTable>
                 </div>
-                <div className='col-12 total-sum flex justify-content-end '>
+                <div className='col-12 total-sum flex justify-content-end'>
                     <span className='total-sum__label'>Total expenses:</span>
                     <span className='total-sum__value'> {expenseTotal}</span>
                 </div>

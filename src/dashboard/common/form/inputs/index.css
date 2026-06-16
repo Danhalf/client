@@ -212,6 +212,11 @@
     padding-left: 10px;
 }
 
+.bordered-checkbox__text {
+    flex: 1;
+    min-width: 0;
+}
+
 .bordered-checkbox .p-inputgroup-addon {
     height: 100%;
     border: none;

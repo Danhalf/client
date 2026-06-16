@@ -373,25 +373,26 @@ export const PercentInput = ({
 export const BorderedCheckbox = ({
     name,
     height = "50px",
+    inputId,
+    className,
+    disabled,
     ...props
 }: CheckboxProps): ReactElement => {
+    const checkboxId = inputId || name;
+
     return (
-        <div
+        <label
+            htmlFor={checkboxId}
             style={{
                 height,
             }}
-            className='p-inputgroup flex-1 w-full align-items-center justify-content-between bordered-checkbox'
+            className={`p-inputgroup flex-1 w-full align-items-center justify-content-between bordered-checkbox cursor-pointer ${disabled ? "p-disabled" : ""} ${className || ""}`}
         >
-            <label
-                className={`cursor-pointer ${props.disabled ? "p-disabled" : ""}`}
-                htmlFor={name}
-            >
-                {name}
-            </label>
+            <span className='bordered-checkbox__text'>{name}</span>
             <span className='p-inputgroup-addon'>
-                <Checkbox inputId={name} {...props} />
+                <Checkbox inputId={checkboxId} disabled={disabled} {...props} />
             </span>
-        </div>
+        </label>
     );
 };
 
