@@ -25,24 +25,21 @@
 
 .purchase-expenses__table.p-datatable {
     --datatable-header-height: 45px;
+    --admss-app-datatable-header-height: var(--datatable-header-height);
     width: 100%;
     margin-top: 50px;
     .p-datatable-thead {
         height: var(--datatable-header-height);
     }
-    ::-webkit-scrollbar {
-        background: linear-gradient(
-            to bottom,
-            var(--admss-app-light-blue) var(--datatable-header-height),
-            transparent var(--datatable-header-height)
-        );
-    }
-    ::-webkit-scrollbar-track {
-        margin-top: var(--datatable-header-height);
-    }
-    ::-webkit-scrollbar-thumb {
-        background: var(--admss-app-medium-blue);
-        border-radius: 5px;
+
+    .p-datatable-wrapper.thin-scrollbar {
+        &::-webkit-scrollbar-thumb {
+            background: var(--admss-app-medium-blue);
+        }
+
+        &::-webkit-scrollbar-button:single-button:vertical:decrement {
+            height: var(--datatable-header-height);
+        }
     }
 
     .p-datatable-wrapper {
