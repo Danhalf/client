@@ -25,6 +25,7 @@ import { useStore } from "store/hooks";
 import { convertToStandardTimestamp } from "common/helpers";
 import { Status } from "common/models/base-response";
 import { usePermissions } from "common/hooks/usePermissions";
+import { getColumnPtStyles } from "dashboard/common/data-table";
 
 export const PurchaseExpenses = observer((): ReactElement => {
     const { id } = useParams();
@@ -376,8 +377,10 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                 },
                             }}
                         />
-                        {renderColumnsData.map(({ field, header }) =>
-                            field === "notbillable" ? (
+                        {renderColumnsData.map(({ field, header }, index) => {
+                            const isLastColumn = index === renderColumnsData.length - 1;
+
+                            return field === "notbillable" ? (
                                 <Column
                                     field={field}
                                     header={header}
@@ -385,7 +388,13 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                     body={(options) => <>{options[field] ? "Yes" : "No"}</>}
                                     key={field}
                                     headerClassName='cursor-move'
-                                    className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                    className={`overflow-hidden text-overflow-ellipsis ${
+                                        isLastColumn ? "" : "max-w-16rem"
+                                    }`}
+                                    pt={getColumnPtStyles({
+                                        isLastColumn,
+                                        additionalStyles: isLastColumn ? { width: "100%" } : {},
+                                    })}
                                 />
                             ) : (
                                 <Column
@@ -394,10 +403,16 @@ export const PurchaseExpenses = observer((): ReactElement => {
                                     alignHeader={"left"}
                                     key={field}
                                     headerClassName='cursor-move'
-                                    className='max-w-16rem overflow-hidden text-overflow-ellipsis'
+                                    className={`overflow-hidden text-overflow-ellipsis ${
+                                        isLastColumn ? "" : "max-w-16rem"
+                                    }`}
+                                    pt={getColumnPtStyles({
+                                        isLastColumn,
+                                        additionalStyles: isLastColumn ? { width: "100%" } : {},
+                                    })}
                                 />
-                            )
-                        )}
+                            );
+                        })}
 
                         <Column
                             body={deleteTemplate}

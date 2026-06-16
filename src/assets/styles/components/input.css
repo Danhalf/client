@@ -1,16 +1,11 @@
-.p-inputtext {
+input.p-inputtext {
     height: 50px;
 }
 
 textarea.p-inputtextarea {
-    height: auto;
-    min-height: 50px;
     resize: vertical;
     max-width: 100%;
     box-sizing: border-box;
-    ~ .float-label {
-        top: 1.3rem;
-    }
 }
 
 .p-inputtext:enabled:hover,

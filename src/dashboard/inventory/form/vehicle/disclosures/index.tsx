@@ -38,7 +38,6 @@ export const VehicleDisclosures = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <BorderedCheckbox
-                    className='mt-1'
                     inputId='disclosures-excess'
                     onChange={() => handleChange("damODOMInExcess", damODOMInExcess)}
                     checked={!!damODOMInExcess}
@@ -47,7 +46,6 @@ export const VehicleDisclosures = observer((): ReactElement => {
             </div>
             <div className='col-6'>
                 <BorderedCheckbox
-                    className='mt-1'
                     inputId='disclosures-discrepancy'
                     onChange={() => handleChange("damODOMNotActual", damODOMNotActual)}
                     checked={!!damODOMNotActual}
@@ -65,7 +63,6 @@ export const VehicleDisclosures = observer((): ReactElement => {
             <div className='col-6'>
                 <BorderedCheckbox
                     inputId='disclosures-salvage'
-                    className='mt-1'
                     onChange={() => handleChange("damSalvage", damSalvage)}
                     checked={!!damSalvage}
                     name='Vehicle is a Salvage Vehicle'
@@ -85,7 +82,6 @@ export const VehicleDisclosures = observer((): ReactElement => {
             <div className='col-6 mr-2'>
                 <BorderedCheckbox
                     inputId='disclosures-flood'
-                    className='mt-1'
                     onChange={() => handleChange("damFlood", damFlood)}
                     checked={!!damFlood}
                     name='Vehicle is a Flood Vehicle'
@@ -94,7 +90,6 @@ export const VehicleDisclosures = observer((): ReactElement => {
             <div className='col-6 mr-2'>
                 <BorderedCheckbox
                     inputId='disclosures-reconstructed'
-                    className='mt-1'
                     onChange={() => handleChange("damReconstructed", damReconstructed)}
                     checked={!!damReconstructed}
                     name='Vehicle has been Reconstructed'
@@ -104,7 +99,6 @@ export const VehicleDisclosures = observer((): ReactElement => {
             <div className='col-6'>
                 <BorderedCheckbox
                     inputId='disclosures-damage'
-                    className='mt-1'
                     onChange={() => handleChange("dam25", dam25)}
                     checked={!!dam25}
                     name='Vehicle suffered damage of at least 25%'
@@ -126,7 +120,6 @@ export const VehicleDisclosures = observer((): ReactElement => {
             <div className='col-6'>
                 <BorderedCheckbox
                     inputId='disclosures-recovered'
-                    className='mt-1'
                     onChange={() => handleChange("damTheft", damTheft)}
                     checked={!!damTheft}
                     name='Vehicle is a Recovered Theft Vehicle'

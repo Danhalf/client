@@ -3,6 +3,11 @@
     height: 204px;
 }
 
+.purchase-expenses > .col-6 > .p-float-label {
+    display: block;
+    width: 100%;
+}
+
 .purchase-expenses-controls {
     display: flex;
     justify-content: flex-end;
@@ -53,7 +58,7 @@
 
     .p-datatable-table {
         width: 100%;
-        table-layout: fixed;
+        min-width: 100%;
     }
 }
 

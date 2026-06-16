@@ -66,6 +66,11 @@
     .p-column-header-content {
         justify-content: flex-start;
     }
+
+    .p-datatable-table {
+        width: 100%;
+        min-width: 100%;
+    }
 }
 
 .purchase-payments__table-button {

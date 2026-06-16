@@ -759,7 +759,13 @@ export const NumberInput = ({
     return colWidth ? <div className={`col-${colWidth}`}>{content}</div> : content;
 };
 
-export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps): ReactElement => {
+export const StateDropdown = ({
+    name,
+    colWidth,
+    height = 50,
+    style,
+    ...props
+}: StateDropdownProps): ReactElement => {
     const content = (
         <ComboBox
             optionLabel='label'
@@ -768,7 +774,8 @@ export const StateDropdown = ({ name, colWidth, ...props }: StateDropdownProps):
             label={name}
             options={STATES_LIST}
             className={`w-full ${props.className || ""}`}
-            style={{ height: `${props.height || 50}px` }}
+            height={height}
+            style={style}
             {...props}
         />
     );
