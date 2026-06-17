@@ -1,5 +1,6 @@
 @import "dashboard/common/form/index.css";
 @import "dashboard/common/form-nav/index.css";
+@import "dashboard/common/entity-form-layout/index.css";
 
 .color-dusty-blue {
     color: var(--admss-app-dusty-blue);

@@ -1,7 +1,4 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { InventoryVehicleData } from "dashboard/inventory/form/vehicle";
-import { Button } from "primereact/button";
-import { FormNav, FormNavButton } from "dashboard/common/form-nav";
 import {
     AccordionItems,
     Inventory,
@@ -40,6 +37,18 @@ import { BaseResponseError, Status } from "common/models/base-response";
 import { debounce } from "common/helpers";
 import { PHONE_NUMBER_REGEX } from "common/constants/regex";
 import { INVENTORY_PAGE } from "common/constants/links";
+import {
+    EntityFormBody,
+    EntityFormCard,
+    EntityFormContent,
+    EntityFormDeleteNavButton,
+    EntityFormFooter,
+    EntityFormHeader,
+    EntityFormPage,
+    EntityFormPrintNavButton,
+    EntityFormSteps,
+} from "dashboard/common/entity-form-layout";
+import { InventoryVehicleData } from "dashboard/inventory/form/vehicle";
 
 const STEP = "step";
 export enum INVENTORY_STEPS {
@@ -698,45 +707,65 @@ export const InventoryForm = observer(() => {
         }
     };
 
+    const inventoryHeaderMetadata = useMemo(() => {
+        if (!id) {
+            return [];
+        }
+
+        return [
+            { label: "Stock#", value: inventory?.StockNo || "", truncate: false },
+            { label: "Make", value: inventory?.Make || "", truncate: false },
+            { label: "Model", value: inventory?.Model || "", truncate: false },
+            { label: "Year", value: inventory?.Year || "", truncate: false },
+            { label: "VIN", value: inventory?.VIN || "", truncate: false },
+        ];
+    }, [id, inventory]);
+
+    const accordionFooter = useMemo(() => {
+        if (!id) {
+            return undefined;
+        }
+
+        return (
+            <>
+                <EntityFormPrintNavButton
+                    isActive={stepActiveIndex === printActiveIndex}
+                    onClick={handleActivePrintForms}
+                >
+                    Print forms
+                </EntityFormPrintNavButton>
+                {inventoryPermissions.canDelete() && (
+                    <EntityFormDeleteNavButton
+                        onClick={() =>
+                            inventoryPermissions.canDelete() &&
+                            setStepActiveIndex(deleteActiveIndex)
+                        }
+                    >
+                        Delete inventory
+                    </EntityFormDeleteNavButton>
+                )}
+            </>
+        );
+    }, [
+        id,
+        stepActiveIndex,
+        printActiveIndex,
+        deleteActiveIndex,
+        inventoryPermissions,
+        handleActivePrintForms,
+    ]);
+
     return (
         <Suspense fallback={<Loader className='inventory-loader' />}>
-            <div className='grid relative'>
-                <Button
-                    icon='pi pi-times'
-                    className='p-button close-button'
-                    onClick={handleExitClick}
-                />
-                <div className='col-12'>
-                    <div className='card inventory'>
-                        <div className='card-header flex'>
-                            <h2 className='card-header__title uppercase m-0'>
-                                {id ? "Edit" : "Create new"} inventory
-                            </h2>
-                            {id && (
-                                <div className='card-header-info'>
-                                    Stock#
-                                    <span className='card-header-info__data'>
-                                        {inventory?.StockNo}
-                                    </span>
-                                    Make
-                                    <span className='card-header-info__data'>
-                                        {inventory?.Make}
-                                    </span>
-                                    Model
-                                    <span className='card-header-info__data'>
-                                        {inventory?.Model}
-                                    </span>
-                                    Year
-                                    <span className='card-header-info__data'>
-                                        {inventory?.Year}
-                                    </span>
-                                    VIN
-                                    <span className='card-header-info__data'>{inventory?.VIN}</span>
-                                </div>
-                            )}
-                        </div>
-                        <div className='card-content inventory__card'>
-                            <div className='grid flex-nowrap inventory__card-content card-content__wrapper'>
+            <EntityFormPage onClose={handleExitClick}>
+                <EntityFormCard entityClassName='inventory'>
+                    <EntityFormHeader
+                        title={`${id ? "Edit" : "Create new"} inventory`}
+                        metadata={inventoryHeaderMetadata}
+                    />
+                    <EntityFormContent>
+                        <EntityFormBody
+                            sidebar={
                                 <FormStepAccordion
                                     sections={inventorySections}
                                     stepActiveIndex={stepActiveIndex}
@@ -745,173 +774,94 @@ export const InventoryForm = observer(() => {
                                     onStepChange={handleStepChange}
                                     errorSections={errorSections}
                                     resolveStepClassName={resolveStepClassName}
-                                    accordionClassName='inventory__accordion'
+                                    accordionClassName='entity-form-accordion'
                                     stepClassName='border-circle inventory-step'
                                     renderSectionHeader={renderSectionHeader}
                                     navigationRef={stepsRef}
                                     expandMode='sync-with-step'
-                                    wrapperClassName='inventory__navigation'
-                                    footer={
-                                        id ? (
-                                            <>
-                                                <Button
-                                                    icon='icon adms-print'
-                                                    className={`p-button gap-2 inventory__print-nav ${
-                                                        stepActiveIndex === printActiveIndex &&
-                                                        "inventory__print-nav--active"
-                                                    } w-full`}
-                                                    onClick={handleActivePrintForms}
-                                                >
-                                                    Print forms
-                                                </Button>
-                                                {inventoryPermissions.canDelete() && (
-                                                    <Button
-                                                        icon='pi pi-times'
-                                                        className='p-button gap-2 inventory__delete-nav w-full'
-                                                        severity='danger'
-                                                        onClick={() =>
-                                                            inventoryPermissions.canDelete() &&
-                                                            setStepActiveIndex(deleteActiveIndex)
-                                                        }
-                                                    >
-                                                        Delete inventory
-                                                    </Button>
-                                                )}
-                                            </>
-                                        ) : undefined
-                                    }
+                                    wrapperClassName='p-0'
+                                    footer={accordionFooter}
                                 />
-                                <div className='w-full flex flex-column p-0 inventory-content__wrapper'>
-                                    <div className='flex flex-grow-1'>
-                                        <Formik
-                                            innerRef={formikRef}
-                                            validationSchema={InventoryFormSchema({
-                                                initialVIN,
-                                                initialStockNo,
-                                                debouncedCheckStockNoAvailability,
-                                                debouncedCheckVINAvailability,
-                                                isSubmitting,
-                                            })}
-                                            initialValues={
-                                                {
-                                                    VIN: inventory?.VIN || "",
-                                                    Make: inventory.Make,
-                                                    Model: inventory.Model,
-                                                    Year: inventory.Year,
-                                                    TypeOfFuel_id: inventory?.TypeOfFuel_id || "0",
-                                                    StockNo: inventory?.StockNo || "",
-                                                    locationuid:
-                                                        inventory?.locationuid || currentLocation,
-                                                    GroupClassName: inventory?.GroupClassName || "",
-                                                    purPurchaseEmail:
-                                                        inventoryExtData?.purPurchaseEmail || "",
-                                                    purPurchasePhone:
-                                                        inventoryExtData?.purPurchasePhone || "",
-                                                    titleHolderPhone:
-                                                        inventoryExtData?.titleHolderPhone || "",
-                                                    titlePrevPhone:
-                                                        inventoryExtData?.titlePrevPhone || "",
-                                                } as PartialInventory
-                                            }
-                                            enableReinitialize
-                                            validateOnChange={false}
-                                            validateOnBlur={false}
-                                            validateOnMount={validateOnMount}
-                                            onSubmit={() => handleSubmit(id)}
-                                        >
-                                            <Form name='inventoryForm' className='w-full'>
-                                                {inventorySections.map((section) =>
-                                                    section.items.map((item: InventoryItem) => (
-                                                        <div
-                                                            key={item.itemIndex}
-                                                            className={`${
-                                                                stepActiveIndex === item.itemIndex
-                                                                    ? "block inventory-form"
-                                                                    : "hidden"
-                                                            }`}
-                                                        >
-                                                            <div className='inventory-form__title uppercase'>
-                                                                {item.itemLabel}
-                                                            </div>
-                                                            {stepActiveIndex === item.itemIndex && (
-                                                                <Suspense
-                                                                    fallback={
-                                                                        <Loader className='inventory-loader' />
-                                                                    }
-                                                                >
-                                                                    {item.component}
-                                                                </Suspense>
-                                                            )}
-                                                        </div>
-                                                    ))
-                                                )}
-
-                                                {stepActiveIndex === printActiveIndex && (
-                                                    <div className='inventory-form'>
-                                                        <div className='inventory-form__title uppercase'>
-                                                            Print history
-                                                        </div>
-                                                        <PrintForms />
-                                                    </div>
-                                                )}
-                                                {stepActiveIndex === deleteActiveIndex && (
-                                                    <DeleteForm
-                                                        attemptedSubmit={attemptedSubmit}
-                                                        isDeleteConfirm={isDeleteConfirm}
-                                                    />
-                                                )}
-                                            </Form>
-                                        </Formik>
-                                    </div>
-                                </div>
-                            </div>
-                            <FormNav>
-                                <FormNavButton
-                                    onClick={handleOnBackClick}
-                                    disabled={stepActiveIndex <= 0}
-                                    severity={stepActiveIndex <= 0 ? "secondary" : "success"}
-                                    outlined
-                                >
-                                    Back
-                                </FormNavButton>
-                                <FormNavButton
-                                    onClick={handleOnNextClick}
-                                    disabled={stepActiveIndex >= itemsMenuCount}
-                                    severity={
-                                        stepActiveIndex === deleteActiveIndex ||
-                                        stepActiveIndex >= itemsMenuCount
-                                            ? "secondary"
-                                            : "success"
-                                    }
-                                    outlined
-                                >
-                                    Next
-                                </FormNavButton>
-                                {stepActiveIndex === deleteActiveIndex ? (
-                                    <FormNavButton
-                                        onClick={() =>
-                                            deleteReason.length
-                                                ? setConfirmDeleteVisible(true)
-                                                : setAttemptedSubmit(true)
-                                        }
-                                        className='form-nav__button--danger'
+                            }
+                        >
+                            <Formik
+                                innerRef={formikRef}
+                                validationSchema={InventoryFormSchema({
+                                    initialVIN,
+                                    initialStockNo,
+                                    debouncedCheckStockNoAvailability,
+                                    debouncedCheckVINAvailability,
+                                    isSubmitting,
+                                })}
+                                initialValues={
+                                    {
+                                        VIN: inventory?.VIN || "",
+                                        Make: inventory.Make,
+                                        Model: inventory.Model,
+                                        Year: inventory.Year,
+                                        TypeOfFuel_id: inventory?.TypeOfFuel_id || "0",
+                                        StockNo: inventory?.StockNo || "",
+                                        locationuid: inventory?.locationuid || currentLocation,
+                                        GroupClassName: inventory?.GroupClassName || "",
+                                        purPurchaseEmail:
+                                            inventoryExtData?.purPurchaseEmail || "",
+                                        purPurchasePhone:
+                                            inventoryExtData?.purPurchasePhone || "",
+                                        titleHolderPhone:
+                                            inventoryExtData?.titleHolderPhone || "",
+                                        titlePrevPhone: inventoryExtData?.titlePrevPhone || "",
+                                    } as PartialInventory
+                                }
+                                enableReinitialize
+                                validateOnChange={false}
+                                validateOnBlur={false}
+                                validateOnMount={validateOnMount}
+                                onSubmit={() => handleSubmit(id)}
+                            >
+                                <Form name='inventoryForm' className='w-full'>
+                                    <EntityFormSteps
+                                        sections={inventorySections}
+                                        stepActiveIndex={stepActiveIndex}
+                                        loaderClassName='inventory-loader'
+                                        panelClassName='entity-form-panel inventory-form'
+                                        titleClassName='entity-form-panel__title inventory-form__title'
                                     >
-                                        Delete
-                                    </FormNavButton>
-                                ) : (
-                                    <FormNavButton
-                                        onClick={handleSaveInventoryForm}
-                                        severity={isFormChanged ? "success" : "secondary"}
-                                        disabled={!isFormChanged}
-                                    >
-                                        {id ? "Update" : "Save"}
-                                    </FormNavButton>
-                                )}
-                            </FormNav>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                        {stepActiveIndex === printActiveIndex && (
+                                            <div className='entity-form-panel inventory-form'>
+                                                <div className='entity-form-panel__title inventory-form__title uppercase'>
+                                                    Print history
+                                                </div>
+                                                <PrintForms />
+                                            </div>
+                                        )}
+                                        {stepActiveIndex === deleteActiveIndex && (
+                                            <DeleteForm
+                                                attemptedSubmit={attemptedSubmit}
+                                                isDeleteConfirm={isDeleteConfirm}
+                                            />
+                                        )}
+                                    </EntityFormSteps>
+                                </Form>
+                            </Formik>
+                        </EntityFormBody>
+                        <EntityFormFooter
+                            stepActiveIndex={stepActiveIndex}
+                            itemsMenuCount={itemsMenuCount}
+                            isOnDeleteStep={stepActiveIndex === deleteActiveIndex}
+                            isSaveDisabled={!isFormChanged}
+                            isEditMode={!!id}
+                            onBack={handleOnBackClick}
+                            onNext={handleOnNextClick}
+                            onSave={handleSaveInventoryForm}
+                            onDelete={() =>
+                                deleteReason.length
+                                    ? setConfirmDeleteVisible(true)
+                                    : setAttemptedSubmit(true)
+                            }
+                        />
+                    </EntityFormContent>
+                </EntityFormCard>
+            </EntityFormPage>
             <ConfirmModalComponent />
             {confirmDeleteVisible && (
                 <ConfirmModal
