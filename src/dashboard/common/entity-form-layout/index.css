@@ -1,13 +1,19 @@
 .entity-form-page {
-    --entity-form-nav-padding-right: 40px;
+    --entity-form-edge-spacing: 60px;
+    --entity-form-content-gap: 50px;
+    --entity-form-panel-padding-left: 50px;
 }
 
-.entity-form-card {
+.card.entity-form-card {
+    --entity-form-edge-spacing: 60px;
+    --entity-form-content-gap: 50px;
+    --entity-form-panel-padding-left: 50px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     margin-bottom: 45px;
-    --form-nav-padding-right: var(--entity-form-nav-padding-right);
+    padding: 25px 0 var(--entity-form-edge-spacing) 30px;
+    --form-nav-padding-right: 0;
 }
 
 .entity-form-content {
@@ -16,6 +22,8 @@
 }
 
 .entity-form-body {
+    display: flex;
+    flex-wrap: nowrap;
     height: 60vh;
     max-height: 754px;
     overflow-y: scroll;
@@ -32,7 +40,8 @@
 }
 
 .entity-form-main {
-    width: 100%;
+    flex: 1 1 0;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     padding: 0;
@@ -72,7 +81,7 @@
 
 .entity-form-panel {
     width: 100%;
-    padding: 0 40px;
+    padding: 0 var(--entity-form-edge-spacing) 0 var(--entity-form-panel-padding-left);
     min-height: 705px;
     overflow: hidden;
 }
@@ -131,9 +140,11 @@
 }
 
 .entity-form-card .form-nav {
-    width: calc(100% - var(--admss-app-card-sidebar-width));
-    margin-left: var(--admss-app-card-sidebar-width);
+    margin-top: var(--entity-form-content-gap);
+    margin-left: 0;
     margin-right: 0;
-    padding-right: var(--entity-form-nav-padding-right);
+    padding-left: var(--admss-app-card-sidebar-width);
+    padding-right: var(--entity-form-edge-spacing);
+    width: 100%;
     box-sizing: border-box;
 }

@@ -255,9 +255,9 @@
     border: 1px solid var(--admss-app-primary-main-green);
 }
 
-.inventory-form {
+.inventory-form:not(.entity-form-panel) {
     width: 100%;
-    padding: 0 40px;
+    padding: 0 var(--entity-form-edge-spacing, 60px) 0 var(--entity-form-panel-padding-left, 50px);
 }
 
 .inventory-form__title {

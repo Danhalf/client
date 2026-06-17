@@ -42,7 +42,7 @@ interface EntityFormBodyProps {
 
 export const EntityFormBody = ({ sidebar, children }: EntityFormBodyProps): ReactElement => {
     return (
-        <div className='grid flex-nowrap entity-form-body'>
+        <div className='flex flex-nowrap entity-form-body'>
             <div className='entity-form-sidebar'>{sidebar}</div>
             <div className='entity-form-main'>{children}</div>
         </div>
