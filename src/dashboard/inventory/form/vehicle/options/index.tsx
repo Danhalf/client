@@ -101,7 +101,10 @@ export const VehicleOptions = observer((): ReactElement => {
             {hasInventoryGroup && (
                 <div className='vehicle-options__list'>
                     {options.map(({ name, index }) => (
-                        <div key={index} className='vehicle-options__checkbox flex align-items-center'>
+                        <div
+                            key={index}
+                            className='vehicle-options__checkbox flex align-items-center'
+                        >
                             <Checkbox
                                 inputId={name}
                                 name={name}
