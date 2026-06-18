@@ -1,3 +1,7 @@
+.vehicle-disclosures .splitter__title {
+    color: var(--admss-app-red);
+}
+
 .vehicle-disclosures__text-area {
     height: 50px;
     min-height: 50px;

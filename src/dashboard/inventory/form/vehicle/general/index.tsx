@@ -1,4 +1,5 @@
 import "./index.css";
+import { Splitter } from "dashboard/common/display";
 import { ReactElement, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     deleteInventoryMake,
@@ -428,9 +429,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 />
             </div>
 
-            <div className='col-12'>
-                <hr className='form-line' />
-            </div>
+            <Splitter />
             {inventory.GroupClassName === EQUIPMENT ? (
                 <div className='col-6 relative'>
                     <TextInput
@@ -679,10 +678,7 @@ export const VehicleGeneral = observer((): ReactElement => {
                 />
             </div>
 
-            <div className='flex col-12'>
-                <h3 className='vehicle-general__title m-0 pr-3'>Vehicle status</h3>
-                <hr className='vehicle-general__line flex-1' />
-            </div>
+            <Splitter title='Vehicle status' />
 
             <div className='col-3'>
                 <ComboBox

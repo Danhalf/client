@@ -1,3 +1,4 @@
+import { Splitter } from "dashboard/common/display";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ReactElement } from "react";
 import "./index.css";
@@ -30,12 +31,7 @@ export const VehicleDisclosures = observer((): ReactElement => {
 
     return (
         <div className='grid vehicle-disclosures row-gap-2'>
-            <div className='flex col-12 py-3'>
-                <h3 className='text-line__title text-line__title--red m-0 pr-3'>
-                    Odometer discrepancy
-                </h3>
-                <hr className='text-line__line flex-1' />
-            </div>
+            <Splitter title='Odometer discrepancy' className='py-3' />
             <div className='col-6'>
                 <BorderedCheckbox
                     inputId='disclosures-excess'
@@ -53,12 +49,7 @@ export const VehicleDisclosures = observer((): ReactElement => {
                 />
             </div>
 
-            <div className='flex col-12 py-3'>
-                <h3 className='text-line__title text-line__title--red m-0 pr-3'>
-                    Damage discrepancy
-                </h3>
-                <hr className='text-line__line flex-1' />
-            </div>
+            <Splitter title='Damage discrepancy' className='py-3' />
 
             <div className='col-6'>
                 <BorderedCheckbox

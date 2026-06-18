@@ -95,6 +95,7 @@ export const VINDecoder = ({
                 <Button
                     className={`vin-decoder__decode-button ${buttonClassName} ${isDecoding ? "vin-decoder__decode-button--loading" : ""}`}
                     disabled={buttonDisabled || disabled}
+                    severity={buttonDisabled || disabled ? "secondary" : "success"}
                     loading={isDecoding}
                     type='button'
                     onClick={handleGetVinInfo}

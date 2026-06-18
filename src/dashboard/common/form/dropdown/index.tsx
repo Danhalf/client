@@ -42,6 +42,7 @@ export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function Combo
         openOnFocus = editable,
         onFocus,
         onBlur,
+        onHide,
         onChange,
         value,
         ...props
@@ -49,6 +50,8 @@ export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function Combo
     ref
 ) {
     const dropdownRef = useRef<DropdownRef>(null);
+    const showDropdownTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const suppressOpenOnFocusRef = useRef(false);
     const [isFiltering, setIsFiltering] = useState(false);
     const shouldEnableFilter = options && options.length > filterThreshold;
     const uniqueId = useId();
@@ -102,21 +105,51 @@ export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function Combo
     }, [editable, getOptionText, isFiltering, openOnFocus, sortedOptions, value]);
 
     const showDropdown = useCallback(() => {
-        setTimeout(() => {
+        if (showDropdownTimeoutRef.current) {
+            clearTimeout(showDropdownTimeoutRef.current);
+        }
+
+        showDropdownTimeoutRef.current = setTimeout(() => {
             dropdownRef.current?.show();
+            showDropdownTimeoutRef.current = null;
         }, 0);
     }, []);
+
+    const cancelShowDropdown = useCallback(() => {
+        if (showDropdownTimeoutRef.current) {
+            clearTimeout(showDropdownTimeoutRef.current);
+            showDropdownTimeoutRef.current = null;
+        }
+    }, []);
+
+    const suppressDropdownOpen = useCallback(() => {
+        suppressOpenOnFocusRef.current = true;
+        cancelShowDropdown();
+    }, [cancelShowDropdown]);
 
     const handleFocus = useCallback(
         (event: FocusEvent<HTMLInputElement>) => {
             setIsFiltering(false);
             onFocus?.(event);
+            const shouldSuppressOpen = suppressOpenOnFocusRef.current;
+            suppressOpenOnFocusRef.current = false;
+
+            if (shouldSuppressOpen) {
+                cancelShowDropdown();
+                return;
+            }
+
             if (editable && openOnFocus) {
                 showDropdown();
             }
         },
-        [editable, onFocus, openOnFocus, showDropdown]
+        [cancelShowDropdown, editable, onFocus, openOnFocus, showDropdown]
     );
+
+    const handleHide = useCallback(() => {
+        suppressDropdownOpen();
+        onHide?.();
+    }, [onHide, suppressDropdownOpen]);
 
     const handleBlur = useCallback(
         (event: FocusEvent<HTMLInputElement>) => {
@@ -129,12 +162,17 @@ export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function Combo
     const handleChange = useCallback(
         (event: DropdownChangeEvent) => {
             if (editable && openOnFocus) {
-                setIsFiltering(true);
-                showDropdown();
+                if (event.originalEvent?.type === "input") {
+                    setIsFiltering(true);
+                    showDropdown();
+                } else {
+                    setIsFiltering(false);
+                    suppressDropdownOpen();
+                }
             }
             onChange?.(event);
         },
-        [editable, onChange, openOnFocus, showDropdown]
+        [editable, onChange, openOnFocus, showDropdown, suppressDropdownOpen]
     );
 
     const dropdownListItem = (option: unknown) => {
@@ -171,10 +209,12 @@ export const ComboBox = forwardRef<Dropdown, CustomDropdownProps>(function Combo
             valueTemplate={dropdownListItem}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            onHide={handleHide}
             onChange={handleChange}
             pt={{
                 list: {
                     className: "combo-box__list",
+                    onMouseDown: suppressDropdownOpen,
                 },
             }}
         />
