@@ -1,5 +1,11 @@
-.p-inputtext {
+input.p-inputtext {
     height: 50px;
+}
+
+textarea.p-inputtextarea {
+    resize: vertical;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .p-inputtext:enabled:hover,
