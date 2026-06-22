@@ -803,12 +803,9 @@ export const InventoryForm = observer(() => {
                                         StockNo: inventory?.StockNo || "",
                                         locationuid: inventory?.locationuid || currentLocation,
                                         GroupClassName: inventory?.GroupClassName || "",
-                                        purPurchaseEmail:
-                                            inventoryExtData?.purPurchaseEmail || "",
-                                        purPurchasePhone:
-                                            inventoryExtData?.purPurchasePhone || "",
-                                        titleHolderPhone:
-                                            inventoryExtData?.titleHolderPhone || "",
+                                        purPurchaseEmail: inventoryExtData?.purPurchaseEmail || "",
+                                        purPurchasePhone: inventoryExtData?.purPurchasePhone || "",
+                                        titleHolderPhone: inventoryExtData?.titleHolderPhone || "",
                                         titlePrevPhone: inventoryExtData?.titlePrevPhone || "",
                                     } as PartialInventory
                                 }
@@ -829,7 +826,7 @@ export const InventoryForm = observer(() => {
                                         {stepActiveIndex === printActiveIndex && (
                                             <div className='entity-form-panel inventory-form'>
                                                 <div className='entity-form-panel__title inventory-form__title uppercase'>
-                                                    Print history
+                                                    Print forms
                                                 </div>
                                                 <PrintForms />
                                             </div>

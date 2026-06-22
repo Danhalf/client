@@ -42,6 +42,10 @@
     width: calc(33.33% - 20px);
 }
 
+.entity-form-panel.inventory-form:has(.vehicle-options__header) .vehicle-options__button {
+    margin-right: -30px;
+}
+
 .vehicle-options__button {
     width: 126px;
     height: 30px;
