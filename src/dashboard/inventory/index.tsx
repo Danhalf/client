@@ -506,11 +506,7 @@ export default function Inventories({
                         ]}
                         rounded
                         appendTo='self'
-                        pt={{
-                            menu: {
-                                className: "inventory-location__menu",
-                            },
-                        }}
+                        menuClassName='inventory-location__menu'
                     />
                 )}
             </div>
