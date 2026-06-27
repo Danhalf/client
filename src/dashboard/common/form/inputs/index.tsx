@@ -96,7 +96,7 @@ interface DateInputProps extends Omit<CalendarProps, "value" | "onChange"> {
 interface TextInputProps extends InputTextProps {
     colWidth?: Range<1, 13>;
     clearButton?: boolean;
-    ref?: React.RefObject<HTMLInputElement>;
+    ref?: React.RefObject<HTMLInputElement | null>;
     wrapperClassName?: string;
     infoText?: string;
     error?: boolean;
@@ -106,7 +106,7 @@ interface TextInputProps extends InputTextProps {
 
 interface NumberInputProps extends InputNumberProps {
     colWidth?: Range<1, 13>;
-    ref?: React.RefObject<InputNumber>;
+    ref?: React.RefObject<InputNumber | null>;
     wrapperClassName?: string;
     infoText?: string;
     error?: boolean;
