@@ -8,7 +8,7 @@ import { PartialContact } from "dashboard/contacts/form/common/types";
 import { EntityFormSteps } from "dashboard/common/entity-form-layout";
 
 interface ContactFormContentProps {
-    formikRef: RefObject<FormikProps<PartialContact>>;
+    formikRef: RefObject<FormikProps<PartialContact> | null>;
     contactSections: ContactSection[];
     stepActiveIndex: number;
     deleteActiveIndex: number;
@@ -46,7 +46,9 @@ export default function ContactFormContent({
             onSubmit={onSubmit}
         >
             <Form name='contactForm' className='w-full'>
-                <EntityFormSteps sections={contactSections} stepActiveIndex={stepActiveIndex}
+                <EntityFormSteps
+                    sections={contactSections}
+                    stepActiveIndex={stepActiveIndex}
                     panelClassName='entity-form-panel contact-form'
                     titleClassName='entity-form-panel__title contact-form__title'
                 >
